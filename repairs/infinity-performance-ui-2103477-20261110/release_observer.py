@@ -236,11 +236,9 @@ def main():
                     except RuntimeError:result.append(dict(id=aid,installed=False))
             elif action == 'search-open':
                 xbmc.executebuiltin('RunScript(script.infinity.commandcenter,universal-search,movie)')
-                deadline=time.monotonic()+35
-                while xbmcgui.getCurrentWindowDialogId()!=10103 and time.monotonic()<deadline:
-                    MONITOR.waitForAbort(.1)
-                require(xbmcgui.getCurrentWindowDialogId()==10103,'REAL_EXISTING_INFINITY_SEARCH_KEYBOARD')
-                result=state()
+                # Infinity uses its Android IME/dialog path, not Kodi generic10103.
+                # The host verifies fresh Android app hierarchy and Cancel ownership.
+                result=dict(existing_RunScript_requested=True, state=state())
             elif action == 'playback-smoke':
                 clip='/sdcard/Download/infinity-performance-probe/synthetic24.mp4'
                 player=xbmc.Player();require(not player.isPlaying(),'NO_ACTIVE_VIDEO_INTERRUPTION')

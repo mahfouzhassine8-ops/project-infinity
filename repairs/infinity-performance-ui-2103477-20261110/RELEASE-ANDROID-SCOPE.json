@@ -19,10 +19,10 @@
     "Actual installedAPK hash and originalsamecert v1/v2/v3",
     "Native module signature+80sources and full948active skin proof at candidate/recovery versions",
     "Retain ownQA data sentinel across both in-place updates",
-    "Actual42s local H264AAC24fps playback, timeadvance and nativeStop; require full checking->ok948 cycle whilevideoactive",
     "Existing Search keyboard open/Back and read-only installed-provider metadata, no provider queries or sourcechanges",
     "Existing InfinityMovies/TV and Progress/Next/Continue routes; fixtureprofile notowner populatedtracking evidence",
-    "Recovery81 authenticates original77functional source, existingHub opens, processalivecrashcheck"
+    "Recovery81 authenticates original77functional source, existingHub opens, processalivecrashcheck",
+    "Reuse prior achieved playback and full-check assertions exactly; no video replay. Fresh77/80 profile seed necessary only for unfinished nativeAndroidSearch/nav/forward81recovery."
   ],
   "components": {
     "candidate": {
@@ -36,6 +36,7 @@
       "skin": "1.0.5.274"
     }
   },
+  "followup_only": true,
   "not_run": [
     "PhysicalFold frontinner/folding/themes/120Hz/thermal/battery",
     "Actualprovider online discovery/source resolution/playback or catalog results",
@@ -43,6 +44,18 @@
     "Shutdown"
   ],
   "owner_delivery": false,
+  "reused_playback": {
+    "actual_playback_seconds": 41.408,
+    "artifact_id": 13772574106,
+    "complete948_check_while_playing": true,
+    "overall_prior_run": "FAIL_RETAINED_NATIVE_ANDROID_SEARCH_OBSERVER_API",
+    "path": "repairs/infinity-performance-ui-2103477-20261110/evidence/42833554341/PLAYBACK-PASS.json",
+    "replayed": false,
+    "run": 42833554341,
+    "sha256": "c8da47f1d588f1ce148bddb4f4138dfc0d4f103d48649c3172330fa1e30c0d20",
+    "source": "b40c8266a27bf4cbdf8b728f55bd971b8604b39b"
+  },
+  "run_playback_smoke": false,
   "selected_before_execution": true,
   "selected_feature": "infinity77-performance-signed-pair",
   "shutdown_tests": false,
@@ -71,11 +84,13 @@
     "repairs/infinity-performance-ui-2103477-20261110/HOST-SOURCE-VERIFICATION.json": "a3cb1799c606e63b7c0f1b37837a2dc1a3accbfd6846d372b341a383d2fe02ef",
     "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e",
     "repairs/infinity-performance-ui-2103477-20261110/context_batch_prototype.py": "80dc916af52924b39f20a92e463d1433fd729abacfc1f21d767e62dfc0862e65",
+    "repairs/infinity-performance-ui-2103477-20261110/evidence/42833554341/ARTIFACT.json": "c386c377d9cb8a8551f8f2d5c8cf8ba0cf1fdc41ece1ee19c9cc00cfb01ca08c",
+    "repairs/infinity-performance-ui-2103477-20261110/evidence/42833554341/PLAYBACK-PASS.json": "c8da47f1d588f1ce148bddb4f4138dfc0d4f103d48649c3172330fa1e30c0d20",
     "repairs/infinity-performance-ui-2103477-20261110/integrity_probe.py": "1d3bba5b08bdaf8ac031f108841de182b2e0c42a563fd8ad8cb6adef87436d46",
     "repairs/infinity-performance-ui-2103477-20261110/qa-fixtures/PROVENANCE.json": "a046eade0475313a5bccf40bab42f93dc1ba2672ac26cc47241a471ce5978b55",
     "repairs/infinity-performance-ui-2103477-20261110/qa-fixtures/synthetic24.mp4": "f9a56845b231db7392668791c1928cc2a0abc4e373111e4f0955a833ace84e5b",
-    "repairs/infinity-performance-ui-2103477-20261110/release_android.py": "fd737c0b710153fecc738c376424a1477709ffcb06faeeefc052b8a58cff1bc0",
-    "repairs/infinity-performance-ui-2103477-20261110/release_observer.py": "59281550b94b3e5b5ca027e039b2276e2a486e22859e48106b7a44fb8f02a924",
+    "repairs/infinity-performance-ui-2103477-20261110/release_android.py": "4f4b650f1f21ff3400e9fd1110aa209c780e67befe34d56e917c5b544b7ede44",
+    "repairs/infinity-performance-ui-2103477-20261110/release_observer.py": "6fc0b7062f899b9111d3f23a03bd38e0ddfa2104ae281f7090313bb9cd704cf1",
     "repairs/infinity-performance-ui-2103477-20261110/surface_layers.py": "238d249e7aa4b083c0dcc60868e0783d9caa610c1b166e8755484d00e8571956"
   }
 }

@@ -73,11 +73,48 @@ def navigation(device,out,label,params):
     base.save(out/('navigation-'+label+'.json'),dict(requested=url,rows=rows,fixture_profile_not_owner_tracking_card_evidence=True))
     return rows[-1]
 
+def native_search(device,out):
+    until=time.monotonic()+35;errors=[];found=None
+    while time.monotonic()<until:
+        try:
+            tree=device.nodes('native-infinity-search')
+        except (RuntimeError,subprocess.SubprocessError) as error:
+            errors.append(type(error).__name__);continue
+        nodes=[n for n in tree.iter('node') if n.get('package')==base.PACKAGE]
+        title=[n for n in nodes if n.get('text')=='Infinity Search']
+        editors=[n for n in nodes if n.get('class')=='android.widget.EditText' and n.get('enabled')=='true']
+        category=[n for n in nodes if n.get('text','').startswith('Movies') and 'search' in n.get('text','').lower()]
+        cancel=[n for n in nodes if n.get('text')=='×' and n.get('clickable')=='true' and n.get('enabled')=='true']
+        if len(title)==len(editors)==len(category)==len(cancel)==1:
+            found=cancel[0];break
+        time.sleep(.2)
+    base.require(found is not None,'ACTUAL_APP_OWNED_ANDROID_INFINITY_SEARCH_WITH_MOVIES_EDITOR_CANCEL')
+    foreground=base.resumed_component(device.shell('dumpsys','activity','activities'))
+    base.require(foreground and foreground.startswith(base.PACKAGE+'/') and foreground.endswith('.Main'),'SEARCH_OWNED_BY_ORIGINAL_MAIN_ACTIVITY')
+    capture=device.last_ui_capture;device.screenshot('native-infinity-search')
+    device.tap(found,'Cancel existing Infinity Android Search; no query or provider request')
+    until=time.monotonic()+35;after=None
+    while time.monotonic()<until:
+        tree=device.nodes('native-infinity-search-after-cancel')
+        if not any(n.get('package')==base.PACKAGE and n.get('text')=='Infinity Search' for n in tree.iter('node')):
+            after=device.last_ui_capture;break
+        time.sleep(.2)
+    base.require(after is not None,'ACTUAL_ANDROID_SEARCH_CANCELED_NOT_JUST_IME_HIDDEN')
+    device.rpc('Input.Home');until=time.monotonic()+10
+    while time.monotonic()<until:
+        current=device.rpc('GUI.GetProperties',dict(properties=['currentwindow']))
+        if current['currentwindow']['id']==10000:break
+        time.sleep(.1)
+    base.require(current['currentwindow']['id']==10000,'RETURN_TO_EXISTING_INFINITY_HOME_AFTER_NATIVE_CANCEL')
+    return dict(Android_UI=True,before_capture=capture,after_capture=after,foreground=foreground,Cancel=device.actions[-1],transient_capture_errors=errors,query_submitted=False,provider_calls=False)
+
+
 def run(sdk,inputs,out):
     scope=selected();base.require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('GITHUB_REF')=='refs/heads/work/infinity-2103477-full-performance-ui-stability-20261110','DISPOSABLE_SELECTED_BRANCH')
     base.require(not out.exists(),'FRESH_RESULTS');out.mkdir(parents=True)
     report=dict(status='RUNNING',shutdown='NOT_SELECTED',Cobra_tests=False,Fold='NOT_RUN',provider_online_playback='NOT_RUN_THIS_CASE_IS_LOCAL_MEDIA_SMOKE',physical_Hz_thermal_battery='NOT_RUN',uninstall_reset_or_data_clear=False)
     device=reader=None
+    def checkpoint():base.save(out/'SIGNED-PAIR-ANDROID.json',report)
     try:
         admitted=base.load(inputs/'INTAKE.json');base.require(admitted['scope_sha256']==base.sha(HERE/'RELEASE-ANDROID-SCOPE.json'),'EXACT_INTAKE')
         device=b.Device(out,sdk);report['environment']=base.environment(device,out);base.require(not device.shell('pm','list','packages',base.PACKAGE).strip(),'FRESH_VM_ONLY')
@@ -88,7 +125,7 @@ def run(sdk,inputs,out):
         sources=out/'FRESH-FIXTURE-sources.xml';sources.write_text('<sources><files><source><name>Disposable performance observer</name><path pathversion="1">'+REMOTE+'</path><allowsharing>false</allowsharing></source></files></sources>')
         sentinel=out/'preservation-sentinel.txt';sentinel.write_text('Performance QA retained-data sentinel. Not account or database data.\n');sentinel_sha=base.sha(sentinel)
         device.adb('push',settings,base.PROFILE+'/guisettings.xml');device.adb('push',sources,base.PROFILE+'/sources.xml');device.adb('push',sentinel,QP+'/preservation-sentinel.txt')
-        device.adb('push',HERE/'qa-fixtures/synthetic24.mp4',REMOTE+'synthetic24.mp4')
+        if scope['run_playback_smoke']:device.adb('push',HERE/'qa-fixtures/synthetic24.mp4',REMOTE+'synthetic24.mp4')
         for label in ('candidate','recovery'):
             q=admitted['inputs'][label]['observer'];device.adb('push',q['path'],REMOTE+q['archive'])
         uid=device.shell('stat','-c','%u','/data/user/0/'+base.PACKAGE).strip();base.require(uid.isdigit(),'FRESH_UID')
@@ -96,28 +133,32 @@ def run(sdk,inputs,out):
         device.adb('forward','tcp:19090','tcp:9090');report['baseline_setup_not_repeated_acceptance']=base.start_once(device,2103477,out)
         report['stages']={}
         for label in ('candidate','recovery'):
-            row=admitted['inputs'][label];stage={}
+            row=admitted['inputs'][label];stage={};report['stages'][label]=stage;checkpoint()
             stage_out=out/label;stage_out.mkdir()
             stage['install']=device.adb('install','-r','--no-streaming',row['apk'],timeout=300)
             base.require(stage['install'].strip().endswith('Success'),'ORIGINAL_SIGNED_IN_PLACE_'+label.upper())
             path=device.shell('pm','path',base.PACKAGE).splitlines();base.require(len(path)==1,'ONE_PACKAGE_APK')
-            stage['installed_sha256']=device.shell('sha256sum',path[0][8:],timeout=30).split()[0];base.require(stage['installed_sha256']==row['sha256'],'ACTUAL_INSTALLED_SIGNED_BYTES')
-            stage['retained_sentinel_sha256']=device.shell('sha256sum',QP+'/preservation-sentinel.txt').split()[0];base.require(stage['retained_sentinel_sha256']==sentinel_sha,'USERDATA_SENTINEL_RETAINED')
+            stage['installed_sha256']=device.shell('sha256sum',path[0][8:],timeout=30).split()[0];base.require(stage['installed_sha256']==row['sha256'],'ACTUAL_INSTALLED_SIGNED_BYTES');checkpoint()
+            stage['retained_sentinel_sha256']=device.shell('sha256sum',QP+'/preservation-sentinel.txt').split()[0];base.require(stage['retained_sentinel_sha256']==sentinel_sha,'USERDATA_SENTINEL_RETAINED');checkpoint()
             stage['startup']=base.start_once(device,row['version'],out)
             gui.install_zip(device,row['observer'],dict(remote_zip_directory=REMOTE),out,label+'-observer')
             # Reset only this disposable observer's protocol slots, retaining its data sentinel.
             for protocol,value in [('request.json',dict(pid=device.pid,sequence=0,action='state')),('ready.json',dict(pid=0,qa=QA))]:
                 temporary=stage_out/protocol;base.save(temporary,value);device.adb('push',temporary,QP+'/'+protocol+'.pending');device.shell('mv',QP+'/'+protocol+'.pending',QP+'/'+protocol)
             observer=b.Observer(device,stage_out);stage['authenticated_native_module_identity']=observer.ready
-            base.require(observer.ready['manifest']==scope['components'][label]['manifest'] and observer.ready['files']==80,'COMPLETE80_NATIVE_AUTHENTICATION')
+            base.require(observer.ready['manifest']==scope['components'][label]['manifest'] and observer.ready['files']==80,'COMPLETE80_NATIVE_AUTHENTICATION');checkpoint()
             device.rpc('Input.Home');stage['resident_ready']=wait_identity(observer,scope['components'][label]);stage['hub']=observer.call('hub');device.rpc('Input.Back');device.rpc('Input.Home')
             if label=='candidate':
                 stage['provider_availability']=observer.call('provider-availability')
-                stage['playback_smoke']=observer.call('playback-smoke',timeout=75)
-                base.require(stage['playback_smoke']['complete_integrity_cycle_during_video'],'ACTUAL_VIDEO_WITH_COMPLETE_PERIODIC_CHECK')
-                device.rpc('Input.Home');stage['search_interface']=observer.call('search-open',timeout=40);device.rpc('Input.Back');device.rpc('Input.Home')
+                if scope['run_playback_smoke']:
+                    stage['playback_smoke']=observer.call('playback-smoke',timeout=75)
+                    base.require(stage['playback_smoke']['complete_integrity_cycle_during_video'],'ACTUAL_VIDEO_WITH_COMPLETE_PERIODIC_CHECK')
+                else:
+                    stage['playback_smoke_reused']=scope['reused_playback']
+                checkpoint()
+                device.rpc('Input.Home');stage['search_request']=observer.call('search-open');stage['search_interface']=native_search(device,out);checkpoint()
                 stage['navigation']={}
-                for name,query in [('movies','action=movies'),('tv','action=tv'),('progress','action=library&media=tv&bucket=progress'),('next','action=library&media=tv&bucket=next'),('continue','action=library&media=movie&bucket=continue')]:stage['navigation'][name]=navigation(device,out,name,query)
+                for name,query in [('movies','action=movies'),('tv','action=tv'),('progress','action=library&media=tv&bucket=progress'),('next','action=library&media=tv&bucket=next'),('continue','action=library&media=movie&bucket=continue')]:stage['navigation'][name]=navigation(device,out,name,query);checkpoint()
                 device.rpc('Input.Home')
             stage['finished']=observer.call('finish');base.crash_free_alive(device)
             report['stages'][label]=stage
