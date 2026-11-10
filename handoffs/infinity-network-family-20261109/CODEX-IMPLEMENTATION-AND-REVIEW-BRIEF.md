@@ -1,3 +1,5 @@
+> **SUPERSEDED / DO NOT IMPLEMENT ON THIS BRANCH (2026-11-09).** The user confirmed **2103477** is the new Infinity baseline, and 2103469 is historical. Work from [`work/infinity-network-family-from-2103477-20261109`](https://github.com/mahfouzhassine8-ops/project-infinity/tree/work/infinity-network-family-from-2103477-20261109) and [the updated Codex handoff](https://github.com/mahfouzhassine8-ops/project-infinity/blob/work/infinity-network-family-from-2103477-20261109/handoffs/infinity-network-family-20261109/CODEX-IMPLEMENTATION-AND-REVIEW-BRIEF.md). No networking code was implemented on this obsolete branch.
+
 # Infinity-only Network Connections — Codex implementation and 6.1 / Astra review
 Date: 2026-11-09
 Status: **AUTHORIZED FEATURE SCOPE; NOT IMPLEMENTED / NOT TESTED / NOT SIGNED**
