@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -2637,7 +2637,7 @@ jobs:
           workflow=Path('.github/workflows/infinity-combined-release.yml')
           assert hashlib.sha256(workflow.read_bytes()).hexdigest()==request['workflow_sha256']
           before=subprocess.check_output(['git','show','b13996af:'+str(workflow)],text=True).rstrip()
-          expected=before.replace('sign-tracking, verify-network-native]','sign-tracking, verify-network-native, prepare-network-modules]',1)
+          expected=before.replace('sign-tracking, verify-network-native]','sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network]',1)
           assert workflow.read_text().split('\n  prepare-network-modules:\n')[0].rstrip()==expected,'PRIOR_SIGNER_JOBS_CHANGED'
           original=json.loads(subprocess.check_output(['git','show','dfee7205dd88abe81db5e263c368f67ece43df02:repairs/dual-experience-isolation-2103420/release-authority.json']))
           for name,wanted in original['source_files'].items():
@@ -2707,5 +2707,88 @@ jobs:
             network-module-prepared/PREPARATION.json
             network-module-prepared/*/INPUTS.json
             NETWORK-SIGNER-ROUTES.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  prepare-network-release:
+    name: Exact signed77 network and forward-recovery owner bundles; unsigned internal QA
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-network-family-from-2103477-20261109' && inputs.operation == 'prepare-network-release'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Exact reviewed no-key preparation and current preserved native source before import
+        run: |
+          python3 - <<'PYAPK'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110')
+          request=json.loads((task/'release/APK-PREPARE-REQUEST.json').read_text())
+          assert request['operation']=='prepare-signed77-network-forward-owner-bundles'
+          assert request['APK_signing'] is False and request['registry_mutation'] is False and request['publication'] is False
+          assert request['candidate_version']==2103478 and request['recovery_version']==2103479
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          assert hashlib.sha256(Path('.github/workflows/infinity-combined-release.yml').read_bytes()).hexdigest()==request['workflow_sha256']
+          for name,wanted in request['source_bindings'].items():
+              p=Path(name);assert not p.is_absolute() and '..' not in p.parts and p.is_file()
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==wanted,name
+          original=json.loads(subprocess.check_output(['git','show','dfee7205dd88abe81db5e263c368f67ece43df02:repairs/dual-experience-isolation-2103420/release-authority.json']))
+          for name,wanted in original['source_files'].items():
+              assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==wanted,name
+          pins=json.loads((task/'SOURCE-PINS.json').read_text())
+          for group,files in pins.items():
+              for name,wanted in files.items():
+                  assert hashlib.sha256((task/group/name).read_bytes()).hexdigest()==wanted,name
+          live=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/git/ref/heads/work/infinity-2103460-nine-corrections-20261106']))
+          assert live['object']['sha']=='dfee7205dd88abe81db5e263c368f67ece43df02','REGISTRY_ADVANCED_RECONCILE_BEFORE_PREPARATION'
+          print('PASS exact official unsigned preparation; source and authority anchors unchanged; no keys or application tests')
+          PYAPK
+      - name: Reuse authenticated original-workflow artifact intake; no source reconstruction from old APK
+        run: python3 repairs/infinity-network-family-2103477-20261110/release/intake.py --out network-release-inputs
+      - name: Preserve exact77 components and reuse existing linked engine; no Android/native compilation
+        run: |
+          python3 - <<'PYPREP'
+          import json,shutil,sys
+          from pathlib import Path
+          task=Path('repairs/infinity-network-family-2103477-20261110/release')
+          sys.path.insert(0,str(task))
+          import prepare_apk
+          record=json.loads(Path('network-release-inputs/INTAKE.json').read_text())
+          prepare_apk.prepare(Path(record['apk']),Path(record['native']),Path(record['module_fixture']),Path(record['components']),Path('network-apk-prepared'),2103478,2103479)
+          for version in (2103478,2103479):
+              work=Path('network-apk-prepared')/str(version)
+              shutil.copyfile(Path(record['module_fixture'])/'network-module-audit/MODULE-UPGRADE-RECOVERY.json',work/'MODULE-UPGRADE-RECOVERY.json')
+              shutil.copyfile('network-release-inputs/INTAKE.json',work/'OFFICIAL-INPUT-INTAKE.json')
+              for name in ('ARM64-LINK-VERIFIED.json','SOURCE-PRESERVATION.json'):
+                  shutil.copyfile(Path(record['native']).parent/name,work/name)
+          PYPREP
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103478-Network-Prepared-${{ github.run_id }}-INTERNAL-NOT-INSTALLER
+          path: |
+            network-apk-prepared/2103478/components/
+            network-apk-prepared/2103478/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103479-Network-Forward-Recovery-Prepared-${{ github.run_id }}-INTERNAL-NOT-INSTALLER
+          path: |
+            network-apk-prepared/2103479/components/
+            network-apk-prepared/2103479/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Network-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            network-release-inputs/INTAKE.json
+            network-apk-prepared/PAIR-PREPARATION.json
           retention-days: 90
           if-no-files-found: warn
