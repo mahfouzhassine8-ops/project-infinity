@@ -1,0 +1,23 @@
+{
+  "APK_builds_or_signing": false,
+  "Cobra_changes": false,
+  "application_tests_selected": [],
+  "authorization": "Owner-supplied feasibility brief atd7a5f059; read-only review and isolated prototype only if actualsupportedrouteexists",
+  "frozen_versions": [
+    2103478,
+    2103479
+  ],
+  "gateway_production_authorization": false,
+  "global_proxy_environment_opener_socket_changes": false,
+  "production_edits": false,
+  "protected_baseline": 2103477,
+  "prototype_condition": "Actual supported installedprovider->gateway route without protectedchanges",
+  "prototype_condition_result": "NOT_MET",
+  "prototype_tests_selected": [],
+  "shutdown_tests": false,
+  "source_investigation_selected": [
+    "Existing provider proxy arguments/settings and actual caller ownership",
+    "Kodi per-item http_proxy propagation to directFFmpeg",
+    "Userproxy ownership, loopback isolation, streamsecurity/resource contract"
+  ]
+}
