@@ -120,7 +120,7 @@
       "repairs/infinity-2103445-standalone-external-player/release_guard.py": "3c80c746931c9723d5a858e83779d369694cdc4e08ec7d688837761c368078b0"
     }
   },
-  "generation": 64,
+  "generation": 65,
   "guard_schema": 2,
   "last_issued_versionCode": 2103480,
   "launcher_icon_exception": {
@@ -168,10 +168,14 @@
     }
   },
   "owner_update_evidence": {
-    "Android": "WORKER_PASS42827490004_SIGNED_APK_INSTALL_RECOVERY_PENDING",
+    "Android": "PASS_SELECTED_INPLACE_SOURCE_AUTH_SEARCH_NAV_FORWARD_RECOVERY_42837128934",
     "CC": "0.3.5.79",
     "Cobra_changes": false,
     "accepted_pointer_updated": false,
+    "actual_signed80_APK_sha256": "9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2",
+    "actual_signed80_run": 42830516841,
+    "actual_signed81_APK_sha256": "621060de911fcb3e5098dd063ccb4a97aa339884342cec39f216d10159fe022c",
+    "actual_signed81_run": 42832461653,
     "artifact": {
       "digest": "sha256:1cc1f700aae0a4cf0e22ccadaccab5264b25fc9ee5b28410dba328c7e5b27b19",
       "id": 13771745316,
@@ -179,26 +183,35 @@
       "size_in_bytes": 316186129
     },
     "baseline_APK_sha256": "93eb081cd6a86ff9cf1cb9aa75bc6d9087cd9c982fb46e0a9baa12c12aa9af22",
+    "delivery_report_sha256": "df5e7b029ed7fb96d65d4a8e64e5259a9f256d53f95610a66b75f05d2a283ba6",
     "engineering_QA_only": true,
     "experimental": true,
+    "freeze": "EVIDENCE_REFRESH_ONLY_NO_PAYLOAD_VERSION_OR_ACCEPTED_POINTER_CHANGE",
     "frozen_network_versions_preserved": [
       2103478,
       2103479
     ],
     "immutable_functional_base": 2103477,
+    "local_playback": "PASS41.408s_WITH_FULL948_CHECK_42833554341_REUSED_WITH_PRIOR_OVERALL_FAILURE_RETAINED",
     "module_manifest_sha256": "da8cc80647fa7fca9af25c5922c7b2402b6f6626e189ad43e052f2479ca7df5c",
     "module_source_count": 80,
     "module_upgrade_recovery_sha256": "75c07fb6afd4dcc8cc61276e81d7d1e2e9091b4440b8e2d46ebfdd7b54a845d4",
     "native_sha256": "ee3be7c7a95b86f8357539001fcd50bedbd80217b02f130d649f7f57e6075794",
     "networking_inputs": false,
     "owner": "INFINITY_PERFORMANCE_FORWARD_RECOVERY_TO77",
-    "owner_delivery_cleared": false,
-    "physical_Fold": "PENDING_OWNER",
+    "owner_delivery_cleared": true,
+    "physical_Fold": "PENDING_OWNER_SINGLE_ACCEPTANCE",
     "preparation_sha256": "793318d28c19694334bd7dcf623d86ee18d489729a515c8a0f048a6b06bd2d6f",
     "producer_run": 42829229209,
     "producer_source": "82c6144c9357182e237f536f280b57ba4b59c5de",
     "public_release": false,
     "publication": false,
+    "remaining_unverified": [
+      "PhysicalFoldfrontinner/orientation/themes/highrefresh",
+      "Onlineproviderdiscovery/results/playback",
+      "Thermalbattery/physical30-60cadence",
+      "ShutdownNOT_SELECTED"
+    ],
     "skin": "1.0.5.274",
     "source_files": {
       "repairs/infinity-performance-ui-2103477-20261110/ANDROID-WORKER-REVIEW.json": "f197d9a24512ba26a5f11504f99b45d881ef75b763cba30dea4c5bf6ce5685a8",
@@ -216,7 +229,7 @@
       "repairs/infinity-performance-ui-2103477-20261110/release/MODULE-PREPARE-REQUEST.json": "9aaaf1b484b11298aa501815967775f11f71a87d4384ade123b1af0384538161",
       "repairs/infinity-performance-ui-2103477-20261110/release/PREPARATION-ADAPTER-REVIEW.json": "f3121e7d6a40b7c1d628d07a82e84a9c765078d78d9cc896c046c4bf34d40e19",
       "repairs/infinity-performance-ui-2103477-20261110/release/PREPARED-PAIR-PIN.json": "9f3cbaee49bea1212a58955b3ff5c17b38a68bb58e471819fa09ea676356beed",
-      "repairs/infinity-performance-ui-2103477-20261110/release/SIGN-REQUEST.json": "e53a907e7db66612e380e755a41b583089b8de75b57014a04ba271b8817d5275",
+      "repairs/infinity-performance-ui-2103477-20261110/release/SIGN-REQUEST.json": "d22dc93eb4166b91032d9ece2d417636d7491aefb366fab7bf026906556d0b63",
       "repairs/infinity-performance-ui-2103477-20261110/release/SIGNED-CANDIDATE-PIN.json": "0fa07e21b4a21faeb9909504aec5e40050b1ab87396015eb0af91bea8976e044",
       "repairs/infinity-performance-ui-2103477-20261110/release/intake.py": "dad3bb4e624955131f67087c0dc2c61941c151e260d48a570504b1b5ba627d59",
       "repairs/infinity-performance-ui-2103477-20261110/release/prepare_apk.py": "ad9c8374476301af77978695ea8879ad97bef7318950f2cfc33d39a9c9c44d4e",
@@ -224,6 +237,7 @@
       "repairs/infinity-performance-ui-2103477-20261110/release/register_release.py": "ff91ff94d2c017dd983f0aa35e77ff45fcda85cb93ec537a0cd6be450c2aa026",
       "repairs/infinity-performance-ui-2103477-20261110/release/verify_modules.py": "3dfe05b0bc0898df749cef1fdfe92e3c64bab019749b8b587e4a80ced72bef9e"
     },
+    "task_signing_enabled": false,
     "verification_toolchain": {
       "java_major": 21,
       "unchanged_original_DEX": true
@@ -67609,7 +67623,7 @@
     "root": "CobraCardsTheme",
     "source_sha256": "58bd661ed94a2a949b459bab470c095bfb48d6d84d1e3fddc178f8ea21851864"
   },
-  "previous_authority_sha256": "ad2fe4014ec210b043d889f92913afc300927d2affcfede0b4a0247c8cae8131",
+  "previous_authority_sha256": "9dc9a20d249d340015ead4ba38b1b7a6357a0114e7227fae817df419c4f1c197",
   "proofs": {
     "COMBINATION-CONTROLS.json": "bcb21adb63fefb898a8e8799d9892f76e382315518d8e94b51c42060cc5ece83",
     "OWNER-CONTRACT.json": "dd0fdfdcb7715777007984969bfac45b36f3e4ef04023b5ba1884c67904d0846",
@@ -67804,10 +67818,7 @@
     "repairs/dual-experience-isolation-2103420/verify_runtime.py": "b903edd3d6c3402d46613841c9ac44f0103420a64da5dff2897d14c9952e7460"
   },
   "status": "ENGINEERING_REVIEWED_FOLD_PENDING",
-  "target_owners": [
-    "INFINITY",
-    "CHOOSER_SHELL"
-  ],
-  "update_kind": "owner_update",
+  "target_owners": [],
+  "update_kind": "evidence_refresh",
   "workflow_sha256": "09c8e21bf5172dab85cc618c5a08cca16f017e41afe771f0316004142124e69a"
 }
