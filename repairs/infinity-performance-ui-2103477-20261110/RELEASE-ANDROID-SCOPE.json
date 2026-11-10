@@ -1,0 +1,81 @@
+{
+  "APK_build": false,
+  "APK_sha256": {
+    "candidate": "9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2",
+    "recovery": "621060de911fcb3e5098dd063ccb4a97aa339884342cec39f216d10159fe022c"
+  },
+  "Cobra_tests": false,
+  "baseline_artifact": {
+    "digest": "sha256:722320ab0780b4bb96c5282e12e211f3ce6ce6d78aa09891730dbe0414ba1c78",
+    "id": 13721668270,
+    "name": "Infinity2103477-Exact74-OriginalSigned-ExperimentalRetest-42724088145",
+    "run": 42724088145,
+    "size_in_bytes": 328333278,
+    "source": "80f9c78e5c133ef63abe95af359c3e4e7366153f"
+  },
+  "cases": [
+    "Onefresh77 setup to seed actual native installation, not repeated baseline acceptance",
+    "Normal signed Android install-r 77->80->81, no appClose/uninstall/reset/cachepurge",
+    "Actual installedAPK hash and originalsamecert v1/v2/v3",
+    "Native module signature+80sources and full948active skin proof at candidate/recovery versions",
+    "Retain ownQA data sentinel across both in-place updates",
+    "Actual42s local H264AAC24fps playback, timeadvance and nativeStop; require full checking->ok948 cycle whilevideoactive",
+    "Existing Search keyboard open/Back and read-only installed-provider metadata, no provider queries or sourcechanges",
+    "Existing InfinityMovies/TV and Progress/Next/Continue routes; fixtureprofile notowner populatedtracking evidence",
+    "Recovery81 authenticates original77functional source, existingHub opens, processalivecrashcheck"
+  ],
+  "components": {
+    "candidate": {
+      "CC": "0.3.5.78",
+      "manifest": "c67327c9683ec21be4aae58fe9add45d04372c91b16f1e1b2ee49e5dca50f2b9",
+      "skin": "1.0.5.273"
+    },
+    "recovery": {
+      "CC": "0.3.5.79",
+      "manifest": "da8cc80647fa7fca9af25c5922c7b2402b6f6626e189ad43e052f2479ca7df5c",
+      "skin": "1.0.5.274"
+    }
+  },
+  "not_run": [
+    "PhysicalFold frontinner/folding/themes/120Hz/thermal/battery",
+    "Actualprovider online discovery/source resolution/playback or catalog results",
+    "30/60fps or physical24fps presentationcadence",
+    "Shutdown"
+  ],
+  "owner_delivery": false,
+  "selected_before_execution": true,
+  "selected_feature": "infinity77-performance-signed-pair",
+  "shutdown_tests": false,
+  "signed_pair": {
+    "candidate": {
+      "digest": "sha256:d5d6cfe8ac40649a4c022cf4b9db5946e42a8c1a34bdc2d8db484e0f33cb7f4a",
+      "id": 13771187253,
+      "name": "Infinity-Performance-Original-Signed-2103480-42830516841-INTERNAL-QA-NOT-ACCEPTED",
+      "run": 42830516841,
+      "size_in_bytes": 328346247,
+      "source": "80e8fd3399d2d3ce1b8ede6a618ff4ad9bc244e7"
+    },
+    "recovery": {
+      "digest": "sha256:e653f92ec817094a4ee8419de45e81666ec1237fe6e9fbed0fc974443615b2fa",
+      "id": 13771773326,
+      "name": "Infinity-Performance-Original-Signed-2103481-42832461653-INTERNAL-QA-NOT-ACCEPTED",
+      "run": 42832461653,
+      "size_in_bytes": 328345230,
+      "source": "1da730fe270847fea2dadfd1fe61e02caaddc0f8"
+    }
+  },
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "ea97e8cae7fb6c189bc9b834aeb41746a95cb8987cb719044959b09e52f778c9",
+    "handoffs/infinity-full-performance-ui-stability-20261110/CODEX-OWNER-END-TO-END-BRIEF.md": "838f0dec1b777b582af6b4dfc123298aaf22d027aec3aed270c0abeaaf2c948e",
+    "repairs/infinity-performance-ui-2103477-20261110/ANDROID-WORKER-REVIEW.json": "f197d9a24512ba26a5f11504f99b45d881ef75b763cba30dea4c5bf6ce5685a8",
+    "repairs/infinity-performance-ui-2103477-20261110/HOST-SOURCE-VERIFICATION.json": "a3cb1799c606e63b7c0f1b37837a2dc1a3accbfd6846d372b341a383d2fe02ef",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e",
+    "repairs/infinity-performance-ui-2103477-20261110/context_batch_prototype.py": "80dc916af52924b39f20a92e463d1433fd729abacfc1f21d767e62dfc0862e65",
+    "repairs/infinity-performance-ui-2103477-20261110/integrity_probe.py": "1d3bba5b08bdaf8ac031f108841de182b2e0c42a563fd8ad8cb6adef87436d46",
+    "repairs/infinity-performance-ui-2103477-20261110/qa-fixtures/PROVENANCE.json": "a046eade0475313a5bccf40bab42f93dc1ba2672ac26cc47241a471ce5978b55",
+    "repairs/infinity-performance-ui-2103477-20261110/qa-fixtures/synthetic24.mp4": "f9a56845b231db7392668791c1928cc2a0abc4e373111e4f0955a833ace84e5b",
+    "repairs/infinity-performance-ui-2103477-20261110/release_android.py": "fd737c0b710153fecc738c376424a1477709ffcb06faeeefc052b8a58cff1bc0",
+    "repairs/infinity-performance-ui-2103477-20261110/release_observer.py": "59281550b94b3e5b5ca027e039b2276e2a486e22859e48106b7a44fb8f02a924",
+    "repairs/infinity-performance-ui-2103477-20261110/surface_layers.py": "238d249e7aa4b083c0dcc60868e0783d9caa610c1b166e8755484d00e8571956"
+  }
+}

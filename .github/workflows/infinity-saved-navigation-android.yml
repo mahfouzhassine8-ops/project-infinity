@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, tracking-baseline-android, tracking-integration-android, tracking-signed-install-android, infinity77-performance-baseline, infinity77-performance-followup, infinity77-ui-cost-comparison, infinity77-integrity-worker-android]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, tracking-baseline-android, tracking-integration-android, tracking-signed-install-android, infinity77-performance-baseline, infinity77-performance-followup, infinity77-ui-cost-comparison, infinity77-integrity-worker-android, infinity77-performance-signed-pair]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1906,7 +1906,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && !(github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108') && inputs.feature != 'tracking-baseline-android' && inputs.feature != 'tracking-integration-android' && inputs.feature != 'tracking-signed-install-android' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android' && inputs.feature != 'infinity77-performance-baseline' && inputs.feature != 'infinity77-performance-followup' && inputs.feature != 'infinity77-ui-cost-comparison' && inputs.feature != 'infinity77-integrity-worker-android'
+    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && !(github.event_name == 'push' && github.ref == 'refs/heads/work/infinity-tracking-integration-20261108') && inputs.feature != 'tracking-baseline-android' && inputs.feature != 'tracking-integration-android' && inputs.feature != 'tracking-signed-install-android' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android' && inputs.feature != 'infinity77-performance-baseline' && inputs.feature != 'infinity77-performance-followup' && inputs.feature != 'infinity77-ui-cost-comparison' && inputs.feature != 'infinity77-integrity-worker-android' && inputs.feature != 'infinity77-performance-signed-pair'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -2478,6 +2478,73 @@ jobs:
         if: always()
         with:
           name: Infinity77-Performance-Worker-${{ github.run_id }}-INTERNAL-NO-APK-NO-ACCEPTANCE
+          path: |
+            performance-results/
+            performance-inputs/INTAKE.json
+            performance-inputs/SIGNATURE.txt
+            performance-platform/
+            performance-emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
+          compression-level: 6
+
+  infinity77_performance_signed_pair:
+    name: Original-signed performance upgrade and forward recovery; selected Infinity smoke, no shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'infinity77-performance-signed-pair'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+      SELECTED_FEATURE: ${{ inputs.feature }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
+      - name: Selected scope and exact signed77 intake; no build or signing
+        run: python3 repairs/infinity-performance-ui-2103477-20261110/release_android.py admit --sdk "$ANDROID_HOME" --out performance-inputs
+      - name: Existing qualified disposable emulator prerequisites
+        run: |
+          set -euo pipefail
+          sudo apt-get -o Acquire::Retries=3 update -qq
+          sudo apt-get install -y libpulse0
+          python3 - <<'PYSDK'
+          import ast,os,subprocess,json
+          from pathlib import Path
+          source='a4a89977f085480c720a7b6e73489374d01395dc'
+          path='repairs/four-repair-20261018/android37_gate.py'
+          raw=subprocess.check_output(['git','show',source+':'+path])
+          fn=next(n for n in ast.parse(raw).body if isinstance(n,ast.FunctionDef) and n.name=='pin_tools')
+          namespace={'os':os,'Path':Path,'json':json}
+          exec(compile(ast.Module(body=[fn],type_ignores=[]),path,'exec'),namespace)
+          namespace['pin_tools'](os.environ['ANDROID_HOME'],'performance-platform')
+          path='repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py'
+          raw=subprocess.check_output(['git','show',source+':'+path])
+          temporary=Path('/tmp/infinity-performance-emulator-prepare.py');temporary.write_bytes(raw)
+          subprocess.run(['python3',str(temporary),'--out','performance-emulator-setup'],check=True)
+          PYSDK
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        timeout-minutes: 25
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 10G
+          avd-name: infinity-tracking-baseline-api36
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python3 repairs/infinity-performance-ui-2103477-20261110/release_android.py run --sdk "$ANDROID_HOME" --inputs performance-inputs --out performance-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity77-Performance-SignedPair-${{ github.run_id }}-INTERNAL-NO-ACCEPTANCE
           path: |
             performance-results/
             performance-inputs/INTAKE.json
