@@ -9,6 +9,7 @@
   "baseline": 2103480,
   "baseline_performance_worker": "PRESERVED",
   "branch": "work/infinity-2103480-close-and-startup-readiness-20261110",
+  "current_evidence_review": "EXTRACTED-EVIDENCE-REVIEW.md",
   "frozen_networking": [
     2103478,
     2103479
@@ -21,7 +22,7 @@
       "Genuineprotected_or_unknown_writernegativecontrolmustFAILclosed"
     ],
     "depends_on_startup_or_packaging": false,
-    "exact_operation_fixture": "PENDING_ACTUAL_DIAGNOSTIC_CLASSIFICATION",
+    "exact_operation_fixture": "NOT_CLASSIFIABLE_FROM_CURRENT_EXTRACTS",
     "legacy_three_cycle_safe_scenario": "NOT_AUTOMATICALLY_SELECTED",
     "workflow": "Infinityshutdownverification-independentandexplicitlyselected"
   },
@@ -37,6 +38,7 @@
   },
   "network_controls_owner_choice_claim": "OWNER_NOW_CONFIRMS_TEMPORARILY_HIDDEN_NOT_PERMANENTLY_ABANDONED;NO_NETWORKING_CHANGE_IN_CLOSE_STARTUP_SCOPE",
   "networking_changes": false,
+  "original_archive_access_blocker": "RESOLVED_BY_PRIVATE_READABLE_EXTRACTS",
   "owner_brief_commit": "101f6c287f3ffcaaa2b260085a9837a7eedbbbd5",
   "preservation": [
     "OriginalAPKandmoduleidentity",
@@ -45,11 +47,16 @@
     "Search/providers/Trakt/tracking/resume/UI/data"
   ],
   "production_changes": [],
-  "production_patch_status": "BLOCKED_UNCLASSIFIED_OPERATION_AND_UNMATCHED_STARTUP_CAUSALITY",
-  "raw_device_evidence": "Owner_reports_attached_Infinity-Diagnostics-20261110-134206.zip_but_no_matching_file_or_download_reference_is_exposed",
+  "production_patch_status": "BLOCKED_NO_SAFE_OPERATION_EXEMPTION_OR_MATCHED_INCOMPLETE_HOME_CAUSE",
+  "raw_device_evidence": "NINETEEN_READABLE_PRIVATE_EXTRACTS_RECEIVED_AND_HASH_VERIFIED",
   "raw_diagnostic_committed": false,
+  "remaining_blockers": [
+    "Exact optional-service/native-image provenance and metadata targets/results/resource lifecycle are absent",
+    "Incomplete Home sections and post-failure resident state are not correlated to the latest owner/launch",
+    "Active skin body/manifest identity is absent; addon.xml differs from signed80"
+  ],
   "signing": false,
-  "status": "BLOCKED_ORIGINAL_ZIP_ATTACHMENT_NOT_EXPOSED",
+  "status": "EVIDENCE_ADMITTED_SOURCE_CORRECTION_BLOCKED_BY_SPECIFIC_PROVENANCE_AND_CAUSALITY_GAPS",
   "test_plan_recorded_before_execution": true,
   "version_reserved": false
 }

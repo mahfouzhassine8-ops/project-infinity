@@ -1,6 +1,6 @@
 # 2103480 Close/startup — first source checkpoint
 
-Status: read-only source tracing completed; production correction blocked on the original device diagnostic. No application test, build, signing, version reservation or production source change. Starting brief:101f6c28. Starting signed APK:2103480 (`9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2`). This is the selected repair input, not final owner acceptance.
+Status: historical source checkpoint, superseded for evidence availability by `EXTRACTED-EVIDENCE-REVIEW.md`. All nineteen privately supplied readable files are now admitted and hash-checked. They confirm the failed admission, but do not establish a safe operation exemption or the cause of incomplete Home. No application test, build, signing, version reservation or production source change. Starting brief:101f6c28. Starting signed APK:2103480 (`9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2`). This is the selected repair input, not final owner acceptance.
 
 ## Verified input and preservation
 
@@ -50,4 +50,4 @@ GPT-6.1 reviewed exact native admission; Astra reviewed startup/preservation bou
 
 The owner explicitly confirms the IPv4/IPv6 selector is temporarily hidden, not permanently abandoned. The previous permission ambiguity is resolved by this new instruction. Keep its networking work preserved and separate from this Close/startup repair. No selector or networking source changes are made here.
 
-The owner reports attaching the original134206 ZIP, but that file/download reference has not appeared in the execution workspace. Reuse checkpoint a11d4872; do not repeat source investigation, export, application tests or builds while waiting for the same existing archive to become accessible.
+At this historical checkpoint the ZIP was unavailable. The owner subsequently provided nineteen readable private extracts. Access is now resolved; the current operation-level and startup-causality findings are recorded in `EXTRACTED-EVIDENCE-REVIEW.md`. No repeat export or phone test is requested at this stage.
