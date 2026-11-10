@@ -1,0 +1,135 @@
+{
+  "status": "PASS_CONTROLLED_HOST_BASELINE_EQUIVALENCE_ONLY",
+  "production_change": false,
+  "curl_version": "8.10.0 POSIX threaded resolver",
+  "comparison": "Authenticated baseline pool and shared options versus candidate pool and Automatic policy; identical hostcurl backend and5s stall.",
+  "Android_application_result": "NOT_RUN_BY_THIS_COMPARISON",
+  "old_hard_deadline_result": "FAIL_RETAINED_BOTH_VARIANTS",
+  "rows": [
+    {
+      "result": 28,
+      "perform_seconds": 5.00066,
+      "release_seconds": 2.3325e-05,
+      "caller_seconds": 5.00069,
+      "curl_reported_seconds": 5.00048,
+      "first_progress_abort_seconds": -1,
+      "fd_difference": 2,
+      "variant": "baseline",
+      "scenario": "deadline",
+      "process_seconds": 5.008892565998394,
+      "fixture": {
+        "fixture_family": 0,
+        "fixture_stall_seconds": 5
+      },
+      "previous_2_25s_connect_cleanup_requirement_met": false,
+      "previous_3_75s_total_return_requirement_met": false
+    },
+    {
+      "result": 28,
+      "perform_seconds": 5.00063,
+      "release_seconds": 1.0476e-05,
+      "caller_seconds": 5.00065,
+      "curl_reported_seconds": 5.00048,
+      "first_progress_abort_seconds": -1,
+      "fd_difference": 2,
+      "variant": "candidate",
+      "scenario": "deadline",
+      "process_seconds": 5.008825681001326,
+      "fixture": {
+        "fixture_family": 0,
+        "fixture_stall_seconds": 5
+      },
+      "previous_2_25s_connect_cleanup_requirement_met": false,
+      "previous_3_75s_total_return_requirement_met": false
+    },
+    {
+      "result": 42,
+      "perform_seconds": 5.00055,
+      "release_seconds": 1.0496e-05,
+      "caller_seconds": 5.00056,
+      "curl_reported_seconds": 0.256147,
+      "first_progress_abort_seconds": 0.256186,
+      "fd_difference": 2,
+      "variant": "baseline",
+      "scenario": "cancel",
+      "process_seconds": 5.0120406259993615,
+      "fixture": {
+        "fixture_family": 0,
+        "fixture_stall_seconds": 5
+      },
+      "previous_2_25s_connect_cleanup_requirement_met": false,
+      "previous_3_75s_total_return_requirement_met": false
+    },
+    {
+      "result": 42,
+      "perform_seconds": 5.00053,
+      "release_seconds": 1.0376e-05,
+      "caller_seconds": 5.00054,
+      "curl_reported_seconds": 0.256076,
+      "first_progress_abort_seconds": 0.256157,
+      "fd_difference": 2,
+      "variant": "candidate",
+      "scenario": "cancel",
+      "process_seconds": 5.008582360002038,
+      "fixture": {
+        "fixture_family": 0,
+        "fixture_stall_seconds": 5
+      },
+      "previous_2_25s_connect_cleanup_requirement_met": false,
+      "previous_3_75s_total_return_requirement_met": false
+    }
+  ],
+  "comparisons": [
+    {
+      "scenario": "deadline",
+      "latency_delta_seconds": -3.999999999937387e-05,
+      "introduced_regression_observed": false
+    },
+    {
+      "scenario": "cancel",
+      "latency_delta_seconds": -2.0000000000131024e-05,
+      "introduced_regression_observed": false
+    }
+  ],
+  "source_and_binary_hashes": {
+    "baseline/DllLibCurl.cpp": "e3af5f8466ca0be19286321670d42a883facb83fac1cfe65c0a79b7cd554404b",
+    "baseline/DllLibCurl.h": "f3c9eb094b9e3e2b65bf1fa683d9362f0421e883ea5ed316122b351a5ddc0f5b",
+    "baseline/host_binary": "a813a6c91b49a6d3b9da0d966d7d2d885cab9afef909a650b20b7d978aeb0886",
+    "candidate/host_binary": "387b22b90c90afff5c7d0bafaf8cd78c0f8dace8f3c73ad66148f14351309199",
+    "shared_host_libcurl": "94fc9271d0acfa56138a095557dc154c3bcd1dbe3491c1e7ec5caf8094cd4ca9"
+  },
+  "compile_commands": [
+    [
+      "g++",
+      "-O2",
+      "-std=c++17",
+      "-pthread",
+      "-I/workspace/scratch/network-baseline-comparison/baseline-sources",
+      "-I/workspace/scratch/network-curl810-dns/curl-8.10.0/include",
+      "-I/workspace/scratch/network-family-host/stubs",
+      "-DINFINITY_COMPARE_BASELINE=1",
+      "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/baseline-comparison/compare_probe.cpp",
+      "/workspace/scratch/network-baseline-comparison/baseline-sources/DllLibCurl.cpp",
+      "/workspace/scratch/network-curl810-dns/curl-8.10.0/lib/.libs/libcurl.so.4.8.0",
+      "-Wl,-rpath,/workspace/scratch/network-curl810-dns/curl-8.10.0/lib/.libs",
+      "-o",
+      "/workspace/scratch/network-baseline-comparison/baseline-probe"
+    ],
+    [
+      "g++",
+      "-O2",
+      "-std=c++17",
+      "-pthread",
+      "-I/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/native/xbmc/filesystem",
+      "-I/workspace/scratch/network-curl810-dns/curl-8.10.0/include",
+      "-I/workspace/scratch/network-family-host/stubs",
+      "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/baseline-comparison/compare_probe.cpp",
+      "/workspace/infinity-network-family/repairs/infinity-network-family-2103477-20261110/native/xbmc/filesystem/DllLibCurl.cpp",
+      "/workspace/scratch/network-curl810-dns/curl-8.10.0/lib/.libs/libcurl.so.4.8.0",
+      "-Wl,-rpath,/workspace/scratch/network-curl810-dns/curl-8.10.0/lib/.libs",
+      "-o",
+      "/workspace/scratch/network-baseline-comparison/candidate-probe"
+    ]
+  ],
+  "production_resolver_replacement": "NONE"
+}
