@@ -1,0 +1,28 @@
+{
+  "feature_branch_registry": {
+    "candidate_versionCode": 2103469,
+    "generation": 56,
+    "last_issued_versionCode": 2103468
+  },
+  "live_canonical_registry": {
+    "candidate_versionCode": 2103475,
+    "generation": 59,
+    "head": "dfee7205dd88abe81db5e263c368f67ece43df02",
+    "last_issued_versionCode": 2103474,
+    "ref": "work/infinity-2103460-nine-corrections-20261106",
+    "sha256": "62b743168901ffbe5d3654905b50ffe4e63515211fd534a32622af333af62faf"
+  },
+  "metadata_source": "Use actual signed77 CC0.3.5.75; three-file overlay alone is not a full signed77package.",
+  "production_source_mapping": "PASS_ALL_THREE_FUNCTIONAL_OVERLAY_FILES_BYTE_IDENTICAL_TO_SIGNED_2103477",
+  "read_only": true,
+  "reviewer": "Astra",
+  "signing_gate": "Reconcile actual signed76/77 issuance receipts with authorized canonical registry before reserving successor. Do not reuse stale69defaults or assume78available. No registry was modified.",
+  "system_hub": {
+    "active_path": "assets/addons/skin.infinity.diggz/unified/Custom_1191_InfinitySystemHub.xml",
+    "existing_entries": "KODI SETTINGS; UPDATE",
+    "insert_after_control": 1191104,
+    "insert_before_control": 1191106,
+    "shared_front_inner_resolution": "Actual skin addon.xml selects unified for both screen states",
+    "source_baseline": "Exact XML extracted from signed77APK. No edits."
+  }
+}
