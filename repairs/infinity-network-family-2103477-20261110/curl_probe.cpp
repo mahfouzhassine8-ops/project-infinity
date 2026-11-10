@@ -37,6 +37,8 @@ int main(int argc, char** argv)
     std::string body;
     auto start = std::chrono::steady_clock::now();
     g_curlInterface.easy_setopt(easy, CURLOPT_URL, argv[2]);
+    // Match CCurlFile::SetCommonOptions; signal handling changes DNS timing.
+    g_curlInterface.easy_setopt(easy, CURLOPT_NOSIGNAL, 1L);
     g_curlInterface.easy_setopt(easy, CURLOPT_PROXY, argv[5]);
     g_curlInterface.easy_setopt(easy, CURLOPT_NOPROXY, "");
     g_curlInterface.easy_setopt(easy, CURLOPT_COOKIEFILE, "");

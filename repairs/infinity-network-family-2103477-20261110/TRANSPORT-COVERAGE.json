@@ -1,0 +1,42 @@
+{
+  "baseline": 2103477,
+  "coverage": [
+    {
+      "client": "Kodi CCurlFile HTTP/HTTPS including VFS-based artwork and streams",
+      "state": "NOT_PROVEN_ANDROID",
+      "implementation": "New per-transfer policy implemented; actual core+pool13host cases:12PASS,1DNSdeadlineFAIL."
+    },
+    {
+      "client": "Provider independent Python requests/urllib sockets (including reviewedWNT; provider families must retain ownclients)",
+      "state": "NOT_ENFORCED",
+      "implementation": "No provider/socket monkeypatch. CommandCenter delegatesnativeproviderwork; settingcannotgovernindependentHTTP."
+    },
+    {
+      "client": "FFmpeg direct avformat HTTP",
+      "state": "NOT_ENFORCED",
+      "implementation": "No directFFmpeg modifications."
+    },
+    {
+      "client": "Inputstream requests delegated through Kodi VFS",
+      "state": "NOT_PROVEN",
+      "implementation": "ConditionalCurlFilecoverage mustbe demonstrated perpath."
+    },
+    {
+      "client": "Inputstream add-on own sockets or HTTP",
+      "state": "NOT_ENFORCED",
+      "implementation": "IndependentclientoutsideCurlFile."
+    },
+    {
+      "client": "HTTP/SOCKS proxies using controlledCurlFile",
+      "state": "NOT_PROVEN_ANDROID",
+      "implementation": "Strictlocalhopfamily. Originfamilyunmeasuredwhenproxyresolvesremotely; localHTTPproxyhostcasepassed."
+    },
+    {
+      "client": "Cobra OkHttp/HttpURLConnection/Media3",
+      "state": "UNAFFECTED_OUT_OF_SCOPE",
+      "implementation": "NoDEx/resource/settingschanges. Nativeengineownershipverifiedbyretainedcomponentinventoryandactual77manifest; no globalDNS/JVM mutation."
+    }
+  ],
+  "search_metadata_Trakt_and_Watchlists": "Architectureandproviderlogicunchanged; representativeAndroidfeaturepreservationNOT_RUN",
+  "owner_acceptance": "NOT_RUN_FOR_NETWORK_FEATURE"
+}

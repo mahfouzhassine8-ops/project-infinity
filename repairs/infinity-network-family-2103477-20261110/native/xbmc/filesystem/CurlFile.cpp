@@ -9,9 +9,6 @@
 #include "CurlFile.h"
 #if defined(TARGET_ANDROID)
 #include "InfinityCloseNetworkGate.h"
-#include "InfinityNetworkFamily.h"
-#include "utils/XBMCTinyXML.h"
-#include <fstream>
 #endif
 
 #if defined(TARGET_ANDROID)
@@ -49,6 +46,10 @@
 #endif
 
 #include "DllLibCurl.h"
+#if defined(TARGET_ANDROID)
+#include "InfinityNetworkFamily.h"
+#include "utils/XBMCTinyXML.h"
+#endif
 #include "ShoutcastFile.h"
 #include "utils/CharsetConverter.h"
 #include "utils/log.h"
@@ -79,13 +80,21 @@ int ReadInfinityNetworkFamily()
   // No provider settings, credentials, Android preferences or databases are read.
   const std::string path = CSpecialProtocol::TranslatePath(
       "special://profile/addon_data/script.infinity.commandcenter/settings.xml");
-  std::ifstream stream(path, std::ios::binary);
-  std::string data(65537, '\0');
-  stream.read(&data[0], static_cast<std::streamsize>(data.size()));
-  const auto count = stream.gcount();
-  if (count <= 0 || count > 65536)
+  CFile file;
+  if (!file.Open(path))
     return InfinityNetworkFamily::Automatic;
-  data.resize(static_cast<size_t>(count));
+  const auto length = file.GetLength();
+  if (length <= 0 || length > 65536)
+    return InfinityNetworkFamily::Automatic;
+  std::string data(static_cast<size_t>(length), '\0');
+  size_t offset = 0;
+  while (offset < data.size())
+  {
+    const auto count = file.Read(&data[offset], data.size() - offset);
+    if (count <= 0)
+      return InfinityNetworkFamily::Automatic;
+    offset += static_cast<size_t>(count);
+  }
   CXBMCTinyXML document;
   if (!document.Parse(data))
     return InfinityNetworkFamily::Automatic;

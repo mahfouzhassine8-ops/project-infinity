@@ -1,0 +1,13 @@
+{
+  "run": 42741596579,
+  "job": 129583714640,
+  "source": "2f7c3c9faecb3b835f4555d8fe0a7b3f8c633b73",
+  "result": "FAIL_ARM64_COMPILE",
+  "source_restoration_and_exact77_native_foundation": "PASS",
+  "failure": "Curl header included before Kodi curl wrapper; pinned NDK fstream/fseeko conflict.",
+  "correction": "Move policy include after DllLibCurl.h; replace fstream with existing local CFile reader.",
+  "native_link": "NOT_RUN",
+  "APK": false,
+  "signing": false,
+  "shutdown_tests": false
+}
