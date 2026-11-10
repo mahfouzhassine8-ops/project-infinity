@@ -1,0 +1,109 @@
+{
+  "pid": 5225,
+  "result": {
+    "FD_attribution": "Process-wide descriptors include the separately running resident and GUI; raw samples retained, not exclusive leak proof",
+    "after_cancel": {
+      "all_fds": 424,
+      "at": 261.015933622,
+      "process_cpu": 60.440685574,
+      "python_threads": [
+        "MainThread"
+      ],
+      "skin_descriptors": [
+        "/data/data/com.projectinfinity.kodi/cache/apk/assets/addons/skin.infinity.diggz/media/Textures.xbt"
+      ]
+    },
+    "after_worker": {
+      "all_fds": 424,
+      "at": 258.040597854,
+      "process_cpu": 57.158686184,
+      "python_threads": [
+        "MainThread"
+      ],
+      "skin_descriptors": [
+        "/data/data/com.projectinfinity.kodi/cache/apk/assets/addons/skin.infinity.diggz/media/Textures.xbt"
+      ]
+    },
+    "alive_before_cancel": true,
+    "before": {
+      "all_fds": 424,
+      "at": 252.358460652,
+      "process_cpu": 50.495921632,
+      "python_threads": [
+        "MainThread"
+      ],
+      "skin_descriptors": [
+        "/data/data/com.projectinfinity.kodi/cache/apk/assets/addons/skin.infinity.diggz",
+        "/data/data/com.projectinfinity.kodi/cache/apk/assets/addons/skin.infinity.diggz/media/Textures.xbt"
+      ]
+    },
+    "cancellation_attribution": "Completion can win the event race; parent rejection is mandatory regardless of private result status",
+    "cancellation_during_read_observed": true,
+    "cancellation_result": {
+      "checked": 0,
+      "mismatches": [],
+      "status": "canceled"
+    },
+    "dispatch_ms": 32.36448900000255,
+    "dispatches": [
+      {
+        "alive": true,
+        "milliseconds": 3.700179999981401,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 21.453592999989723,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 19.38230599998292,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 32.544373000007454,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 16.69768700000418,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 15.050279999996974,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 11.786623999995527,
+        "status": "checking"
+      },
+      {
+        "alive": true,
+        "milliseconds": 8.89068600000087,
+        "status": "checking"
+      }
+    ],
+    "manual_ms": 2901.4840010000285,
+    "manual_result": {
+      "candidate": 270,
+      "checked": 948,
+      "mismatches": [],
+      "skin_version": "1.0.5.270",
+      "status": "ok"
+    },
+    "scope": "Real authenticated functions and SDK/gate in private QA interpreter; resident verified separately",
+    "worker_result": {
+      "candidate": 270,
+      "checked": 948,
+      "mismatches": [],
+      "skin_version": "1.0.5.270",
+      "status": "ok"
+    },
+    "worker_wall_ms": 5653.739271000006
+  },
+  "sequence": 13
+}

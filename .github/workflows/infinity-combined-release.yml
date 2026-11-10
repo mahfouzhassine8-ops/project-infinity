@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, prepare-performance-modules]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, prepare-performance-modules, prepare-performance-release]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -2626,3 +2626,79 @@ jobs:
             PERFORMANCE-SIGNER-ROUTES.json
           retention-days: 90
           if-no-files-found: error
+
+  prepare-performance-release:
+    name: Signed77 performance and forward-recovery bundles; no keys or publication
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103477-full-performance-ui-stability-20261110' && inputs.operation == 'prepare-performance-release'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Reviewed selected Android evidence and current authority before preparation
+        run: |
+          python3 - <<'PYGUARD'
+          import hashlib,json,os,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-performance-ui-2103477-20261110')
+          request=json.loads((task/'release/APK-PREPARE-REQUEST.json').read_text())
+          assert request['operation']=='prepare-signed77-performance-forward-bundles'
+          assert request['APK_signing'] is False and request['registry_mutation'] is False and request['publication'] is False
+          assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          for name,wanted in request['source_bindings'].items():
+              p=Path(name);assert not p.is_absolute() and '..' not in p.parts
+              assert hashlib.sha256(p.read_bytes()).hexdigest()==wanted,name
+          workflow=Path('.github/workflows/infinity-combined-release.yml')
+          assert hashlib.sha256(workflow.read_bytes()).hexdigest()==request['workflow_sha256']
+          before=subprocess.check_output(['git','show','7b84194eed8f0a6d5d07739e2f6ba041e816a79a:'+str(workflow)],text=True).rstrip()
+          expected=before.replace('sign-tracking, prepare-performance-modules]','sign-tracking, prepare-performance-modules, prepare-performance-release]',1)
+          assert workflow.read_text().split('\n  prepare-performance-release:\n')[0].rstrip()==expected,'PRIOR_SIGNER_JOBS_CHANGED'
+          evidence=json.loads((task/'evidence/42827490004/CANDIDATE-ANDROID.json').read_text())
+          assert evidence['status']=='PASS_SELECTED_AUTHENTICATED_ANDROID_WORKER_AND_RESIDENT_CASE_NOT_RELEASE_OR_FOLD_ACCEPTANCE'
+          assert evidence['native_authenticated_CC78']['manifest']==request['module_manifest_sha256']
+          assert evidence['worker_contracts']['worker_result']==evidence['worker_contracts']['manual_result']
+          live=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/git/ref/heads/work/infinity-2103460-nine-corrections-20261106']))
+          assert live['object']['sha']=='bd46fa73c713ed869f75822fab1b0821a7d2d11b','REGISTRY_ADVANCED_RECONCILE_BEFORE_PREPARATION'
+          print('PASS reviewed Android worker evidence; original authority unchanged; no keys')
+          PYGUARD
+      - name: Retained official artifact intake
+        run: python3 repairs/infinity-performance-ui-2103477-20261110/release/intake.py --out performance-release-inputs
+      - name: Original component assembly from exact77; no native or DEX rebuild
+        run: |
+          python3 - <<'PYPREP'
+          import json,sys
+          from pathlib import Path
+          task=Path('repairs/infinity-performance-ui-2103477-20261110/release')
+          sys.path.insert(0,str(task));import prepare_apk
+          inputs=json.loads(Path('performance-release-inputs/INTAKE.json').read_text())
+          prepare_apk.prepare(Path(inputs['apk']),Path(inputs['module_fixture']),Path(inputs['components']),Path('performance-apk-prepared'),2103480,2103481)
+          PYPREP
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103480-Performance-Prepared-${{ github.run_id }}-INTERNAL-NOT-INSTALLER
+          path: |
+            performance-apk-prepared/2103480/components/
+            performance-apk-prepared/2103480/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103481-Performance-Forward-Recovery-Prepared-${{ github.run_id }}-INTERNAL-NOT-INSTALLER
+          path: |
+            performance-apk-prepared/2103481/components/
+            performance-apk-prepared/2103481/*.json
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Performance-Preparation-Evidence-${{ github.run_id }}
+          path: |
+            performance-release-inputs/INTAKE.json
+            performance-apk-prepared/PAIR-PREPARATION.json
+          retention-days: 90
+          if-no-files-found: warn
