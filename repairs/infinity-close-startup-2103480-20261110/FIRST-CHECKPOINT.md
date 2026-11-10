@@ -45,3 +45,9 @@ The next test plan has separate manual startup-feature and shutdown cases. Start
 The brief's phrase “owner elected to hide” the IPv4/IPv6 control is not established in this conversation: the owner objected to its removal. Selecting80 as this repair's code input does not erase that objection. No network/UI restoration or further removal is performed in this scope. The original brief remains unchanged; this annotation preserves the discrepancy explicitly.
 
 GPT-6.1 reviewed exact native admission; Astra reviewed startup/preservation boundaries. Both performed read-only analysis without edits, tests or builds.
+
+## Subsequent owner clarification
+
+The owner explicitly confirms the IPv4/IPv6 selector is temporarily hidden, not permanently abandoned. The previous permission ambiguity is resolved by this new instruction. Keep its networking work preserved and separate from this Close/startup repair. No selector or networking source changes are made here.
+
+The owner reports attaching the original134206 ZIP, but that file/download reference has not appeared in the execution workspace. Reuse checkpoint a11d4872; do not repeat source investigation, export, application tests or builds while waiting for the same existing archive to become accessible.
