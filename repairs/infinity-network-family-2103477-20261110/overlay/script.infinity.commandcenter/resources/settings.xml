@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<settings version="1"><section id="script.infinity.commandcenter"><category id="experience" label="Infinity Experience"><group id="1">
+<setting id="motion_mode" type="string" label="Motion"><level>0</level><default>full</default><constraints><options><option label="Full">full</option><option label="Reduced">reduced</option><option label="Off">off</option></options></constraints><control type="spinner" format="string"/></setting>
+<setting id="ambient_home" type="string" label="Ambient Home"><level>0</level><default>subtle</default><constraints><options><option label="Off">off</option><option label="Subtle">subtle</option><option label="Immersive">immersive</option></options></constraints><control type="spinner" format="string"/></setting>
+<setting id="network_family" type="string" label="Network Connections"><level>0</level><default>auto</default><constraints><options><option label="Automatic (Default)">auto</option><option label="IPv4 Only">ipv4</option><option label="IPv6 Only">ipv6</option></options></constraints><control type="spinner" format="string"/></setting>
+</group></category></section></settings>
