@@ -20,7 +20,7 @@ import release_gate as gate
 from inventory import CERT_SHA,SIGNATURE,digest,canonical
 
 VERSION=2103482
-GEN=66
+GEN=67
 SHA_BASE='9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2'
 SHA_ENGINE='503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437'
 REQ=ROOT/'repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-ORIGINAL-SIGN-REQUEST.json'
@@ -50,7 +50,7 @@ def admission():
     req=json.loads(REQ.read_text())
     fail(req=={
       'operation':'sign-exact-registered-shutdown82-internal-QA',
-      'versionCode':2103482,'generation':66,
+      'versionCode':2103482,'generation':67,
       'original_signer_workflow_id':397702717,
       'prepared_artifact_id':13833695178,
       'prepared_run':42970204230,
@@ -62,7 +62,7 @@ def admission():
     a=json.loads((ROOT/ra.AUTHORITY_PATH).read_text())
     fail(a['generation']==GEN and a['candidate_versionCode']==VERSION,'UNREGISTERED_CANDIDATE')
     fail(a['status']=='ENGINEERING_REVIEWED_FOLD_PENDING','RELEASE_ALREADY_ACCEPTED')
-    fail(a['target_owners']==['INFINITY','CHOOSER_SHELL'],'WRONG_OWNER_VECTOR')
+    fail(a['target_owners']==[] and a['update_kind']=='evidence_refresh','UNVERIFIED_AUTHORITY_REFRESH')
     fail(a['experience_version_labels']=={'INFINITY':VERSION,'COBRA':2103445},'LABELS_CHANGED')
     fail(a['components']['COBRA']['version']=='2103445.cobra.1','COBRA_CHANGED')
     fail(a['accepted_pointer_updated'] is False,'ACCEPTED_BASELINE_UPDATED')
