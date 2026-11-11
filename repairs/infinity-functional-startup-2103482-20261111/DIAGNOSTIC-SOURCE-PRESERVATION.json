@@ -1,0 +1,33 @@
+{
+  "Cobra": "UNCHANGED",
+  "apk_built": false,
+  "baseline82_engine": "503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437",
+  "changed": {
+    "xbmc/interfaces/builtins/AddonBuiltins.cpp": {
+      "after": "2890988c31c80d23cabcbf3a995abb660f64169ecd94eaaac3669e64abe0fa0f",
+      "before": "628003e3c97ac572870d26620827109f59a3cb7b3e7a23d298d3e0600405c248"
+    },
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": {
+      "after": "09a86d7b984255b817920084cc376754bbbcffb57865f72e0abf9c777e63808f",
+      "before": "a9eb9a48269adf3ed838c18a3247e469056d9784bfeca85833957cebb45c8661"
+    },
+    "xbmc/interfaces/python/PythonInvoker.cpp": {
+      "after": "8765370da585cef37918ebd31a4322035901793e0b0f4275868ca11e2e1ff724",
+      "before": "f6098e8f01cd8221ba634fb3ccfbe27e7bad4d683a2f797278f0b4081ae4160e"
+    },
+    "xbmc/interfaces/python/XBPython.cpp": {
+      "after": "98a43016373baae31524a22447acff9d3abbfd7ef9129c226c5ccac6f070c15f",
+      "before": "adcf97ede4bbf8211960f380ccbfb059d0f963fea0444825c74990af40f328d9"
+    }
+  },
+  "correction_implemented": "CPython3.11.7 recoverable-NULL cleanup only; Fold attribution unresolved",
+  "diagnostic_build_flag": "INFINITY_STARTUP_TRACE_QA=1",
+  "new_header": {
+    "xbmc/interfaces/generic/InfinityStartupTrace.h": "b249a101e5e308dd2960f37c4fedfd50d70f6922aa2a82f1e852bf805a54a6ac"
+  },
+  "runtime_gate": "exact com.projectinfinity.kodi:kodi process",
+  "signing": false,
+  "source_commit": "a7f890b1cdccebca7db6695fa3e6752d501cec9d",
+  "status": "PASS_EXACT82_PLUS_FOUR_DIAGNOSTIC_CALLSITE_FILES_AND_ONE_QA_HEADER",
+  "unchanged82_native_sources": 9407
+}

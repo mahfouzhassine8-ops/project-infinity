@@ -170,15 +170,18 @@ def run(sdk,inputs,out):
             if network=='offline':
                 # Disposable VM only, after APK acquisition. No app/network
                 # source changes or physical-device settings are involved.
-                device.shell('svc','wifi','disable');device.shell('svc','data','disable')
+                device.shell('svc','wifi','disable',timeout=5);device.shell('svc','data','disable',timeout=5)
                 deadline=time.monotonic()+15
                 while True:
-                    text=device.shell('dumpsys','connectivity',timeout=5)
+                    remaining=deadline-time.monotonic()
+                    base.require(remaining>0,'EMULATOR_OFFLINE_STATE_NOT_ESTABLISHED')
+                    text=device.shell('dumpsys','connectivity',timeout=min(5,remaining))
                     default=re.search(r'^\s*Active default network:\s*(\S+)',text,re.M)
                     if default and default.group(1).lower()=='none':break
                     base.require(time.monotonic()<deadline,'EMULATOR_OFFLINE_STATE_NOT_ESTABLISHED')
                     time.sleep(.2)
-                report['offline_evidence']=dict(default_network='none',method='Normal shell service commands in new disposable VM only')
+                report['offline_evidence']=dict(default_network_before='none',method='Normal shell service commands in new disposable VM only')
+            else:report['normal_network_scope']='Unchanged emulator configuration; internet availability not independently tested'
         report['startup']=base.start_once(device,1,out);checkpoint()
         installed=device.shell('pm','path',base.PACKAGE).strip().removeprefix('package:')
         base.require(device.shell('sha256sum',installed).split()[0]==APK82,'ACTUAL_INSTALLED_APK_HASH')
@@ -248,6 +251,11 @@ def run(sdk,inputs,out):
                 except AssertionError:
                     if time.monotonic()>=deadline:raise
                     time.sleep(.2)
+            if report['network_case']=='offline':
+                text=device.shell('dumpsys','connectivity',timeout=5)
+                default=re.search(r'^\s*Active default network:\s*(\S+)',text,re.M)
+                base.require(default and default.group(1).lower()=='none','OFFLINE_CONDITION_NOT_RETAINED')
+                report['offline_evidence'].update(default_network_after='none',observation='No default network before and after selected cases; no continuous packet capture')
         base.crash_free_alive(device)
         report['status']=('PASS_INTERNAL_QA_SELECTED_NATIVE_AND_LOCAL_EXECUTION_NOT_FOLD_REPRODUCTION' if selection.get('require_native_trace') else 'PASS_SELECTED_BASELINE_HEALTH_CENTER_AND_CC_WITH_RETAINED_ERROR_PROOF_NOT_FOLD_REPRODUCTION')
     except Exception:

@@ -49,7 +49,7 @@
       "APK_built": false
     },
     "ARM64_link": {
-      "status": "IN_PROGRESS_FULL_ARM64_ENGINE_COMPILATION",
+      "status": "PASS_FULL_ARM64_LINK_AND_BASELINE_ABI",
       "run": 43040415571,
       "historical_preparation_failure": {
         "prior_run": 43036765104,
@@ -74,9 +74,15 @@
       "job": 130819412595,
       "Ubuntu_tooling": "PASS",
       "pinned_NDK": "PASS",
-      "native_link": "IN_PROGRESS",
+      "native_link": "PASS",
       "runner_signature_checks_preserved": true,
-      "retained_dependency_build": "PASS"
+      "retained_dependency_build": "PASS",
+      "artifact": 13899051924,
+      "native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+      "source": "a7f890b1cdccebca7db6695fa3e6752d501cec9d",
+      "original_exports_preserved": 71213,
+      "proof": "ARM64-DIAGNOSTIC-BUILD.json",
+      "source_preservation": "DIAGNOSTIC-SOURCE-PRESERVATION.json"
     },
     "Android_local_functionality": {
       "status": "PASS_SELECTED_BASELINE_LOCAL_FUNCTIONALITY_WITH_RETAINED_HISTORICAL_FAILURES",
@@ -122,8 +128,8 @@
   "continuation_checkpoint": "ee6d5571aa1204c1a775f24389a6f9b7ce6c968b",
   "internal_QA_preparation": {
     "script": "package_internal_qa.py",
-    "status": "SOURCE_PREPARED_NOT_EXECUTED",
-    "native_artifact_request": "NOT_FROZEN_PENDING_LINK",
+    "status": "FROZEN_UNSIGNED_REQUEST_READY_FOR_ACTIONS",
+    "native_artifact_request": "QA-STAGE-REQUEST.json",
     "signed": false,
     "version_reserved": false,
     "registry_changed": false
