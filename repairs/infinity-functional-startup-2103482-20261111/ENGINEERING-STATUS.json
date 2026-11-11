@@ -49,7 +49,7 @@
       "APK_built": false
     },
     "ARM64_link": {
-      "status": "NOT_RUN_RUNNER_DEPENDENCY_BLOCKED",
+      "status": "IN_PROGRESS_FRESH_RUNNER_DEPENDENCIES_RESTORED_THROUGH_ORIGINAL_RECIPE",
       "run": 43040415571,
       "prior_run": 43036765104,
       "prior_attempts": [
@@ -67,18 +67,52 @@
         "pkg-config",
         "libcurl4-openssl-dev"
       ],
-      "Ubuntu_signature_checks_weakened": false
+      "Ubuntu_signature_checks_weakened": false,
+      "historical_preparation_failure": {
+        "prior_run": 43036765104,
+        "prior_attempts": [
+          1,
+          2
+        ],
+        "failed_step": "Retained dependency tooling",
+        "exit_code": 100,
+        "errors": [
+          "Temporary failure resolving 'azure.archive.ubuntu.com'",
+          "Temporary failure resolving 'archive.ubuntu.com'",
+          "Temporary failure resolving 'security.ubuntu.com'"
+        ],
+        "packages_needed": [
+          "pkg-config",
+          "libcurl4-openssl-dev"
+        ],
+        "Ubuntu_signature_checks_weakened": false
+      },
+      "attempt": 2,
+      "job": 130819412595,
+      "Ubuntu_tooling": "PASS",
+      "pinned_NDK": "PASS",
+      "native_link": "PENDING",
+      "runner_signature_checks_preserved": true
     },
     "Android_local_functionality": {
-      "status": "NOT_RUN",
-      "run": 43039363818,
-      "workflow_conclusion": "cancelled",
-      "last_step": "Reuse qualified disposable SDK tooling",
-      "dependency": "libpulse0",
-      "package_mirror_DNS_failure": true,
-      "cancel_reason": "Pre-execution correction: published HC contract version2.5.26 differs from addon metadata2.5.27; no application test ran",
-      "corrected_probe_ready": true,
-      "no_blind_repeat": true
+      "status": "PARTIAL_PASS_WITH_RETAINED_FAILED_HEALTH_CENTER_CASE",
+      "first_run": 43109315570,
+      "first_proof": "ANDROID-BASELINE-INITIAL.json",
+      "passed": [
+        "Original82 Home",
+        "Actual Python body",
+        "Actual controlled exception in Kodi log",
+        "Independent Python after exception"
+      ],
+      "followup_run": 43110915155,
+      "followup_proof": "ANDROID-BASELINE-FOLLOWUP.json",
+      "health_fresh_profile_enabled_state": "DISABLED; enabled through normal native API on disposable profile",
+      "followup_failure": "SIGSEGV during observer borrowed Control getLabel; original context recovered and exact82 ELF resolved",
+      "fixture_corrective_commit": "85a3f9dbdb46d057928568cba40b77cfd519db0a",
+      "corrected_fixture_run": 43112968019,
+      "corrected_fixture_status": "IN_PROGRESS",
+      "Fold_reproduced": false,
+      "original_APK_changed": false
     },
     "Android_instrumentation_and_repeated_starts": {
       "status": "NOT_RUN_NATIVE_BUILD_REQUIRED"
@@ -93,8 +127,17 @@
       "status": "NOT_RUN_OWNER_ONLY"
     }
   },
-  "next_required": "Restore ordinary authenticated Ubuntu package reachability on the disposable CI runner; rerun failed preparation/ARM compilation and the already reviewed named Android case. No new owner diagnostic is needed.",
+  "next_required": "Finish actual full ARM64 compilation/linkage and corrected observer Android case. Only after actual verified artifact identity freeze internal QA payload and use original owner-gated signing infrastructure. No new owner diagnostic requested.",
   "new_APK": null,
   "registry_version_reserved": false,
-  "production_startup_repair_accepted": false
+  "production_startup_repair_accepted": false,
+  "continuation_checkpoint": "ee6d5571aa1204c1a775f24389a6f9b7ce6c968b",
+  "internal_QA_preparation": {
+    "script": "package_internal_qa.py",
+    "status": "SOURCE_PREPARED_NOT_EXECUTED",
+    "native_artifact_request": "NOT_FROZEN_PENDING_LINK",
+    "signed": false,
+    "version_reserved": false,
+    "registry_changed": false
+  }
 }
