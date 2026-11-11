@@ -22,7 +22,7 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.11.7'}
       - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
-        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
       - name: Exact source-only scope and script syntax
         run: |
           set -euo pipefail
