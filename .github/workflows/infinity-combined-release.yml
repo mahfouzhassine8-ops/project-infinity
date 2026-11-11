@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -3217,7 +3217,7 @@ jobs:
 
   startup83-original-key-internal-qa:
     name: Exactly registered 2103483 internal QA through original permanent signing key
-    if: github.event_name == 'push' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && startsWith(github.event.head_commit.message, 'Sign startup QA:')
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && ((github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Sign startup QA:')) || (github.event_name == 'workflow_dispatch' && inputs.operation == 'sign-startup-internal-qa'))
     runs-on: ubuntu-22.04
     timeout-minutes: 100
     permissions: {contents: read, actions: read}

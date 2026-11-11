@@ -50,6 +50,7 @@ def request():
     require(git('rev-parse','HEAD')==os.environ.get('GITHUB_SHA'),'HEAD_RACE')
     require(not git('status','--porcelain','--untracked-files=no'),'DIRTY_REVIEWED_SOURCE')
     r=load(HERE/'QA-SIGN-REQUEST.json')
+    require(r['sign_operation']=='sign-startup-internal-qa','EXPLICIT_ORIGINAL_QA_OPERATION_REQUIRED')
     require(all(type(r[k]) is int and r[k]>0 for k in ('prepared_run','prepared_artifact_id','native_run')),'NUMERIC_FROZEN_PRODUCER_IDENTITIES')
     require(r['operation']=='original-owner-functional-startup-internal-QA' and r['versionCode']==VERSION and r['generation']==GENERATION,'EXACT_FROZEN_QA_REQUEST')
     require(r['original_signer_workflow_id']==397702717 and r['baseline_APK_sha256']==BASE_APK,'ORIGINAL_SIGNER_AND_BASELINE_REQUIRED')
