@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   original-owner-qa-assembly:
+    if: "!startsWith(github.event.head_commit.message, 'Audit signer inventory:')"
     name: Verify signed80, rebuild only Infinity native+label ownership, stage unsigned QA
     runs-on: ubuntu-22.04
     timeout-minutes: 45
@@ -101,3 +102,46 @@ jobs:
           retention-days: 90
           if-no-files-found: error
           compression-level: 1
+  signer-inventory-audit-only:
+    name: Enumerate new workflows, inspect key access and compare reviewed signer inventory (read-only)
+    if: startsWith(github.event.head_commit.message, 'Audit signer inventory:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Inspect actual GitHub workflow inventory under read-only token
+        env:
+          GH_TOKEN: '${{ github.token }}'
+        run: |
+          python3 - <<'PY'
+          import json,subprocess,hashlib
+          from pathlib import Path
+          policy=json.loads(Path('repairs/dual-experience-isolation-2103420/signer-policy.json').read_text())
+          known=set(policy['reviewed_workflow_ids'])
+          actual={}
+          for page in range(1,30):
+              value=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/workflows?per_page=100&page='+str(page)],text=True))
+              items=value['workflows']
+              for w in items:
+                  actual[w['id']]={'id':w['id'],'name':w['name'],'path':w['path'],'state':w['state']}
+              if len(items)<100:break
+          unknown=sorted((w for w in actual.values() if w['state']=='active' and w['id'] not in known),key=lambda w:w['path'])
+          for w in unknown:
+              path=w['path'].removeprefix('.github/workflows/')
+              found=[]
+              for b in ('work/infinity-2103480-shutdown-qa-package-20261111','work/infinity-2103480-shutdown-apk-build-20261110','work/infinity-2103460-nine-corrections-20261106'):
+                  p=Path('.github/workflows')/path
+                  try:
+                      content=subprocess.check_output(['git','show','origin/'+b+':'+p.as_posix()],stderr=subprocess.DEVNULL)
+                      found.append({'branch':b,'sha256':hashlib.sha256(content).hexdigest(),'secrets_referenced':('secrets.' in content.decode('utf-8')),'actions_write':('actions: write' in content.decode('utf-8')),'contents_write':('contents: write' in content.decode('utf-8')),'signer_keywords':any(k in content.lower() for k in (b'apksigner sign',b'infinity_keystore_b64',b'signinfinitymodules'))})
+                  except subprocess.CalledProcessError:pass
+              w['sources']=found
+          Path('signer-inventory-audit.json').write_text(json.dumps({'active_count':sum(v['state']=='active' for v in actual.values()),'reviewed_count':len(known),'unknown_active':unknown},indent=2,sort_keys=True)+'\n')
+          print('CURRENT_ACTIVE_WORKFLOWS',sum(v['state']=='active' for v in actual.values()))
+          print('UNKNOWN_ACTIVE_COUNT',len(unknown))
+          print('UNKNOWN_ACTIVE_JSON',json.dumps(unknown,sort_keys=True))
+          if not unknown:print('PASS No unknown active workflows')
+          PY
+      - uses: actions/upload-artifact@v4
+        with: {name: 'Infinity-Signer-Workflow-Inventory-${{ github.run_id }}-NO-KEY', path: signer-inventory-audit.json, retention-days: 30, if-no-files-found: error}
