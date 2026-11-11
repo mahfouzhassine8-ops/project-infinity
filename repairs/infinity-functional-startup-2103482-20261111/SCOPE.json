@@ -1,0 +1,28 @@
+{
+  "APK_build": false,
+  "Cobra_changes": false,
+  "authorized_scope": "Infinity functional startup and demonstrated shared execution defect only",
+  "branch": "work/infinity-2103482-functional-startup-20261111",
+  "current_owner_reported_QA": 2103482,
+  "feature_verification": "Independent startup/functional invocation cycles; NOT_RUN",
+  "known_limits": [
+    "Input files are filtered logcat; native thread/CPU/wait-state sections omitted",
+    "Failed Health Center invocation and successful restart not matched",
+    "Signed82 bytes inaccessible through artifact download proxy; reuse source/run records only"
+  ],
+  "new_tests_run": [],
+  "production_changes": [],
+  "protected_baseline": 2103477,
+  "raw_logs_committed": false,
+  "reviews": {
+    "Astra": "Same-engine timeline, live resident counterevidence, Android CPU termination and preserved boundaries",
+    "GPT_6_1": "Shared Python stages, Core attempt deduplication and narrow NULL/GIL source contract"
+  },
+  "schema": 1,
+  "selected_runtime_test_fixture": "PENDING_MATCHED_FAILURE_STATE",
+  "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",
+  "signing": false,
+  "source_anchor": "694d46a480e62004952cc6a5b289af0ff995a071",
+  "status": "SOURCE_AND_EXISTING_EXTRACT_ANALYSIS;ROOT_CAUSE_UNRESOLVED",
+  "version_reserved": false
+}

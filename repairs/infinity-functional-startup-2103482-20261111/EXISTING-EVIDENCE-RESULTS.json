@@ -1,0 +1,83 @@
+{
+  "actual_failed_health_center_invocation_identified": false,
+  "cpu_attributed_to_core_worker": false,
+  "distinct_core_load_attempts_total": 233,
+  "files": [
+    {
+      "absence_is_not_proof_in_filtered_extract": true,
+      "bytes": 37980,
+      "distinct_core_load_attempts": 4,
+      "distinct_core_namespace_failures": 4,
+      "file": "1-bugreport-q8quew-CP2A.260605.016-2026-11-11-05-27-47.txt",
+      "filtered_logcat_only": true,
+      "first_attempt": "11-11 05:28:45.756",
+      "initialization_markers_observed": {
+        "CHECKPOINT_FAILED": 0,
+        "CPythonInvoker": 0,
+        "Py_NewInterpreter": 0,
+        "native.interpreter": 0
+      },
+      "largest_attempt_gap_s": 5.064,
+      "last_attempt": "11-11 05:28:53.398",
+      "median_attempt_interval_s": 1.558,
+      "original_dumpstate_bytes": 334781714,
+      "safe_events": [
+        {
+          "kind": "android_background_cpu_kill",
+          "original_line": 3411954,
+          "time": "11-11 05:28:53.707"
+        },
+        {
+          "kind": "input_channel_removed",
+          "original_line": 3412010,
+          "time": "11-11 05:28:53.911"
+        },
+        {
+          "kind": "window_binder_death_cleanup",
+          "original_line": 3412019,
+          "time": "11-11 05:28:53.925"
+        }
+      ],
+      "sha256": "29cecb4003f20497bb41177ada7d605df43efa89951a8851b0ef6d986f7c41cd"
+    },
+    {
+      "absence_is_not_proof_in_filtered_extract": true,
+      "bytes": 855308,
+      "distinct_core_load_attempts": 229,
+      "distinct_core_namespace_failures": 229,
+      "file": "2-bugreport-q8quew-CP2A.260605.016-2026-11-11-05-09-40.txt",
+      "filtered_logcat_only": true,
+      "first_attempt": "11-11 05:02:47.283",
+      "initialization_markers_observed": {
+        "CHECKPOINT_FAILED": 0,
+        "CPythonInvoker": 0,
+        "Py_NewInterpreter": 0,
+        "native.interpreter": 0
+      },
+      "largest_attempt_gap_s": 238.591,
+      "last_attempt": "11-11 05:11:47.089",
+      "median_attempt_interval_s": 1.015,
+      "original_dumpstate_bytes": 278438392,
+      "safe_events": [
+        {
+          "kind": "command_center_policy_balanced",
+          "original_line": 208898,
+          "time": "11-11 05:02:54.327"
+        },
+        {
+          "kind": "command_center_policy_performance",
+          "original_line": 209188,
+          "time": "11-11 05:02:55.378"
+        }
+      ],
+      "sha256": "123fd504566f4a16b32fbaa97d538bc7213f018122f3aad5ba187d8c6c9fc712"
+    }
+  ],
+  "new_application_tests": "NOT_RUN",
+  "raw_reports_committed": false,
+  "root_cause": "UNRESOLVED",
+  "same_engine_pid_across_core_attempts": true,
+  "schema": 1,
+  "thread_stack_or_wait_owner_captured": false,
+  "weather_busy_used_as_job_evidence": false
+}
