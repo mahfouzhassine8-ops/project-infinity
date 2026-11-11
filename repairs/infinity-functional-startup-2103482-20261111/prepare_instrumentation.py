@@ -113,6 +113,13 @@ def python(s):
             s=once(s,line,'        '+event(stage,', GetId()')+'\n'+line)
     s=once(s,'      PyEval_RestoreThread(m_mainThreadState);\n      m_invokerOwnsGil = true;','      PyEval_RestoreThread(m_mainThreadState);\n      '+event('GilAcquired',', GetId()')+'\n      m_invokerOwnsGil = true;')
     s=once(s,'      if (l_threadState == nullptr)\n      {','      if (l_threadState == nullptr)\n      {\n        '+event('InterpreterFailed',', GetId()'))
+    # Pinned CPython3.11.7 recoverable NULL returns retain this caller's
+    # temporary state and GIL. The old second acquisition self-deadlocks.
+    failed=s.index('      if (l_threadState == nullptr)\n      {')
+    cleanup=s.index('        PyThreadState_Clear(m_mainThreadState);',failed)
+    redundant='        PyEval_RestoreThread(m_mainThreadState);\n        m_invokerOwnsGil = true;\n'
+    assert s[failed:cleanup].endswith(redundant)
+    s=s[:failed]+s[failed:cleanup].removesuffix(redundant)+s[cleanup:]
     s=once(s,'  PyEval_RestoreThread(l_threadState);\n  m_invokerOwnsGil = true;','  PyEval_RestoreThread(l_threadState);\n  '+event('RestoreGilAcquired',', GetId()')+'\n  m_invokerOwnsGil = true;')
     line='  m_infinityPersistenceObserver = InfinityPythonPersistence::Start(GetId(), m_threadState->interp);'
     s=once(s,line,line+'\n  if (InfinityStartupTrace::Enabled()) '+event('ObserverReturned',', GetId(), PyErr_Occurred() ? 1 : 0'))

@@ -1,7 +1,8 @@
 # Internal native startup diagnostic
 
-Authorized continuation: owner instruction after 93d025b6. This is diagnostic
-instrumentation, not a claimed repair of the Fold failure.
+Authorized continuation: owner instruction after 93d025b6. This includes bounded
+diagnostics and the proven CPython NULL-cleanup repair below. It is not yet a
+causally established repair of the Fold failure.
 
 Four source-bound call-site files change: `ScriptInvocationManager.cpp`,
 `AddonBuiltins.cpp`, `PythonInvoker.cpp`, and `XBPython.cpp`. One header supplies
@@ -52,14 +53,34 @@ startup/shutdown refusal, missing file/handler, quarantine, controlled lock
 delay and recovery, foreign-process disablement, capacity/batch bounds and six
 trace-compiled-out equivalence cases. These do not execute CPython or Android.
 
-`test_cpython_initialization.py` is separately selected for pinned CPython
-3.11.7 on Actions. A host-only audit hook makes the real interpreter API fail
-early. It compares the unchanged cleanup against a host-only removal of the
-redundant GIL acquisition. It also creates/runs/retires three real interpreters
-and verifies an independent Python thread. A baseline timeout is recorded as a
-reproduced defect, never successful application initialization. This injection
-is not present in the Android payload, and the cleanup comparison is not applied
-to production. Fold attribution remains a separate gate.
+`test_cpython_initialization.py` separately executes pinned CPython 3.11.7 on
+Actions. A host-only audit hook makes the real interpreter API fail early. The
+test verifies the real NULL result, original current thread state and expected
+exception before cleanup. Run 43036170257's focused-host job passed: unchanged
+cleanup self-deadlocked at the second GIL acquisition; the two-line comparison
+returned, then created/ran/retired three interpreters and an independent Python
+thread. The parent deadline kills only the disposable host child.
+
+Both reviewers confirmed pinned CPython's recoverable NULL paths return before
+switching away from this caller's temporary thread state; the GIL remains held.
+Later initialization errors are fatal-status paths, not a contrary recoverable
+NULL contract. The candidate therefore removes only the redundant
+`PyEval_RestoreThread(m_mainThreadState)` and duplicate `m_invokerOwnsGil = true`
+in the first NULL branch. Existing Clear/DeleteCurrent, pointer/ownership reset,
+error reporting, failure return and persistence accounting remain unchanged.
+The current test compares the exact candidate block with be06e127 and requires
+precisely that two-line delta. No failure injection enters the Android payload.
+
+This repairs a reproduced initialization failure path. It does not establish
+that the owner's Fold entered it, suffered allocation failure, or stopped
+because of Core. Continued Core Python execution is inconsistent with a GIL
+self-deadlock lasting that entire observed interval. Native admission traces
+remain necessary for actual failed-start attribution.
+
+The first ARM job was cancelled during source preparation, after its host job
+passed, to incorporate this proven repair before dependency/full compilation.
+It is not recorded as an ARM build failure or PASS. Only the affected host
+proof must rerun for the exact corrective source before its ARM build.
 
 Independent reviewers requested removal of an unsafe/eager NULL-path Python
 query and bounded log draining. Both were corrected before Android compilation;

@@ -77,7 +77,7 @@ def prepare():
         source_commit=os.environ['GITHUB_SHA'],baseline82_engine='503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437',
         changed=bindings,new_header={HEADER:expected[HEADER]},unchanged82_native_sources=9407,
         diagnostic_build_flag='INFINITY_STARTUP_TRACE_QA=1',runtime_gate='exact com.projectinfinity.kodi:kodi process',
-        correction_implemented=False,signing=False,apk_built=False,Cobra='UNCHANGED'))
+        correction_implemented='CPython3.11.7 recoverable-NULL cleanup only; Fold attribution unresolved',signing=False,apk_built=False,Cobra='UNCHANGED'))
 
 
 def dependencies():

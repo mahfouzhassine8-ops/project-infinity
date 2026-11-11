@@ -85,18 +85,22 @@ int main(int argc,char** argv){
 def main():
     p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);a=p.parse_args()
     assert sys.version_info[:3]==(3,11,7), 'Pinned CPython3.11.7 required; no version substitution'
-    source=(HERE/'native/overlay/xbmc/interfaces/python/PythonInvoker.cpp').read_text()
-    start=source.index('      m_mainThreadState = PyThreadState_New(owner->interp);')
-    end=source.index('      newInterp = true;',start)+len('      newInterp = true;')
-    original=source[start:end]
+    path='repairs/infinity-functional-startup-2103482-20261111/native/overlay/xbmc/interfaces/python/PythonInvoker.cpp'
+    source=subprocess.check_output(['git','show','be06e127:'+path],cwd=HERE,text=True)
+    def block(text):
+        start=text.index('      m_mainThreadState = PyThreadState_New(owner->interp);')
+        end=text.index('      newInterp = true;',start)+len('      newInterp = true;')
+        return text[start:end]
+    original=block(source)
     redundant='        PyEval_RestoreThread(m_mainThreadState);\n        m_invokerOwnsGil = true;\n'
     assert original.count(redundant)==1
-    comparison=original.replace(redundant,'',1)
+    comparison=block((HERE/'native/overlay/xbmc/interfaces/python/PythonInvoker.cpp').read_text())
+    assert comparison==original.replace(redundant,'',1),'Candidate must contain only the proven two-line cleanup correction'
     include=sysconfig.get_path('include');libdir=sysconfig.get_config_var('LIBDIR')
     results=[]
     with tempfile.TemporaryDirectory(prefix='infinity-py311-init-') as tmp:
         tmp=Path(tmp)
-        for variant,block in [('unchanged_cleanup',original),('host_only_cleanup_comparison',comparison)]:
+        for variant,block in [('unchanged_cleanup',original),('candidate_cleanup',comparison)]:
             assert block.count('l_threadState = Py_NewInterpreter();')==1
             observed=block.replace('l_threadState = Py_NewInterpreter();','l_threadState = checkedNew(m_mainThreadState);',1)
             cpp=tmp/(variant+'.cpp');cpp.write_text(PREFIX+observed+SUFFIX);binary=tmp/variant
@@ -115,8 +119,8 @@ def main():
                 results.append(dict(variant=variant,case=mode,result='PASS_CONTROLLED_CPYTHON_EXECUTION',trace=r.stdout.splitlines(),parent_killed_host_child=False))
     report=dict(python=sys.version,source_block_sha256=hashlib.sha256(original.encode()).hexdigest(),
                 controlled_trigger='Host-only native audit rejection of cpython.PyInterpreterState_New; not present in deployed observer',
-                results=results,fold_failure_reproduced=False,production_cleanup_changed=False,
-                conclusion='Real NULL-return self-deadlock reproduced; host-only two-line cleanup comparison restores progress; Fold attribution unresolved')
+                results=results,fold_failure_reproduced=False,production_cleanup_changed=True,
+                conclusion='Real NULL-return self-deadlock reproduced; exact candidate two-line cleanup restores progress; Fold attribution unresolved')
     a.out.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))
 
 

@@ -247,7 +247,7 @@
          CLog::LogF(LOGERROR, "({}, {}) Python main thread state unavailable", GetId(), m_sourceFile);
          return false;
        }
-@@ -275,29 +281,35 @@
+@@ -275,33 +281,37 @@
        m_mainThreadState = PyThreadState_New(owner->interp);
        if (m_mainThreadState == nullptr)
        {
@@ -282,8 +282,12 @@
 +        InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterFailed, GetId());
          CLog::Log(LOGERROR, "CPythonInvoker({}, {}): FAILED to get thread m_threadState!", GetId(),
                    m_sourceFile);
-         PyEval_RestoreThread(m_mainThreadState);
-@@ -317,8 +329,10 @@
+-        PyEval_RestoreThread(m_mainThreadState);
+-        m_invokerOwnsGil = true;
+         PyThreadState_Clear(m_mainThreadState);
+         PyThreadState_DeleteCurrent();
+         m_mainThreadState = nullptr;
+@@ -317,8 +327,10 @@
    // get the GIL
  #if defined(TARGET_ANDROID)
    InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.restore_gil", reinterpret_cast<uintptr_t>(l_threadState->interp));
@@ -294,7 +298,7 @@
    m_invokerOwnsGil = true;
    if (newInterp)
    {
-@@ -327,10 +341,12 @@
+@@ -327,10 +339,12 @@
  
  #if defined(TARGET_ANDROID)
      InfinityScriptPersistence::InitializationProgress(GetId(), "native.kodi_module.initialize", reinterpret_cast<uintptr_t>(l_threadState->interp));
@@ -307,7 +311,7 @@
  #endif
      setState(InvokerStateInitialized);
  
-@@ -438,8 +454,10 @@
+@@ -438,8 +452,10 @@
    // BEGIN INFINITY_PREBYTECODE_OBSERVER
  #if defined(TARGET_ANDROID)
    InfinityScriptPersistence::InitializationProgress(GetId(), "native.observer.before_start", reinterpret_cast<uintptr_t>(m_threadState->interp));
@@ -318,7 +322,7 @@
    // END INFINITY_PREBYTECODE_OBSERVER
  #endif
  
-@@ -452,6 +470,7 @@
+@@ -452,6 +468,7 @@
  
    bool failed = false;
    std::string exceptionType, exceptionValue, exceptionTraceback;
@@ -326,7 +330,7 @@
    if (!stopping)
    {
      try
-@@ -489,9 +508,11 @@
+@@ -489,9 +506,11 @@
          }
          try {
  #endif
@@ -340,7 +344,7 @@
          if(waitProbe)InfinityPythonWaitProbe::BodyReturned();
  #endif
  #if defined(TARGET_ANDROID)
-@@ -518,6 +539,7 @@
+@@ -518,6 +537,7 @@
      }
    }
  

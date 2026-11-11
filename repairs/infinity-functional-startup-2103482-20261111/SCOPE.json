@@ -2,6 +2,7 @@
   "APK_build": false,
   "Cobra_changes": false,
   "RunScript_return_contract": "UNCHANGED",
+  "artifact_access": "RESOLVED_AUTHENTICATED_ACTIONS_43034295742",
   "authorized_scope": "Owner-authorized bounded Infinity-only native admission/interpreter diagnostic instrumentation, controlled reproduction and internal Android QA; causal repair only after proof",
   "branch": "work/infinity-2103482-functional-startup-20261111",
   "continuation_from": "93d025b65cf6d5b7e3912ce704d0bc98af4879fd",
@@ -10,9 +11,9 @@
   "known_limits": [
     "Owner confirms original dumpstate skipped current Kodi backtrace because process was cached",
     "Failed Health Center invocation/admission result and successful restart are not matched",
-    "Host experiment substitutes invocation peers; no actual Python/add-on/dlopen/Android execution",
-    "Signed82 bytes inaccessible through artifact-storage CONNECT 403; source/run records reused only"
+    "Host experiment substitutes invocation peers; no actual Python/add-on/dlopen/Android execution"
   ],
+  "native_build": "Diagnostic internal ARM64 job selected; first source-preparation job cancelled to include proven cleanup repair before full compilation",
   "new_phone_tests_requested": false,
   "new_tests_run": [
     {
@@ -26,7 +27,10 @@
       "selected_assertions": "PASS"
     }
   ],
-  "production_changes": [],
+  "production_changes": [
+    "Native QA instrumentation in ScriptInvocationManager, AddonBuiltins, PythonInvoker, XBPython and one bounded trace header",
+    "Proven CPython3.11.7 NULL-return cleanup: remove redundant GIL acquisition and duplicate ownership flag; Fold attribution unresolved"
+  ],
   "protected_baseline": 2103477,
   "raw_logs_committed": false,
   "reviews": {
@@ -44,6 +48,6 @@
   "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",
   "signing": false,
   "source_anchor": "694d46a480e62004952cc6a5b289af0ff995a071",
-  "status": "NEXT_ENGINEERING_STAGE_AUTHORIZED_AND_STARTED",
+  "status": "PROVEN_NULL_CLEANUP_CORRECTION_PLUS_DIAGNOSTIC_VERIFICATION_IN_PROGRESS",
   "version_reserved": false
 }
