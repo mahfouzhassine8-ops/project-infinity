@@ -23,6 +23,7 @@ QP=base.PROFILE+'/addon_data/'+QA
 REMOTE='/sdcard/Download/infinity-startup-qa/'
 APK82='78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32'
 HC_HASH='fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26'
+HC_CONTRACTS_HASH='3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214'
 SELECTION=HERE/'ANDROID-STARTUP-SELECTION.json'
 
 def selected():
@@ -60,8 +61,10 @@ elif request['action']=='health-center':
     path=xbmcvfs.translatePath(xbmcaddon.Addon('script.kodihealthcenter').getAddonInfo('path'))
     with open(os.path.join(path,'default.py'),'rb') as f: actual=hashlib.sha256(f.read()).hexdigest()
     assert actual=='fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26'
+    with open(os.path.join(path,'khc_contracts.py'),'rb') as f: contract_hash=hashlib.sha256(f.read()).hexdigest()
+    assert contract_hash=='3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214'
     assert not xbmc.getCondVisibility('Window.IsVisible(1188)')
-    result.update(health_window_initially_absent=True,health_source_sha256=actual)
+    result.update(health_window_initially_absent=True,health_source_sha256=actual,health_contracts_sha256=contract_hash)
     xbmc.executebuiltin('RunScript(script.kodihealthcenter)')
     deadline=time.monotonic()+40
     monitor=xbmc.Monitor()
@@ -69,7 +72,7 @@ elif request['action']=='health-center':
         visible=xbmc.getCondVisibility('Window.IsVisible(1188)')
         version=xbmcgui.Window(10000).getProperty('KHC.Version')
         dialog=xbmcgui.getCurrentWindowDialogId()
-        if visible and version=='2.5.27' and dialog==11188:
+        if visible and version=='2.5.26' and dialog==11188:
             label=xbmcgui.Window(11188).getControl(1188101).getLabel()
             assert label=='Scan Kodi'
             result.update(health_window_visible=True,health_version=version,
@@ -87,7 +90,9 @@ def prepare(apk,out):
     selection=selected()
     out.mkdir(parents=True,exist_ok=False)
     assert base.sha(apk)==APK82,'UNVERIFIED_BASELINE82'
-    with ZipFile(apk) as z:assert hashlib.sha256(z.read('assets/addons/script.kodihealthcenter/default.py')).hexdigest()==HC_HASH
+    with ZipFile(apk) as z:
+        assert hashlib.sha256(z.read('assets/addons/script.kodihealthcenter/default.py')).hexdigest()==HC_HASH
+        assert hashlib.sha256(z.read('assets/addons/script.kodihealthcenter/khc_contracts.py')).hexdigest()==HC_CONTRACTS_HASH
     archive=out/'startup-observer.zip'
     with ZipFile(archive,'w',ZIP_DEFLATED) as z:
         z.writestr(QA+'/addon.xml','<addon id="'+QA+'" version="1.0.0" name="Internal Startup QA" provider-name="Infinity QA"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable engineering probe</summary><description lang="en_GB">Not shipped</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')

@@ -2163,8 +2163,7 @@ jobs:
           path.write_bytes(subprocess.check_output(['git','show',retained+':repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py']))
           PY
           if ! dpkg-query -W -f='${Status}' libpulse0 2>/dev/null | grep -q 'install ok installed'; then
-            sudo apt-get -o Acquire::Retries=2 update -qq
-            sudo apt-get -o Acquire::Retries=2 install -y libpulse0
+            bash repairs/infinity-functional-startup-2103482-20261111/prepare_ci_tooling.sh emulator
           fi
           python startup-qa-sdk/prepare_android_emulator.py --out startup-qa-emulator-setup
           sudo chmod 666 /dev/kvm
