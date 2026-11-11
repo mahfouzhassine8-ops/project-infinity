@@ -1,0 +1,100 @@
+{
+  "status": "BLOCKED_ANDROID_ENGINEERING_NOT_RELEASE_READY",
+  "instrumentation_commit": "be06e127",
+  "corrective_commit": "679807f7a38173cae2b071d137ef28cf2d35fa37",
+  "probe_commit": "f2dc77b383b7094533cc687ae2a74bde53a4e56a",
+  "fold_cause_established": false,
+  "baseline_2103477_modified": false,
+  "Cobra_changed": false,
+  "user_device_access": false,
+  "gates": {
+    "signed82_artifact": {
+      "status": "PASS",
+      "run": 43034295742,
+      "source_artifact": 13836509327,
+      "source_run": 42979187229,
+      "sha256": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+      "certificate": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "v1": true,
+      "v2": true,
+      "v3": true,
+      "payload_members_unchanged_from_signed80": 7758
+    },
+    "native_trace_host": {
+      "status": "PASS_SELECTED_ASSERTIONS",
+      "run": 43036765104,
+      "cases": 15,
+      "artifact": 13862739074,
+      "actual_python": false,
+      "Android": false
+    },
+    "CPython3117": {
+      "status": "PASS_CONTROLLED_FAILURE_PATH_PROOF",
+      "run": 43036765104,
+      "original_success": "PASS",
+      "original_NULL": "EXPECTED_SELF_DEADLOCK_PARENT_TERMINATED_HOST_CHILD",
+      "corrected_success": "PASS",
+      "corrected_NULL": "PASS_FAILURE_RETURN_THEN_THREE_INTERPRETERS_AND_INDEPENDENT_THREAD",
+      "Fold_reproduction": false
+    },
+    "source_reconstruction": {
+      "status": "PASS_SOURCE_PREPARATION",
+      "runs": [
+        43036765104,
+        43040415571
+      ],
+      "native_files_preserved_from82": 9407,
+      "changed_native_callsite_files": 4,
+      "new_diagnostic_header": 1,
+      "APK_built": false
+    },
+    "ARM64_link": {
+      "status": "NOT_RUN_RUNNER_DEPENDENCY_BLOCKED",
+      "run": 43040415571,
+      "prior_run": 43036765104,
+      "prior_attempts": [
+        1,
+        2
+      ],
+      "failed_step": "Retained dependency tooling",
+      "exit_code": 100,
+      "errors": [
+        "Temporary failure resolving 'azure.archive.ubuntu.com'",
+        "Temporary failure resolving 'archive.ubuntu.com'",
+        "Temporary failure resolving 'security.ubuntu.com'"
+      ],
+      "packages_needed": [
+        "pkg-config",
+        "libcurl4-openssl-dev"
+      ],
+      "Ubuntu_signature_checks_weakened": false
+    },
+    "Android_local_functionality": {
+      "status": "NOT_RUN",
+      "run": 43039363818,
+      "workflow_conclusion": "cancelled",
+      "last_step": "Reuse qualified disposable SDK tooling",
+      "dependency": "libpulse0",
+      "package_mirror_DNS_failure": true,
+      "cancel_reason": "Pre-execution correction: published HC contract version2.5.26 differs from addon metadata2.5.27; no application test ran",
+      "corrected_probe_ready": true,
+      "no_blind_repeat": true
+    },
+    "Android_instrumentation_and_repeated_starts": {
+      "status": "NOT_RUN_NATIVE_BUILD_REQUIRED"
+    },
+    "shutdown_relaunch": {
+      "status": "NOT_RUN"
+    },
+    "original_signing": {
+      "status": "NOT_RUN_NO_SUCCESSOR_ISSUED"
+    },
+    "Fold_acceptance": {
+      "status": "NOT_RUN_OWNER_ONLY"
+    }
+  },
+  "next_required": "Restore ordinary authenticated Ubuntu package reachability on the disposable CI runner; rerun failed preparation/ARM compilation and the already reviewed named Android case. No new owner diagnostic is needed.",
+  "new_APK": null,
+  "registry_version_reserved": false,
+  "production_startup_repair_accepted": false
+}

@@ -1,6 +1,11 @@
 # Functional initialization investigation — November 11 evidence
 
-Status: the owner's intermittent functional failure is not yet reproduced or causally attributed. Production changes: none. Continuing from b251f65d, this checkpoint adds the owner's original-dumpstate findings, a bounded native-admission host experiment and the separate Resume Hub warning analysis. No new device capture is requested.
+Status: the owner's intermittent functional failure remains unattributed. Since
+93d025b6, native instrumentation is implemented in be06e127 and a separately
+reproduced CPython NULL-return cleanup deadlock is corrected in 679807f7.
+Authenticated Actions artifact access is resolved. Exact results and limits are
+in `INSTRUMENTATION.md`, `CPYTHON-INITIALIZATION-RESULTS.json` and
+`SIGNED82-VERIFICATION.json`. No new owner-device capture or test is requested.
 
 ## What the supplied files establish
 
@@ -51,13 +56,32 @@ Signed80 member bindings inspected by the preservation reviewer:
 - `classes3.dex`: `5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8`.
 - `assets/infinity/resume-hub-controller.zip`: `cb6a2de4ecf9a47b3953d06ab8eccdf8cfbbcb4fb3a209b87f2ccc41f71c6688`.
 
-Historical source: `repairs/resume-hub-2103292/InfinityResumeHubInstaller.java.in`, version constants 34–35 and exclusion 75–78. The retained disassembly, not the native-tree Java template, establishes the added write-barrier close and actual `Main.onResume()` call sequence. Signed82 inherits these members according to its preservation receipts; this is not a new byte verification of the inaccessible signed82 artifact. The warning indicates Java reached its nonpending-exit branch at that instant, not that native invocation admission was open.
+Historical source: `repairs/resume-hub-2103292/InfinityResumeHubInstaller.java.in`, version constants 34–35 and exclusion 75–78. The retained disassembly, not the native-tree Java template, establishes the added write-barrier close and actual `Main.onResume()` call sequence. Authenticated Actions43034295742 now independently verifies signed82 preserves these signed80 members byte-for-byte. The warning indicates Java reached its nonpending-exit branch at that instant, not that native invocation admission was open.
 
 ## Additional source finding, not attributed to this incident
 
 `CPythonInvoker.cpp` acquires the GIL before `Py_NewInterpreter()`, then reacquires it in the NULL-return cleanup branch. The pinned dependency is CPython 3.11.7. Its early interpreter/thread-state allocation failures return NULL while retaining the original thread state/GIL; `PyEval_RestoreThread()` unconditionally takes the GIL. This branch can therefore deadlock on reacquisition. Later interpreter-initialization failures have different fatal behavior and must not be conflated with this narrow NULL contract.
 
-Reviewed upstream blobs: `Python/pylifecycle.c` 9248e971d9c78fa10daf68652d558701184623b9; `Python/ceval.c` bb6bb35030d2128598794fed02a374a5615c92f9; `Python/pystate.c` db2ce878af64ec3321850d0e5b4666368e945689, tag v3.11.7. No allocation/NULL-branch observation or matching blocked stack is supplied. No production cleanup change is made on that hypothesis. A host injection would prove only the failure-path contract, not the Fold cause; no such test was run here.
+Reviewed upstream blobs: `Python/pylifecycle.c` 9248e971d9c78fa10daf68652d558701184623b9; `Python/ceval.c` bb6bb35030d2128598794fed02a374a5615c92f9; `Python/pystate.c` db2ce878af64ec3321850d0e5b4666368e945689, tag v3.11.7.
+
+The controlled pinned3.11.7 execution in run43036765104's host job now proves
+this failure path. A host-only native audit hook denies the real interpreter
+creation API, verifies its actual NULL result, retained current state and error,
+then executes the original cleanup. That child self-deadlocks at the second GIL
+acquisition. It is recorded as `EXPECTED_BASELINE_SELF_DEADLOCK`, never a
+successful application start.
+
+Corrective commit679807f7 removes only the redundant restore/acquisition and its
+duplicate ownership assignment in that branch. Clear/DeleteCurrent, pointer
+reset, failure return and persistence protections remain. The exact corrected
+block returns safely, creates/runs/retires three real interpreters and permits
+an independent Python thread to run. Both original and corrected success paths
+also pass. Injection is absent from the Android payload. Both reviewers checked
+the pinned contract and preservation.
+
+No matching NULL failure or stack exists in the Fold evidence. This repairs a
+proven failure path, not a proven cause of that incident. Continued Core Python
+logs contradict a continuous GIL deadlock throughout their observed interval.
 
 ## 2103482 provenance and preservation
 
@@ -68,14 +92,59 @@ Protected baseline remains 2103477; currently tested QA input is 2103482. Seven 
 - Original-key signing run 42979187229, source 4ed6e8a8bdc19f7bca50429e5bbb286f70eaf143: existing SUCCESS; artifact 13836509327. Certificate pinned by that route: `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`.
 - Core-loader prototype host run 42934459571: existing SUCCESS, but the prototype is explicitly excluded from the 82 APK. Its host PASS is not startup acceptance.
 
-These are source/build/signing records, not a new independent byte verification of the signed82 artifact. The artifact's authorized redirect was obtained, but this executor's proxy denied the Azure download CONNECT with HTTP 403. No proxy bypass was attempted. The live registry at signing source still lists candidate82 / last-issued81 and accepted-pointer unchanged; future issuance must reconcile actual signing history rather than reuse82. No registry change is made here.
+The former local Azure CONNECT403 is no longer an artifact-access blocker:
+authenticated Actions43034295742 downloaded artifact13836509327 and verified
+its APK original certificate, v1/v2/v3, package/version, native hash and exact
+signed80 member preservation. APK82 SHA-256:
+`78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32`.
+Exactly7,758 payload members are unchanged; only engine, versionCode and
+experience label differ. This is evidence reuse, not a new issuance. The live
+registry's candidate82/last-issued81 discrepancy remains to reconcile before
+any successor; no version is reserved.
 
 ## Remaining evidence and release gates
 
 The precise causal gap is a failed invocation matched to its native admission result or initialization stage and checkpoint generation. The original report explicitly skipped the current live backtrace. The supplied evidence does not contain the matching native receipt; another symptom screenshot or repetition of the same phone test would not resolve that gap.
 
-The existing native ledger already records invoker ID, native thread ID, interpreter identity, `observed` status and initialization stages. `InfinityAndroidCheckpoint.cpp::EncodeStatusLocked()` serializes them under its bounded receipt budget; `InfinityShutdownTrace` records admission closure. These existing probes should be used in a controlled Android reproduction to distinguish refusal from a wait before bytecode. Historical receipts from a different PID/session cannot attribute this incident. No such new Android reproduction has passed here. The signed82 artifact download also remains blocked by the executor's artifact-storage CONNECT 403; this is an environment access limit, not application failure.
+The existing native ledger records invoker/thread/interpreter identities and
+initialization progress. The new bounded native recorder adds explicit refusal
+reasons, lifecycle flags, manager lock waits, runtime readiness, GIL waits,
+interpreter/module/observer/bytecode boundaries, and the actual RunScript
+admission result. RunScript's public return remains zero for compatibility.
+The host checks demonstrate both admitted execution and refusal despite that
+zero result. No admission policy or essential-save gate is relaxed.
 
-No production correction is selected without that causal evidence. In particular, do not reopen admission after failed Close, clear the opaque-writer ledger, widen the legacy overlay guard, or package the separate Core prototype as a supposed startup repair. The independent CPython NULL cleanup finding remains source-confirmed but untested/unattributed in this checkpoint.
+Native instrumentation is internal QA only, compile-time off by default and
+runtime gated to the exact Infinity engine process. It excludes script paths,
+arguments, credentials and exception text. Buffers, capture duration and drain
+work are bounded. The existing native source tree remains untouched; overlays
+are applied only to a source-bound Actions build.
 
-Only the three focused host cases above ran. No new ARM64 build, Android cycles, signing, registry reservation or APK release occurred. Actual repeated functional launch, local-offline Health Center/add-on execution, independent clean shutdown/relaunch, recovery and physical Fold acceptance remain pending a demonstrated repair. All production code, Cobra, skin, Search/providers, Trakt/tracking/resume, settings/data and networking remain unchanged.
+ARM run43036765104 passed source preparation, but both attempts stopped before
+compilation because Ubuntu mirror DNS failed on the runner. Run43040415571 reused
+the successful exact-source host proof and tried Ubuntu's official HTTPS
+repositories with normal signature verification. Those hosts also failed DNS
+resolution. ARM compilation/linkage are NOT_RUN, not a native compile failure
+or PASS. ENGINEERING-STATUS.json retains exact errors and run bindings.
+
+Manual feature run43039363818 selected unchanged signed82 startup, actual local
+Python invocations, a nonce-bound real exception, another independent invocation,
+and unchanged Health Center execution. It requires an absent-to-visible11188
+transition and the source-bound1188101 control, actual installed source hashes,
+and exact process/start/nonce identity. No RPC acknowledgement or stale window
+can substitute for execution. Scope and helper bindings are committed in
+`ANDROID-STARTUP-SELECTION.json`; reviewer corrections were verified before
+dispatch. During emulator setup its libpulse0 acquisition hit the same package
+mirror DNS failure. It was cancelled before application execution when source
+inspection caught that HC publishes khc_contracts.VERSION2.5.26 despite
+addon.xml2.5.27. Commitf2dc77b3 corrects the probe and verifies both installed
+source hashes. The prepared case has not run; it is not a Fold reproduction.
+No further identical attempt is launched against the confirmed runner blocker.
+
+The new source touches four native call-site files and one diagnostic header;
+the only intended runtime behavior correction is the two-line NULL cleanup.
+Cobra, DEX, skin, Search/providers, Trakt/tracking/resume, settings/data,
+networking and existing shutdown policy remain protected. No signed successor
+or installer is available yet. Repeated functional Android starts, instrumented
+Android execution, clean shutdown/relaunch and final Fold acceptance remain
+unverified. The Core prototype and legacy overlay expansion are not included.
