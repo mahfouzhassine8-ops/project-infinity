@@ -1,0 +1,95 @@
+name: Infinity 2103480 shutdown — original-owner unsigned QA staging only
+on:
+  push:
+    branches: [work/infinity-2103480-shutdown-qa-package-20261111]
+    paths:
+      - .github/workflows/infinity-2103480-shutdown-qa-assembly.yml
+      - repairs/infinity-close-startup-2103480-20261110/build_candidate/package_unsigned_qa.py
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-shutdown-2103480-one-unsigned-qa
+  cancel-in-progress: false
+jobs:
+  original-owner-qa-assembly:
+    name: Verify signed80, rebuild only Infinity native+label ownership, stage unsigned QA
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Exact source-only scope and script syntax
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/infinity-close-startup-2103480-20261110/build_candidate/package_unsigned_qa.py
+          python3 - <<'PY'
+          import importlib.util
+          p='repairs/infinity-close-startup-2103480-20261110/build_candidate/package_unsigned_qa.py'
+          s=importlib.util.spec_from_file_location('shutdown_qa_assembly',p)
+          module=importlib.util.module_from_spec(s);s.loader.exec_module(module)
+          module.require_scope()
+          print('PASS isolated branch and original signer source untouched')
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13770936077', run-id: '42829229209', merge-multiple: true, github-token: '${{ github.token }}', path: official}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13830588821', run-id: '42959455792', merge-multiple: true, github-token: '${{ github.token }}', path: native}
+      - name: Authenticate original signed80 APK certificate and original module owner preparation
+        run: |
+          set -euo pipefail
+          (cd signed80 && sha256sum -c SHA256SUMS)
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs signed80/Infinity-2103480-Combined-Original-Signer.apk > original-certificate.txt
+          grep -qi 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' original-certificate.txt
+          python3 - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path('native')
+          engine=json.loads((root/'ARM64-NATIVE-BUILD.json').read_text())
+          source=json.loads((root/'SOURCE-PRESERVATION.json').read_text())
+          assert engine['status']=='PASS_FULL_ARM64_ENGINE_AND_BASELINE_ABI'
+          assert source['unchanged_production_native_files']==9410
+          assert engine['native_sha256']=='503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437'
+          assert source['after_sha256']=='2273becee60a25e81b2c5844f052fe32eaa8d03335311672cd67b66bc3738648'
+          print('PASS original signed80 plus exact native PASS source')
+          PY
+      - name: Rebuild original owner bundles and verify 3-change-only unsigned APK preservation
+        run: |
+          python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/package_unsigned_qa.py \
+            --signed80 signed80/Infinity-2103480-Combined-Original-Signer.apk \
+            --official official/components \
+            --native native/libkodi.so \
+            --native-proof native/ARM64-NATIVE-BUILD.json \
+            --source-proof native/SOURCE-PRESERVATION.json \
+            --out shutdown82-qa
+      - name: Preserve reviewed candidate with visible signing and safety limitations
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path('shutdown82-qa/UNSIGNED-QA-PRESERVATION.json')
+          j=json.loads(p.read_text())
+          assert j['status']=='PASS_UNSIGNED_OWNER_BUNDLE_AND_APK_MEMBER_PRESERVATION'
+          assert j['original_key_used'] is False
+          assert j['signed_apk_sha256'] is None
+          assert j['Android_shutdown']=='NOT_RUN'
+          assert j['native_writer_unknown_effect'].startswith('FAIL_CLOSED')
+          print('UNSIGNED candidate only; no approval to install or bypass protection')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103482-Shutdown-UNSIGNED-Owner-Prepared-${{ github.run_id }}-NOT-INSTALLABLE
+          path: |
+            shutdown82-qa/Infinity-2103482-Shutdown-UNSIGNED-NOT-INSTALLABLE.apk
+            shutdown82-qa/UNSIGNED-QA-PRESERVATION.json
+            shutdown82-qa/components/
+          retention-days: 90
+          if-no-files-found: error
+          compression-level: 1
