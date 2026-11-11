@@ -1,5 +1,5 @@
 {
-  "status": "ORIGINAL_SIGNED_INTERNAL_QA_READY_FOR_SELECTED_ANDROID_EXECUTION",
+  "status": "SIGNED_INTERNAL_QA_AND_SELECTED_ANDROID_PASS_FOLD_CAUSE_UNRESOLVED",
   "instrumentation_commit": "be06e127",
   "corrective_commit": "679807f7a38173cae2b071d137ef28cf2d35fa37",
   "probe_commit": "f2dc77b383b7094533cc687ae2a74bde53a4e56a",
@@ -107,9 +107,12 @@
       "health_center_pass_requires": "Normal API enablement on new disposable profile; not automatic fresh-profile readiness"
     },
     "Android_instrumentation_and_repeated_starts": {
-      "status": "SELECTED_NOT_RUN",
-      "feature": "startup-internal-qa",
-      "scope": "Two independent fresh VMs; actualnativeTID/body/stage correlation; realexceptionfollowedbyindependentscript; HC actualcontrolread; CC localplugin; unlaunched82->QA install-r with syntheticprofile sentinel; no ownerprofile orshutdown/reopen claim"
+      "status": "PASS_TWO_SELECTED_ANDROID_NATIVE_AND_LOCAL_STARTUPS_NOT_FOLD_CAUSAL_REPAIR",
+      "run": 43120012859,
+      "proof": "ANDROID-QA-RESULTS.json",
+      "scope": "Two independent fresh API36 VMs, normal/offline; actual ARM64 via stock native bridge; selected local functionality only",
+      "Android_NULL_path": "NOT_INJECTED",
+      "Fold_reproduction": false
     },
     "shutdown_relaunch": {
       "status": "NOT_RUN"
@@ -124,16 +127,23 @@
     },
     "Fold_acceptance": {
       "status": "NOT_RUN_OWNER_ONLY"
+    },
+    "forward_recovery": {
+      "status": "NOT_ISSUED",
+      "protected_historical_artifacts": "UNCHANGED"
     }
   },
-  "next_required": "Execute frozen actual signed83 startup-internal-qa selection on two disposable VMs; retain failures and no Fold cause attribution.",
+  "next_required": "Fold cause remains unestablished: no recorded failing invocation matched to admission/initialization stage. Internal QA instrumentation now executes on Android, but the original intermittent state was not reproduced. Do not label signed83 a permanent Fold repair or request repeated owner tests.",
   "new_APK": {
     "versionCode": 2103483,
     "sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
     "run": 43119348510,
     "artifact": 13899912993,
     "source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
-    "owner_delivery": false
+    "owner_delivery": false,
+    "internal_QA_ready": true,
+    "owner_installation_clearance": false,
+    "download": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43119348510/artifacts/13899912993"
   },
   "registry_version_reserved": true,
   "production_startup_repair_accepted": false,
@@ -151,5 +161,13 @@
     "source": "43dac4a78fb3429ec6d62e7d3f0d2ec208a4e0b9",
     "unsigned_sha256": "88133cae56402ab8a096656a964682bc08a1b6f6d693974f210e3dd0a020d820",
     "proof": "UNSIGNED-QA-PRESERVATION.json"
-  }
+  },
+  "remaining_limits": [
+    "Android NULL interpreter failure not injected; pinned actual3.11.7 host proof retained",
+    "No same-profile shutdown/relaunch acceptance",
+    "No actual online provider/search/playback cases in this selected task",
+    "Stock API36 ARM64 native bridge, not physical Fold Android17",
+    "Fresh-profile Health Center required normal API enablement",
+    "Fold empty-shell causality and final owner acceptance unproven"
+  ]
 }

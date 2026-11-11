@@ -98,9 +98,10 @@ its APK original certificate, v1/v2/v3, package/version, native hash and exact
 signed80 member preservation. APK82 SHA-256:
 `78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32`.
 Exactly7,758 payload members are unchanged; only engine, versionCode and
-experience label differ. This is evidence reuse, not a new issuance. The live
-registry's candidate82/last-issued81 discrepancy remains to reconcile before
-any successor; no version is reserved.
+experience label differ. This is evidence reuse, not a new issuance. The historical candidate82/last-issued81 discrepancy was reconciled through
+the unchanged original authority transition. Generation68 reserves internal
+QA83 with last-issued82; the protected accepted pointer is unchanged. Actual
+proposal43118831108 and original signing43119348510 passed.
 
 ## Remaining evidence and release gates
 
@@ -120,31 +121,62 @@ arguments, credentials and exception text. Buffers, capture duration and drain
 work are bounded. The existing native source tree remains untouched; overlays
 are applied only to a source-bound Actions build.
 
-ARM run43036765104 passed source preparation, but both attempts stopped before
-compilation because Ubuntu mirror DNS failed on the runner. Run43040415571 reused
-the successful exact-source host proof and tried Ubuntu's official HTTPS
-repositories with normal signature verification. Those hosts also failed DNS
-resolution. ARM compilation/linkage are NOT_RUN, not a native compile failure
-or PASS. ENGINEERING-STATUS.json retains exact errors and run bindings.
+Historical ARM attempts43036765104 and43040415571 stopped on runner Ubuntu
+repository DNS failures. Those results remain failures; no dependency signature
+check was weakened. A fresh runner in43040415571 attempt2 completed the original
+dependency recipe, actual Android ARM64 compilation and full native linking.
+The resulting engine retains all71,213 original exports and its library
+requirements.9,407 native source files remain unchanged; the four reviewed
+instrumentation callsites and bounded header account for the source delta.
+`ARM64-DIAGNOSTIC-BUILD.json` and `DIAGNOSTIC-SOURCE-PRESERVATION.json` bind this
+result to its actual source and artifact. No native rebuild followed that PASS.
 
-Manual feature run43039363818 selected unchanged signed82 startup, actual local
-Python invocations, a nonce-bound real exception, another independent invocation,
-and unchanged Health Center execution. It requires an absent-to-visible11188
-transition and the source-bound1188101 control, actual installed source hashes,
-and exact process/start/nonce identity. No RPC acknowledgement or stale window
-can substitute for execution. Scope and helper bindings are committed in
-`ANDROID-STARTUP-SELECTION.json`; reviewer corrections were verified before
-dispatch. During emulator setup its libpulse0 acquisition hit the same package
-mirror DNS failure. It was cancelled before application execution when source
-inspection caught that HC publishes khc_contracts.VERSION2.5.26 despite
-addon.xml2.5.27. Commitf2dc77b3 corrects the probe and verifies both installed
-source hashes. The prepared case has not run; it is not a Fold reproduction.
-No further identical attempt is launched against the confirmed runner blocker.
+Original82 Android evidence is retained in three separate receipts.43109315570
+passed actual local Python execution, a real controlled script exception and an
+independent subsequent script, but did not launch disabled Health Center.
+43110915155 enabled only that add-on through the normal Kodi API on a fresh VM,
+then failed during a test-observer borrowed GUI Control read. The original
+fault context and exact82 ELF identify ControlButton_getLabel at the borrowed
+object boundary. Retaining the observer's Window/Control ownership changed
+only the fixture; the actual dialog/control/label assertions remain.
+43112968019 then passed Health Center's actual UI, an independent Python
+invocation and the authenticated Command Center plugin listing. These are
+baseline results, not candidate or Fold acceptance. Historical failures remain
+visible in their own receipts.
 
-The new source touches four native call-site files and one diagnostic header;
-the only intended runtime behavior correction is the two-line NULL cleanup.
-Cobra, DEX, skin, Search/providers, Trakt/tracking/resume, settings/data,
-networking and existing shutdown policy remain protected. No signed successor
-or installer is available yet. Repeated functional Android starts, instrumented
-Android execution, clean shutdown/relaunch and final Fold acceptance remain
-unverified. The Core prototype and legacy overlay expansion are not included.
+Unsigned staging43117750382 and original signing43119348510 produced internal
+QA2103483. Its SHA-256 is
+`0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236`.
+The unchanged original signer verifies v1/v2/v3 and the permanent certificate.
+Exactly7,766 payload members match authenticated82; only the native engine,
+Android versionCode and Infinity component label differ. DEX, Cobra, skin,
+Command Center, providers, settings defaults and all other payloads are
+preserved. Native artifact43040415571/13899051924 was independently hashed,
+and both staging and signing bind consumed inputs to authenticated raw ZIPs.
+No owner data or historical signed baseline was modified.
+
+The precise signed83 candidate checks are frozen in
+`ANDROID-INTERNAL-QA-SELECTION.json`: two independent fresh Android API36 VMs,
+normal/offline local functionality, observed native initialization/admission,
+CPython3.11.7 script success/error/recovery, actual Health Center UI and CC
+plugin execution. Upgrade checks install over unlaunched original82 and retain
+a synthetic profile sentinel; they do not prove owner-profile migration.
+Run43120012859 passed both cases. Each retained609 native events, including21
+successful interpreter creations and the exact native stages for all five
+selected script bodies. Controlled body errors were actually reported (native
+error values1/2), followed by independent successful scripts (0/0). Health
+Center opened with the real Scan Kodi control; authenticated CC returned21
+rows. Offline default-network absence was verified before and after execution.
+Both install-over checks preserved their synthetic sentinel. Exact artifact
+hashes, native stages and limitations are in `ANDROID-QA-RESULTS.json`.
+Health Center needed normal API enablement on each fresh VM profile. These
+results do not establish automatic fresh-profile enablement, actual online
+provider behavior, same-profile restart, or physical Android17 performance.
+
+Android NULL-path injection is not performed; the proven failure cleanup
+contract remains the pinned real CPython host result. Same-profile shutdown
+and relaunch are NOT_RUN. The owner Fold cause and acceptance remain unknown.
+No provider-specific workaround, Core prototype, legacy Resume Hub overlay
+expansion, global admission change or new owner diagnostic is introduced.
+The signed artifact is internal QA evidence, not a declared permanent repair
+or an owner installation clearance. Forward recovery has not been issued.

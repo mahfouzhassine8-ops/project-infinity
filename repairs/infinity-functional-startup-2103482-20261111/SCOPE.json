@@ -7,7 +7,7 @@
   "branch": "work/infinity-2103482-functional-startup-20261111",
   "continuation_from": "93d025b65cf6d5b7e3912ce704d0bc98af4879fd",
   "current_owner_reported_QA": 2103482,
-  "feature_verification": "Original82 Android PASS selected local success/error/recovery (43109315570) and HC UI plus independent Python/CC plugin (43112968019). Failed observer GUI lifetime case43110915155 retained. No Fold cause attribution.",
+  "feature_verification": "Retained baseline results plus signed83 actual native/local Android normal/offline PASS43120012859. Synthetic install-over preserved; not Fold causality or same-profile restart acceptance.",
   "known_limits": [
     "Owner confirms original dumpstate skipped current Kodi backtrace because process was cached",
     "Failed Health Center invocation/admission result and successful restart are not matched",
@@ -34,8 +34,8 @@
   "protected_baseline": 2103477,
   "raw_logs_committed": false,
   "reviews": {
-    "Astra": "Native recording bounds/privacy and cleanup preservation reviewed; Android probe stale UI/error/hash evidence issues corrected and re-reviewed without remaining blockers",
-    "GPT_6_1": "Native instrumentation and real pinned CPython NULL/GIL contract reviewed; two-line cleanup correction justified; Fold attribution unresolved"
+    "Astra": "Native recording bounds/privacy and cleanup preservation reviewed; Android probe stale UI/error/hash evidence issues corrected and re-reviewed without remaining blockers; actual signed83 authority/payload receipt reviewed without mismatch",
+    "GPT_6_1": "Native instrumentation and real pinned CPython NULL/GIL contract reviewed; two-line cleanup correction justified; Fold attribution unresolved; actual609-event normal/offline Android reports independently reviewed without contradiction"
   },
   "schema": 1,
   "selected_next_checks": [
@@ -50,7 +50,7 @@
   "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",
   "signing": true,
   "source_anchor": "694d46a480e62004952cc6a5b289af0ff995a071",
-  "status": "ORIGINAL_SIGNED_INTERNAL_QA_READY_FOR_SELECTED_ANDROID_EXECUTION",
+  "status": "SIGNED_INTERNAL_QA_AND_SELECTED_ANDROID_PASS_FOLD_CAUSE_UNRESOLVED",
   "version_reserved": true,
   "APK_build_scope": "Original-key signed internal83 QA; only native engine/version/Infinitylabel delta from authenticated82. No owner delivery or Fold repair claim."
 }

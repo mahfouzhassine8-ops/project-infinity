@@ -1,0 +1,714 @@
+{
+  "status": "PASS_TWO_SELECTED_ANDROID_NATIVE_AND_LOCAL_STARTUPS_NOT_FOLD_CAUSAL_REPAIR",
+  "run": 43120012859,
+  "source": "847bb01ad1f3f729e52fbbf3f98e369bcac55500",
+  "APK_version": 2103483,
+  "APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "selection": "ANDROID-INTERNAL-QA-SELECTION.json",
+  "signing_proof": "SIGNED83-QA-PRESERVATION.json",
+  "runs": [
+    {
+      "status": "PASS_INTERNAL_QA_SELECTED_NATIVE_AND_LOCAL_EXECUTION_NOT_FOLD_REPRODUCTION",
+      "network_case": "normal",
+      "install_over": {
+        "existing_owner_data_used": false,
+        "from_version": 2103482,
+        "passed": true,
+        "previous_version_launched": false,
+        "synthetic_profile_sentinel_preserved": true,
+        "to_version": 2103483
+      },
+      "health_center_admission_before": {
+        "addonid": "script.kodihealthcenter",
+        "enabled": false,
+        "type": "xbmc.python.script",
+        "version": "2.5.27"
+      },
+      "health_center_admission_after": {
+        "addonid": "script.kodihealthcenter",
+        "enabled": true,
+        "type": "xbmc.python.script",
+        "version": "2.5.27"
+      },
+      "native_trace": {
+        "Android_NULL_path": "NOT_INJECTED",
+        "Fold_cause_established": false,
+        "builtin_individual_addon_attribution": "Not claimed; events deliberately exclude add-on paths and arguments",
+        "builtin_results": [
+          {
+            "invoker": 3,
+            "request": 4,
+            "us": 207609265,
+            "value": 3
+          },
+          {
+            "invoker": 4,
+            "request": 5,
+            "us": 207647391,
+            "value": 4
+          },
+          {
+            "invoker": 8,
+            "request": 10,
+            "us": 211563166,
+            "value": 8
+          },
+          {
+            "invoker": 10,
+            "request": 11,
+            "us": 211590715,
+            "value": 10
+          },
+          {
+            "invoker": 12,
+            "request": 13,
+            "us": 214556860,
+            "value": 12
+          },
+          {
+            "invoker": 14,
+            "request": 15,
+            "us": 219601889,
+            "value": 14
+          },
+          {
+            "invoker": 15,
+            "request": 16,
+            "us": 221801216,
+            "value": 15
+          },
+          {
+            "invoker": 16,
+            "request": 17,
+            "us": 222175780,
+            "value": 16
+          },
+          {
+            "invoker": 17,
+            "request": 18,
+            "us": 222505392,
+            "value": 17
+          },
+          {
+            "invoker": 19,
+            "request": 20,
+            "us": 227727538,
+            "value": 19
+          }
+        ],
+        "cases": [
+          {
+            "action": "local-python",
+            "body_enter_us": 219378384,
+            "invoker": 12,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 1,
+            "tid": 5577
+          },
+          {
+            "action": "controlled-body-error",
+            "body_enter_us": 221069366,
+            "invoker": 14,
+            "native_finished_value": 2,
+            "native_return_value": 1,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 2,
+            "tid": 5700
+          },
+          {
+            "action": "local-python",
+            "body_enter_us": 222077495,
+            "invoker": 15,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 3,
+            "tid": 5762
+          },
+          {
+            "action": "health-center",
+            "body_enter_us": 222456858,
+            "invoker": 16,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 4,
+            "tid": 5778
+          },
+          {
+            "action": "local-python",
+            "body_enter_us": 229171508,
+            "invoker": 19,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 5,
+            "tid": 5899
+          }
+        ],
+        "event_count": 609,
+        "status": "PASS_OBSERVED_ANDROID_NATIVE_INITIALIZATION_AND_SELECTED_BODY_EXECUTION"
+      },
+      "cases": [
+        {
+          "action": "local-python",
+          "arithmetic": 6,
+          "body_enter_us": 219378384,
+          "cc_version": "0.3.5.78",
+          "native_tid": 5577,
+          "nonce": "b161e372b4334c3db43db363bc2eb418",
+          "passed": true,
+          "pid": 5006,
+          "process_start": "18304",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 1
+        },
+        {
+          "action": "controlled-body-error",
+          "actual_traceback_observed": true,
+          "body_enter_us": 221069366,
+          "controlled_error": "startup_qa_body_error_b161e372b4334c3db43db363bc2eb418",
+          "native_tid": 5700,
+          "nonce": "b161e372b4334c3db43db363bc2eb418",
+          "passed": false,
+          "pid": 5006,
+          "process_start": "18304",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 2
+        },
+        {
+          "action": "local-python",
+          "arithmetic": 6,
+          "body_enter_us": 222077495,
+          "cc_version": "0.3.5.78",
+          "native_tid": 5762,
+          "nonce": "b161e372b4334c3db43db363bc2eb418",
+          "passed": true,
+          "pid": 5006,
+          "process_start": "18304",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 3
+        },
+        {
+          "action": "health-center",
+          "actual_dialog_id": 11188,
+          "body_enter_us": 222456858,
+          "health_contracts_sha256": "3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214",
+          "health_control_label": "Scan Kodi",
+          "health_source_sha256": "fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26",
+          "health_version": "2.5.26",
+          "health_window_initially_absent": true,
+          "health_window_visible": true,
+          "native_tid": 5778,
+          "nonce": "b161e372b4334c3db43db363bc2eb418",
+          "passed": true,
+          "pid": 5006,
+          "process_start": "18304",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 4
+        },
+        {
+          "action": "local-python",
+          "arithmetic": 6,
+          "body_enter_us": 229171508,
+          "cc_version": "0.3.5.78",
+          "native_tid": 5899,
+          "nonce": "b161e372b4334c3db43db363bc2eb418",
+          "passed": true,
+          "pid": 5006,
+          "process_start": "18304",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 5
+        }
+      ],
+      "job": 130857802957,
+      "artifact": 13901046460,
+      "archive_sha256": "f97a47185590e042414d90a6965b1691c001be898c2526bea70b4e904fff8c66",
+      "result_sha256": "f7c6225aa3e12f15f7e4fb98a310861156db73f708cccd41e05677e1f9a32395",
+      "kodi_log_sha256": "b9aaa02a88e6d2aaeb12a931ccb84aa4f9c97b1e830a1031133b1eb1d3e53840",
+      "native_stage_counts": {
+        "builtin.resolve": 10,
+        "builtin.resolved": 10,
+        "builtin.result": 10,
+        "bytecode.enter": 21,
+        "bytecode.returned": 16,
+        "dispatch.fresh": 21,
+        "dispatch.locked": 42,
+        "dispatch.wait": 42,
+        "execute.enter": 21,
+        "execution.finished": 16,
+        "gil.acquired": 21,
+        "gil.restore_acquired": 21,
+        "gil.restore_wait": 21,
+        "gil.wait": 21,
+        "handler.begin": 21,
+        "handler.ready": 21,
+        "interpreter.create": 21,
+        "interpreter.created": 21,
+        "kodi.initialize": 21,
+        "kodi.initialized": 21,
+        "lookup.locked": 21,
+        "lookup.wait": 21,
+        "observer.begin": 21,
+        "observer.returned": 21,
+        "request.begin": 21,
+        "request.end": 21,
+        "runtime.initialize": 1,
+        "runtime.initialized": 1,
+        "runtime.locked": 21,
+        "runtime.reused": 20,
+        "runtime.wait": 21
+      },
+      "signature_v1_v2_v3": true,
+      "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "CC_version": "0.3.5.78",
+      "CC_rows": 21,
+      "CC_commands_activated": false,
+      "environment": {
+        "sdk": 36,
+        "image": "system-images;android-36;google_apis;x86_64",
+        "revision": 7,
+        "execution": "Actual ARM64 APK engine through stock x86_64 native bridge",
+        "physical_device": false
+      },
+      "network_limit": "Unchanged emulator configuration; internet availability not independently tested"
+    },
+    {
+      "status": "PASS_INTERNAL_QA_SELECTED_NATIVE_AND_LOCAL_EXECUTION_NOT_FOLD_REPRODUCTION",
+      "network_case": "offline",
+      "install_over": {
+        "existing_owner_data_used": false,
+        "from_version": 2103482,
+        "passed": true,
+        "previous_version_launched": false,
+        "synthetic_profile_sentinel_preserved": true,
+        "to_version": 2103483
+      },
+      "health_center_admission_before": {
+        "addonid": "script.kodihealthcenter",
+        "enabled": false,
+        "type": "xbmc.python.script",
+        "version": "2.5.27"
+      },
+      "health_center_admission_after": {
+        "addonid": "script.kodihealthcenter",
+        "enabled": true,
+        "type": "xbmc.python.script",
+        "version": "2.5.27"
+      },
+      "native_trace": {
+        "Android_NULL_path": "NOT_INJECTED",
+        "Fold_cause_established": false,
+        "builtin_individual_addon_attribution": "Not claimed; events deliberately exclude add-on paths and arguments",
+        "builtin_results": [
+          {
+            "invoker": 3,
+            "request": 6,
+            "us": 193545734,
+            "value": 3
+          },
+          {
+            "invoker": 4,
+            "request": 7,
+            "us": 193577126,
+            "value": 4
+          },
+          {
+            "invoker": 8,
+            "request": 10,
+            "us": 196563234,
+            "value": 8
+          },
+          {
+            "invoker": 10,
+            "request": 11,
+            "us": 196616103,
+            "value": 10
+          },
+          {
+            "invoker": 12,
+            "request": 13,
+            "us": 199586983,
+            "value": 12
+          },
+          {
+            "invoker": 13,
+            "request": 14,
+            "us": 206895021,
+            "value": 13
+          },
+          {
+            "invoker": 15,
+            "request": 16,
+            "us": 214393718,
+            "value": 15
+          },
+          {
+            "invoker": 16,
+            "request": 17,
+            "us": 215303792,
+            "value": 16
+          },
+          {
+            "invoker": 17,
+            "request": 18,
+            "us": 215765519,
+            "value": 17
+          },
+          {
+            "invoker": 19,
+            "request": 20,
+            "us": 223270063,
+            "value": 19
+          }
+        ],
+        "cases": [
+          {
+            "action": "local-python",
+            "body_enter_us": 206565593,
+            "invoker": 12,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 1,
+            "tid": 4981
+          },
+          {
+            "action": "controlled-body-error",
+            "body_enter_us": 212890361,
+            "invoker": 13,
+            "native_finished_value": 2,
+            "native_return_value": 1,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 2,
+            "tid": 5182
+          },
+          {
+            "action": "local-python",
+            "body_enter_us": 215019183,
+            "invoker": 15,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 3,
+            "tid": 5639
+          },
+          {
+            "action": "health-center",
+            "body_enter_us": 215725157,
+            "invoker": 16,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 4,
+            "tid": 5667
+          },
+          {
+            "action": "local-python",
+            "body_enter_us": 224974293,
+            "invoker": 19,
+            "native_finished_value": 0,
+            "native_return_value": 0,
+            "observed_stages": [
+              "execute.enter",
+              "handler.ready",
+              "gil.acquired",
+              "interpreter.created",
+              "kodi.initialized",
+              "observer.returned",
+              "bytecode.enter",
+              "bytecode.returned",
+              "execution.finished"
+            ],
+            "sequence": 5,
+            "tid": 5845
+          }
+        ],
+        "event_count": 609,
+        "status": "PASS_OBSERVED_ANDROID_NATIVE_INITIALIZATION_AND_SELECTED_BODY_EXECUTION"
+      },
+      "cases": [
+        {
+          "action": "local-python",
+          "arithmetic": 6,
+          "body_enter_us": 206565593,
+          "cc_version": "0.3.5.78",
+          "native_tid": 4981,
+          "nonce": "d7b842d3063a46a49888d327452da7aa",
+          "passed": true,
+          "pid": 4709,
+          "process_start": "17706",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 1
+        },
+        {
+          "action": "controlled-body-error",
+          "actual_traceback_observed": true,
+          "body_enter_us": 212890361,
+          "controlled_error": "startup_qa_body_error_d7b842d3063a46a49888d327452da7aa",
+          "native_tid": 5182,
+          "nonce": "d7b842d3063a46a49888d327452da7aa",
+          "passed": false,
+          "pid": 4709,
+          "process_start": "17706",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 2
+        },
+        {
+          "action": "local-python",
+          "arithmetic": 6,
+          "body_enter_us": 215019183,
+          "cc_version": "0.3.5.78",
+          "native_tid": 5639,
+          "nonce": "d7b842d3063a46a49888d327452da7aa",
+          "passed": true,
+          "pid": 4709,
+          "process_start": "17706",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 3
+        },
+        {
+          "action": "health-center",
+          "actual_dialog_id": 11188,
+          "body_enter_us": 215725157,
+          "health_contracts_sha256": "3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214",
+          "health_control_label": "Scan Kodi",
+          "health_source_sha256": "fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26",
+          "health_version": "2.5.26",
+          "health_window_initially_absent": true,
+          "health_window_visible": true,
+          "native_tid": 5667,
+          "nonce": "d7b842d3063a46a49888d327452da7aa",
+          "passed": true,
+          "pid": 4709,
+          "process_start": "17706",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 4
+        },
+        {
+          "action": "local-python",
+          "arithmetic": 6,
+          "body_enter_us": 224974293,
+          "cc_version": "0.3.5.78",
+          "native_tid": 5845,
+          "nonce": "d7b842d3063a46a49888d327452da7aa",
+          "passed": true,
+          "pid": 4709,
+          "process_start": "17706",
+          "python_body_entered": true,
+          "python_version": [
+            3,
+            11,
+            7
+          ],
+          "sequence": 5
+        }
+      ],
+      "job": 130857802678,
+      "artifact": 13899599986,
+      "archive_sha256": "3af7a8aa8b016da68b1d557f47ed8ef1421a9956bf2f1ae8fa7d2a685ea1034b",
+      "result_sha256": "97811926083704b37d2cf0947a368a893ee9a4c5233cdff502de81c396618dbe",
+      "kodi_log_sha256": "23506fa6b34a83db40ad0be8de142ea81b01e92f5faacf86d0987a1ca4020dd7",
+      "native_stage_counts": {
+        "builtin.resolve": 10,
+        "builtin.resolved": 10,
+        "builtin.result": 10,
+        "bytecode.enter": 21,
+        "bytecode.returned": 16,
+        "dispatch.fresh": 21,
+        "dispatch.locked": 42,
+        "dispatch.wait": 42,
+        "execute.enter": 21,
+        "execution.finished": 16,
+        "gil.acquired": 21,
+        "gil.restore_acquired": 21,
+        "gil.restore_wait": 21,
+        "gil.wait": 21,
+        "handler.begin": 21,
+        "handler.ready": 21,
+        "interpreter.create": 21,
+        "interpreter.created": 21,
+        "kodi.initialize": 21,
+        "kodi.initialized": 21,
+        "lookup.locked": 21,
+        "lookup.wait": 21,
+        "observer.begin": 21,
+        "observer.returned": 21,
+        "request.begin": 21,
+        "request.end": 21,
+        "runtime.initialize": 1,
+        "runtime.initialized": 1,
+        "runtime.locked": 21,
+        "runtime.reused": 20,
+        "runtime.wait": 21
+      },
+      "signature_v1_v2_v3": true,
+      "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+      "CC_version": "0.3.5.78",
+      "CC_rows": 21,
+      "CC_commands_activated": false,
+      "environment": {
+        "sdk": 36,
+        "image": "system-images;android-36;google_apis;x86_64",
+        "revision": 7,
+        "execution": "Actual ARM64 APK engine through stock x86_64 native bridge",
+        "physical_device": false
+      },
+      "offline_evidence": {
+        "default_network_after": "none",
+        "default_network_before": "none",
+        "method": "Normal shell service commands in new disposable VM only",
+        "observation": "No default network before and after selected cases; no continuous packet capture"
+      }
+    }
+  ],
+  "Android_NULL_cleanup": "NOT_INJECTED_NOT_OBSERVED; proven pinned CPython3.11.7 host contract reused",
+  "Fold_failure_reproduced": false,
+  "Fold_cause_established": false,
+  "shutdown_relaunch": "NOT_RUN",
+  "online_provider_functionality": "NOT_RUN",
+  "owner_data": "NOT_ACCESSED; synthetic fresh-profile upgrade sentinel only",
+  "health_center_limit": "Existing HC disabled in both new VM profiles; enabled through normal Kodi API before actual UI execution. This is not automatic first-profile readiness.",
+  "interpretation_review": "GPT6.1 reviewed actual reports/traces and found no contradiction; selected runtime PASS only. Astra separately reviewed actual signed preservation receipt.",
+  "trace_limit": "609 events per case;21 interpreter creations succeeded, selected bodies completed. Remaining long-lived service bodies were not required to retire; no shutdown acceptance inferred.",
+  "internal_QA_ready": true,
+  "owner_installation_clearance": false
+}
