@@ -630,8 +630,13 @@ def run_kodi_service() -> None:
     last_trigger = ""
     monitor = xbmc.Monitor()
     while not monitor.abortRequested():
-        # Poll faster (1.0s) while binary is not yet running so post-install activation is instant without restart
-        wait_interval = 10.0 if (loaded_lib is not None or proc is not None or is_healthy()) else 1.0
+        # A failed Android native load must not produce a busy one-second
+        # copy/dlopen loop. A changed binary fingerprint can retry normally.
+        selected_lib = resolve_paths(addon_dir)[0] if is_android else None
+        failed_native = (is_android and
+                         _native_fingerprint(selected_lib) in _FAILED_NATIVE_LOADS)
+        wait_interval = 10.0 if (loaded_lib is not None or proc is not None
+                                 or is_healthy() or failed_native) else 1.0
         if monitor.waitForAbort(wait_interval):
             break
 
@@ -642,10 +647,15 @@ def run_kodi_service() -> None:
                     trigger = xbmcgui.Window(10000).getProperty("AdultHideoutCore.TriggerStart") or ""
                 except Exception:
                     trigger = ""
-            if (trigger and trigger != last_trigger) or is_binary_installed(addon_dir):
+            requested_start = bool(trigger and trigger != last_trigger)
+            if requested_start and is_android:
+                _FAILED_NATIVE_LOADS.discard(_native_fingerprint(selected_lib))
+            if failed_native and not requested_start:
+                continue
+            if requested_start or is_binary_installed(addon_dir):
                 last_trigger = trigger
                 if is_binary_installed(addon_dir):
-                    _log("Detected newly installed Core binary; starting engine immediately...")
+                    _log("Detected installed Core binary; attempting safe engine startup...")
                     loaded_lib, proc = start_engine(addon_dir)
             elif not is_binary_installed(addon_dir) and (xbmcgui is None or xbmcgui.Window(10000).getProperty("AdultHideoutCore.Downloading") != "1"):
                 try:
