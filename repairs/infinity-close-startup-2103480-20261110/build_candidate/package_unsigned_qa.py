@@ -38,6 +38,7 @@ DELTA = {
 FILES = {
     "repairs/infinity-close-startup-2103480-20261110/build_candidate/package_unsigned_qa.py",
     ".github/workflows/infinity-2103480-shutdown-qa-assembly.yml",
+    "repairs/infinity-close-startup-2103480-20261110/build_candidate/ORIGINAL-KEY-SIGNING-HANDOFF.md",
 }
 
 
