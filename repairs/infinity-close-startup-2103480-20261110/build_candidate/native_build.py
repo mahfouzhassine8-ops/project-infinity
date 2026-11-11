@@ -123,6 +123,38 @@ def prepare():
     })
     print("PASS exact signed80 native source and 9410-byte-identical source files", flush=True)
 
+
+def dependencies():
+    """Regenerate expired verified dependency inputs from the unchanged original recipe."""
+    require_scope()
+    assert NATIVE.exists() and (OUT / "NATIVE-SOURCE-MAP.json").exists()
+    recipe = (ROOT / "scripts/infinity_live_app_ci_2.sh").read_text()
+    original = subprocess.check_output(
+        ["git", "show", SOURCE_PARENT + ":scripts/infinity_live_app_ci_2.sh"],
+        text=True, cwd=ROOT)
+    assert recipe == original, "COMPILER_DEPENDENCY_RECIPE_CHANGED"
+    start = recipe.index("\ncd kodi/tools/depends\n")
+    end = recipe.index('\nmake -C target/cmakebuildsys BUILD_DIR="$BUILD_DIR"', start)
+    dependency_block = recipe[start:end]
+    assert dependency_block.count("./bootstrap") == 1
+    assert dependency_block.count("./configure") == 1
+    assert dependency_block.count('make -j"$(nproc)"') == 1
+    assert "fontconfig-2.14.0.tar.xz" in dependency_block
+    shell = ('set -euo pipefail\ncd "$GITHUB_WORKSPACE"\n'
+             'mkdir -p "$DEPENDS" "$TARBALLS" "$BUILD_DIR"\n'
+             + dependency_block + "\n")
+    subprocess.run(["bash", "-c", shell], cwd=ROOT, check=True)
+    subprocess.run(["python3", "repairs/android-checkpoint-shutdown/native_ci.py",
+                    "mark-dependencies"], cwd=ROOT, check=True)
+    save("REBUILT-DEPENDENCY-STATUS.json", {
+        "status": "PASS_ORIGINAL_PINNED_DEPENDENCIES_REGENERATED_AND_VERIFIED",
+        "source_commit": os.environ["GITHUB_SHA"],
+        "original_native_source_map_sha256": MAP_SHA,
+        "toolchain": "NDK21.4.7075529",
+        "APK": "NOT_BUILT", "key_access": False,
+    })
+    print("PASS original pinned compiler dependencies rebuilt and verified", flush=True)
+
 def compile_native():
     require_scope()
     expected = json.loads((OUT / "NATIVE-SOURCE-MAP.json").read_text())
@@ -171,5 +203,5 @@ def compile_native():
     print("PASS full ARM64 engine, native ABI and fail-closed source preservation; APK NOT BUILT", flush=True)
 
 if __name__ == "__main__":
-    assert len(sys.argv) == 2 and sys.argv[1] in ("prepare", "compile")
-    {"prepare": prepare, "compile": compile_native}[sys.argv[1]]()
+    assert len(sys.argv) == 2 and sys.argv[1] in ("prepare", "dependencies", "compile")
+    {"prepare": prepare, "dependencies": dependencies, "compile": compile_native}[sys.argv[1]]()

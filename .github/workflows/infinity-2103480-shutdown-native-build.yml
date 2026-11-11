@@ -51,20 +51,17 @@ jobs:
         with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
       - name: Restore exact signed80 9411 native sources with only approved shutdown correction
         run: python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/native_build.py prepare
-      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '11698374892', run-id: '38132105717', merge-multiple: true, github-token: '${{ github.token }}', path: dependency-transfer}
-      - name: Restore verified existing compiler dependencies and cache
+      - name: Install retained native dependency tooling
         run: |
           set -euo pipefail
           sudo apt-get -o Acquire::Retries=3 update -qq
-          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev
-          (cd dependency-transfer && sha256sum -c SHA256SUMS)
-          tar --no-same-owner -xf dependency-transfer/verified-android-dependencies.tar
-          tar --no-same-owner -xf dependency-transfer/verified-compiler-cache.tar -C "$HOME"
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev autoconf automake libtool pkg-config
       - uses: actions/cache@v4
         with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
       - name: Restore original pinned Android NDK
         run: bash repairs/android-checkpoint-shutdown/install_ndk.sh
+      - name: Rebuild expired dependency inputs through unchanged pinned Kodi source recipe
+        run: python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/native_build.py dependencies
       - name: Compile and link complete ARM64 engine with original ABI preservation
         run: python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/native_build.py compile
       - uses: actions/upload-artifact@v4
