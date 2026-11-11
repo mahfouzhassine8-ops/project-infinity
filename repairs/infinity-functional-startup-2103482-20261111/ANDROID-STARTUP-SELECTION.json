@@ -1,0 +1,30 @@
+{
+  "feature": "signed82-local-python-and-health-center",
+  "APK_version": 2103482,
+  "APK_sha256": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+  "shutdown_tests": false,
+  "Cobra_tests": false,
+  "owner_device": false,
+  "selected_cases": [
+    "One unchanged original82 cold startup on qualified disposable API36",
+    "Actual local script execution with PID/start/nonce binding",
+    "Unique controlled Python body exception observed in real Kodi log",
+    "Another independent successful Python invocation after exception",
+    "Unchanged installed Health Center script hash and absent-to-visible11188 transition with original1188101 control",
+    "Final independent local Python invocation and process survival"
+  ],
+  "unselected": [
+    "Playback",
+    "Search",
+    "Cobra",
+    "Shutdown",
+    "Physical Fold acceptance"
+  ],
+  "helper_sha256": {
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315",
+    "repairs/infinity-tracking-integration-2103469-20261108/stage_tracking_android.py": "d5d2e8e99721a576e6e52611fa9f0ca8a02a9c89f639f6fe99ba90db020323b8",
+    "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e"
+  }
+}

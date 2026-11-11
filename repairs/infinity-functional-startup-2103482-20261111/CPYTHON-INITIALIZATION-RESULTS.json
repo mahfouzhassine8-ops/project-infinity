@@ -1,0 +1,92 @@
+{
+  "python": "3.11.7 (main, Sep 30 2024, 20:04:00) [GCC 11.4.0]",
+  "source_block_sha256": "4c5e0a026b0107b1c472776f96dc19b6a3f34918205585a2262ed11f18e818d3",
+  "controlled_trigger": "Host-only native audit rejection of cpython.PyInterpreterState_New; not present in deployed observer",
+  "results": [
+    {
+      "variant": "unchanged_cleanup",
+      "case": "success",
+      "result": "PASS_CONTROLLED_CPYTHON_EXECUTION",
+      "trace": [
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "three_interpreters_and_independent_thread_passed"
+      ],
+      "parent_killed_host_child": false
+    },
+    {
+      "variant": "unchanged_cleanup",
+      "case": "denied",
+      "result": "EXPECTED_BASELINE_SELF_DEADLOCK",
+      "trace": [
+        "audit_denial_and_retained_current_state_verified",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.failed"
+      ],
+      "parent_killed_host_child": true
+    },
+    {
+      "variant": "candidate_cleanup",
+      "case": "success",
+      "result": "PASS_CONTROLLED_CPYTHON_EXECUTION",
+      "trace": [
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "three_interpreters_and_independent_thread_passed"
+      ],
+      "parent_killed_host_child": false
+    },
+    {
+      "variant": "candidate_cleanup",
+      "case": "denied",
+      "result": "PASS_CONTROLLED_CPYTHON_EXECUTION",
+      "trace": [
+        "audit_denial_and_retained_current_state_verified",
+        "controlled_failure_returned",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.failed",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "gil.wait",
+        "gil.acquired",
+        "interpreter.create",
+        "interpreter.created",
+        "three_interpreters_and_independent_thread_passed"
+      ],
+      "parent_killed_host_child": false
+    }
+  ],
+  "fold_failure_reproduced": false,
+  "production_cleanup_changed": true,
+  "conclusion": "Real NULL-return self-deadlock reproduced; exact candidate two-line cleanup restores progress; Fold attribution unresolved"
+}

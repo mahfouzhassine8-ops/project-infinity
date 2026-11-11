@@ -7,13 +7,13 @@
   "branch": "work/infinity-2103482-functional-startup-20261111",
   "continuation_from": "93d025b65cf6d5b7e3912ce704d0bc98af4879fd",
   "current_owner_reported_QA": 2103482,
-  "feature_verification": "Independent startup/functional invocation cycles; NOT_RUN",
+  "feature_verification": "Selected manual startup82-local-python: one unchanged82 startup plus actual local invocations/controlled exception/HealthCenter; PENDING",
   "known_limits": [
     "Owner confirms original dumpstate skipped current Kodi backtrace because process was cached",
     "Failed Health Center invocation/admission result and successful restart are not matched",
-    "Host experiment substitutes invocation peers; no actual Python/add-on/dlopen/Android execution"
+    "Trace-host peers are controlled; separate actual pinned CPython3.11.7 execution proves NULL-return self-deadlock and exact correction; neither is a Fold reproduction"
   ],
-  "native_build": "Diagnostic internal ARM64 job selected; first source-preparation job cancelled to include proven cleanup repair before full compilation",
+  "native_build": "43036765104 attempt1 blocked before compilation by runner Ubuntu mirror DNS; failed ARM job only retried; host PASS retained",
   "new_phone_tests_requested": false,
   "new_tests_run": [
     {
@@ -34,15 +34,16 @@
   "protected_baseline": 2103477,
   "raw_logs_committed": false,
   "reviews": {
-    "Astra": "Legacy DEX overlay guard and return flow; host-test claim boundaries; no production changes",
-    "GPT_6_1": "Pinned CPython NULL/GIL source contract and deterministic proposed test; not run/not attributed to Fold"
+    "Astra": "Native recording bounds/privacy and cleanup preservation reviewed; Android probe stale UI/error/hash evidence issues corrected and re-reviewed without remaining blockers",
+    "GPT_6_1": "Native instrumentation and real pinned CPython NULL/GIL contract reviewed; two-line cleanup correction justified; Fold attribution unresolved"
   },
   "schema": 1,
   "selected_next_checks": [
     "Authenticated GitHub Actions download of artifact13836509327 from run42979187229; verify original certificate v1/v2/v3, version and signed80 member preservation without installation",
     "Focused native trace host cases: successful dispatch, unchanged refusal results, delayed initialization/lock progress, trace disabled equivalence, bounded records and privacy",
     "Pinned CPython3.11.7 initialization failure versus success with native-only observation; artificial failure explicitly labeled",
-    "Internal ARM64 diagnostic compile/link and original-owner QA preparation only after instrumentation/source review; no owner-facing repair claim"
+    "Internal ARM64 diagnostic compile/link and original-owner QA preparation only after instrumentation/source review; no owner-facing repair claim",
+    "Existing manual feature-only startup82-local-python on disposable qualified API36 with exact unchanged signed82; no Close/Cobra/playback/search; no Fold claim"
   ],
   "selected_runtime_test_fixture": "NATIVE_HOST_ADMISSION_ONLY; actual methods and controlled peers",
   "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",
