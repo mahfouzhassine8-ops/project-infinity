@@ -169,7 +169,9 @@ def proposal(prepared, out):
         producer_run=ARTIFACT_RUN, producer_source=ASSEMBLY_COMMIT,
         artifact={"id":ARTIFACT_ID,"name":ARTIFACT_NAME,
                   "digest":"sha256:"+ARTIFACT_ARCHIVE_DIGEST},
-        source_files={script_path:sha_path(task_path)},
+        source_files={script_path:sha_path(task_path),
+                      'repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py':
+                      sha_path(ROOT / 'repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py')},
         preparation_sha256=sha_path(receipt_path),
         immutable_functional_base=2103480,
         baseline_APK_sha256=BASE_APK, native_sha256=NATIVE, native_build_commit=NATIVE_COMMIT,
