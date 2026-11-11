@@ -19,6 +19,7 @@ def verify(log,cases):
     required=('execute.enter','handler.ready','gil.acquired','interpreter.created','kodi.initialized','observer.returned','bytecode.enter')
     result=[]
     for case in cases:
+        assert case['python_version']==[3,11,7],'Actual embedded CPython differs from source-bound failure proof'
         tid=case['native_tid'];entered=case['body_enter_us']
         starts=[r for r in rows if r['tid']==tid and r['stage']=='bytecode.enter' and r['us']<=entered]
         assert len(starts)==1,'Missing or ambiguous observed invocation'

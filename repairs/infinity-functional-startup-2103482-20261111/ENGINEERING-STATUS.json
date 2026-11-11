@@ -1,5 +1,5 @@
 {
-  "status": "ARM64_AND_BASELINE_ANDROID_PASS_INTERNAL_QA_UNSIGNED_SIGNING_PENDING",
+  "status": "ORIGINAL_SIGNED_INTERNAL_QA_READY_FOR_SELECTED_ANDROID_EXECUTION",
   "instrumentation_commit": "be06e127",
   "corrective_commit": "679807f7a38173cae2b071d137ef28cf2d35fa37",
   "probe_commit": "f2dc77b383b7094533cc687ae2a74bde53a4e56a",
@@ -107,7 +107,7 @@
       "health_center_pass_requires": "Normal API enablement on new disposable profile; not automatic fresh-profile readiness"
     },
     "Android_instrumentation_and_repeated_starts": {
-      "status": "PREPARED_NOT_RUN_REQUIRES_ISSUED_QA_HASH",
+      "status": "SELECTED_NOT_RUN",
       "feature": "startup-internal-qa",
       "scope": "Two independent fresh VMs; actualnativeTID/body/stage correlation; realexceptionfollowedbyindependentscript; HC actualcontrolread; CC localplugin; unlaunched82->QA install-r with syntheticprofile sentinel; no ownerprofile orshutdown/reopen claim"
     },
@@ -115,18 +115,27 @@
       "status": "NOT_RUN"
     },
     "original_signing": {
-      "status": "PENDING_EXACT_AUTHORITY_NO_KEY_USED",
-      "keyfree_proposal": 43118344037,
-      "proposal_status": "PASS_BUT_SUPERSEDED_BY_DISPATCH_METADATA_CORRECTION",
-      "refreshed_source": "7c6a683ac7d93b99f18f5be95aae135c9905fca5"
+      "status": "PASS_ORIGINAL_SIGNED_INTERNAL_QA_THREE_MEMBER_PRESERVATION",
+      "run": 43119348510,
+      "proof": "SIGNED83-QA-PRESERVATION.json",
+      "authority_proposal_run": 43118831108,
+      "source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+      "generation": 68
     },
     "Fold_acceptance": {
       "status": "NOT_RUN_OWNER_ONLY"
     }
   },
-  "next_required": "Refresh source-bound original authority proposal after adding explicit signing dispatch, register reviewed83generation68 without changing protected accepted pointer, then use original signer and selected candidate Android checks. No ownerdevice diagnostics requested.",
-  "new_APK": null,
-  "registry_version_reserved": false,
+  "next_required": "Execute frozen actual signed83 startup-internal-qa selection on two disposable VMs; retain failures and no Fold cause attribution.",
+  "new_APK": {
+    "versionCode": 2103483,
+    "sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+    "run": 43119348510,
+    "artifact": 13899912993,
+    "source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+    "owner_delivery": false
+  },
+  "registry_version_reserved": true,
   "production_startup_repair_accepted": false,
   "continuation_checkpoint": "ee6d5571aa1204c1a775f24389a6f9b7ce6c968b",
   "internal_QA_preparation": {

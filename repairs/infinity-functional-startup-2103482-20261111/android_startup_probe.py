@@ -55,7 +55,7 @@ class Device(RetainedDevice):
         return super().rpc(method,params,timeout)
 
 OBSERVER=r'''
-import hashlib, json, os, time
+import hashlib, json, os, sys, time
 import xbmc, xbmcaddon, xbmcgui, xbmcvfs
 ROOT=xbmcvfs.translatePath('special://profile/addon_data/script.infinity.startupqaprobe/')
 with open(ROOT+'request.json') as f: request=json.load(f)
@@ -63,7 +63,8 @@ with open('/proc/self/stat') as f: started=f.read().rsplit(') ',1)[1].split()[19
 assert request['pid']==os.getpid() and request['process_start']==started
 result=dict(nonce=request['nonce'],sequence=request['sequence'],pid=os.getpid(),process_start=started,
             action=request['action'],python_body_entered=True,passed=False,
-            native_tid=int(os.readlink('/proc/thread-self').split('/')[-1]),body_enter_us=time.monotonic_ns()//1000)
+            native_tid=int(os.readlink('/proc/thread-self').split('/')[-1]),body_enter_us=time.monotonic_ns()//1000,
+            python_version=list(sys.version_info[:3]))
 def save():
     with open(ROOT+'reply.pending','w') as f: json.dump(result,f)
     os.replace(ROOT+'reply.pending',ROOT+'reply.json')

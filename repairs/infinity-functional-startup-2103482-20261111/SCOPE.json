@@ -48,9 +48,9 @@
   ],
   "selected_runtime_test_fixture": "NATIVE_HOST_ADMISSION_ONLY; actual methods and controlled peers",
   "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",
-  "signing": false,
+  "signing": true,
   "source_anchor": "694d46a480e62004952cc6a5b289af0ff995a071",
-  "status": "ACTUAL_ARM64_AND_BASELINE_ANDROID_PASS; UNSIGNED_QA_PRESERVATION_PASS; ORIGINAL_SIGNING_AND_CANDIDATE_ANDROID_PENDING",
-  "version_reserved": false,
-  "APK_build_scope": "Unsigned internalQA only; not installable; exact original82 plusengine/version/Infinitylabel"
+  "status": "ORIGINAL_SIGNED_INTERNAL_QA_READY_FOR_SELECTED_ANDROID_EXECUTION",
+  "version_reserved": true,
+  "APK_build_scope": "Original-key signed internal83 QA; only native engine/version/Infinitylabel delta from authenticated82. No owner delivery or Fold repair claim."
 }

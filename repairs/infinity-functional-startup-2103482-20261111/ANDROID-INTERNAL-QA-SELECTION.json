@@ -1,0 +1,47 @@
+{
+  "feature": "signed-startup-internal-qa",
+  "APK_version": 2103483,
+  "APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "require_native_trace": true,
+  "shutdown_tests": false,
+  "Cobra_tests": false,
+  "owner_device": false,
+  "Fold_cause_established": false,
+  "execution_actions": [
+    "local-python",
+    "controlled-body-error",
+    "local-python",
+    "health-center",
+    "local-python"
+  ],
+  "original_signer_workflow_id": 397702717,
+  "baseline_apk_sha256": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+  "signed_run": 43119348510,
+  "signed_source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+  "signed_artifact_id": 13899912993,
+  "signed_artifact_digest": "sha256:df8aa2cd1ba52a83d0da60927bbd51e6fbc5de3808d4a9e2279e9eb759f820e7",
+  "helper_sha256": {
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734",
+    "repairs/infinity-tracking-integration-2103469-20261108/verify_tracking_android.py": "04e736720a44f6a56d99132cce24498c32311ab8df728d8305284a28d4e10315",
+    "repairs/infinity-tracking-integration-2103469-20261108/stage_tracking_android.py": "d5d2e8e99721a576e6e52611fa9f0ca8a02a9c89f639f6fe99ba90db020323b8",
+    "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
+    "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e"
+  },
+  "selected_cases": [
+    "Two independent fresh VM cold starts; actual corrected ARM64 engine via qualified API36 native bridge",
+    "Original certificate install-r over unlaunched signed82; synthetic profile sentinel retained",
+    "Actual CPython3.11.7 thread-bound native initialization and admission stages",
+    "Actual controlled script body exception followed by independent successful invocation",
+    "Actual Health Center window/control plus authenticated Command Center plugin execution",
+    "Normal VM networking and separately verified offline local functionality"
+  ],
+  "unselected": [
+    "Android NULL interpreter fault injection",
+    "Same-profile shutdown/relaunch",
+    "Owner-profile migration",
+    "Provider search or playback",
+    "Cobra execution",
+    "Fold acceptance"
+  ]
+}
