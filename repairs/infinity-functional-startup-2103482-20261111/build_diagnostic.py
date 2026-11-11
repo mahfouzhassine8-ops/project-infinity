@@ -40,7 +40,7 @@ def scope():
     assert os.environ['GITHUB_REF']=='refs/heads/'+BRANCH
     assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()==os.environ['GITHUB_SHA']
     changed=subprocess.check_output(['git','diff','--name-only',BASE,'HEAD'],cwd=ROOT,text=True).splitlines()
-    permitted={'.github/workflows/infinity-functional-startup-evidence.yml','.github/workflows/infinity-functional-startup-native.yml'}
+    permitted={'.github/workflows/infinity-functional-startup-evidence.yml','.github/workflows/infinity-functional-startup-native.yml','.github/workflows/infinity-saved-navigation-android.yml'}
     assert all(p in permitted or p.startswith('repairs/infinity-functional-startup-2103482-20261111/') for p in changed),changed
     assert json.loads((HERE/'HOST-TRACE-RESULTS.json').read_text())['all_selected_assertions_passed']
     # Historical restoration/compiler/signing inputs are immutable; the new
