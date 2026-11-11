@@ -2,7 +2,7 @@ name: Infinity combined release | owner gate before original signing
 on:
   push:
     branches: [work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108, work/infinity-exact69-forward-2103476-20261109, work/infinity-exact74-retest-2103477-20261109, work/infinity-2103460-nine-corrections-20261106]
-    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-SIGN-REQUEST.json]
+    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-SIGN-REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-ORIGINAL-SIGN-REQUEST.json]
   workflow_dispatch:
     inputs:
       operation:
@@ -3072,5 +3072,82 @@ jobs:
         with:
           name: Infinity82-OriginalSigner-AuthorityProposal-${{ github.run_id }}-NO-KEY-NO-APK
           path: shutdown82-authority-review/
+          retention-days: 90
+          if-no-files-found: warn
+
+  shutdown82-original-key-internal-qa:
+    name: Exactly registered 2103482 internal QA through original permanent signing key
+    if: github.event_name == 'push' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && startsWith(github.event.head_commit.message, 'Sign shutdown82:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 100
+    permissions: {contents: read, actions: read}
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Verify registered generation66 and sole authorized signer before keys
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py
+          python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py admit
+          mkdir -p shutdown82-gate
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out shutdown82-gate/SIGNER-ROUTES.json
+          test -x "$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13833695178', run-id: '42970204230', merge-multiple: true, github-token: '${{ github.token }}', path: shutdown82-prepared}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Prove exact signed80 parent and unsigned candidate with only approved member differences
+        run: |
+          (cd signed80 && sha256sum -c SHA256SUMS)
+          python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py inputs
+      - name: Run unchanged original pre-sign source, ownership and DEX guards
+        run: |
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py \
+            --apk shutdown82-prepared/Infinity-2103482-Shutdown-UNSIGNED-NOT-INSTALLABLE.apk \
+            --jars tools/receipt-evidence/tool-jars --work shutdown82-gate/dex \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 66 \
+            --out shutdown82-gate/RELEASE-DECISION.json
+          python3 - <<'PY82'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('shutdown82-gate/RELEASE-DECISION.json').read_text())
+          assert d['status']=='PRE_SIGN_PAYLOAD_VERIFIED' and d['versionCode']==2103482 and d['generation']==66
+          print('PASS original release authority gate, safe to call existing signer',flush=True)
+          PY82
+      - name: Sign only the admitted source with existing original permanent key
+        env:
+          INFINITY_KEYSTORE_B64: '${{ secrets.INFINITY_KEYSTORE_B64 }}'
+          INFINITY_STORE_PASSWORD: '${{ secrets.INFINITY_STORE_PASSWORD }}'
+          INFINITY_KEY_PASSWORD: '${{ secrets.INFINITY_KEY_PASSWORD }}'
+          INFINITY_KEY_ALIAS: '${{ secrets.INFINITY_KEY_ALIAS }}'
+        run: |
+          python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
+            --apk shutdown82-prepared/Infinity-2103482-Shutdown-UNSIGNED-NOT-INSTALLABLE.apk \
+            --jars tools/receipt-evidence/tool-jars --work shutdown82-gate/dex-signer \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 66 \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out shutdown82-original-signed
+      - name: Verify signed v1/v2/v3, original certificate, install-over and member preservation
+        run: python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py post
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103482-OriginalSigned-Shutdown-QA-${{ github.run_id }}-FOLD-PENDING
+          path: shutdown82-original-signed/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity2103482-OriginalSigner-Refusal-${{ github.run_id }}-NO-APK
+          path: shutdown82-gate/*.json
           retention-days: 90
           if-no-files-found: warn
