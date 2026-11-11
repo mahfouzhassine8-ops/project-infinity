@@ -3091,7 +3091,9 @@ jobs:
         with: {python-version: '3.11.7'}
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with: {distribution: temurin, java-version: '21'}
-      - name: Verify registered generation66 and sole authorized signer before keys
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Verify registered generation67 evidence refresh and sole original signer before keys
         run: |
           set -euo pipefail
           python3 -m py_compile repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py
@@ -3115,13 +3117,13 @@ jobs:
           python3 repairs/dual-experience-isolation-2103420/release_gate.py \
             --apk shutdown82-prepared/Infinity-2103482-Shutdown-UNSIGNED-NOT-INSTALLABLE.apk \
             --jars tools/receipt-evidence/tool-jars --work shutdown82-gate/dex \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 66 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 67 \
             --out shutdown82-gate/RELEASE-DECISION.json
           python3 - <<'PY82'
           import json
           from pathlib import Path
           d=json.loads(Path('shutdown82-gate/RELEASE-DECISION.json').read_text())
-          assert d['status']=='PRE_SIGN_PAYLOAD_VERIFIED' and d['versionCode']==2103482 and d['generation']==66
+          assert d['status']=='PRE_SIGN_PAYLOAD_VERIFIED' and d['versionCode']==2103482 and d['generation']==67
           print('PASS original release authority gate, safe to call existing signer',flush=True)
           PY82
       - name: Sign only the admitted source with existing original permanent key
@@ -3134,7 +3136,7 @@ jobs:
           python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
             --apk shutdown82-prepared/Infinity-2103482-Shutdown-UNSIGNED-NOT-INSTALLABLE.apk \
             --jars tools/receipt-evidence/tool-jars --work shutdown82-gate/dex-signer \
-            --repository . --expected-head "$GITHUB_SHA" --expected-generation 66 \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 67 \
             --sdk "$ANDROID_HOME/build-tools/35.0.0" --out shutdown82-original-signed
       - name: Verify signed v1/v2/v3, original certificate, install-over and member preservation
         run: python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py post
@@ -3149,5 +3151,39 @@ jobs:
         with:
           name: Infinity2103482-OriginalSigner-Refusal-${{ github.run_id }}-NO-APK
           path: shutdown82-gate/*.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  shutdown82-g67-keyfree-refresh:
+    name: Reviewed shutdown workflow inventory to G67 - authority evidence refresh only, no key
+    if: github.event_name == 'push' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && startsWith(github.event.head_commit.message, 'Refresh shutdown82:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    permissions: {contents: read, actions: read}
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Check actual active workflows and the exact reviewed original-key inventory
+        run: |
+          set -euo pipefail
+          mkdir -p shutdown82-policy
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out shutdown82-policy/SIGNER-ROUTES.json
+          python3 -m py_compile repairs/infinity-close-startup-2103480-20261110/build_candidate/refresh_shutdown82_authority.py
+          python3 -m py_compile repairs/infinity-close-startup-2103480-20261110/build_candidate/sign_shutdown82.py
+      - name: Verify original authority and propose only key-free generation67 evidence refresh
+        run: |
+          python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/refresh_shutdown82_authority.py --out shutdown82-g67
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity82-Authority-G67-Reviewed-KeyFree-${{ github.run_id }}
+          path: |
+            shutdown82-g67/
+            shutdown82-policy/
           retention-days: 90
           if-no-files-found: warn
