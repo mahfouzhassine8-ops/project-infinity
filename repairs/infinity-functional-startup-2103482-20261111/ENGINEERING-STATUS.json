@@ -49,7 +49,7 @@
       "APK_built": false
     },
     "ARM64_link": {
-      "status": "IN_PROGRESS_RETAINED_NATIVE_DEPENDENCY_BUILD",
+      "status": "IN_PROGRESS_FULL_ARM64_ENGINE_COMPILATION",
       "run": 43040415571,
       "historical_preparation_failure": {
         "prior_run": 43036765104,
@@ -74,8 +74,9 @@
       "job": 130819412595,
       "Ubuntu_tooling": "PASS",
       "pinned_NDK": "PASS",
-      "native_link": "PENDING",
-      "runner_signature_checks_preserved": true
+      "native_link": "IN_PROGRESS",
+      "runner_signature_checks_preserved": true,
+      "retained_dependency_build": "PASS"
     },
     "Android_local_functionality": {
       "status": "PASS_SELECTED_BASELINE_LOCAL_FUNCTIONALITY_WITH_RETAINED_HISTORICAL_FAILURES",
@@ -100,7 +101,9 @@
       "health_center_pass_requires": "Normal API enablement on new disposable profile; not automatic fresh-profile readiness"
     },
     "Android_instrumentation_and_repeated_starts": {
-      "status": "NOT_RUN_NATIVE_BUILD_REQUIRED"
+      "status": "PREPARED_NOT_RUN_REQUIRES_ISSUED_QA_HASH",
+      "feature": "startup-internal-qa",
+      "scope": "Two independent fresh VMs; actualnativeTID/body/stage correlation; realexceptionfollowedbyindependentscript; HC actualcontrolread; CC localplugin; unlaunched82->QA install-r with syntheticprofile sentinel; no ownerprofile orshutdown/reopen claim"
     },
     "shutdown_relaunch": {
       "status": "NOT_RUN"

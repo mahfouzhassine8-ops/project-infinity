@@ -14,12 +14,12 @@ old=yaml.load(subprocess.check_output(['git','show','93d025b6:'+WORKFLOW],cwd=RO
 new=yaml.load((ROOT/WORKFLOW).read_text(),Loader=yaml.BaseLoader)
 feature='startup82-local-python'
 assert new['on']['push']==old['on']['push']
-assert new['on']['workflow_dispatch']['inputs']['feature']['options']==old['on']['workflow_dispatch']['inputs']['feature']['options']+[feature]
+assert new['on']['workflow_dispatch']['inputs']['feature']['options']==old['on']['workflow_dispatch']['inputs']['feature']['options']+[feature,'startup-internal-qa']
 before=old['jobs'];after=new['jobs']
-assert set(after)-set(before)=={'selected-startup82-local-python'}
+assert set(after)-set(before)=={'selected-startup82-local-python','selected-startup-internal-qa'}
 for name,job in before.items():
     expected=dict(job)
-    if name=='android17':expected['if']="inputs.feature != 'startup82-local-python' && "+expected['if']
+    if name=='android17':expected['if']="inputs.feature != 'startup-internal-qa' && inputs.feature != 'startup82-local-python' && "+expected['if']
     assert after[name]==expected,'Unrelated workflow job changed: '+name
 job=after['selected-startup82-local-python']
 assert job['if']=="github.event_name == 'workflow_dispatch' && inputs.feature == 'startup82-local-python' && github.ref == 'refs/heads/work/infinity-2103482-functional-startup-20261111'"
@@ -29,16 +29,28 @@ for step in job['steps']:
     assert 'continue-on-error' not in step
     if "python - <<'PY'\n" in step.get('run',''):
         ast.parse(step['run'].split("python - <<'PY'\n",1)[1].split('\nPY',1)[0])
+candidate=after['selected-startup-internal-qa']
+assert candidate['if']==job['if'].replace("'startup82-local-python'","'startup-internal-qa'")
+assert candidate['strategy']=={'fail-fast':'false','matrix':{'cold_start':['1','2']}}
+assert 'needs' not in candidate and 'continue-on-error' not in candidate
+for step in candidate['steps']:
+    assert 'continue-on-error' not in step
+    for marker in ('PY','PYQA'):
+        token="python - <<'"+marker+"'\n"
+        if token in step.get('run',''):ast.parse(step['run'].split(token,1)[1].split('\n'+marker,1)[0])
 spec=importlib.util.spec_from_file_location('startup_qa',HERE/'android_startup_probe.py')
 probe=importlib.util.module_from_spec(spec);spec.loader.exec_module(probe)
 selection=probe.selected();ast.parse(probe.OBSERVER)
+for name in ('android_internal_qa.py','verify_android_native_trace.py'):ast.parse((HERE/name).read_text())
 source=(HERE/'android_startup_probe.py').read_text()
 for forbidden in ('force-stop','pm clear','Application.Quit','Quit()','Shutdown()','Player.Stop','stop_once','base.run('):
     assert forbidden not in source,forbidden
 assert 'Startup' not in probe.Device.METHODS and 'Application.Quit' not in probe.Device.METHODS
 proof=dict(status='PASS_SELECTED_SCOPE_AND_UNCHANGED_OTHER_WORKFLOW_JOBS_ONLY',
     application_executed=False,legacy_policy_test='NOT_EXECUTED_IMPORT_BLOCKED; historical single-job assertions predate current workflow; no alteration to old test',
-    selected_feature=feature,protected_jobs=len(before),shutdown_selected=False,
-    hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/WORKFLOW,HERE/'android_startup_probe.py',HERE/'ANDROID-STARTUP-SELECTION.json')})
+    selected_feature=feature,candidate_feature='startup-internal-qa',candidate_application_executed=False,
+    candidate_scope='Two independent fresh-VM cold starts; unlaunched82 install-over and synthetic sentinel only; no shutdown/reopen or owner-profile claim',
+    protected_jobs=len(before),shutdown_selected=False,
+    hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/WORKFLOW,HERE/'android_startup_probe.py',HERE/'ANDROID-STARTUP-SELECTION.json',HERE/'android_internal_qa.py',HERE/'verify_android_native_trace.py')})
 (HERE/'ANDROID-SCOPE-HOST.json').write_text(json.dumps(proof,indent=2)+'\n')
 print(json.dumps(proof,indent=2))

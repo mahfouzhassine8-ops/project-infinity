@@ -23,13 +23,15 @@ QA='script.infinity.startupqaprobe'
 QP=base.PROFILE+'/addon_data/'+QA
 REMOTE='/sdcard/Download/infinity-startup-qa/'
 APK82='78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32'
+APK_VERSION=2103482
+FEATURE='signed82-local-python-and-health-center'
 HC_HASH='fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26'
 HC_CONTRACTS_HASH='3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214'
 SELECTION=HERE/'ANDROID-STARTUP-SELECTION.json'
 
 def selected():
     row=base.load(SELECTION)
-    assert row['feature']=='signed82-local-python-and-health-center' and row['shutdown_tests'] is False
+    assert row['feature']==FEATURE and row['shutdown_tests'] is False
     for name,wanted in row['helper_sha256'].items():
         assert base.sha(ROOT/name)==wanted,'RETAINED_HELPER_DRIFT:'+name
     if os.environ.get('GITHUB_ACTIONS')=='true':
@@ -59,7 +61,8 @@ with open(ROOT+'request.json') as f: request=json.load(f)
 with open('/proc/self/stat') as f: started=f.read().rsplit(') ',1)[1].split()[19]
 assert request['pid']==os.getpid() and request['process_start']==started
 result=dict(nonce=request['nonce'],sequence=request['sequence'],pid=os.getpid(),process_start=started,
-            action=request['action'],python_body_entered=True,passed=False)
+            action=request['action'],python_body_entered=True,passed=False,
+            native_tid=int(os.readlink('/proc/thread-self').split('/')[-1]),body_enter_us=time.monotonic_ns()//1000)
 def save():
     with open(ROOT+'reply.pending','w') as f: json.dump(result,f)
     os.replace(ROOT+'reply.pending',ROOT+'reply.json')
@@ -116,7 +119,7 @@ def prepare(apk,out):
     with ZipFile(archive,'w',ZIP_DEFLATED) as z:
         z.writestr(QA+'/addon.xml','<addon id="'+QA+'" version="1.0.0" name="Internal Startup QA" provider-name="Infinity QA"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/><extension point="xbmc.addon.metadata"><summary lang="en_GB">Disposable engineering probe</summary><description lang="en_GB">Not shipped</description><platform>all</platform><license>GPL-2.0-or-later</license></extension></addon>')
         z.writestr(QA+'/default.py',OBSERVER)
-    base.save(out/'INTAKE.json',dict(apk=str(apk.resolve()),sha256=APK82,versionCode=2103482,
+    base.save(out/'INTAKE.json',dict(apk=str(apk.resolve()),sha256=APK82,versionCode=APK_VERSION,
         selection_sha256=base.sha(SELECTION),helper_sha256=selection['helper_sha256'],
         health_source_sha256=HC_HASH,observer=dict(addon=QA,version='1.0.0',archive=archive.name,sha256=base.sha(archive))))
 
@@ -130,7 +133,8 @@ def run(sdk,inputs,out):
     assert proof['selection_sha256']==base.sha(SELECTION) and proof['helper_sha256']==selection['helper_sha256']
     assert base.sha(inputs/proof['observer']['archive'])==proof['observer']['sha256']
     report=dict(status='RUNNING',owner_device=False,Cobra_executed=False,shutdown='NOT_RUN',
-                profile='NEW_DISPOSABLE_EMULATOR_ONLY',baseline_apk=proof['sha256'],cases=[],
+                profile='NEW_DISPOSABLE_EMULATOR_ONLY',baseline_apk=proof['sha256'] if APK_VERSION==2103482 else None,
+                apk_under_test=proof['sha256'],tested_version_code=APK_VERSION,cases=[],
                 startup_repair_accepted=False,fold_failure_reproduced=False)
     device=None;reader=None
     def checkpoint():base.save(out/'FUNCTIONAL-STARTUP-ANDROID.json',report)
@@ -138,7 +142,17 @@ def run(sdk,inputs,out):
         device=Device(out,sdk);report['environment']=base.environment(device,out)
         base.require(not device.shell('pm','list','packages',base.PACKAGE).strip(),'FRESH_VM_REQUIRED')
         base.root_reconnect(device,out);reader=base.start_lifecycle_log(device,out)
-        base.require(device.adb('install','--no-streaming',proof['apk'],timeout=300).strip().endswith('Success'),'ORIGINAL_SIGNED_INSTALL')
+        install_options=['install','--no-streaming']
+        if 'upgrade_baseline' in proof:
+            parent=proof['upgrade_baseline'];sentinel=out/'upgrade-sentinel.json'
+            base.require(APK_VERSION>2103482 and base.sha(Path(parent))=='78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32','EXACT_SIGNED82_UPGRADE_INPUT')
+            base.require(device.adb('install','--no-streaming',parent,timeout=300).strip().endswith('Success'),'ORIGINAL82_INSTALL')
+            device.shell('mkdir','-p',QP);sentinel.write_text(json.dumps(dict(purpose='fresh-emulator-upgrade-only',nonce=uuid.uuid4().hex)))
+            device.adb('push',sentinel,QP+'/upgrade-sentinel.json');install_options.append('-r')
+        base.require(device.adb(*install_options,proof['apk'],timeout=300).strip().endswith('Success'),'ORIGINAL_SIGNED_INSTALL')
+        if 'upgrade_baseline' in proof:
+            base.require(device.shell('cat',QP+'/upgrade-sentinel.json').strip()==sentinel.read_text(),'SYNTHETIC_PROFILE_DATA_LOST_ON_UPGRADE')
+            report['install_over']=dict(from_version=2103482,to_version=APK_VERSION,passed=True,synthetic_profile_sentinel_preserved=True,existing_owner_data_used=False,previous_version_launched=False)
         device.shell('mkdir','-p',base.PROFILE,REMOTE,QP)
         settings=out/'NEW-FIXTURE-guisettings.xml';settings.write_text('<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting><setting id="general.addonupdates">2</setting><setting id="addons.unknownsources">true</setting><setting id="services.esenabled">true</setting><setting id="services.esallinterfaces">true</setting></settings>')
         sources=out/'NEW-FIXTURE-sources.xml';sources.write_text('<sources><files><source><name>Internal Startup QA</name><path pathversion="1">'+REMOTE+'</path><allowsharing>false</allowsharing></source></files></sources>')
@@ -207,8 +221,18 @@ def run(sdk,inputs,out):
             base.require(route.scheme=='plugin' and route.netloc==base.CC and route.path=='/' and not route.fragment and
                          parse_qs(route.query)=={'action':['command'],'command':[key]},'SOURCE_BOUND_COMMAND_ROUTE_'+key)
         report['command_center_plugin']=dict(passed=True,addon=cc,rows=files,commands_activated=False)
+        if selection.get('require_native_trace'):
+            from verify_android_native_trace import verify
+            deadline=time.monotonic()+15
+            while True:
+                device.alive()
+                log=device.shell('tail','-c','8388608',base.HOME+'/temp/kodi.log',check=False)
+                try:report['native_trace']=verify(log,report['cases']);break
+                except AssertionError:
+                    if time.monotonic()>=deadline:raise
+                    time.sleep(.2)
         base.crash_free_alive(device)
-        report['status']='PASS_SELECTED_BASELINE_HEALTH_CENTER_AND_CC_WITH_RETAINED_ERROR_PROOF_NOT_FOLD_REPRODUCTION'
+        report['status']=('PASS_INTERNAL_QA_SELECTED_NATIVE_AND_LOCAL_EXECUTION_NOT_FOLD_REPRODUCTION' if selection.get('require_native_trace') else 'PASS_SELECTED_BASELINE_HEALTH_CENTER_AND_CC_WITH_RETAINED_ERROR_PROOF_NOT_FOLD_REPRODUCTION')
     except Exception:
         report.update(status='BLOCKED_OR_FAILED_SELECTED_CASE',error=traceback.format_exc())
         if device:
