@@ -178,11 +178,13 @@ def post():
     for scheme in ('v1','v2','v3'):
         require(any(l.startswith('Verified using '+scheme+' scheme') and l.endswith(': true') for l in signature.splitlines()),'SIGNATURE_SCHEME_MISSING:'+scheme)
     unchanged=compare(ROOT/'signed82/Infinity-2103482-Combined-Original-Signer.apk',apk,r['native_sha256'])
-    (out/'QA-PRESERVATION.json').write_bytes(canonical(dict(status='PASS_ORIGINAL_SIGNED_INTERNAL_QA_THREE_MEMBER_PRESERVATION',
+    proof=dict(status='PASS_ORIGINAL_SIGNED_INTERNAL_QA_THREE_MEMBER_PRESERVATION',
         versionCode=VERSION,source=git('rev-parse','HEAD'),signed_apk_sha256=file_sha(apk),certificate_sha256=CERT_SHA,
         native_sha256=r['native_sha256'],changed_members=sorted(MEMBERS),unchanged_payload_members=unchanged,Cobra_changed=False,
         protected77_preservation='Inherited protection unchanged; original77 artifact not modified or freshly reverified here',Android_candidate='NOT_RUN',actual_installation='NOT_RUN',Fold='NOT_RUN',Fold_cause_established=False,
-        owner_delivery=False,published_release=False,forward_recovery='NOT_ISSUED')))
+        owner_delivery=False,published_release=False,forward_recovery='NOT_ISSUED')
+    (out/'QA-PRESERVATION.json').write_bytes(canonical(proof))
+    print(json.dumps(proof,sort_keys=True))
 
 def download():
     r=request()
