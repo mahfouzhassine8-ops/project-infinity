@@ -1,0 +1,73 @@
+{
+  "run": 43109315570,
+  "source": "ee6d5571aa1204c1a775f24389a6f9b7ce6c968b",
+  "artifact": 13894759872,
+  "artifact_sha256": "e3485e2cd41ff5ec4c991bf14a461b76401ae62a6ee6ed2265020a4b22e0361b",
+  "APK_sha256": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+  "native_process": 4708,
+  "process_start": "11134",
+  "startup": {
+    "currentcontrol": {
+      "label": "TV SHOWS"
+    },
+    "currentwindow": {
+      "id": 10000,
+      "label": "Home"
+    },
+    "skin": {
+      "id": "skin.infinity.diggz",
+      "name": "Infinity"
+    }
+  },
+  "cases": [
+    {
+      "action": "local-python",
+      "arithmetic": 6,
+      "cc_version": "0.3.5.78",
+      "nonce": "022e66a74f624ac9b2dfbae995112a54",
+      "passed": true,
+      "pid": 4708,
+      "process_start": "11134",
+      "python_body_entered": true,
+      "sequence": 1
+    },
+    {
+      "action": "controlled-body-error",
+      "actual_traceback_observed": true,
+      "controlled_error": "startup_qa_body_error_022e66a74f624ac9b2dfbae995112a54",
+      "nonce": "022e66a74f624ac9b2dfbae995112a54",
+      "passed": false,
+      "pid": 4708,
+      "process_start": "11134",
+      "python_body_entered": true,
+      "sequence": 2
+    },
+    {
+      "action": "local-python",
+      "arithmetic": 6,
+      "cc_version": "0.3.5.78",
+      "nonce": "022e66a74f624ac9b2dfbae995112a54",
+      "passed": true,
+      "pid": 4708,
+      "process_start": "11134",
+      "python_body_entered": true,
+      "sequence": 3
+    }
+  ],
+  "Health_Center": {
+    "status": "NOT_LAUNCHED_OBSERVER_PREREQUISITE_FAILED",
+    "actual_error": "Unknown addon id 'script.kodihealthcenter'.",
+    "failing_call": "xbmcaddon.Addon('script.kodihealthcenter')",
+    "manager_discovered_version": "2.5.27",
+    "enabled_state": "NOT_CAPTURED_IN_THIS_RUN",
+    "next_check": "Read enabled-state using native JSONRPC; never infer disabled solely from exception"
+  },
+  "workflow_status": "failure",
+  "Fold_reproduced": false,
+  "root_cause_of_Fold": "UNKNOWN",
+  "controlled_NULL_path": "NOT_INJECTED_IN_ANDROID_APP",
+  "user_data": "NEW_DISPOSABLE_PROFILE_ONLY",
+  "APK_modified": false,
+  "Cobra": false,
+  "shutdown": "NOT_RUN"
+}

@@ -12,6 +12,7 @@ import sys
 import time
 import traceback
 import uuid
+from urllib.parse import parse_qs, urlsplit
 from zipfile import ZipFile, ZIP_DEFLATED
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1]
@@ -40,6 +41,15 @@ def selected():
 device_source=(ROOT/'repairs/infinity-performance-ui-2103477-20261110/baseline.py').read_text()
 node=next(n for n in ast.parse(device_source).body if isinstance(n,ast.ClassDef) and n.name=='Device')
 exec(compile(ast.Module(body=[node],type_ignores=[]),'retained-feature-transport','exec'),globals())
+RetainedDevice=Device
+class Device(RetainedDevice):
+    METHODS=RetainedDevice.METHODS|{'Addons.SetAddonEnabled','Files.GetDirectory'}
+    def rpc(self,method,params=None,timeout=5):
+        if method=='Addons.SetAddonEnabled':
+            base.require(params==dict(addonid='script.kodihealthcenter',enabled=True),'ONLY_FRESH_VM_HEALTH_CENTER_ENABLE')
+        if method=='Files.GetDirectory':
+            base.require(params==dict(directory='plugin://script.infinity.commandcenter/?action=commands',media='files'),'ONLY_READ_ONLY_LOCAL_CC_COMMAND_LIST')
+        return super().rpc(method,params,timeout)
 
 OBSERVER=r'''
 import hashlib, json, os, time
@@ -133,8 +143,22 @@ def run(sdk,inputs,out):
         installed=device.shell('pm','path',base.PACKAGE).strip().removeprefix('package:')
         base.require(device.shell('sha256sum',installed).split()[0]==APK82,'ACTUAL_INSTALLED_APK_HASH')
         gui.install_zip(device,proof['observer'],dict(remote_zip_directory=REMOTE),out,'startup-observer')
+        # New disposable profile: use Kodi's normal enabled-state API, never a
+        # database edit or a production add-on/source modification. Capture the
+        # real prior state; do not infer "disabled" from an SDK lookup error.
+        before=device.rpc('Addons.GetAddonDetails',dict(addonid='script.kodihealthcenter',properties=['version','enabled']))['addon']
+        report['health_center_admission_before']=before;checkpoint()
+        base.require(before['version']=='2.5.27','EXACT_HEALTH_CENTER_ADDON_METADATA')
+        if before['enabled'] is False:
+            result=device.rpc('Addons.SetAddonEnabled',dict(addonid='script.kodihealthcenter',enabled=True))
+            base.require(result=='OK','NORMAL_HEALTH_CENTER_ENABLE_REJECTED')
+        after=device.rpc('Addons.GetAddonDetails',dict(addonid='script.kodihealthcenter',properties=['version','enabled']))['addon']
+        report['health_center_admission_after']=after;checkpoint()
+        base.require(after['enabled'] is True and after['version']=='2.5.27','HEALTH_CENTER_NOT_ADMITTED')
         nonce=uuid.uuid4().hex
-        for sequence,action in enumerate(['local-python','controlled-body-error','local-python','health-center','local-python'],1):
+        # Reuse successful first-run local/error/local cases. This follow-up
+        # selects only Health Center, independent post-UI invocation and CC.
+        for sequence,action in enumerate(selection['execution_actions'],1):
             request=dict(pid=device.pid,process_start=device.start_time,nonce=nonce,sequence=sequence,action=action)
             local=out/'request.json';base.save(local,request);device.adb('push',local,QP+'/request.pending');device.shell('mv',QP+'/request.pending',QP+'/request.json')
             device.rpc('Addons.ExecuteAddon',dict(addonid=QA));deadline=time.monotonic()+55;reply=None
@@ -161,8 +185,21 @@ def run(sdk,inputs,out):
             else:base.require(reply['passed'],'PYTHON_FUNCTIONAL_'+action)
             if action=='health-center':
                 device.screenshot('actual-python-health-center');device.rpc('Input.Back');device.rpc('Input.Home')
+        cc=device.rpc('Addons.GetAddonDetails',dict(addonid=base.CC,properties=['version','enabled']))['addon']
+        base.require(cc['version']=='0.3.5.78' and cc['enabled'] is True,'AUTHENTICATED_CC_INSTALLED_AND_ENABLED')
+        listing=device.rpc('Files.GetDirectory',dict(directory='plugin://script.infinity.commandcenter/?action=commands',media='files'),timeout=25)
+        files=listing.get('files',[])
+        base.require({'Health Center','Resume Hub'}<={r.get('label') for r in files},'ACTUAL_AUTHENTICATED_CC_PLUGIN_RESULTS')
+        base.require(all(r.get('file','').startswith('plugin://script.infinity.commandcenter/?action=command&') for r in files),'EXACT_SOURCE_BOUND_COMMAND_ROWS')
+        for label,key in [('Health Center','health-center'),('Resume Hub','resume-hub')]:
+            rows=[r for r in files if r.get('label')==label]
+            base.require(len(rows)==1,'UNAMBIGUOUS_COMMAND_ROW_'+key)
+            route=urlsplit(rows[0]['file'])
+            base.require(route.scheme=='plugin' and route.netloc==base.CC and route.path=='/' and not route.fragment and
+                         parse_qs(route.query)=={'action':['command'],'command':[key]},'SOURCE_BOUND_COMMAND_ROUTE_'+key)
+        report['command_center_plugin']=dict(passed=True,addon=cc,rows=files,commands_activated=False)
         base.crash_free_alive(device)
-        report['status']='PASS_SELECTED_BASELINE_LOCAL_PYTHON_AND_HEALTH_CENTER_NOT_FOLD_REPRODUCTION'
+        report['status']='PASS_SELECTED_BASELINE_HEALTH_CENTER_AND_CC_WITH_RETAINED_ERROR_PROOF_NOT_FOLD_REPRODUCTION'
     except Exception:
         report.update(status='BLOCKED_OR_FAILED_SELECTED_CASE',error=traceback.format_exc())
         if device:
