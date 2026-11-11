@@ -5,12 +5,12 @@
   "selected_feature": "startup82-local-python",
   "candidate_feature": "startup-internal-qa",
   "candidate_application_executed": false,
-  "candidate_scope": "Two independent fresh-VM cold starts; unlaunched82 install-over and synthetic sentinel only; no shutdown/reopen or owner-profile claim",
+  "candidate_scope": "Two independent fresh-VM cold starts, normal/offline; normal shell disables VM Wi-Fi/data with actual no-default-network check. Unlaunched82 install-over and synthetic sentinel only; no shutdown/reopen or owner-profile claim",
   "protected_jobs": 23,
   "shutdown_selected": false,
   "hashes": {
-    ".github/workflows/infinity-saved-navigation-android.yml": "19294b005a85287f323448c15465b20d7de2bf15b2bb2874cba5fefb388195eb",
-    "repairs/infinity-functional-startup-2103482-20261111/android_startup_probe.py": "526cb5387f00767b1ad0cd9c9a9df7a91e3b823b0e2910040e4012e929593227",
+    ".github/workflows/infinity-saved-navigation-android.yml": "0ce39ba8a8196ab5421f840754a94f197b21fbeb8d5dcb374255aee9ba89f560",
+    "repairs/infinity-functional-startup-2103482-20261111/android_startup_probe.py": "42b31ec0addd53472848e8402de444a2fe23f82b6bb76fe6fbbc33e1b6fd6480",
     "repairs/infinity-functional-startup-2103482-20261111/ANDROID-STARTUP-SELECTION.json": "537d5aa70933017c1ed5669d050922866bb1e19ff6cde1d451b4b909d74a3c17",
     "repairs/infinity-functional-startup-2103482-20261111/android_internal_qa.py": "b392c9bd4cba0d85bef25e5a5ba69987657cd2f12f133c618540719509d7d3a7",
     "repairs/infinity-functional-startup-2103482-20261111/verify_android_native_trace.py": "438124acc4ff1c19cf8dcd6f0d5da2ed4ea7d88b758541c44b637bec8b0ce667"

@@ -44,7 +44,7 @@
     "Pinned CPython3.11.7 initialization failure versus success with native-only observation; artificial failure explicitly labeled",
     "Internal ARM64 diagnostic compile/link and original-owner QA preparation only after instrumentation/source review; no owner-facing repair claim",
     "Existing manual feature-only startup82-local-python on disposable qualified API36 with exact unchanged signed82; no Close/Cobra/playback/search; no Fold claim",
-    "After actual original-key QA issuance only: startup-internal-qa, two separate fresh disposable Android VMs, fixed signed/native hashes, actualnative initialization/admission traces, local Python success/error/recovery, Health Center and CC; legitimate install-r over unlaunched signed82 with synthetic sentinel. No userdevice, no Close or in-process-restart acceptance."
+    "After actual original-key QA issuance only: startup-internal-qa, two separate fresh disposable Android VMs, fixed signed/native hashes, actualnative initialization/admission traces, local Python success/error/recovery, Health Center and CC; legitimate install-r over unlaunched signed82 with synthetic sentinel. No userdevice, no Close or in-process-restart acceptance. One VM uses normal networking; the second disables its Wi-Fi/data using ordinary shell service commands and requires no active default network, exercising the existing owner-required local/offline startup gate. No application or owner networking is changed."
   ],
   "selected_runtime_test_fixture": "NATIVE_HOST_ADMISSION_ONLY; actual methods and controlled peers",
   "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",

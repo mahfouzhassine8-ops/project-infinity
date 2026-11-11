@@ -31,7 +31,8 @@ for step in job['steps']:
         ast.parse(step['run'].split("python - <<'PY'\n",1)[1].split('\nPY',1)[0])
 candidate=after['selected-startup-internal-qa']
 assert candidate['if']==job['if'].replace("'startup82-local-python'","'startup-internal-qa'")
-assert candidate['strategy']=={'fail-fast':'false','matrix':{'cold_start':['1','2']}}
+assert candidate['strategy']=={'fail-fast':'false','matrix':{'include':[{'cold_start':'1','network':'normal'},{'cold_start':'2','network':'offline'}]}}
+assert candidate['env']['STARTUP_NETWORK_CASE']=='${{ matrix.network }}'
 assert 'needs' not in candidate and 'continue-on-error' not in candidate
 for step in candidate['steps']:
     assert 'continue-on-error' not in step
@@ -49,7 +50,7 @@ assert 'Startup' not in probe.Device.METHODS and 'Application.Quit' not in probe
 proof=dict(status='PASS_SELECTED_SCOPE_AND_UNCHANGED_OTHER_WORKFLOW_JOBS_ONLY',
     application_executed=False,legacy_policy_test='NOT_EXECUTED_IMPORT_BLOCKED; historical single-job assertions predate current workflow; no alteration to old test',
     selected_feature=feature,candidate_feature='startup-internal-qa',candidate_application_executed=False,
-    candidate_scope='Two independent fresh-VM cold starts; unlaunched82 install-over and synthetic sentinel only; no shutdown/reopen or owner-profile claim',
+    candidate_scope='Two independent fresh-VM cold starts, normal/offline; normal shell disables VM Wi-Fi/data with actual no-default-network check. Unlaunched82 install-over and synthetic sentinel only; no shutdown/reopen or owner-profile claim',
     protected_jobs=len(before),shutdown_selected=False,
     hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in (ROOT/WORKFLOW,HERE/'android_startup_probe.py',HERE/'ANDROID-STARTUP-SELECTION.json',HERE/'android_internal_qa.py',HERE/'verify_android_native_trace.py')})
 (HERE/'ANDROID-SCOPE-HOST.json').write_text(json.dumps(proof,indent=2)+'\n')

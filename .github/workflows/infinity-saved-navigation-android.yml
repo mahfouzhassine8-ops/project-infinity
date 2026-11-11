@@ -2205,10 +2205,14 @@ jobs:
     timeout-minutes: 35
     strategy:
       fail-fast: false
-      matrix: {cold_start: [1, 2]}
+      matrix:
+        include:
+          - {cold_start: 1, network: normal}
+          - {cold_start: 2, network: offline}
     env:
       SELECTED_FEATURE: signed-startup-internal-qa
       GH_TOKEN: '${{ github.token }}'
+      STARTUP_NETWORK_CASE: '${{ matrix.network }}'
       PYTHONDONTWRITEBYTECODE: '1'
       SELECTED_SOURCE: '${{ inputs.source_ref }}'
       AUTHORIZED_SCOPE: '${{ inputs.authorization }}'

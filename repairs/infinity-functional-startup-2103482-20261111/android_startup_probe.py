@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import socket
 import sys
 import time
@@ -162,6 +163,22 @@ def run(sdk,inputs,out):
         device.shell('chown','-R',uid+':'+uid,'/data/media/0/Android/data/'+base.PACKAGE)
         device.shell('restorecon','-RF','/data/media/0/Android/data/'+base.PACKAGE)
         device.adb('forward','tcp:19090','tcp:9090')
+        if selection.get('require_native_trace'):
+            network=os.environ.get('STARTUP_NETWORK_CASE')
+            base.require(network in ('normal','offline'),'EXPLICIT_QA_NETWORK_CASE_REQUIRED')
+            report['network_case']=network
+            if network=='offline':
+                # Disposable VM only, after APK acquisition. No app/network
+                # source changes or physical-device settings are involved.
+                device.shell('svc','wifi','disable');device.shell('svc','data','disable')
+                deadline=time.monotonic()+15
+                while True:
+                    text=device.shell('dumpsys','connectivity',timeout=5)
+                    default=re.search(r'^\s*Active default network:\s*(\S+)',text,re.M)
+                    if default and default.group(1).lower()=='none':break
+                    base.require(time.monotonic()<deadline,'EMULATOR_OFFLINE_STATE_NOT_ESTABLISHED')
+                    time.sleep(.2)
+                report['offline_evidence']=dict(default_network='none',method='Normal shell service commands in new disposable VM only')
         report['startup']=base.start_once(device,1,out);checkpoint()
         installed=device.shell('pm','path',base.PACKAGE).strip().removeprefix('package:')
         base.require(device.shell('sha256sum',installed).split()[0]==APK82,'ACTUAL_INSTALLED_APK_HASH')
