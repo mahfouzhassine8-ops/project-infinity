@@ -41,3 +41,7 @@ Use the exact publisher source and the already-verified 2103480 native source bi
 Determine whether this requires a small upstream service cooperation or an isolated runtime boundary; explain any unavoidable provider modification/update risk before deployment. This is a fix design, not a request for broad additional logs.
 
 No phone test/export, app modification, new APK, signed release, or provider patch is performed by this attribution record.
+
+## Independent local Python audit reproduction (host only)
+
+I executed a disposable Python `shutil.copy2` test with a source file carrying an extended attribute. Registered a process-local read-only `sys.addaudithook` observer that counted only operation names, then copied the file into a temporary target. The resulting exact CPython audit categories were **one `os.utime`, one `os.listxattr`, one `os.setxattr`, and one `os.chmod`**. Without an extended attribute, `os.utime` and `os.chmod` still occurred, but `os.setxattr` did not. This demonstrates the mechanism from upstream `shutil.copy2` independently, without executing or contacting the third-party Kodi add-on. It is **not** the actual Fold trace, and the 170/340 event counts were not reproduced.
