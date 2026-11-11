@@ -1,0 +1,203 @@
+{
+  "scope": "Exact native call sites with controlled peers; no CPython or Android execution",
+  "generated_cpp_sha256": "33b70b2d081ad98469ae9c6152c99809a2cc39eb037ccf7d9f1032a3acac0c47",
+  "results": [
+    {
+      "trace_compiled": true,
+      "case": "success",
+      "dispatched": 1,
+      "trace_records": 12,
+      "stages": [
+        "request.begin",
+        "builtin.resolve",
+        "builtin.resolved",
+        "lookup.wait",
+        "lookup.locked",
+        "dispatch.wait",
+        "dispatch.locked",
+        "dispatch.wait",
+        "dispatch.locked",
+        "dispatch.fresh",
+        "builtin.result",
+        "request.end"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "startup-gate",
+      "dispatched": 0,
+      "trace_records": 10,
+      "stages": [
+        "gate.startup_closed",
+        "request.begin",
+        "builtin.resolve",
+        "builtin.resolved",
+        "lookup.wait",
+        "lookup.locked",
+        "refused.startup_gate",
+        "refused.null_invoker",
+        "builtin.result",
+        "request.end"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "shutdown-gate",
+      "dispatched": 0,
+      "trace_records": 10,
+      "stages": [
+        "gate.shutdown_closed",
+        "request.begin",
+        "builtin.resolve",
+        "builtin.resolved",
+        "lookup.wait",
+        "lookup.locked",
+        "refused.shutdown",
+        "refused.null_invoker",
+        "builtin.result",
+        "request.end"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "missing-file",
+      "dispatched": 0,
+      "trace_records": 6,
+      "stages": [
+        "request.begin",
+        "builtin.resolve",
+        "builtin.resolved",
+        "refused.missing_script",
+        "builtin.result",
+        "request.end"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "missing-handler",
+      "dispatched": 0,
+      "trace_records": 9,
+      "stages": [
+        "request.begin",
+        "builtin.resolve",
+        "builtin.resolved",
+        "lookup.wait",
+        "lookup.locked",
+        "refused.missing_handler",
+        "refused.null_invoker",
+        "builtin.result",
+        "request.end"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "quarantine",
+      "dispatched": 0,
+      "trace_records": 12,
+      "stages": [
+        "request.begin",
+        "builtin.resolve",
+        "builtin.resolved",
+        "lookup.wait",
+        "lookup.locked",
+        "dispatch.wait",
+        "dispatch.locked",
+        "dispatch.wait",
+        "dispatch.locked",
+        "refused.quarantine",
+        "builtin.result",
+        "request.end"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "delayed-runtime",
+      "dispatched": 0,
+      "trace_records": 7,
+      "stages": [
+        "runtime.wait",
+        "runtime.locked",
+        "runtime.initialize",
+        "runtime.initialized",
+        "runtime.wait",
+        "runtime.locked",
+        "runtime.reused"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "foreign-process",
+      "dispatched": 1,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": true,
+      "case": "capacity",
+      "dispatched": 1,
+      "trace_records": 8193,
+      "stages": [
+        "request.begin"
+      ],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": false,
+      "case": "success",
+      "dispatched": 1,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": false,
+      "case": "startup-gate",
+      "dispatched": 0,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": false,
+      "case": "shutdown-gate",
+      "dispatched": 0,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": false,
+      "case": "missing-file",
+      "dispatched": 0,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": false,
+      "case": "missing-handler",
+      "dispatched": 0,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    },
+    {
+      "trace_compiled": false,
+      "case": "quarantine",
+      "dispatched": 0,
+      "trace_records": 0,
+      "stages": [],
+      "assertions_passed": true
+    }
+  ],
+  "all_selected_assertions_passed": true,
+  "fold_failure_reproduced": false
+}

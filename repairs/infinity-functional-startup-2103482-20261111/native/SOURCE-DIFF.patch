@@ -1,0 +1,389 @@
+--- a/xbmc/interfaces/generic/ScriptInvocationManager.cpp
++++ b/xbmc/interfaces/generic/ScriptInvocationManager.cpp
+@@ -7,6 +7,7 @@
+  */
+ 
+ #include "ScriptInvocationManager.h"
++#include "interfaces/generic/InfinityStartupTrace.h"
+ #include "platform/android/activity/InfinityShutdownTrace.h"
+ #if defined(TARGET_ANDROID)
+ #include "platform/android/activity/InfinityVfsOpenTrace.h"
+@@ -367,6 +368,11 @@
+ 
+ void CScriptInvocationManager::Process()
+ {
++  InfinityStartupTrace::Drain([](const InfinityStartupTrace::Event& event) {
++    CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}",
++      InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
++      event.monotonicUs, event.value, event.flags, event.tracked);
++  });
+   std::unique_lock<CCriticalSection> lock(m_critSection);
+   // go through all active threads and find and remove all which are done
+   std::vector<LanguageInvokerThread> tempList;
+@@ -405,8 +411,10 @@
+ 
+ void CScriptInvocationManager::BeginCheckpointStartupAdmission()
+ {
++  (void)InfinityStartupTrace::Enabled(); // Resolve QA identity before taking the manager lock.
+   std::unique_lock<CCriticalSection> lock(m_critSection);
+   m_checkpointStartupAdmissionClosed = true;
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::StartupGateClosed, -1, 0, (m_shutdownRequested ? 1U : 0U) | (m_checkpointStartupAdmissionClosed ? 2U : 0U), m_scripts.size());
+   InfinityShutdownTrace::Event("milestone", "scripts.checkpoint_new_background_admission_closed");
+ }
+ 
+@@ -437,8 +445,10 @@
+ 
+ void CScriptInvocationManager::BeginShutdown()
+ {
++  (void)InfinityStartupTrace::Enabled(); // Resolve QA identity before taking the manager lock.
+   std::unique_lock<CCriticalSection> lock(m_critSection);
+   m_shutdownRequested = true;
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ShutdownGateClosed, -1, 0, (m_shutdownRequested ? 1U : 0U) | (m_checkpointStartupAdmissionClosed ? 2U : 0U), m_scripts.size());
+ }
+ 
+ namespace
+@@ -463,10 +473,12 @@
+ 
+ void CScriptInvocationManager::BeginAndroidCheckpoint()
+ {
++  (void)InfinityStartupTrace::Enabled();
+   std::vector<CLanguageInvokerThreadPtr> pending;
+   {
+     std::unique_lock<CCriticalSection> lock(m_critSection);
+     m_shutdownRequested = true;
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::CheckpointGateClosed, -1, 0, (m_shutdownRequested ? 1U : 0U) | (m_checkpointStartupAdmissionClosed ? 2U : 0U), m_scripts.size());
+     // Only one stop notification wave per engine checkpoint. Retaining the
+     // original grace start also prevents a late stage restart from hiding a
+     // stubborn service behind another full timeout.
+@@ -828,10 +840,16 @@
+ LanguageInvokerPtr CScriptInvocationManager::GetLanguageInvokerForAdmission(
+     const std::string& script, const ADDON::AddonPtr& addon, bool reuseable)
+ {
+-  std::unique_lock<CCriticalSection> lock(m_critSection);
++  InfinityStartupTrace::Request infinityRequest;
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::LookupWait);
++  std::unique_lock<CCriticalSection> lock(m_critSection);
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::LookupLocked, -1, 0, (m_shutdownRequested ? 1U : 0U) | (m_checkpointStartupAdmissionClosed ? 2U : 0U), m_scripts.size());
+   if (m_shutdownRequested || (m_checkpointStartupAdmissionClosed &&
+       !CanAdmitCheckpointStartupLocked(script, addon, reuseable)))
++  {
++    InfinityStartupTrace::Record(m_shutdownRequested ? InfinityStartupTrace::Stage::ShutdownClosed : InfinityStartupTrace::Stage::StartupClosed);
+     return LanguageInvokerPtr();
++  }
+ 
+   // A refused new request must not Reset/Release an already-admitted owner.
+   // Verified essential startup gets a fresh invoker, never a reused client.
+@@ -855,6 +873,7 @@
+   if (it != m_invocationHandlers.end() && it->second != NULL)
+     return LanguageInvokerPtr(it->second->CreateInvoker());
+ 
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::MissingHandler);
+   return LanguageInvokerPtr();
+ }
+ 
+@@ -865,11 +884,13 @@
+     bool reuseable /* = false */,
+     int pluginHandle /* = -1 */)
+ {
++  InfinityStartupTrace::Request infinityRequest;
+   if (script.empty())
+-    return -1;
++  { InfinityStartupTrace::Record(InfinityStartupTrace::Stage::EmptyScript); return -1; }
+ 
+   if (!CFileUtils::Exists(script, false))
+   {
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::MissingScript);
+     CLog::Log(LOGERROR, "{} - Not executing non-existing script {}", __FUNCTION__, script);
+     return -1;
+   }
+@@ -886,20 +907,30 @@
+     bool reuseable /* = false */,
+     int pluginHandle /* = -1 */)
+ {
++  InfinityStartupTrace::Request infinityRequest;
+   if (script.empty() || languageInvoker == NULL)
++  {
++    InfinityStartupTrace::Record(script.empty() ? InfinityStartupTrace::Stage::EmptyScript : InfinityStartupTrace::Stage::NullInvoker);
+     return -1;
++  }
+   {
+     // Refused direct requests do not touch quarantine/probation, file checks,
+     // retained invoker state or writer admission. Recheck at dispatch below.
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::DispatchWait);
+     std::unique_lock<CCriticalSection> admissionCheck(m_critSection);
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::DispatchLocked, languageInvoker->GetId(), 0, (m_shutdownRequested ? 1U : 0U) | (m_checkpointStartupAdmissionClosed ? 2U : 0U), m_scripts.size());
+   if (m_shutdownRequested || (m_checkpointStartupAdmissionClosed &&
+       !CanAdmitCheckpointStartupLocked(script, addon, reuseable, languageInvoker)))
++  {
++    InfinityStartupTrace::Record(m_shutdownRequested ? InfinityStartupTrace::Stage::ShutdownClosed : InfinityStartupTrace::Stage::StartupClosed);
+     return -1;
+   }
++  }
+ 
+ 
+   if (!CFileUtils::Exists(script, false))
+   {
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::MissingScript);
+     CLog::Log(LOGERROR, "{} - Not executing non-existing script {}", __FUNCTION__, script);
+     return -1;
+   }
+@@ -909,15 +940,21 @@
+   if (!reuseable)
+     checkpointContract = InfinityAndroidCheckpoint::ClassifyScript(script, addon ? addon->ID() : "");
+ #endif
+-  std::unique_lock<CCriticalSection> lock(m_critSection);
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::DispatchWait);
++  std::unique_lock<CCriticalSection> lock(m_critSection);
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::DispatchLocked, languageInvoker->GetId(), 0, (m_shutdownRequested ? 1U : 0U) | (m_checkpointStartupAdmissionClosed ? 2U : 0U), m_scripts.size());
+   if (m_shutdownRequested || (m_checkpointStartupAdmissionClosed &&
+       !CanAdmitCheckpointStartupLocked(script, addon, reuseable, languageInvoker)))
++  {
++    InfinityStartupTrace::Record(m_shutdownRequested ? InfinityStartupTrace::Stage::ShutdownClosed : InfinityStartupTrace::Stage::StartupClosed);
+     return -1;
++  }
+   // A probation retry is consumed only inside the same serialized decision
+   // that admits/dispatches this invocation. Freeze cannot intervene between.
+ #if defined(TARGET_ANDROID)
+   if (addon && InfinityAddonQuarantine::ShouldSuppress(addon->ID(), script))
+   {
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::Quarantined);
+     CLog::Log(LOGINFO, "Infinity quarantine: suppressing failing background service {}", addon->ID());
+     return -1;
+   }
+@@ -948,6 +985,7 @@
+     if (checkpointContract == "command_center" || checkpointContract == "compat")
+       InfinityScriptPersistence::RegisterParticipant(invokerThread->GetId());
+ #endif
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ReusedDispatch, invokerThread->GetId(), 0, 0, m_scripts.size());
+     invokerThread->Execute(script, arguments);
+ 
+     return invokerThread->GetId();
+@@ -975,6 +1013,7 @@
+   if (checkpointContract == "command_center" || checkpointContract == "compat")
+     InfinityScriptPersistence::RegisterParticipant(invokerThread->GetId());
+ #endif
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::FreshDispatch, invokerThread->GetId(), 0, 0, m_scripts.size());
+   invokerThread->Execute(script, arguments);
+ 
+   return invokerThread->GetId();
+--- a/xbmc/interfaces/builtins/AddonBuiltins.cpp
++++ b/xbmc/interfaces/builtins/AddonBuiltins.cpp
+@@ -7,6 +7,7 @@
+  */
+ 
+ #include "AddonBuiltins.h"
++#include "interfaces/generic/InfinityStartupTrace.h"
+ 
+ #include "FileItem.h"
+ #include "GUIPassword.h"
+@@ -223,6 +224,8 @@
+ template<bool OnlyApple=false>
+ static int RunScript(const std::vector<std::string>& params)
+ {
++  InfinityStartupTrace::Request infinityRequest;
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::BuiltinResolve);
+ #if defined(TARGET_DARWIN_OSX)
+   std::string execute;
+   std::string parameter = params.size() ? params[0] : "";
+@@ -278,7 +281,10 @@
+     if (!filename.empty())
+       argv[0] = filename;
+ 
+-    CScriptInvocationManager::GetInstance().ExecuteAsync(scriptpath, addon, argv);
++    // Diagnostic only: retain the public built-in return contract below.
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::BuiltinResolved);
++    const int infinityInvocationResult = CScriptInvocationManager::GetInstance().ExecuteAsync(scriptpath, addon, argv);
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::BuiltinResult, infinityInvocationResult, infinityInvocationResult);
+   }
+ 
+   return 0;
+--- a/xbmc/interfaces/python/PythonInvoker.cpp
++++ b/xbmc/interfaces/python/PythonInvoker.cpp
+@@ -13,6 +13,7 @@
+ // clang-format on
+ 
+ #include "PythonInvoker.h"
++#include "interfaces/generic/InfinityStartupTrace.h"
+ #if defined(TARGET_ANDROID)
+ #include "threads/InfinityPythonWaitProbe.h"
+ #include "threads/InfinityProbeExport.h"
+@@ -193,6 +194,7 @@
+ {
+ #if defined(TARGET_ANDROID)
+   InfinityScriptPersistence::InitializationProgress(GetId(), "native.execute.enter", 0);
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ExecuteEnter, GetId());
+ #endif
+   if (script.empty())
+     return false;
+@@ -202,6 +204,7 @@
+ #endif
+   if (!CFileUtils::Exists(script))
+   {
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ExecuteMissing, GetId());
+     CLog::Log(LOGERROR, "CPythonInvoker({}): python script \"{}\" does not exist", GetId(),
+               CSpecialProtocol::TranslatePath(script));
+     return false;
+@@ -209,12 +212,14 @@
+ 
+ #if defined(TARGET_ANDROID)
+   InfinityScriptPersistence::InitializationProgress(GetId(), "native.handler.initialize", 0);
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::HandlerBegin, GetId());
+ #endif
+   if (!onExecutionInitialized())
+-    return false;
++  { InfinityStartupTrace::Record(InfinityStartupTrace::Stage::HandlerRejected, GetId()); return false; }
+ 
+ #if defined(TARGET_ANDROID)
+   InfinityScriptPersistence::InitializationProgress(GetId(), "native.handler.initialized", 0);
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::HandlerReady, GetId());
+ #endif
+   return ILanguageInvoker::Execute(script, arguments);
+ }
+@@ -265,6 +270,7 @@
+       PyThreadState* owner = CServiceBroker::GetXBPython().GetMainThreadState();
+       if (owner == nullptr)
+       {
++        InfinityStartupTrace::Record(InfinityStartupTrace::Stage::MainStateMissing, GetId());
+         CLog::LogF(LOGERROR, "({}, {}) Python main thread state unavailable", GetId(), m_sourceFile);
+         return false;
+       }
+@@ -275,29 +281,35 @@
+       m_mainThreadState = PyThreadState_New(owner->interp);
+       if (m_mainThreadState == nullptr)
+       {
++        InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ThreadStateFailed, GetId());
+         CLog::LogF(LOGERROR, "({}, {}) PyThreadState_New failed", GetId(), m_sourceFile);
+         return false;
+       }
+ 
+ #if defined(TARGET_ANDROID)
+       InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.acquire_gil", 0);
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::GilWait, GetId());
+ #endif
+       PyEval_RestoreThread(m_mainThreadState);
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::GilAcquired, GetId());
+       m_invokerOwnsGil = true;
+ #if defined(TARGET_ANDROID)
+       InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.create", 0);
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterCreate, GetId());
+ #endif
+       l_threadState = Py_NewInterpreter();
+       if (l_threadState != nullptr)
+       {
+ #if defined(TARGET_ANDROID)
+         InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.created", reinterpret_cast<uintptr_t>(l_threadState->interp));
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterCreated, GetId());
+ #endif
+         PyEval_ReleaseThread(l_threadState);
+         m_invokerOwnsGil = false;
+       }
+       if (l_threadState == nullptr)
+       {
++        InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterFailed, GetId());
+         CLog::Log(LOGERROR, "CPythonInvoker({}, {}): FAILED to get thread m_threadState!", GetId(),
+                   m_sourceFile);
+         PyEval_RestoreThread(m_mainThreadState);
+@@ -317,8 +329,10 @@
+   // get the GIL
+ #if defined(TARGET_ANDROID)
+   InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.restore_gil", reinterpret_cast<uintptr_t>(l_threadState->interp));
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RestoreGilWait, GetId());
+ #endif
+   PyEval_RestoreThread(l_threadState);
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RestoreGilAcquired, GetId());
+   m_invokerOwnsGil = true;
+   if (newInterp)
+   {
+@@ -327,10 +341,12 @@
+ 
+ #if defined(TARGET_ANDROID)
+     InfinityScriptPersistence::InitializationProgress(GetId(), "native.kodi_module.initialize", reinterpret_cast<uintptr_t>(l_threadState->interp));
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::KodiInitialize, GetId());
+ #endif
+     onInitialization();
+ #if defined(TARGET_ANDROID)
+     InfinityScriptPersistence::InitializationProgress(GetId(), "native.kodi_module.initialized", reinterpret_cast<uintptr_t>(l_threadState->interp));
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::KodiInitialized, GetId());
+ #endif
+     setState(InvokerStateInitialized);
+ 
+@@ -438,8 +454,10 @@
+   // BEGIN INFINITY_PREBYTECODE_OBSERVER
+ #if defined(TARGET_ANDROID)
+   InfinityScriptPersistence::InitializationProgress(GetId(), "native.observer.before_start", reinterpret_cast<uintptr_t>(m_threadState->interp));
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ObserverBegin, GetId());
+ #endif
+   m_infinityPersistenceObserver = InfinityPythonPersistence::Start(GetId(), m_threadState->interp);
++  if (InfinityStartupTrace::Enabled()) InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ObserverReturned, GetId(), PyErr_Occurred() ? 1 : 0);
+   // END INFINITY_PREBYTECODE_OBSERVER
+ #endif
+ 
+@@ -452,6 +470,7 @@
+ 
+   bool failed = false;
+   std::string exceptionType, exceptionValue, exceptionTraceback;
++  if (stopping) { InfinityStartupTrace::Record(InfinityStartupTrace::Stage::StoppingBeforeBytecode, GetId()); }
+   if (!stopping)
+   {
+     try
+@@ -489,9 +508,11 @@
+         }
+         try {
+ #endif
++          InfinityStartupTrace::Record(InfinityStartupTrace::Stage::BytecodeEnter, GetId());
+           executeScript(fp, realFilename, moduleDict);
+-#if defined(TARGET_ANDROID)
+-        }catch(...){if(waitProbe)InfinityPythonWaitProbe::BodyReturned();throw;}
++          if (InfinityStartupTrace::Enabled()) InfinityStartupTrace::Record(InfinityStartupTrace::Stage::BytecodeReturned, GetId(), PyErr_Occurred() ? 1 : 0);
++#if defined(TARGET_ANDROID)
++        }catch(...){InfinityStartupTrace::Record(InfinityStartupTrace::Stage::BytecodeException, GetId());if(waitProbe)InfinityPythonWaitProbe::BodyReturned();throw;}
+         if(waitProbe)InfinityPythonWaitProbe::BodyReturned();
+ #endif
+ #if defined(TARGET_ANDROID)
+@@ -518,6 +539,7 @@
+     }
+   }
+ 
++  if (InfinityStartupTrace::Enabled()) InfinityStartupTrace::Record(InfinityStartupTrace::Stage::ExecutionFinished, GetId(), (failed ? 1 : 0) | (PyErr_Occurred() ? 2 : 0));
+   m_systemExitThrown = false;
+   InvokerState stateToSet;
+   if (!failed && !PyErr_Occurred())
+--- a/xbmc/interfaces/python/XBPython.cpp
++++ b/xbmc/interfaces/python/XBPython.cpp
+@@ -13,6 +13,7 @@
+ // clang-format on
+ 
+ #include "XBPython.h"
++#include "interfaces/generic/InfinityStartupTrace.h"
+ #if defined(TARGET_ANDROID)
+ #include "platform/android/activity/InfinityAndroidCheckpoint.h"
+ #endif
+@@ -501,8 +502,10 @@
+     return false;
+ 
+   XBMC_TRACE;
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RuntimeWait, invoker->GetId());
+   CLog::Log(LOGDEBUG, "initializing python engine.");
+   std::unique_lock<CCriticalSection> lock(m_critSection);
++  InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RuntimeLocked, invoker->GetId(), m_bInitialized ? 1 : 0, 0, m_iDllScriptCounter);
+   m_iDllScriptCounter++;
+   if (!m_bInitialized)
+   {
+@@ -564,13 +567,16 @@
+     CHTTPPythonWsgiInvoker::GlobalInitializeModules();
+ #endif
+ 
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RuntimeInitialize, invoker->GetId());
+     Py_Initialize();
+     // Capture the main interpreter state on the thread that initialized Python.
+     // Every invoker creates its own temporary state from this interpreter.
+     m_mainThreadState = PyEval_SaveThread();
+ 
+     m_bInitialized = true;
+-  }
++    InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RuntimeInitialized, invoker->GetId());
++  }
++  else { InfinityStartupTrace::Record(InfinityStartupTrace::Stage::RuntimeReused, invoker->GetId()); }
+ 
+   return m_bInitialized;
+ }
