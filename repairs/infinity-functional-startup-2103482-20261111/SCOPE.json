@@ -7,7 +7,7 @@
   "branch": "work/infinity-2103482-functional-startup-20261111",
   "continuation_from": "93d025b65cf6d5b7e3912ce704d0bc98af4879fd",
   "current_owner_reported_QA": 2103482,
-  "feature_verification": "Original82 Android actual Python success/error/recovery PASS; HC follow-up SIGSEGV traced to fixture borrowed Control lifetime; corrected fixture selected run43112968019 IN_PROGRESS",
+  "feature_verification": "Original82 Android PASS selected local success/error/recovery (43109315570) and HC UI plus independent Python/CC plugin (43112968019). Failed observer GUI lifetime case43110915155 retained. No Fold cause attribution.",
   "known_limits": [
     "Owner confirms original dumpstate skipped current Kodi backtrace because process was cached",
     "Failed Health Center invocation/admission result and successful restart are not matched",

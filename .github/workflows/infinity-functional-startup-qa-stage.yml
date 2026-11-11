@@ -1,0 +1,68 @@
+name: Infinity functional startup - authenticated internal QA staging only
+on:
+  push:
+    branches: [work/infinity-2103482-functional-startup-20261111]
+    paths: [repairs/infinity-functional-startup-2103482-20261111/QA-STAGE-REQUEST.json]
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-functional-startup-unsigned-qa
+  cancel-in-progress: false
+jobs:
+  stage:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && startsWith(github.event.head_commit.message, 'Stage startup QA:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Authenticate and retain the exact compiled native archive
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,subprocess,sys
+          from pathlib import Path
+          from zipfile import ZipFile
+          sys.path.insert(0,'repairs/dual-experience-isolation-2103420')
+          from inventory import validate_names
+          request=json.loads(Path('repairs/infinity-functional-startup-2103482-20261111/QA-STAGE-REQUEST.json').read_text())
+          assert request['operation']=='stage-functional-startup-internal-QA'
+          assert request['signed'] is False and request['owner_delivery'] is False
+          native=request['native_producer']
+          assert type(native['artifact_id']) is int and native['artifact_id']>0
+          archive=Path('native-evidence.zip')
+          with archive.open('wb') as output:
+              subprocess.run(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/'+str(native['artifact_id'])+'/zip'],stdout=output,check=True,timeout=300)
+          with archive.open('rb') as stream:
+              assert 'sha256:'+hashlib.file_digest(stream,'sha256').hexdigest()==native['artifact_digest']
+          with ZipFile(archive) as z:
+              names=set(validate_names(z))
+              required={'libkodi.so','ARM64-DIAGNOSTIC-BUILD.json','DIAGNOSTIC-SOURCE-PRESERVATION.json'}
+              assert required<=names
+              for name in required:z.extract(name,'native-evidence')
+          PY
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13836509327', run-id: '42979187229', merge-multiple: true, github-token: '${{ github.token }}', path: signed82}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13833695178', run-id: '42970204230', merge-multiple: true, github-token: '${{ github.token }}', path: original82-owners}
+      - name: Verify complete source, authority, owner bundles and APK member preservation
+        run: |
+          python - <<'PY'
+          import subprocess
+          from pathlib import Path
+          apks=list(Path('signed82').rglob('*.apk'));assert len(apks)==1
+          subprocess.run(['python','repairs/infinity-functional-startup-2103482-20261111/package_internal_qa.py',
+              '--request','repairs/infinity-functional-startup-2103482-20261111/QA-STAGE-REQUEST.json',
+              '--baseline',str(apks[0]),'--components','original82-owners/components',
+              '--native','native-evidence','--native-archive','native-evidence.zip',
+              '--out','startup-qa-unsigned'],check=True)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-FunctionalStartup-Unsigned-QA-${{ github.run_id }}-NOT-INSTALLABLE
+          path: startup-qa-unsigned/
+          retention-days: 90
+          if-no-files-found: error

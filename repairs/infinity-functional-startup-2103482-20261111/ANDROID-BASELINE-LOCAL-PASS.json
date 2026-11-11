@@ -1,0 +1,79 @@
+{
+  "status": "PASS_SELECTED_BASELINE_HEALTH_CENTER_AND_CC_WITH_RETAINED_ERROR_PROOF_NOT_FOLD_REPRODUCTION",
+  "baseline_apk": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+  "cases": [
+    {
+      "action": "health-center",
+      "actual_dialog_id": 11188,
+      "health_contracts_sha256": "3cf340b3c8c49a55e07d0e798b78323b9d46bebfcb949b1040b6e80327769214",
+      "health_control_label": "Scan Kodi",
+      "health_source_sha256": "fc2cb4ce6251cd363094b43462f4d919db27268d2701e30d705fc93fbefc2f26",
+      "health_version": "2.5.26",
+      "health_window_initially_absent": true,
+      "health_window_visible": true,
+      "nonce": "72c862e3a0ba44c7b0ef63dec5b71111",
+      "passed": true,
+      "pid": 5138,
+      "process_start": "19252",
+      "python_body_entered": true,
+      "sequence": 1
+    },
+    {
+      "action": "local-python",
+      "arithmetic": 6,
+      "cc_version": "0.3.5.78",
+      "nonce": "72c862e3a0ba44c7b0ef63dec5b71111",
+      "passed": true,
+      "pid": 5138,
+      "process_start": "19252",
+      "python_body_entered": true,
+      "sequence": 2
+    }
+  ],
+  "health_center_admission_before": {
+    "addonid": "script.kodihealthcenter",
+    "enabled": false,
+    "type": "xbmc.python.script",
+    "version": "2.5.27"
+  },
+  "health_center_admission_after": {
+    "addonid": "script.kodihealthcenter",
+    "enabled": true,
+    "type": "xbmc.python.script",
+    "version": "2.5.27"
+  },
+  "owner_device": false,
+  "Cobra_executed": false,
+  "shutdown": "NOT_RUN",
+  "fold_failure_reproduced": false,
+  "startup_repair_accepted": false,
+  "run": 43112968019,
+  "source": "85a3f9dbdb46d057928568cba40b77cfd519db0a",
+  "artifact": 13896808741,
+  "artifact_sha256": "1a284051f339884879999bf74cf98c45908d2461a4be42213c909e516b0ca249",
+  "APK_modified": false,
+  "Health_Center_scope": "Actual UI after explicit normal API enablement on fresh emulator profile; not automatic fresh-profile readiness",
+  "command_center_plugin": {
+    "passed": true,
+    "addon": {
+      "addonid": "script.infinity.commandcenter",
+      "enabled": true,
+      "type": "xbmc.python.script",
+      "version": "0.3.5.78"
+    },
+    "row_count": 21,
+    "exact_health_resume_routes_verified": true,
+    "commands_activated": false
+  },
+  "reused_error_cleanup": {
+    "run": 43109315570,
+    "proof": "ANDROID-BASELINE-INITIAL.json"
+  },
+  "historical_failed_observer_run": 43110915155,
+  "Android_NULL_failure_injected": false,
+  "evidence_sha256": {
+    "FUNCTIONAL-STARTUP-ANDROID.json": "26e4e569168d387787daa3ccfd7632fd523621953adc45171f03f5efa931b2e6",
+    "kodi.log": "93ccfbdcced0531f392b26ad9bb538c626765d26d483dcab9167a4e31e69b5d9",
+    "observer-stage.json": "e3b5979658ee5a0d57e568c4d8b95adebe271246d44b552b1a129678563d20e3"
+  }
+}

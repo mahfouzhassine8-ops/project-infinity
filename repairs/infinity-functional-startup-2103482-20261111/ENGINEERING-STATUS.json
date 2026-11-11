@@ -49,25 +49,8 @@
       "APK_built": false
     },
     "ARM64_link": {
-      "status": "IN_PROGRESS_FRESH_RUNNER_DEPENDENCIES_RESTORED_THROUGH_ORIGINAL_RECIPE",
+      "status": "IN_PROGRESS_RETAINED_NATIVE_DEPENDENCY_BUILD",
       "run": 43040415571,
-      "prior_run": 43036765104,
-      "prior_attempts": [
-        1,
-        2
-      ],
-      "failed_step": "Retained dependency tooling",
-      "exit_code": 100,
-      "errors": [
-        "Temporary failure resolving 'azure.archive.ubuntu.com'",
-        "Temporary failure resolving 'archive.ubuntu.com'",
-        "Temporary failure resolving 'security.ubuntu.com'"
-      ],
-      "packages_needed": [
-        "pkg-config",
-        "libcurl4-openssl-dev"
-      ],
-      "Ubuntu_signature_checks_weakened": false,
       "historical_preparation_failure": {
         "prior_run": 43036765104,
         "prior_attempts": [
@@ -95,7 +78,7 @@
       "runner_signature_checks_preserved": true
     },
     "Android_local_functionality": {
-      "status": "PARTIAL_PASS_WITH_RETAINED_FAILED_HEALTH_CENTER_CASE",
+      "status": "PASS_SELECTED_BASELINE_LOCAL_FUNCTIONALITY_WITH_RETAINED_HISTORICAL_FAILURES",
       "first_run": 43109315570,
       "first_proof": "ANDROID-BASELINE-INITIAL.json",
       "passed": [
@@ -110,9 +93,11 @@
       "followup_failure": "SIGSEGV during observer borrowed Control getLabel; original context recovered and exact82 ELF resolved",
       "fixture_corrective_commit": "85a3f9dbdb46d057928568cba40b77cfd519db0a",
       "corrected_fixture_run": 43112968019,
-      "corrected_fixture_status": "IN_PROGRESS",
+      "corrected_fixture_status": "PASS",
       "Fold_reproduced": false,
-      "original_APK_changed": false
+      "original_APK_changed": false,
+      "proof": "ANDROID-BASELINE-LOCAL-PASS.json",
+      "health_center_pass_requires": "Normal API enablement on new disposable profile; not automatic fresh-profile readiness"
     },
     "Android_instrumentation_and_repeated_starts": {
       "status": "NOT_RUN_NATIVE_BUILD_REQUIRED"
