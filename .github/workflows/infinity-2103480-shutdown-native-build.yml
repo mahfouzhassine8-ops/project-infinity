@@ -55,7 +55,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get -o Acquire::Retries=3 update -qq
-          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev autoconf automake libtool pkg-config
+          sudo apt-get install -y python3-yaml python3-dev libsqlite3-dev libssl-dev libffi-dev autoconf automake libtool pkg-config libcurl4-openssl-dev
       - uses: actions/cache@v4
         with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
       - name: Restore original pinned Android NDK
