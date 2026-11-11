@@ -1,6 +1,6 @@
 # Functional initialization investigation — November 11 evidence
 
-Status: investigation active; the owner's intermittent functional failure is not yet reproduced or causally attributed. Production changes: none. This checkpoint consumes the two newly supplied private extracts and reuses existing source/build evidence. It does not request another device capture.
+Status: the owner's intermittent functional failure is not yet reproduced or causally attributed. Production changes: none. Continuing from b251f65d, this checkpoint adds the owner's original-dumpstate findings, a bounded native-admission host experiment and the separate Resume Hub warning analysis. No new device capture is requested.
 
 ## What the supplied files establish
 
@@ -12,7 +12,9 @@ The same engine process and worker thread appear across the attempts in both rep
 
 At 05:28:53.707 Android ActivityManager ordered the engine killed for excessive background CPU: 10,040 ms over a 300,072 ms accounting interval, reported limit 2 and adjustment 920. Input-channel removal at 05:28:53.911 and window cleanup through `binderDied` at 05:28:53.925 corroborate termination aftermath. This is an OS termination, not a captured ANR, a native crash, or verified Essential-First completion. The excerpts do not attribute that CPU to Core or prove that this later kill caused an earlier UI failure. Android freeze/unfreeze records must be considered when interpreting elapsed gaps.
 
-No identifiable failed Health Center invocation, relevant invocation return code, interpreter-initialization progression or native wait-owner stack is present in the supplied selection. Neither a fresh engine launch nor the successful-after-reopen comparison is established by it. `22031.mp4` remains unavailable here. The weather header is not used as job-state evidence. Absence from a filtered extract cannot establish absence from the original report.
+No identifiable failed Health Center invocation, relevant invocation return code or interpreter-initialization progression is present in the supplied selection. Neither a fresh engine launch nor the successful-after-reopen comparison is established by it. `22031.mp4` remains unavailable here. The weather header is not used as job-state evidence. Absence from a filtered extract cannot establish absence from the original report.
+
+The owner subsequently examined the complete original dumpstate and supplied its lines 812047–812050: at 05:10:12.835467836-0500 Android explicitly skipped the live Kodi PID 26041 backtrace because the process was cached. This replaces the earlier assumption that the live backtrace might merely have been filtered out. There is no captured current stack to recover from that section, and historical stacks must not substitute. `OWNER-ORIGINAL-EXCERPTS.json` distinguishes these owner-supplied references from independently read attachments.
 
 ## Shared execution paths and competing explanations
 
@@ -23,6 +25,33 @@ No identifiable failed Health Center invocation, relevant invocation return code
 Native skin/input/rendering and Python invocations are separate execution paths. `CScriptRunner::WaitOnScriptResult()` also retains the GUI/busy-dialog event route while awaiting results. Consequently a responsive skin cannot certify add-on readiness. A new process would clear manager flags, interpreter state and process-local resources; the supplied same-process observations do not identify which state a successful restart actually corrected.
 
 The chooser's Java `Splash.showInfinityHealthCenter()` differs from the Python Health Center add-on. The unavailable video and missing invocation trace prevent treating these as the same failing path.
+
+## New selected host result: bookkeeping versus refusal
+
+`test_failure_admission.py` compiled retained production manager/admission methods, the `RunScript` built-in and real persistence headers. Four input files were checked against the BASE77 native source map. Existing lifetime-fixture peers substitute add-on lookup, filesystem access, classification, invoker allocation/thread launch and logging. No CPython, Android loader, actual provider or GUI ran.
+
+Three separate processes completed within the five-second per-case deadline:
+
+- Four synthetic opaque-writer diagnostic rows repeated 233 times remained four aggregated rows. With admission open, an independent Program-script request was admitted. Its own writer had no inherited failure. The original failure remained recorded and durability remained unproved.
+- Closing startup admission refused the independent dispatch, without stopping the existing owner. The actual `RunScript` built-in still returned zero.
+- Hard-shutdown admission likewise refused dispatch while the actual built-in returned zero.
+
+All selected assertions passed. This is a **native host admission result**, not a functional startup PASS. The synthetic records all use the same opaque-writer classification; they do not reproduce original metadata-event classification, actual audit hooks, library loading, CPU load or interpreter execution. The result excludes these ledger records alone as a sufficient explanation under the tested conditions. It does not exclude loader resource effects, an admitted initialization wait, or actual retained checkpoint refusal on the Fold. It confirms that a zero built-in result is not proof that a script started.
+
+Results: `HOST-FAILURE-ADMISSION-RESULTS.json`; preselected scope: `SELECTED-HOST-CHECK.md`. The generated C++ source hash is explicitly labeled as source, not binary. Existing Android and shutdown results were not rerun.
+
+## Separate Resume Hub warning: safe legacy exclusion
+
+The owner reports original dumpstate line 206221, 05:02:53.507: `Unexpected Command Center parent 0.3.5.78; Resume Hub overlay skipped`.
+
+The legacy `InfinityResumeHubInstaller.applyChecked()` supports only CC 0.3.5.17 / 0.3.5.19. Version 0.3.5.78 correctly reaches its warning-and-return branch. That branch does not open the old controller payload or overlay its eight files. The actual retained DEX closes its `InfinityJavaWriteBarrier.Scope` before returning. `Main.onResume()` then continues to the power-route and weather code; the return does not exit native/Python initialization. This is not evidence of an incorrect installed CC version or a shared execution failure. Widening the guard could overwrite modern CC files with the old 0.3.5.19 overlay and is rejected.
+
+Signed80 member bindings inspected by the preservation reviewer:
+
+- `classes3.dex`: `5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8`.
+- `assets/infinity/resume-hub-controller.zip`: `cb6a2de4ecf9a47b3953d06ab8eccdf8cfbbcb4fb3a209b87f2ccc41f71c6688`.
+
+Historical source: `repairs/resume-hub-2103292/InfinityResumeHubInstaller.java.in`, version constants 34–35 and exclusion 75–78. The retained disassembly, not the native-tree Java template, establishes the added write-barrier close and actual `Main.onResume()` call sequence. Signed82 inherits these members according to its preservation receipts; this is not a new byte verification of the inaccessible signed82 artifact. The warning indicates Java reached its nonpending-exit branch at that instant, not that native invocation admission was open.
 
 ## Additional source finding, not attributed to this incident
 
@@ -43,6 +72,10 @@ These are source/build/signing records, not a new independent byte verification 
 
 ## Remaining evidence and release gates
 
-The next discriminating evidence is the **existing original report's** engine-thread/CPU/wait-state sections and the timestamped failed invocation: admission rejection versus an admitted invoker's initialization stage. Those sections were omitted by the supplied filter. The original archives or their unfiltered `dumpstate.txt` are the required existing source; a new phone diagnostic or speculative APK is not needed for this step. If the original report never captured the relevant native stack, report that limit rather than invent one.
+The precise causal gap is a failed invocation matched to its native admission result or initialization stage and checkpoint generation. The original report explicitly skipped the current live backtrace. The supplied evidence does not contain the matching native receipt; another symptom screenshot or repetition of the same phone test would not resolve that gap.
 
-No new host/application tests, ARM64 build, Android cycles, signing, registry reservation or APK release occurred in this investigation. Actual repeated functional launch, local-offline Health Center/add-on execution, independent clean shutdown/relaunch, recovery and physical Fold acceptance remain pending a demonstrated repair. All production code, Cobra, skin, Search/providers, Trakt/tracking/resume, settings/data and networking remain unchanged.
+The existing native ledger already records invoker ID, native thread ID, interpreter identity, `observed` status and initialization stages. `InfinityAndroidCheckpoint.cpp::EncodeStatusLocked()` serializes them under its bounded receipt budget; `InfinityShutdownTrace` records admission closure. These existing probes should be used in a controlled Android reproduction to distinguish refusal from a wait before bytecode. Historical receipts from a different PID/session cannot attribute this incident. No such new Android reproduction has passed here. The signed82 artifact download also remains blocked by the executor's artifact-storage CONNECT 403; this is an environment access limit, not application failure.
+
+No production correction is selected without that causal evidence. In particular, do not reopen admission after failed Close, clear the opaque-writer ledger, widen the legacy overlay guard, or package the separate Core prototype as a supposed startup repair. The independent CPython NULL cleanup finding remains source-confirmed but untested/unattributed in this checkpoint.
+
+Only the three focused host cases above ran. No new ARM64 build, Android cycles, signing, registry reservation or APK release occurred. Actual repeated functional launch, local-offline Health Center/add-on execution, independent clean shutdown/relaunch, recovery and physical Fold acceptance remain pending a demonstrated repair. All production code, Cobra, skin, Search/providers, Trakt/tracking/resume, settings/data and networking remain unchanged.

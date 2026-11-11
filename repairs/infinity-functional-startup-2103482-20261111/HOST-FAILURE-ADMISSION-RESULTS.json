@@ -1,0 +1,47 @@
+{
+  "schema": 1,
+  "scope": "host native admission and ledger only",
+  "source_sha256": {
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": "a9eb9a48269adf3ed838c18a3247e469056d9784bfeca85833957cebb45c8661",
+    "xbmc/interfaces/builtins/AddonBuiltins.cpp": "628003e3c97ac572870d26620827109f59a3cb7b3e7a23d298d3e0600405c248",
+    "xbmc/platform/android/activity/InfinityScriptPersistence.h": "12e26e9ee008ec65b3def04e7dc0919ff66a0d1a2d1f22cc220d83c393f7c67e",
+    "xbmc/platform/android/activity/InfinityProtectedWrites.h": "bcd235ab97e38cd09c768a47488a14106208ff9ba1ac5da550864f2aaaa757ac"
+  },
+  "fixture_sha256": "5cff2dd6d6e278ce975aac45e49809e04d7c4e74ab37d3e68c1f3939e726de4c",
+  "source_map_sha256": "f48df24caabdf36fee25d69d47b0a2ad3c98df3936949c8dcd6d07a92e2f0412",
+  "results": [
+    {
+      "case": "failures-only",
+      "builtin_return": 0,
+      "independent_dispatch_admitted": true,
+      "blocking_rows": 4,
+      "repetitions_per_row": 233,
+      "failure_preserved": true,
+      "python_executed": false
+    },
+    {
+      "case": "startup-gate",
+      "builtin_return": 0,
+      "independent_dispatch_admitted": false,
+      "blocking_rows": 4,
+      "repetitions_per_row": 233,
+      "failure_preserved": true,
+      "python_executed": false
+    },
+    {
+      "case": "shutdown-gate",
+      "builtin_return": 0,
+      "independent_dispatch_admitted": false,
+      "blocking_rows": 4,
+      "repetitions_per_row": 233,
+      "failure_preserved": true,
+      "python_executed": false
+    }
+  ],
+  "all_selected_assertions_passed": true,
+  "actual_core_service_executed": false,
+  "android_tested": false,
+  "fold_failure_reproduced": false,
+  "production_changed": false,
+  "generated_cpp_sha256": "5fdb4ccd44174a71aa7fae79fac066f18d9d7de1411e895c0458737906b22007"
+}

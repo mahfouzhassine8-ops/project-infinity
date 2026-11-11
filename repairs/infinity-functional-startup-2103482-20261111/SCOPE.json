@@ -6,23 +6,35 @@
   "current_owner_reported_QA": 2103482,
   "feature_verification": "Independent startup/functional invocation cycles; NOT_RUN",
   "known_limits": [
-    "Input files are filtered logcat; native thread/CPU/wait-state sections omitted",
-    "Failed Health Center invocation and successful restart not matched",
-    "Signed82 bytes inaccessible through artifact download proxy; reuse source/run records only"
+    "Owner confirms original dumpstate skipped current Kodi backtrace because process was cached",
+    "Failed Health Center invocation/admission result and successful restart are not matched",
+    "Host experiment substitutes invocation peers; no actual Python/add-on/dlopen/Android execution",
+    "Signed82 bytes inaccessible through artifact-storage CONNECT 403; source/run records reused only"
   ],
-  "new_tests_run": [],
+  "new_tests_run": [
+    {
+      "cases": [
+        "failures-only",
+        "startup-gate",
+        "shutdown-gate"
+      ],
+      "production_startup_acceptance": false,
+      "script": "test_failure_admission.py",
+      "selected_assertions": "PASS"
+    }
+  ],
   "production_changes": [],
   "protected_baseline": 2103477,
   "raw_logs_committed": false,
   "reviews": {
-    "Astra": "Same-engine timeline, live resident counterevidence, Android CPU termination and preserved boundaries",
-    "GPT_6_1": "Shared Python stages, Core attempt deduplication and narrow NULL/GIL source contract"
+    "Astra": "Legacy DEX overlay guard and return flow; host-test claim boundaries; no production changes",
+    "GPT_6_1": "Pinned CPython NULL/GIL source contract and deterministic proposed test; not run/not attributed to Fold"
   },
   "schema": 1,
-  "selected_runtime_test_fixture": "PENDING_MATCHED_FAILURE_STATE",
+  "selected_runtime_test_fixture": "NATIVE_HOST_ADMISSION_ONLY; actual methods and controlled peers",
   "shutdown_verification": "Independent explicitly selected clean shutdown/relaunch; NOT_RUN",
   "signing": false,
   "source_anchor": "694d46a480e62004952cc6a5b289af0ff995a071",
-  "status": "SOURCE_AND_EXISTING_EXTRACT_ANALYSIS;ROOT_CAUSE_UNRESOLVED",
+  "status": "NATIVE_HOST_EXCLUSION_VERIFIED;FOLD_ROOT_CAUSE_UNRESOLVED",
   "version_reserved": false
 }

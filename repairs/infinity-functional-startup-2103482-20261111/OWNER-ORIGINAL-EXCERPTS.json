@@ -1,0 +1,41 @@
+{
+  "schema": 1,
+  "provenance": "Owner supplied original-dumpstate excerpts in conversation after checkpoint b251f65d; original unfiltered archive not read by this executor",
+  "earlier_dumpstate_bytes": 278438392,
+  "core_namespace_denial": {
+    "original_lines": [192920, 192955],
+    "time": "2026-11-11 05:02:47",
+    "namespace": "clns-9",
+    "staging_location": "Android external app-files Kodi temp, despite the service describing it as internal",
+    "independently_present_in_filtered_attachment": true,
+    "successful_core_execution_established": false
+  },
+  "resume_hub_warning": {
+    "original_line": 206221,
+    "time": "2026-11-11 05:02:53.507",
+    "installed_cc_reported_by_warning": "0.3.5.78",
+    "message": "Unexpected Command Center parent 0.3.5.78; Resume Hub overlay skipped",
+    "classification": "legacy_overlay_version_exclusion; not functional-startup root cause"
+  },
+  "live_backtrace": {
+    "original_lines": [812047, 812050],
+    "pid": 26041,
+    "time": "2026-11-11 05:10:12.835467836-0500",
+    "process": "com.projectinfinity.kodi:kodi",
+    "captured": false,
+    "reason": "Process is cached, skipping backtrace due to high chance of timeout.",
+    "historical_stacks_are_not_current_failure_evidence": true
+  },
+  "later_background_cpu_kill": {
+    "time": "2026-11-11 05:28:53.707",
+    "pid": 26041,
+    "adjustment": 920,
+    "cpu_ms": 10040,
+    "accounting_interval_ms": 300072,
+    "reported_duration_ms": 1390057,
+    "reported_limit": 2,
+    "independently_present_in_filtered_attachment": true,
+    "worker_attributed": false,
+    "earlier_functional_failure_explained": false
+  }
+}
