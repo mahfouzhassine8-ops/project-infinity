@@ -1,0 +1,53 @@
+{
+  "run": 43110915155,
+  "source": "69e160faece641694856007a0d236e4cb500f3ab",
+  "artifact": 13897315292,
+  "artifact_sha256": "8fef1cb43466569ca57837f571cf023cef7fa6d98e418c25f9949e5814a59d74",
+  "status": "FAIL_NATIVE_SIGSEGV_DURING_OBSERVER_GUI_READ",
+  "APK": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+  "HC_before": {
+    "addonid": "script.kodihealthcenter",
+    "enabled": false,
+    "type": "xbmc.python.script",
+    "version": "2.5.27"
+  },
+  "HC_after": {
+    "addonid": "script.kodihealthcenter",
+    "enabled": true,
+    "type": "xbmc.python.script",
+    "version": "2.5.27"
+  },
+  "Fold_reproduced": false,
+  "CPython_NULL_reproduced": false,
+  "production_changed": false,
+  "original_signal": {
+    "pid": 5003,
+    "tid": 5679,
+    "signal": 11,
+    "si_code": 2,
+    "pc": "0x7fc7fd947d00",
+    "lr": "0x7fc7f946f1b4",
+    "source": "Crash-handler ASCII record retained in tombstone memory near x29; final signal is reraised SI_TKILL"
+  },
+  "symbol_resolution": {
+    "artifact": 13830588821,
+    "run": 42959455792,
+    "artifact_sha256": "7cc0410e013875ce555078826a84d977704291516c9f520ade50281578218f02",
+    "engine_sha256": "503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437",
+    "load_bias": "0x7fc7f7ec1000",
+    "pc_offset": "0x5a86d00",
+    "pc_symbol": "typeinfo for XBMCAddon::xbmcaddon::AddonException",
+    "lr_offset": "0x15ae1b4",
+    "lr_symbol": "PythonBindings::xbmcgui_XBMCAddon_xbmcgui_ControlButton_getLabel",
+    "lr_source": "generated AddonModuleXbmcgui.i.cpp:6031",
+    "call_instruction": "0x15ae1b0 blr x9 after loading virtual slot0xc8"
+  },
+  "fixture_defect": "Window temporary destroyed while borrowed native Control wrapper still used. Window::dispose clears owning vecControls; ordinary SWIG method return does not Acquire C++ Control.",
+  "correction": "Keep dashboard and scan_button locals alive through actual getLabel, assert control ID/type and actual dialog before/after. No suppression/fallback.",
+  "remaining": "Need Android execution of corrected fixture; source and symbol evidence identify hazard, not proof of owner Fold cause.",
+  "evidence_sha256": {
+    "FUNCTIONAL-STARTUP-ANDROID.json": "093eac349c7e4e48b1a61657163cfa784210412281125505b7aab0c2a152bb43",
+    "failure-final-tombstone.txt": "fe532ca8d00d56a6e2ff6ca6e707303e1aa3b9f4456bb073ab9e7f4f1a5dcbb8",
+    "kodi.log": "a27c29a2ad473b015c5c1ae0c7da5eb20196957480cdc7f43934a4e6e9ed0d80"
+  }
+}

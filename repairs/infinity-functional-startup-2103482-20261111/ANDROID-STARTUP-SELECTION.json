@@ -46,5 +46,12 @@
       "Independent successful Python invocation after error"
     ],
     "health_center": "NOT_LAUNCHED: observer SDK Addon lookup threw Unknown addon id; current state must be read before any enabling"
+  },
+  "followup_reason": {
+    "failed_run": 43110915155,
+    "artifact": 13897315292,
+    "archive_sha256": "8fef1cb43466569ca57837f571cf023cef7fa6d98e418c25f9949e5814a59d74",
+    "finding": "Borrowed native Control read from temporary Window in observer; retain Window and Control locals through unchanged real label assertion. No production edit. Original crash stays FAIL.",
+    "repeat_scope": "Only interrupted Health Center/new independent script/CC plugin cases; prior local/error/local proof reused."
   }
 }

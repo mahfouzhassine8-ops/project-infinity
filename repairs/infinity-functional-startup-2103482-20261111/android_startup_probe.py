@@ -83,8 +83,17 @@ elif request['action']=='health-center':
         version=xbmcgui.Window(10000).getProperty('KHC.Version')
         dialog=xbmcgui.getCurrentWindowDialogId()
         if visible and version=='2.5.26' and dialog==11188:
-            label=xbmcgui.Window(11188).getControl(1188101).getLabel()
-            assert label=='Scan Kodi'
+            # Kodi returns a borrowed native Control owned by this Window's
+            # vecControls. Keep that owner alive through the real GUI read.
+            dashboard=xbmcgui.Window(11188)
+            scan_button=dashboard.getControl(1188101)
+            assert isinstance(scan_button,xbmcgui.ControlButton)
+            assert scan_button.getId()==1188101 and xbmcgui.getCurrentWindowDialogId()==11188
+            with open(ROOT+'stage.json','w') as f:
+                json.dump(dict(nonce=request['nonce'],pid=os.getpid(),stage='before_owned_control_label_read',
+                               dialog_id=11188,control_id=1188101),f)
+            label=scan_button.getLabel()
+            assert label=='Scan Kodi' and xbmcgui.getCurrentWindowDialogId()==11188
             result.update(health_window_visible=True,health_version=version,
                           actual_dialog_id=dialog,health_control_label=label,passed=True)
             break
@@ -205,11 +214,20 @@ def run(sdk,inputs,out):
         if device:
             try:base.capture_failure(device,out)
             except Exception as e:report['capture_error']=type(e).__name__
+            try:
+                # Existing native recorder preserves the original signal PC;
+                # Android's final tombstone may contain only its re-raise.
+                path='/data/user/0/'+base.PACKAGE+'/files/infinity-native-diagnostics/native-crash-last.txt'
+                record=device.shell('head','-c','8192',path,check=False,timeout=4)
+                (out/'existing-native-crash-last.txt').write_text(record)
+            except Exception as e:report['native_record_capture_error']=type(e).__name__
         raise
     finally:
         if device:
             try:device.adb('pull',base.HOME+'/temp/kodi.log',out/'kodi.log',timeout=15,check=False)
             except Exception as e:report['log_collection_error']=type(e).__name__
+            try:device.adb('pull',QP+'/stage.json',out/'observer-stage.json',timeout=4,check=False)
+            except Exception as e:report['stage_collection_error']=type(e).__name__
         if reader:
             try:report['lifecycle_reader']=base.stop_lifecycle_log(reader,out)
             except Exception as e:report['lifecycle_collection_error']=type(e).__name__
