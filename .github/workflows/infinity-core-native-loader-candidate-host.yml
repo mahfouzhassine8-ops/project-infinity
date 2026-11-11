@@ -1,0 +1,24 @@
+name: Infinity native Core compatibility - host-only candidate
+on:
+  push:
+    branches:
+      - work/infinity-2103480-close-and-startup-readiness-20261110
+    paths:
+      - repairs/infinity-close-startup-2103480-20261110/provider-compat/**
+      - .github/workflows/infinity-core-native-loader-candidate-host.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  focused-source-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax and focused offline Android native-loader guards
+        run: |
+          python -m compileall -q repairs/infinity-close-startup-2103480-20261110/provider-compat/service.adulthideout.core/service.py
+          python -m unittest discover -s repairs/infinity-close-startup-2103480-20261110/provider-compat -p 'test_core_loader_guard.py' -v
