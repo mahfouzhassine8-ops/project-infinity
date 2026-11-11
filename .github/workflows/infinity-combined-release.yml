@@ -1,8 +1,8 @@
 name: Infinity combined release | owner gate before original signing
 on:
   push:
-    branches: [work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108, work/infinity-exact69-forward-2103476-20261109, work/infinity-exact74-retest-2103477-20261109]
-    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json]
+    branches: [work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108, work/infinity-exact69-forward-2103476-20261109, work/infinity-exact74-retest-2103477-20261109, work/infinity-2103460-nine-corrections-20261106]
+    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-SIGN-REQUEST.json]
   workflow_dispatch:
     inputs:
       operation:
@@ -3022,5 +3022,55 @@ jobs:
             REGISTERED-PERFORMANCE-PAYLOAD.json
             SIGNER-ROUTES.json
             UNSIGNED-77-PRESERVATION.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  shutdown82-keyfree-authority-proposal:
+    name: Exact 2103482 QA authority proposal from authenticated owner bundles; no signing
+    if: github.event_name == 'push' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && startsWith(github.event.head_commit.message, 'Prepare shutdown82:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    permissions: {contents: read, actions: read}
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Require scoped signed QA request and unchanged original-key signer
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/infinity-close-startup-2103480-20261110/build_candidate/propose_shutdown82.py
+          python3 - <<'PY82'
+          import json
+          from pathlib import Path
+          request=json.loads(Path('repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-SIGN-REQUEST.json').read_text())
+          assert request=={
+              'operation':'prepare-exact-shutdown82-original-key-QA-authority',
+              'versionCode':2103482,
+              'original_signed_baseline':2103480,
+              'native_engine_sha256':'503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437',
+              'unsigned_artifact_id':13833695178,
+              'unsigned_run_id':42970204230,
+              'scope':'INFINITY_NATIVE_PLUS_CHOOSER_LABEL_ONLY',
+              'unsigned_only':True,'no_signing_keys':True,
+              'Android_shutdown':'NOT_RUN','owner_acceptance':False,
+              'preserve_Cobra':True,'fail_closed_unknown_writer':True
+          }, 'UNREVIEWED_QA_AUTHORITY_REQUEST'
+          print('PASS strict original-key authority proposal request (key-free)')
+          PY82
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13833695178', run-id: '42970204230', merge-multiple: true, github-token: '${{ github.token }}', path: shutdown82-prepared}
+      - name: Propose exact original-owner generation66 under unchanged transition and preservation gates
+        run: |
+          python3 repairs/infinity-close-startup-2103480-20261110/build_candidate/propose_shutdown82.py \
+            --prepared shutdown82-prepared --out shutdown82-authority-review
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity82-OriginalSigner-AuthorityProposal-${{ github.run_id }}-NO-KEY-NO-APK
+          path: shutdown82-authority-review/
           retention-days: 90
           if-no-files-found: warn
