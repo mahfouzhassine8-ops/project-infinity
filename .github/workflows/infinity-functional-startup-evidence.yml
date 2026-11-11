@@ -1,0 +1,33 @@
+name: Infinity functional startup - authenticated 82 evidence and focused host checks
+on:
+  push:
+    branches: [work/infinity-2103482-functional-startup-20261111]
+    paths:
+      - .github/workflows/infinity-functional-startup-evidence.yml
+      - repairs/infinity-functional-startup-2103482-20261111/verify_signed82.py
+permissions: {contents: read, actions: read}
+concurrency:
+  group: infinity-functional-startup-signed82-evidence
+  cancel-in-progress: false
+jobs:
+  original-artifact:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, show-progress: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13836509327', run-id: '42979187229', merge-multiple: true, github-token: '${{ github.token }}', path: signed82}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Verify original certificate and exact signed82 members against signed80
+        run: python3 repairs/infinity-functional-startup-2103482-20261111/verify_signed82.py --base signed80 --candidate signed82 --out verified82
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-FunctionalStartup-Signed82-Evidence-${{ github.run_id }}
+          path: verified82/
+          if-no-files-found: error
+          retention-days: 90
