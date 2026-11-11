@@ -47,7 +47,12 @@ def save(name, value):
 def load(path, name):
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    # Retained builders import adjacent helper modules (e.g. patch.py).
+    sys.path.insert(0, str(path.parent))
+    try:
+        spec.loader.exec_module(module)
+    finally:
+        sys.path.pop(0)
     return module
 
 def require_scope():
