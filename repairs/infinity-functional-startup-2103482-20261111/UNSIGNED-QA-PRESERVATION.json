@@ -1,0 +1,44 @@
+{
+  "status": "PASS_UNSIGNED_STARTUP_QA_THREE_MEMBER_PRESERVATION",
+  "source": "43dac4a78fb3429ec6d62e7d3f0d2ec208a4e0b9",
+  "baseline_version": 2103482,
+  "baseline_sha256": "78b2a5dd878ea847f425f8bbf5b9c71e810d19e134fe4480588db55a7ea52a32",
+  "versionCode": 2103483,
+  "version_reserved": false,
+  "native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "native_source": "a7f890b1cdccebca7db6695fa3e6752d501cec9d",
+  "native_producer": {
+    "run": 43040415571,
+    "source": "a7f890b1cdccebca7db6695fa3e6752d501cec9d",
+    "artifact_id": 13899051924,
+    "artifact_digest": "sha256:74ce5dfc29243db69e41b9108b00e9c826bfee893d1fdd6d1567b62fbe66a036"
+  },
+  "unsigned_sha256": "88133cae56402ab8a096656a964682bc08a1b6f6d693974f210e3dd0a020d820",
+  "changed_members": {
+    "assets/experience-component-updates.properties": {
+      "before": "6cd691295de99fd9f8a5c57d0895c87a3c9929c45236150bec7b027c7f36f5a1",
+      "after": "e9d7fff08eb23648f41f51f96c5e20f66086cafeb06dafc46babce94a97dac85"
+    },
+    "lib/arm64-v8a/libkodi.so": {
+      "before": "503f91109332ef050a604cf15ad604b16e156b55459bafd47c453c3f72de0437",
+      "after": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c"
+    },
+    "AndroidManifest.xml": {
+      "before": "05a0782738e55ff49313f4519f62d262307e9baa3bc15777898d264e88b54996",
+      "after": "e4bf3aab4179e7a969d21d2eeaf644c6eb72c87981aacedc03e54eda796747be"
+    }
+  },
+  "unchanged_payload_members": 7766,
+  "preserved_owner_bundles": {
+    "COBRA": "f63d4c1e491dc94591c5623bf02be90d4f9c187b91a0511b36398ee96745f8a8",
+    "MINIMAL_ANDROID_CONTRACT": "1c4a2890ef5ca8665b86b148dd293c06a56d76ec846de1e0c9c037a3b0151a25"
+  },
+  "original_key_used": false,
+  "signed": false,
+  "installable": false,
+  "Android_candidate": "NOT_RUN",
+  "Fold": "NOT_RUN",
+  "owner_delivery": false,
+  "root_cause_of_Fold": "UNPROVEN",
+  "purpose": "Internal diagnostic instrumentation and host-proven CPython cleanup correction; not accepted production repair"
+}

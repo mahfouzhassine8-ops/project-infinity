@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_ANDROID_ENGINEERING_NOT_RELEASE_READY",
+  "status": "ARM64_AND_BASELINE_ANDROID_PASS_INTERNAL_QA_UNSIGNED_SIGNING_PENDING",
   "instrumentation_commit": "be06e127",
   "corrective_commit": "679807f7a38173cae2b071d137ef28cf2d35fa37",
   "probe_commit": "f2dc77b383b7094533cc687ae2a74bde53a4e56a",
@@ -115,23 +115,32 @@
       "status": "NOT_RUN"
     },
     "original_signing": {
-      "status": "NOT_RUN_NO_SUCCESSOR_ISSUED"
+      "status": "PENDING_EXACT_AUTHORITY_NO_KEY_USED",
+      "keyfree_proposal": 43118344037,
+      "proposal_status": "PASS_BUT_SUPERSEDED_BY_DISPATCH_METADATA_CORRECTION",
+      "refreshed_source": "7c6a683ac7d93b99f18f5be95aae135c9905fca5"
     },
     "Fold_acceptance": {
       "status": "NOT_RUN_OWNER_ONLY"
     }
   },
-  "next_required": "Finish actual full ARM64 compilation/linkage and corrected observer Android case. Only after actual verified artifact identity freeze internal QA payload and use original owner-gated signing infrastructure. No new owner diagnostic requested.",
+  "next_required": "Refresh source-bound original authority proposal after adding explicit signing dispatch, register reviewed83generation68 without changing protected accepted pointer, then use original signer and selected candidate Android checks. No ownerdevice diagnostics requested.",
   "new_APK": null,
   "registry_version_reserved": false,
   "production_startup_repair_accepted": false,
   "continuation_checkpoint": "ee6d5571aa1204c1a775f24389a6f9b7ce6c968b",
   "internal_QA_preparation": {
     "script": "package_internal_qa.py",
-    "status": "FROZEN_UNSIGNED_REQUEST_READY_FOR_ACTIONS",
+    "status": "PASS_UNSIGNED_THREE_MEMBER_PRESERVATION",
     "native_artifact_request": "QA-STAGE-REQUEST.json",
     "signed": false,
     "version_reserved": false,
-    "registry_changed": false
+    "registry_changed": false,
+    "run": 43117750382,
+    "artifact": 13899726424,
+    "artifact_digest": "sha256:db9881b7202962099df4fe325bfc7c6839d92f45b85928eb177b7f6c89f45c02",
+    "source": "43dac4a78fb3429ec6d62e7d3f0d2ec208a4e0b9",
+    "unsigned_sha256": "88133cae56402ab8a096656a964682bc08a1b6f6d693974f210e3dd0a020d820",
+    "proof": "UNSIGNED-QA-PRESERVATION.json"
   }
 }
