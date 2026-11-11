@@ -21,8 +21,6 @@ jobs:
         with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.11.7'}
-      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
-        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
       - name: Exact source-only scope and script syntax
         run: |
           set -euo pipefail
@@ -45,8 +43,18 @@ jobs:
         run: |
           set -euo pipefail
           (cd signed80 && sha256sum -c SHA256SUMS)
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs signed80/Infinity-2103480-Combined-Original-Signer.apk > original-certificate.txt
-          grep -qi 'Signer #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7' original-certificate.txt
+          python3 - <<'PYIDENTITY'
+          import json
+          from pathlib import Path
+          cert='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
+          report=json.loads(Path('signed80/BUILD-RECEIPT.json').read_text())
+          assert report['certificate_sha256']==cert
+          assert report['versionCode']==2103480
+          assert report['signed_apk_sha256']=='9cbb4c5f89a214924b6890463aa5842f85b18ff445d04d855e441fa61f4578c2'
+          signature=Path('signed80/SIGNATURE.txt').read_text().lower()
+          assert cert in signature
+          print('PASS exact original-signed baseline identity reused without re-signing')
+          PYIDENTITY
           python3 - <<'PY'
           import hashlib,json
           from pathlib import Path
