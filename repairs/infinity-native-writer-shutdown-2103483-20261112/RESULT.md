@@ -127,7 +127,10 @@ exports cover Command Center, Umbrella, POV and Trakt, not this service.
 The only located Core library is the previously authenticated publisher
 reference. Search limits and counts are in `EXISTING-ARTIFACT-SEARCH.json`; the
 full local artifact-path inventory stays private. This is a named-package/member
-search, not proof that the Fold lacks the user-installed service. The next
-necessary source evidence remains the installed service code/manifests and its
-actual native image bytes. The November11 diagnostic summary supplies neither;
-another shutdown attempt would not substitute. Production remains unchanged.
+search, not proof that the Fold lacks the user-installed service. The minimum next identity evidence is a read-only installed manifest/source
+fingerprint and actual native-library SHA-256. If these match authenticated
+reference bytes already held, no duplicate source/library transfer is needed.
+Unknown hashes require the corresponding code/image bytes before effect
+analysis. The November11 summary supplies neither installed identity nor this
+completion contract; another shutdown attempt would not substitute. Production
+remains unchanged.
