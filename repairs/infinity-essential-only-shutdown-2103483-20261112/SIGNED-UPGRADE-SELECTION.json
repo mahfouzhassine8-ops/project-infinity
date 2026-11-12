@@ -1,0 +1,70 @@
+{
+  "enabled": true,
+  "schema": 1,
+  "feature": "essential-only-signed-upgrade-recovery",
+  "branch": "work/infinity-essential-only-shutdown-2103483-20261112",
+  "install_only": true,
+  "synthetic_data_only": true,
+  "application_tests": false,
+  "shutdown_tests": false,
+  "native_injection": false,
+  "owner_device": false,
+  "packages": {
+    "baseline": {
+      "versionCode": 2103484,
+      "artifact": {
+        "artifact_id": 13922125843,
+        "name": "Infinity2103484-OriginalSigned-Core-Outcomes-Internal-QA-43169914369-FOLD-PENDING",
+        "run_id": 43169914369,
+        "sha256": "8b689701f585d2cf89de2eab9b7b911f3da90bc13d4a4e5687228039d6ab01af",
+        "size_in_bytes": 328410244,
+        "source": "4131a4ef58bd861891b039f023c6b290bbe7e0e0",
+        "workflow_id": 397702717,
+        "workflow_path": ".github/workflows/infinity-combined-release.yml"
+      },
+      "APK_sha256": "c876d4adb674dfc85e1f3c6e1a18618e955196fa94b89be1953f44b8afcda5b8",
+      "native_sha256": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33"
+    },
+    "repair": {
+      "versionCode": 2103486,
+      "APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+      "native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+      "artifact": {
+        "artifact_id": 13935631408,
+        "name": "Infinity-Essential-Only-repair-OriginalSigned-43200317103-Fold-Pending",
+        "run_id": 43200317103,
+        "sha256": "9317bf844c2dc52a44f70ef19497fa13152251183f8279596f2d533b183a5bb8",
+        "size_in_bytes": 346419095,
+        "source": "fe44ec40cd3e43fb5498084dec24c59dd63c3f3a",
+        "workflow_id": 397702717,
+        "workflow_path": ".github/workflows/infinity-combined-release.yml"
+      }
+    },
+    "recovery": {
+      "versionCode": 2103487,
+      "APK_sha256": "a0962db899df2256f74935a35cf7ced32193437497f6cb48a2781c42a1cc4a0c",
+      "native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+      "artifact": {
+        "artifact_id": 13936225410,
+        "name": "Infinity-Essential-Only-recovery-OriginalSigned-43201341671-Fold-Pending",
+        "run_id": 43201341671,
+        "sha256": "e48ed616554a437a4d8bced831c47a29abc48e92cc2d9729ad7a6b7ada25b861",
+        "size_in_bytes": 346346406,
+        "source": "87d65d642f9054ddd8390038ade3de72168c1695",
+        "workflow_id": 397702717,
+        "workflow_path": ".github/workflows/infinity-combined-release.yml"
+      }
+    }
+  },
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "8292b3e78aa79da882cd654dd483f5cea77186c147e239ac27ee9ce907de20cb",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/SIGNED-INSTALL-SELECTION.json": "a9c4f5478be25eed2e0509c2f37dc6778c078af35cfafddfd4aca05de2849da5",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py": "3e6b8055533883805e7b0c66637cbfda135b54c240cac5119fe6f0872e6c455b",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/prepare_ci_tooling.sh": "e5c1c0b071a7e2da5ef501b6ee24b393649c755edf72b354137718ac46d1ffa1",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/signed_install.py": "1d831b9d44e5bc9bac7089ce5c0040bca59befbb2f2469919706cddac513a8d6",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh": "c69a4233b133b7ea9d4ae90b45dcab2d46debe46ccde6ce77e316e1eface25a7",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/signed_upgrade.py": "766764e77cd8b1da10178a12317f910732df83d634af310845e93e95a28cb8f0",
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734"
+  },
+  "hash_read_budget": "120 seconds for exact read-only sha256sum only; no application or shutdown deadlines changed"
+}
