@@ -44,6 +44,7 @@ int main(int argc,char** argv){
  if(mode=="nested-mode")run("class NestedMode:\n def __index__(self):\n  old_dlopen('libm.so.6',0)\n  return 0\ntry:ctypes.CDLL(root+'/no-image-does-not-exist.so',mode=NestedMode())\nexcept OSError:pass\n");
  if(mode=="nested-mode-spoof")run("real_lib=os.path.realpath('/lib/x86_64-linux-gnu/libm.so.6')\nclass SpoofMode:\n def __index__(self):\n  old_dlopen(real_lib,0)\n  raise OSError(real_lib+': cannot open shared object file: No such file or directory')\ntry:ctypes.CDLL(root+'/no-image-does-not-exist.so',mode=SpoofMode())\nexcept OSError:pass\n");
  if(mode=="nested-audit")run("import sys\nmissing=root+'/no-image-does-not-exist.so'\naudit_seen=[False]\ndef nested_audit(event,args):\n if event=='ctypes.dlopen' and args[0]==missing and not audit_seen[0]:\n  audit_seen[0]=True\n  old_dlopen('libm.so.6',0)\n  sys.audit('ctypes.dlopen',missing)\nsys.addaudithook(nested_audit)\ntry:ctypes.CDLL(missing)\nexcept OSError:pass\n");
+ if(mode=="codec-callback")run("import codecs\nreal_lib=os.path.realpath('/lib/x86_64-linux-gnu/libm.so.6')\noriginal_error_handler=codecs.lookup_error('surrogateescape')\ndef loader_codec_error(error):\n old_dlopen(real_lib,0)\n raise OSError(real_lib+': cannot open shared object file: No such file or directory')\ncodecs.register_error('surrogateescape',loader_codec_error)\ntry:\n try:ctypes.CDLL(chr(0xd800))\n except OSError:pass\nfinally:codecs.register_error('surrogateescape',original_error_handler)\n");
  if(mode=="live-metadata"){
   pauseChmod=true;run("worker=threading.Thread(target=lambda:old_chmod(shared,0o640))\nworker.start()\n");
   auto* saved=PyEval_SaveThread();{std::unique_lock<std::mutex> lock(gateMutex);assert(gateChanged.wait_for(lock,std::chrono::seconds(10),[]{return entered;}));}
@@ -58,7 +59,7 @@ int main(int argc,char** argv){
  if(mode!="live-metadata")assert(L::CloseParticipantWrites(23));
  if(held){assert(!L::SealEssentialWrites(23));L::EndProtectedOperation(held);}
 
- bool expected=mode!="opaque-load" && mode!="bypass-load" && mode!="baseline-copy2" && mode!="nested-mode" && mode!="nested-mode-spoof" && mode!="nested-audit";
+ bool expected=mode!="opaque-load" && mode!="bypass-load" && mode!="baseline-copy2" && mode!="nested-mode" && mode!="nested-mode-spoof" && mode!="nested-audit" && mode!="codec-callback";
  bool sealed=L::SealEssentialWrites(23);
  if(sealed!=expected){for(const auto& why:L::EssentialWrites().blockers)std::cerr<<why<<'\n';return 22;}
  assert(L::EssentialWritesAuthorized(23)==expected);
@@ -79,7 +80,7 @@ def main():
  p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);a=p.parse_args()
  assert sys.version_info[:3]==(3,11,7),'Actual pinned CPython required'
  includes=[HERE/'native/overlay/xbmc',HERE/'native/overlay/xbmc/interfaces/python',HERE/'native/host-baseline/xbmc',HERE/'native/host-baseline/xbmc/interfaces/python',Path(sysconfig.get_path('include'))]
- cases=('copy2','essential-metadata','metadata-errors','missing-load','opaque-load','bypass-load','live-metadata','close-admission','essential-participant','active-essential','unknown-write','classifier','failed-load-after-delete','nested-mode','nested-mode-spoof','nested-audit')
+ cases=('copy2','essential-metadata','metadata-errors','missing-load','opaque-load','bypass-load','live-metadata','close-admission','essential-participant','active-essential','unknown-write','classifier','failed-load-after-delete','nested-mode','nested-mode-spoof','nested-audit','codec-callback')
  rows=[]
  with tempfile.TemporaryDirectory(prefix='essential-only-') as tmp:
   d=Path(tmp);(d/'case.cpp').write_text(CPP);binary=d/'case'

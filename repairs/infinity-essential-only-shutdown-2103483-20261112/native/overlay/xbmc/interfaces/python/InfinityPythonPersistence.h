@@ -882,11 +882,14 @@ inline PyObject* CheckedDlopen(PyObject* self,PyObject* args,PyObject* kwargs)
   }
   // Argument conversion for a user-defined mode/name can itself execute
   // another cached native loader or raise a fabricated loader-like error.
+  // A non-ASCII Unicode filesystem conversion can also invoke a registered
+  // Python codec/error handler; retain strict auditing for that route too.
   // Preserve the ORIGINAL strict audit path for all such calls. Only exact
   // primitive arguments can enter terminal-outcome accounting.
   const auto argc=PyTuple_GET_SIZE(args);
   const bool ordinary=(argc==1 || argc==2) && (!kwargs || PyDict_Size(kwargs)==0) &&
-      (PyUnicode_CheckExact(PyTuple_GET_ITEM(args,0)) || PyBytes_CheckExact(PyTuple_GET_ITEM(args,0))) &&
+      ((PyUnicode_CheckExact(PyTuple_GET_ITEM(args,0)) && PyUnicode_IS_COMPACT_ASCII(PyTuple_GET_ITEM(args,0))) ||
+       PyBytes_CheckExact(PyTuple_GET_ITEM(args,0))) &&
       (argc==1 || PyLong_CheckExact(PyTuple_GET_ITEM(args,1)));
   if(!ordinary)return PyObject_Call(context->originalDlopen,args,kwargs);
   // A loader attempt is a coordination obligation, not evidence that every
