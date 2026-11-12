@@ -30,12 +30,17 @@ int main(int argc,char** argv){
  run("import os,ctypes,shutil,threading\nold_chmod=os.chmod\nold_dlopen=ctypes._dlopen\nshared=root+'/profile/state'\nprivate=root+'/cache/state'\n");
  L::Admit(1,"optional.provider:service.py");auto* context=InfinityPythonPersistence::Start(1,thread->interp);
  if(PyErr_Occurred())PyErr_Print();assert(context && context->observer && L::Snapshot().observed==1);
- if(mode=="copy2")run("shutil.copy2(root+'/cache/source',private)\nos.utime(private,ns=(1600000000000000000,1600000000000000010))\nold_chmod(private,0o640)\nassert os.stat(private).st_mode & 0o777 == 0o640\n");
+ if(mode=="copy2" || mode=="baseline-copy2")run("shutil.copy2(root+'/cache/source',private)\nos.utime(private,ns=(1600000000000000000,1600000000000000010))\nold_chmod(private,0o640)\nassert os.stat(private).st_mode & 0o777 == 0o640\n");
  if(mode=="essential-metadata")run("old_chmod(shared,0o640)\nos.utime(shared,ns=(1600000000000000000,1600000000000000010))\n");
  if(mode=="metadata-errors")run("try:os.setxattr(private,'user.infinity-qa',b'kept',flags=99999)\nexcept OSError:pass\nelse:raise AssertionError('missing original xattr error')\ntry:os.chmod(None,0o600)\nexcept TypeError:pass\nelse:raise AssertionError('missing original TypeError')\n");
  if(mode=="missing-load")run("try:ctypes.CDLL(root+'/no-image-does-not-exist.so')\nexcept OSError as e:assert 'No such file' in str(e)\nelse:raise AssertionError('load succeeded')\n");
  if(mode=="opaque-load")run("library=ctypes.CDLL('libm.so.6')\n");
  if(mode=="bypass-load")run("try:old_dlopen(root+'/no-image-does-not-exist.so')\nexcept OSError:pass\n");
+ if(mode=="failed-load-after-delete")run("os.unlink(shared)\ntry:ctypes.CDLL(root+'/no-image-does-not-exist.so')\nexcept OSError:pass\n");
+ uint64_t held=0;
+ if(mode=="active-essential" || mode=="unknown-write"){
+  held=L::BeginProtectedOperation(1,mode=="unknown-write"?std::vector<std::string>{}:std::vector<std::string>{root+"/profile/state"},"actual_pending_write");assert(held);
+ }
  if(mode=="live-metadata"){
   pauseChmod=true;run("worker=threading.Thread(target=lambda:old_chmod(shared,0o640))\nworker.start()\n");
   auto* saved=PyEval_SaveThread();{std::unique_lock<std::mutex> lock(gateMutex);assert(gateChanged.wait_for(lock,std::chrono::seconds(10),[]{return entered;}));}
@@ -48,15 +53,9 @@ int main(int argc,char** argv){
   L::RegisterParticipant(1);run("os.chmod(shared,0o640)\n");
  }
  if(mode!="live-metadata")assert(L::CloseParticipantWrites(23));
- if(mode=="active-essential" || mode=="unknown-write"){
-  // A real already-admitted write obligation remains a blocker independently
-  // of actor optionality. Populate it before the final sealed phase.
-  auto& s=L::Get();{std::lock_guard<std::mutex> lock(s.mutex);s.protection.phase=0;}
-  auto token=L::BeginProtectedOperation(1,mode=="unknown-write"?std::vector<std::string>{}:std::vector<std::string>{root+"/profile/state"},"actual_pending_write");assert(token);
-  {std::lock_guard<std::mutex> lock(s.mutex);s.protection.phase=2;}
-  assert(!L::SealEssentialWrites(23));L::EndProtectedOperation(token);
- }
- bool expected=mode!="opaque-load" && mode!="bypass-load";
+ if(held){assert(!L::SealEssentialWrites(23));L::EndProtectedOperation(held);}
+
+ bool expected=mode!="opaque-load" && mode!="bypass-load" && mode!="baseline-copy2";
  bool sealed=L::SealEssentialWrites(23);
  if(sealed!=expected){for(const auto& why:L::EssentialWrites().blockers)std::cerr<<why<<'\n';return 22;}
  assert(L::EssentialWritesAuthorized(23)==expected);
@@ -77,7 +76,7 @@ def main():
  p=argparse.ArgumentParser();p.add_argument('--out',type=Path,required=True);a=p.parse_args()
  assert sys.version_info[:3]==(3,11,7),'Actual pinned CPython required'
  includes=[HERE/'native/overlay/xbmc',HERE/'native/overlay/xbmc/interfaces/python',HERE/'native/host-baseline/xbmc',HERE/'native/host-baseline/xbmc/interfaces/python',Path(sysconfig.get_path('include'))]
- cases=('copy2','essential-metadata','metadata-errors','missing-load','opaque-load','bypass-load','live-metadata','close-admission','essential-participant','active-essential','unknown-write','classifier')
+ cases=('copy2','essential-metadata','metadata-errors','missing-load','opaque-load','bypass-load','live-metadata','close-admission','essential-participant','active-essential','unknown-write','classifier','failed-load-after-delete')
  rows=[]
  with tempfile.TemporaryDirectory(prefix='essential-only-') as tmp:
   d=Path(tmp);(d/'case.cpp').write_text(CPP);binary=d/'case'
@@ -88,5 +87,13 @@ def main():
    r=subprocess.run([str(binary),case,str(root)],capture_output=True,text=True,timeout=30)
    rows.append(dict(case=case,exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr));print(case,r.returncode,r.stderr,flush=True)
   result=dict(status='PASS' if all(r['exit_code']==0 for r in rows) else 'FAIL',cases=rows,Python=list(sys.version_info[:3]),Core_executed=False,Android=False,Fold=False)
+  baseline_includes=[HERE/'native/baseline/xbmc',HERE/'native/baseline/xbmc/interfaces/python',*includes[2:]]
+  command=['g++','-std=c++17','-Wall','-Wextra','-Werror','-Wno-misleading-indentation','-pthread',*['-I'+str(x) for x in baseline_includes],str(d/'baseline.cpp'),'-L'+sysconfig.get_config_var('LIBDIR'),'-Wl,-rpath,'+sysconfig.get_config_var('LIBDIR'),'-l'+lib,'-l:libsqlite3.so.0','-ldl','-lm','-lcrypto','-Wl,--export-dynamic','-o',str(d/'baseline')]
+  (d/'baseline.cpp').write_text(CPP[:CPP.index(' if(mode=="classifier")')]+CPP[CPP.index(' std::cout<<'):])
+  subprocess.run(command,check=True)
+  root=d/'baseline';root.mkdir();(root/'profile').mkdir();(root/'cache').mkdir()
+  r=subprocess.run([str(d/'baseline'),'baseline-copy2',str(root)],capture_output=True,text=True,timeout=30)
+  result['baseline_copy2_control']=dict(exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr)
+  if r.returncode:result['status']='FAIL'
   a.out.write_text(json.dumps(result,indent=2)+'\n');assert result['status']=='PASS'
 if __name__=='__main__':main()

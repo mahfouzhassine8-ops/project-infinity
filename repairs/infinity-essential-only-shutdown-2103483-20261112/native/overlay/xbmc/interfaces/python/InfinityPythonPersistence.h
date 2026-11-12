@@ -868,7 +868,11 @@ inline PyObject* CheckedDlopen(PyObject* self,PyObject* args,PyObject* kwargs)
   // PyDLL(None) only references the already-running process, as in Audit().
   if(PyTuple_GET_SIZE(args)>0 && PyTuple_GET_ITEM(args,0)==Py_None)
     return PyObject_Call(context->originalDlopen,args,kwargs);
-  const auto token=InfinityScriptPersistence::BeginProtectedOperation(context->id,{},"native_library_load");
+  // A loader attempt is a coordination obligation, not evidence that every
+  // previously removed filesystem name was recreated. Actual I/O retains its
+  // own leases; an unverified successful image retains the opaque blocker.
+  const auto token=InfinityScriptPersistence::BeginProtectedOperation(context->id,{},"native_library_load",
+      false,false,-1,InfinityScriptPersistence::NamespaceEffect::OBSERVED_CHILDREN);
   if(!token){AdmissionDenied(context,"Infinity native library admission is closed");return nullptr;}
   NativeLoadAttempt attempt;
   context->nativeLoads[thread].push_back(&attempt);
