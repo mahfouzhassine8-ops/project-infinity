@@ -102,7 +102,9 @@ rules.write_text('''-keep class com.projectinfinity.kodi.InfinityCast* { *; }
 dex=OUT/'dex';dex.mkdir(exist_ok=True)
 reuse=os.environ.get('INFINITY_CAST_VERIFIED_COMPONENT')
 if reuse:
- verified=Path(reuse).resolve();receipt=json.loads((verified/'COMPONENT-RESULT.json').read_text())
+ candidates=list(Path(reuse).resolve().rglob('COMPONENT-RESULT.json'))
+ assert len(candidates)==1, 'Reuse requires exactly one authenticated component receipt'
+ verified=candidates[0].parent;receipt=json.loads(candidates[0].read_text())
  assert receipt['status']=='PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT'
  assert receipt['baseline_APK_sha256']=='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197'
  assert receipt['feature_Java_sha256']==source_hashes, 'Java input changed; cannot reuse prior SDK component'

@@ -1,0 +1,34 @@
+{
+  "Android": "NOT_RUN",
+  "Cast_JNI": [
+    "Java_com_projectinfinity_kodi_InfinityCastNative_cancel",
+    "Java_com_projectinfinity_kodi_InfinityCastNative_poll",
+    "Java_com_projectinfinity_kodi_InfinityCastNative_request"
+  ],
+  "Cobra_changed": false,
+  "baseline86_native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+  "dependencies": [
+    "libEGL.so",
+    "libGLESv2.so",
+    "libandroid.so",
+    "libc++_shared.so",
+    "libc.so",
+    "libdl.so",
+    "libjnigraphics.so",
+    "liblog.so",
+    "libm.so",
+    "libmediandk.so",
+    "libshairplay.so"
+  ],
+  "native_sha256": "dc9e734655546f02c9a060b50bda1643f189e2756dd159c4f5b14169e6bb6716",
+  "new_exports": [
+    "Java_com_projectinfinity_kodi_InfinityCastNative_cancel",
+    "Java_com_projectinfinity_kodi_InfinityCastNative_poll",
+    "Java_com_projectinfinity_kodi_InfinityCastNative_request"
+  ],
+  "preserved_exports": 71213,
+  "shutdown_source_changed": false,
+  "signed": false,
+  "source": "0f6c677aa585acb81b363ba44bcfebb6f1dca580",
+  "status": "PASS_FULL_REAL_ARM64_LINK_AND_BASELINE86_ABI"
+}

@@ -1,0 +1,27 @@
+{
+  "Android": "NOT_RUN",
+  "Cobra_changed": false,
+  "Python_startup_changed": false,
+  "added": {
+    "xbmc/platform/android/activity/InfinityCastNative.cpp": "fe3a2567ca89a5bfc661ec80ac80298cca7c71fdea0cf64257f1bd6578c8ec0f"
+  },
+  "baseline86_engine_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+  "baseline86_reference_source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+  "changed": {
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": {
+      "after": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d",
+      "before": "9c03c7761da0f4dcebbb0680a114f2b77389afcd745fa453afb77d5293d67b66"
+    },
+    "xbmc/platform/android/activity/CMakeLists.txt": {
+      "after": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07",
+      "before": "5f0e4bad3ebe5faeea2d9d8c799ab5e51d12e2c532124bc2a12ec1c39dc9979f"
+    }
+  },
+  "old_API_changed": false,
+  "persistence_protections_changed": false,
+  "providers_changed": false,
+  "shutdown_changed": false,
+  "source": "0f6c677aa585acb81b363ba44bcfebb6f1dca580",
+  "status": "PASS_EXACT86_PLUS_CAST_CPP_CMAKE_AND_DIALOG_BUILTIN",
+  "unchanged86_native_files": 9410
+}
