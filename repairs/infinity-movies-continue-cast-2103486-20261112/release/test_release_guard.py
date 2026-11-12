@@ -1,5 +1,5 @@
 """Focused new Cast manifest admission checks; no application tests or signing."""
-import copy,hashlib,json,sys,unittest
+import copy,hashlib,json,sys,unittest,subprocess
 from pathlib import Path
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[2]
 sys.path.insert(0,str(ROOT/'repairs/dual-experience-isolation-2103420'))
@@ -8,7 +8,7 @@ import release_guard as guard
 
 class CastGuard(unittest.TestCase):
  def setUp(self):
-  self.before=json.loads((ROOT/'repairs/dual-experience-isolation-2103420/release-authority.json').read_text())
+  self.before=json.loads(subprocess.check_output(['git','show','87d65d642f9054ddd8390038ade3de72168c1695:repairs/dual-experience-isolation-2103420/release-authority.json'],cwd=ROOT))
   self.after=copy.deepcopy(self.before);self.after['candidate_versionCode']=2103488
   self.proof=dict(schema=1,mode='candidate',baseline_APK_sha256=guard.APK,reference=guard.REFERENCE,
    reference_sha256=guard.REFERENCE_SHA,baseline_normalized_sha256=guard.NORMALIZED,
@@ -22,6 +22,14 @@ class CastGuard(unittest.TestCase):
   self.assertEqual(original,self.after);self.assertEqual(guard.NORMALIZED,historical['payload']['member:AndroidManifest.xml']['sha256'])
   self.assertNotEqual(guard.NORMALIZED,self.after['payload']['member:AndroidManifest.xml']['sha256'])
   guard.verify_evidence(self.after,lambda n:(ROOT/n).read_bytes())
+ def test_only_exact_new_owner_scope_can_reuse_known_cast_metadata_at90(self):
+  before=json.loads(subprocess.check_output(['git','show','ab5f3e41721291091e5fe177787156408193c0fa:repairs/dual-experience-isolation-2103420/release-authority.json'],cwd=ROOT))
+  after=copy.deepcopy(before);after['candidate_versionCode']=2103490
+  after['cast_manifest_exception']=copy.deepcopy(self.proof)
+  after['payload']['member:AndroidManifest.xml']=dict(owner=guard.OWNER,sha256=self.proof['candidate_manifest_sha256'])
+  with self.assertRaises(ValueError):guard.transition(before,after,self.owners)
+  after['owner_update_evidence']=dict(owner='INFINITY_CAST_FINAL_CANDIDATE',baseline_APK_sha256='4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566',original_five_DEX_unchanged=True,Cobra_changed=False,source_files={'repairs/infinity-cast-final-2103488-20261112/SCOPE.json':'bound-by-outer-original-evidence-verifier'})
+  guard.transition(before,after,self.owners)
  def test_any_other_shared_class_or_resource_change_is_rejected(self):
   key=next(k for k,v in self.after['payload'].items() if v['owner']==guard.OWNER and k!='member:AndroidManifest.xml')
   self.after['payload'][key]['sha256']='0'*64

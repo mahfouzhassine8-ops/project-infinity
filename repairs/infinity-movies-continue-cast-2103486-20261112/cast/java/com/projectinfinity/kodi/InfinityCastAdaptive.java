@@ -155,12 +155,29 @@ final class InfinityCastAdaptive {
             walk(child,base,template,list,segmentBase,links,count);
         remove(node,"BaseURL");remove(node,"SegmentTemplate");remove(node,"SegmentList");remove(node,"SegmentBase");
     }
+    private static void escaped(String value,StringBuilder output) throws IOException {
+        for(int i=0;i<value.length();i++) {
+            char c=value.charAt(i);output.append(c=='&'?"&amp;":c=='<'?"&lt;":c=='>'?"&gt;":c=='\"'?"&quot;":String.valueOf(c));
+            if(output.length()>LIMIT*2)throw new IOException("rewritten_manifest_size");
+        }
+    }
+    private static void serialize(Element node,StringBuilder output) throws IOException {
+        output.append('<').append(node.getTagName());
+        for(int i=0;i<node.getAttributes().getLength();i++){Node attr=node.getAttributes().item(i);output.append(' ').append(attr.getNodeName()).append("=\"");escaped(attr.getNodeValue(),output);output.append('\"');}
+        output.append('>');
+        for(Node child=node.getFirstChild();child!=null;child=child.getNextSibling()) {
+            if(child instanceof Element)serialize((Element)child,output);
+            else if(child.getNodeType()==Node.TEXT_NODE || child.getNodeType()==Node.CDATA_SECTION_NODE)escaped(child.getNodeValue(),output);
+        }
+        output.append("</").append(node.getTagName()).append('>');if(output.length()>LIMIT*2)throw new IOException("rewritten_manifest_size");
+    }
     private static byte[] dash(byte[] input,URI base,Links links) throws IOException {
         try {
             // Reject DTDs before parsing, in addition to parser-level controls.
             String raw=utf8(input);if(raw.toUpperCase(Locale.ROOT).contains("<!DOCTYPE") || raw.toUpperCase(Locale.ROOT).contains("<!ENTITY"))throw new IOException("external_xml_refused");
             DocumentBuilderFactory factory=DocumentBuilderFactory.newInstance();factory.setNamespaceAware(true);
-            factory.setExpandEntityReferences(false);factory.setXIncludeAware(false);
+            factory.setExpandEntityReferences(false);
+            try{factory.setXIncludeAware(false);}catch(UnsupportedOperationException unsupported){if(factory.isXIncludeAware())throw new IOException("external_xml_refused");}
             Document document=factory.newDocumentBuilder().parse(new ByteArrayInputStream(input));prune(document);Element root=document.getDocumentElement();
             if(!"MPD".equals(root.getLocalName()))throw new IOException("invalid_dash_manifest");
             NodeList all=root.getElementsByTagNameNS("*","*");if(all.getLength()>20000)throw new IOException("manifest_entry_limit");
@@ -188,11 +205,8 @@ final class InfinityCastAdaptive {
                 }
                 if(children(e,null).isEmpty() && e.getTextContent().contains("://") && !links.owned(e.getTextContent().trim()))throw new IOException("unsupported_private_manifest_field");
             }
-            TransformerFactory transformers=TransformerFactory.newInstance();
-            transformers.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
-            javax.xml.transform.Transformer transform=transformers.newTransformer();transform.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
-            ByteArrayOutputStream out=new ByteArrayOutputStream();transform.transform(new DOMSource(document),new StreamResult(out));
-            if(out.size()>LIMIT*2)throw new IOException("rewritten_manifest_size");return out.toByteArray();
-        } catch(IOException failure){throw failure;}catch(Exception invalid){throw new IOException("invalid_or_unsupported_dash_manifest");}
+            StringBuilder output=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+            serialize(root,output);return output.toString().getBytes(StandardCharsets.UTF_8);
+        } catch(IOException failure){throw failure;}catch(Exception invalid){InfinityCastDiagnostics.event("manifest_xml",invalid.getClass().getSimpleName().toLowerCase(Locale.ROOT),0);throw new IOException("invalid_or_unsupported_dash_manifest");}
     }
 }

@@ -1,0 +1,35 @@
+{
+  "APK_versions_provisional": {
+    "candidate": 2103490,
+    "recovery": 2103491
+  },
+  "accepted_pointer_updated": false,
+  "active_kind": "candidate",
+  "baseline_APK_sha256": "4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566",
+  "inputs": {
+    "baseline": {
+      "digest": "sha256:84f6b84f5773c482ec69e75ea43ef625b06231228fc945da75a3ed542dfd7935",
+      "id": 13979655699,
+      "name": "Infinity86-Movies-Home-Cast-OriginalSigned-43294871896-QA-Fold-Pending",
+      "run": 43294871896,
+      "size_in_bytes": 347790363,
+      "source": "f0aa976d90b262373cea56942a44c9e382ccfaa3",
+      "workflow_id": 397702717
+    },
+    "owners": {
+      "digest": "sha256:93da7f477064d4491258bf652e52dbd06e7c994a393071799fe249ee3e0c0b5b",
+      "id": 13978666818,
+      "name": "Infinity86-Movies-Home-Cast-Prepared-43293634100-UNSIGNED-NOT-INSTALLABLE",
+      "run": 43293634100,
+      "size_in_bytes": 1315104248,
+      "source": "e1d0cdf78b03b6d62ee9840f91c5e3cf642fd90e",
+      "workflow_id": 397702717
+    }
+  },
+  "owner_acceptance_after_signing": true,
+  "recovery": "Higher version restoring exact development2103488 functionality; independent accepted2103486 remains protected",
+  "registry_parent_source": "ab5f3e41721291091e5fe177787156408193c0fa",
+  "schema": 1,
+  "source_bindings": {},
+  "workflow_sha256": "58927b661501338d8bf14941d7a57cecaa07d6fbc4a8d98e9201e81267d67fa0"
+}

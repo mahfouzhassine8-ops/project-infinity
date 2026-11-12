@@ -56,7 +56,16 @@ def transition(previous,proposed,targets):
     b={k:v for k,v in proposed['payload'].items() if v['owner']==OWNER}
     require(set(a)==set(b) and {k for k in a if a[k]!=b[k]}=={'member:AndroidManifest.xml'},'ALL_EXISTING_SHARED_CLASSES_AND_RESOURCES_FROZEN')
     if proof['mode']=='candidate':
-        require(previous['candidate_versionCode']==2103487 and proposed['candidate_versionCode']==2103488 and previous.get('cast_manifest_exception') is None,'EXACT_RECONCILED87_TO88_CAST')
+        if previous['candidate_versionCode']==2103489 and proposed['candidate_versionCode']==2103490:
+            require(validate(previous)['mode']=='recovery','EXACT89_TO90_CAST_REPAIR_PARENT')
+            evidence=proposed.get('owner_update_evidence',{})
+            scope='repairs/infinity-cast-final-2103488-20261112/SCOPE.json'
+            require(evidence.get('owner')=='INFINITY_CAST_FINAL_CANDIDATE' and
+                    evidence.get('baseline_APK_sha256')=='4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566' and
+                    evidence.get('original_five_DEX_unchanged') is True and evidence.get('Cobra_changed') is False and
+                    scope in evidence.get('source_files',{}),'EXACT_OWNER_AUTHORIZED_CAST_ONLY90')
+        else:
+            require(previous['candidate_versionCode']==2103487 and proposed['candidate_versionCode']==2103488 and previous.get('cast_manifest_exception') is None,'EXACT_RECONCILED87_TO88_CAST')
         require(a['member:AndroidManifest.xml']['sha256']==NORMALIZED,'ACCEPTED86_MANIFEST_REQUIRED')
     else:
         require(previous['candidate_versionCode']==2103488 and proposed['candidate_versionCode']==2103489 and
