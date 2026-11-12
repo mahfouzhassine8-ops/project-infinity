@@ -34,7 +34,7 @@ manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:androi
 <application android:label="Cast Component CI" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="true">
 <meta-data android:name="com.google.android.gms.version" android:value="12451000"/>
 <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME" android:value="com.projectinfinity.kodi.InfinityCastOptions"/>
-<activity android:name="com.projectinfinity.kodi.InfinityCastProbeActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>''')
+<activity android:name="com.projectinfinity.kodi.InfinityCastProbeActivity" android:exported="true" android:configChanges="orientation|screenSize|uiMode"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>''')
 shell=OUT/'shell.apk';run([SDK/'aapt2','link','--manifest',manifest,'-I',SDK/'android.jar','-o',shell])
 unsigned=OUT/'CI-ONLY-UNSIGNED-NOT-OWNER-INSTALLER.apk'
 with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub,ZipFile(APK) as original:

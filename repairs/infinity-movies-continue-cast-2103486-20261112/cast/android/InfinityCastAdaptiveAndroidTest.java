@@ -24,6 +24,7 @@ final class InfinityCastAdaptiveAndroidTest {
     }
     static JSONObject run() {
         InfinityCastRelay relay=null;ServerSocket origin=null;AtomicBoolean closing=new AtomicBoolean();AtomicInteger authenticated=new AtomicInteger();
+        AtomicReference<String> sourceFailure=new AtomicReference<>();String stage="fixture_start";
         try {
             origin=new ServerSocket(0,8,InetAddress.getByName("127.0.0.1"));final ServerSocket server=origin;
             Thread worker=new Thread(()->{
@@ -31,14 +32,15 @@ final class InfinityCastAdaptiveAndroidTest {
                     socket.setSoTimeout(2000);ByteArrayOutputStream header=new ByteArrayOutputStream();int value,tail=0;
                     while(header.size()<8192 && (value=socket.getInputStream().read())!=-1){header.write(value);tail=(tail<<8)|value;if(tail==0x0d0a0d0a)break;}
                     String request=header.toString("US-ASCII");boolean head=request.startsWith("HEAD ");String target=request.split(" ")[1];String body,type;
-                    if(!request.contains("authorization: Bearer private"))throw new IOException("sender authentication lost");authenticated.incrementAndGet();
+                    boolean authorization=false;for(String field:request.split("\r\n"))if(field.regionMatches(true,0,"Authorization:",0,14) && field.substring(14).trim().equals("Bearer private"))authorization=true;
+                    if(!authorization){sourceFailure.set("authorization_missing");throw new IOException("sender authentication lost");}authenticated.incrementAndGet();
                     if(target.startsWith("/private/movie.mpd")) {
                         type="application/dash+xml";body="<MPD xmlns=\"urn:mpeg:dash:schema:mpd:2011\"><Period><AdaptationSet><Representation id=\"video\" bandwidth=\"100\"><SegmentTemplate initialization=\"init.mp4?secret=init\" media=\"segment-$Number%05d$.m4s?secret=segment\" duration=\"2\"/></Representation></AdaptationSet></Period></MPD>";
                     } else if(target.startsWith("/private/movie.m3u8")) {
                         type="application/vnd.apple.mpegurl";body="#EXTM3U\n#EXT-X-TARGETDURATION:2\n#EXT-X-MAP:URI=\"init.mp4?secret=init\"\n#EXTINF:2,\nsegment.m4s?secret=segment\n#EXT-X-ENDLIST\n";
                     } else {
-                        java.util.regex.Matcher cookie=Pattern.compile("(?im)^cookie:[ \t]*([^\\r\\n]*)").matcher(request);
-                        if(!cookie.find() || !cookie.group(1).equals("SourceSession=sender-private"))throw new IOException("response cookie lost");
+                        boolean cookie=false;for(String field:request.split("\r\n"))if(field.regionMatches(true,0,"Cookie:",0,7) && field.substring(7).trim().equals("SourceSession=sender-private"))cookie=true;
+                        if(!cookie){sourceFailure.set("response_cookie_missing");throw new IOException("response cookie lost");}
                         type="video/mp4";body="fixture-media";
                     }
                     byte[] data=body.getBytes(StandardCharsets.UTF_8);
@@ -46,17 +48,18 @@ final class InfinityCastAdaptiveAndroidTest {
                 } catch(Exception stopped){if(!closing.get())return;}
             },"CIOnlyAdaptiveSource");worker.setDaemon(true);worker.start();
             for(String name:new String[]{"movie.m3u8","movie.mpd"}) {
+                stage=name+"_prepare";
                 CountDownLatch ready=new CountDownLatch(1);AtomicReference<String> error=new AtomicReference<>();
                 relay=InfinityCastRelay.start(InetAddress.getByName("127.0.0.1"),InfinityCastSource.parse("http://127.0.0.1:"+origin.getLocalPort()+"/private/"+name+"?secret=root", "Authorization=Bearer%20private", "Authorization=Bearer%20private",false),(r,m,f)->{error.set(f);ready.countDown();});
                 if(!ready.await(8,TimeUnit.SECONDS) || error.get()!=null)throw new IOException("adaptive source preparation failed");
-                String manifest=get(relay.address());if(manifest.contains("/private/") || manifest.contains("secret") || manifest.contains("Bearer"))throw new IOException("manifest privacy failed");
+                stage=name+"_manifest";String manifest=get(relay.address());if(manifest.contains("/private/") || manifest.contains("secret") || manifest.contains("Bearer"))throw new IOException("manifest privacy failed");
                 Matcher link=Pattern.compile("http://[^<\\\"\\s]+").matcher(manifest);boolean fetched=false;
-                while(link.find())if(!link.group().contains("$")){if(!get(link.group()).equals("fixture-media"))throw new IOException("segment delivery failed");fetched=true;break;}
-                if(!fetched)throw new IOException("no rewritten init/segment endpoint");drain(relay);relay=null;
+                while(link.find())if(!link.group().contains("$")){stage=name+"_segment";if(!get(link.group()).equals("fixture-media"))throw new IOException("segment delivery failed");fetched=true;break;}
+                if(!fetched)throw new IOException("no rewritten init/segment endpoint");stage=name+"_drain";drain(relay);relay=null;
             }
             return new JSONObject().put("pass",true).put("actual_Android_HLS_DASH_rewrite_and_segment_HTTP",true).put("property_auth_headers_preserved",authenticated.get()>4).put("origin_scoped_response_cookies",true).put("drained",true).put("real_receiver",false).put("decoder",false);
         } catch(Exception | LinkageError failure) {
-            try{return new JSONObject().put("pass",false).put("reason",failure.getClass().getSimpleName());}catch(Exception ignored){return new JSONObject();}
+            try{return new JSONObject().put("pass",false).put("reason",failure.getClass().getSimpleName()).put("stage",stage).put("source_failure",sourceFailure.get()==null?"none":sourceFailure.get());}catch(Exception ignored){return new JSONObject();}
         } finally{closing.set(true);if(relay!=null)relay.close();if(origin!=null)try{origin.close();}catch(IOException ignored){}}
     }
 }
