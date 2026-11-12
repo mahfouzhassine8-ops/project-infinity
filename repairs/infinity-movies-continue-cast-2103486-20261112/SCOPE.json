@@ -20,7 +20,7 @@
     "Automatic baseline promotion or partial owner-facing APK"
   ],
   "selected_now": {
-    "host": "test_movie_routes: actual signed86 validator and target, existing installed-source hashes, exact route/identity, tamper/version refusal, TV negative controls, no progress on saving",
+    "host": "test_movie_routes: actual signed86 validator and target, existing installed-source hashes, exact route/identity, tamper/version refusal, TV negative controls, no progress on saving; native Movie actual-item fallback: current file/type/tag snapshots, exact URI IDs, race/contradiction refusal, no GUI reads/library ID claims",
     "Android": "NOT_SELECTED_YET",
     "shutdown": "Only after corrected movie paths; independent workflow; no shutdown source changes",
     "Cast": "Dependency compatibility and supported ownership boundary; no receiver PASS without actual execution"
@@ -28,5 +28,9 @@
   "movie_production_file": "script.infinity.commandcenter/experience.py",
   "additional_changes": "Must be necessary for the three approved work items; freeze exact list before integration/build",
   "new_APK": "NOT_RESERVED_NOT_BUILT_NOT_SIGNED",
-  "owner_acceptance": "NOT_RUN"
+  "owner_acceptance": "NOT_RUN",
+  "movie_production_files": [
+    "script.infinity.commandcenter/experience.py",
+    "script.infinity.commandcenter/service.py: movie actual-item fallback only"
+  ]
 }

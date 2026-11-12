@@ -200,6 +200,22 @@ def verified_source(entry, route, verify=None):
     return route if hub.same_identity(identity, proof) else ''
 
 
+def native_movie_route_identity(route, observed_ids):
+    """Read only a reviewed movie entry URI; caller proves actual playback.
+
+    This does not admit a click, infer an identity by title, or change episode
+    contracts. The original parser rejects duplicate fields and TV coordinates.
+    """
+    import resume_hub as hub
+    from saved_playback import route_identity
+    proof = route_identity(route, 'movie', verify=lambda provider:
+                           _source_contract(provider, _movie_source_cache, media='movie'))
+    observed = hub.verified_ids(observed_ids)
+    if not proof or (observed and not hub._agreeing_ids(observed, proof['ids'])):
+        return None
+    return proof
+
+
 def browsing_route(route):
     if not isinstance(route, str) or any(c in route for c in '\r\n\x00"'):
         return ''

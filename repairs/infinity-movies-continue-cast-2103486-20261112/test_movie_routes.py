@@ -11,6 +11,7 @@ from pathlib import Path
 import shutil
 import sys
 import tempfile
+import time
 import types
 import unittest
 from urllib.parse import urlencode
@@ -62,6 +63,10 @@ class MovieRoutes(unittest.TestCase):
         sys.modules['resume_hub'] = self.hub
         self.before = module('signed86_experience', BASE / 'experience.py')
         self.after = module('movie_candidate_experience', HERE / 'overlay/script.infinity.commandcenter/experience.py')
+        sys.modules['experience'] = self.after
+        sys.modules['xbmcgui'] = types.SimpleNamespace()
+        sys.modules['saved_playback'] = module('saved_playback', BASE / 'saved_playback.py')
+        sys.modules['title_metadata'] = module('title_metadata', BASE / 'title_metadata.py')
 
     def movie(self, provider='plugin.video.umbrella', ids=None):
         ids = ids or {'tmdb': '268'}  # synthetic route-identity fixture, not owner data
@@ -127,6 +132,80 @@ class MovieRoutes(unittest.TestCase):
         entry, _ = self.movie()
         for route in ('plugin://plugin.video.thecrew/?action=play&tmdb=268', '/storage/test.mp4'):
             self.assertEqual(self.before.verified_source(entry, route), self.after.verified_source(entry, route))
+
+    def actual_movie(self, item=None, race=False, playing=True, native_route=None):
+        _, route = self.movie()
+        raw = dict(type='movie', title='Fixture', uniqueid={}, file='https://media.invalid/public.mp4',
+                   infinity_original_route=route)
+        raw.update(item or {})
+        calls = []
+        tag = types.SimpleNamespace(getMediaType=lambda: 'movie', getTitle=lambda: 'Fixture',
+                                   getUniqueID=lambda name: '')
+        native = types.SimpleNamespace(getVideoInfoTag=lambda: tag, getPath=lambda: raw['file'],
+                                      getProperty=lambda name: raw['infinity_original_route'] if native_route is None else native_route)
+        def filename():
+            calls.append(1)
+            return 'https://media.invalid/changed.mp4' if race and len(calls) > 1 else raw['file']
+        player = types.SimpleNamespace(isPlayingVideo=lambda: playing, getPlayingItem=lambda: native,
+                                       getPlayingFile=filename)
+        xbmc = types.SimpleNamespace(getSkinDir=lambda: 'skin.infinity.diggz', Player=lambda: player,
+                                     getInfoLabel=lambda name: '')
+        env = dict(xbmc=xbmc, hub=self.hub, source_identity=self.after.source_identity,
+                   setting_bool=lambda *a: True)
+        source = HERE / 'overlay/script.infinity.commandcenter/service.py'
+        tree = ast.parse(source.read_text())
+        nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and
+                 n.name in ('_continue_identity', '_continue_movie_route_item')]
+        exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), 'exec'), env)
+        return env['_continue_movie_route_item'](raw), calls
+
+    def test_actual_movie_route_supplies_exact_ids_without_guessing_a_library_id(self):
+        result, calls = self.actual_movie()
+        self.assertEqual({'tmdb': '268'}, result['identity']['ids'])
+        self.assertEqual(-1, result['dbid'])
+        self.assertTrue(result['stable_source'].startswith('plugin://plugin.video.umbrella/'))
+        self.assertEqual(2, len(calls))
+        self.assertEqual([], self.writes)
+
+    def test_movie_ingress_rejects_races_conflicts_and_unstarted_playback(self):
+        self.assertIsNone(self.actual_movie(race=True)[0])
+        self.assertIsNone(self.actual_movie(playing=False)[0])
+        self.assertIsNone(self.actual_movie(item={'uniqueid': {'tmdb': '269'}})[0])
+        self.assertIsNone(self.actual_movie(item={'infinity_original_route': ''})[0])
+        self.assertIsNone(self.actual_movie(native_route='plugin://plugin.video.umbrella/?action=play_Item&tmdb=269')[0])
+
+    def test_typed_tv_row_never_enters_movie_probe(self):
+        result, calls = self.actual_movie(item={'type': 'episode'})
+        self.assertIsNone(result)
+        self.assertEqual([], calls)
+
+    def test_existing_progress_function_and_eligibility_are_not_modified(self):
+        def function(path):
+            tree = ast.parse(path.read_text())
+            return next(n for c in tree.body if isinstance(c, ast.ClassDef) and c.name == 'InfinityPlayer'
+                        for n in c.body if isinstance(n, ast.FunctionDef) and n.name == 'persist_continue')
+        old = function(BASE / 'service.py')
+        new = function(HERE / 'overlay/script.infinity.commandcenter/service.py')
+        self.assertEqual(ast.dump(old), ast.dump(new))
+        new.decorator_list = []
+        movie, _ = self.actual_movie()
+        for position, expected in ((29, 0), (258, 1)):
+            saved = []
+            data = dict(schema=2, items={}, watched={}, watchlist={}, collection={}, later={}, lists={})
+            env = dict(hub=self.hub, time=time, setting_bool=lambda *a: True,
+                       xbmc=types.SimpleNamespace(getSkinDir=lambda: 'skin.infinity.diggz'),
+                       _load_continue=lambda profile: copy.deepcopy(data),
+                       _save_continue=lambda profile, value: saved.append(copy.deepcopy(value)))
+            exec(compile(ast.Module(body=[new], type_ignores=[]), 'actual-unchanged-progress-function', 'exec'), env)
+            instance = types.SimpleNamespace(cw_item=dict(movie, playback_occurrence='fixture-occurrence'),
+                cw_key=movie['key'], cw_occurrence='fixture-occurrence', profile=Path('/unused-profile'),
+                cw_last_save=0, getTime=lambda: position, getTotalTime=lambda: 7200,
+                isPlayingVideo=lambda: True)
+            env['persist_continue'](instance, immediate=True)
+            self.assertEqual(expected, len(saved))
+            if expected:
+                self.assertEqual(1, len(self.hub.entries(saved[0], 'movie', 'items')))
+                self.assertEqual(258, saved[0]['items'][movie['key']]['position'])
 
 
 if __name__ == '__main__':
