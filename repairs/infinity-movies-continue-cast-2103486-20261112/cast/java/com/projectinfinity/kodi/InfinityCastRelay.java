@@ -36,7 +36,7 @@ import okhttp3.Response;
 /** One current progressive stream, one chosen receiver, bounded owned I/O.
  * No provider credentials/URI leave the phone. No global client, socket, DNS,
  * proxy or cookie settings are changed. No files/database/server service.
- * Uses the already installed OkHttp4.12 API; no existing class is replaced.
+ * Uses private Cast-only HTTP code; no existing Cobra class is called/replaced.
  */
 final class InfinityCastRelay implements AutoCloseable {
     interface Ready {void ready(InfinityCastRelay relay,String mime,String failure);}

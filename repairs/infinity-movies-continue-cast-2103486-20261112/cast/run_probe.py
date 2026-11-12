@@ -17,7 +17,7 @@ while time.monotonic()<deadline:
  time.sleep(.5)
 (out/'component.logcat.txt').write_text(adb('logcat','-d','-v','threadtime'))
 if result is None:result=dict(schema=1,**{'pass':False},reason='Probe result not emitted within 35 seconds')
-result.update(scope='Cast SDK/resource/UI-thread and actual local relay with accepted86 OkHttp; no real receiver or Infinity playback',
+result.update(scope='Cast SDK/resource/UI-thread, private isolated HTTP relay/resource and explicit-selection guard; no real receiver or Infinity playback',
               original_APK_modified=False,owner_device='NOT_TESTED',shutdown='NOT_SELECTED')
 (out/'ANDROID-CAST-COMPONENT.json').write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps(result,indent=2))

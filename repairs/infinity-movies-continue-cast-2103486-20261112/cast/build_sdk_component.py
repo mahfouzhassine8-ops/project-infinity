@@ -10,6 +10,7 @@ from zipfile import ZipFile, ZIP_DEFLATED
 import hashlib,json,os,re,shutil,struct,subprocess,sys
 from dex_contract import Dex, class_contract
 from provided_http import obtain as provided_http
+import private_classes
 
 HERE=Path(__file__).resolve().parent
 WORK=Path(sys.argv[1]).resolve();APK=Path(sys.argv[2]).resolve()
@@ -21,13 +22,23 @@ with ZipFile(APK) as z:
   if re.fullmatch(r'classes\d*\.dex',n):baseline.update(Dex(z.read(n)).classes)
 proof=json.loads((DEPS/'SDK-DEPENDENCIES.json').read_text())
 provided=provided_http(WORK)
+build_inputs={p.relative_to(HERE.parent).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
+              for p in list(HERE.glob('*.py'))+list((HERE/'tooling').glob('*.java'))+
+              [HERE.parent/'research'/name for name in ('CAST-SDK-DEPENDENCIES.json','CAST-PROVIDED-HTTP-APIS.json','CAST-BUILD-ONLY-SHADER.json')]}
+(OUT/'BUILD-SOURCES.json').write_text(json.dumps(build_inputs,indent=2)+'\n')
 def run(args):subprocess.run([str(x) for x in args],check=True)
 program=[];resources=[];packages=[];consumer=[]
 for row in proof['artifacts']:
  src=DEPS/row['file'];assert hashlib.sha256(src.read_bytes()).hexdigest()==row['sha256']
  if row['type']=='jar':
   jars=OUT/'jars';jars.mkdir(exist_ok=True);local=jars/(row['coordinate'].replace(':','_')+'.jar')
-  local.write_bytes(src.read_bytes());program.append(local);continue
+  local.write_bytes(src.read_bytes())
+  # Kotlin/HTTP/Guava belong to Cobra in the accepted payload. Cast must
+  # have private program definitions, never import those existing classes.
+  # Use the exact newer private Kotlin required by Okio, not SDK's older
+  # transitive Kotlin. Nothing in the accepted DEX is upgraded/relabelled.
+  if not row['coordinate'].startswith('org.jetbrains.kotlin:'):program.append(local)
+  continue
  folder=OUT/row['coordinate'].replace(':','_');folder.mkdir(exist_ok=True)
  with ZipFile(src) as z:
   for n in z.namelist():
@@ -75,13 +86,14 @@ with ZipFile(compile_lib,'a',ZIP_DEFLATED) as libs:
  # must resolve to the accepted APK's actual identifiers, not new 0x80 IDs.
  reused=[];filtered=[]
  resource_stubs=OUT/'resource-api';resource_stubs.mkdir(exist_ok=True)
- for jar in program+[feature]:
+ for jar in program+provided+[feature]:
   target=OUT/('only-new-'+jar.parent.name+'-'+jar.name)
   with ZipFile(jar) as source,ZipFile(target,'w',ZIP_DEFLATED) as output:
    for name in source.namelist():
     if not name.endswith('.class'):continue
     descriptor='L'+name[:-6]+';'
-    if descriptor in baseline:
+    private=descriptor.startswith(('Lokhttp3/','Lokio/','Lkotlin/','Lcom/google/common/','Landroidx/concurrent/'))
+    if descriptor in baseline and not private:
      reused.append(descriptor)
      if '/R$' in descriptor or descriptor.endswith('/R;'):
       package,leaf=name[:-6].rsplit('/',1)
@@ -101,6 +113,22 @@ with ZipFile(compile_lib,'a',ZIP_DEFLATED) as libs:
   run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-d',resource_classes]+resource_sources)
   for p in resource_classes.rglob('*.class'):libs.writestr(p.relative_to(resource_classes).as_posix(),p.read_bytes())
 rules=OUT/'component.pro'
+shader=private_classes.prepare(WORK);private_program=[]
+for jar in filtered:
+ target=jar.with_name('private-'+jar.name)
+ run(shader+[jar,target,OUT/'private-resources']);private_program.append(target)
+private_consumer=[]
+for index,path in enumerate(consumer):
+ target=OUT/('private-consumer-'+str(index)+'.pro');target.write_text(private_classes.rules(path.read_text()));private_consumer.append(target)
+for jar in provided:
+ with ZipFile(jar) as source:
+  for name in source.namelist():
+   if name.startswith('META-INF/proguard/') and not name.endswith('/'):
+    target=OUT/('private-'+jar.stem+'-'+Path(name).name);target.write_text(private_classes.rules(source.read(name).decode()));private_consumer.append(target)
+  name='okhttp3/internal/publicsuffix/publicsuffixes.gz'
+  if name in source.namelist():
+   target=OUT/'private-resources/assets/infinity/cast/privatehttp'/name
+   target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(source.read(name))
 rules.write_text('''-keep class com.projectinfinity.kodi.InfinityCast* { *; }
 -repackageclasses com.projectinfinity.kodi.castdeps
 -keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*
@@ -116,6 +144,7 @@ if reuse:
  assert receipt['status']=='PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT'
  assert receipt['baseline_APK_sha256']=='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197'
  assert receipt['feature_Java_sha256']==source_hashes, 'Java input changed; cannot reuse prior SDK component'
+ assert receipt.get('build_inputs')==build_inputs, 'Dependency, rules, shader or component build logic changed; stale component refused'
  assert receipt['resources']['sha256']==hashlib.sha256(resource_apk.read_bytes()).hexdigest(), 'Resource input changed; cannot reuse prior SDK component'
  for name,digest in receipt['dex'].items():
   assert re.fullmatch(r'classes\d*\.dex',name)
@@ -125,7 +154,6 @@ if reuse:
 else:
  run(['java','-Xmx2g','-cp',SDK/'d8.jar','com.android.tools.r8.R8','--release','--min-api','21',
       '--lib',SDK/'android.jar','--lib',compile_lib,'--output',dex,'--pg-conf',rules]+
-     [x for p in provided for x in ('--lib',p)]+
-     [x for p in consumer for x in ('--pg-conf',p)]+filtered)
+     [x for p in private_consumer for x in ('--pg-conf',p)]+private_program)
 from audit_sdk_component import verify
 verify(APK,SDK,OUT)

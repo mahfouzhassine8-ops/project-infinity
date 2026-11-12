@@ -16,6 +16,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
     private InfinityCastSession cast;
     private int oldResource;
     private int activityResourceAfter,applicationResourceAfter,applicationCastResource,activityCastResource;
+    private boolean explicitSelectionGuard,privateResource;
     private volatile JSONObject relayResult;
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
@@ -27,6 +28,18 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
         Thread relayProbe=new Thread(()->relayResult=InfinityCastRelayAndroidTest.run(),"CIOnlyCastRelayProbe");
         relayProbe.setDaemon(true);relayProbe.start();
         cast=InfinityCastSession.get(this);cast.attach(this);
+        try {
+            java.lang.reflect.Field source=InfinityCastSession.class.getDeclaredField("source");source.setAccessible(true);
+            java.lang.reflect.Field transport=InfinityCastSession.class.getDeclaredField("privateSource");transport.setAccessible(true);
+            source.set(cast,new JSONObject());transport.set(cast,InfinityCastSource.parse("https://example.invalid/public.mp4"));
+            java.lang.reflect.Method connect=InfinityCastSession.class.getDeclaredMethod("connectedSession",com.google.android.gms.cast.framework.CastSession.class);
+            connect.setAccessible(true);connect.invoke(cast,new Object[]{null});
+            java.lang.reflect.Field started=InfinityCastSession.class.getDeclaredField("transferStarted");started.setAccessible(true);
+            explicitSelectionGuard=!started.getBoolean(cast);source.set(cast,null);transport.set(cast,null);
+            Class<?> suffix=Class.forName("assets.infinity.cast.privatehttp.okhttp3.internal.publicsuffix.PublicSuffixDatabase");
+            try(java.io.InputStream data=suffix.getResourceAsStream("publicsuffixes.gz")){privateResource=data!=null && data.read()==31 && data.read()==139;}
+            if(!explicitSelectionGuard || !privateResource){result(false,"private_transport_or_explicit_selection_guard_failed");return;}
+        }catch(Exception | LinkageError failure){result(false,"private_runtime_guard_"+failure.getClass().getSimpleName());return;}
         pulse();
     }
     private void pulse() {
@@ -68,6 +81,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
                 .put("Application_original_after",applicationResourceAfter).put("Application_Cast_id",applicationCastResource)
                 .put("Activity_Cast_id",activityCastResource)
                 .put("relay",relayResult==null?JSONObject.NULL:relayResult)
+                .put("explicit_receiver_selection_required",explicitSelectionGuard).put("private_HTTP_resource_readable",privateResource)
                 .put("full_Infinity_playback","NOT_TESTED").put("receiver_transfer","NOT_TESTED")
                 .put("shutdown","NOT_SELECTED").put("owner_APK",false);
             android.util.Log.i("InfinityCastProbe",value.toString());

@@ -2,16 +2,21 @@
   "status": "PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT",
   "baseline_APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
   "baseline_classes": 9077,
-  "new_classes": 794,
+  "new_classes": 992,
   "duplicate_classes": [],
   "missing_baseline_APIs": [],
-  "provided_HTTP": "Existing OkHttp4.12/Okio classes only; no HTTP implementation replacements/additions permitted",
+  "provided_HTTP": "Private relocated HTTP/Kotlin/futures only; no Cobra-owned runtime imports or existing class replacements",
+  "Cobra_owned_type_references": [],
+  "old_HTTP_Kotlin_future_runtime_class_names": [],
+  "private_resources": {
+    "assets/infinity/cast/privatehttp/okhttp3/internal/publicsuffix/publicsuffixes.gz": "9af43e9995ec749e7a30eec4e5a87770d7e2027847084a07cca82060eff0c791"
+  },
   "DEX_format": "035; baseline minimum Android API21 unchanged; Cast resources require API30 only when invoked",
   "feature_Java_sha256": {
     "java/com/projectinfinity/kodi/InfinityCastResources.java": "1c7fc3cf02af2acd61c9b1887cc88c6ff6b2ec1ed087701f947e46b8762f1637",
     "java/com/projectinfinity/kodi/InfinityCastGateway.java": "fbe9502139c701e344ebb8882ca53a73baff38921b6db9e536e79225cc00fbed",
-    "java/com/projectinfinity/kodi/InfinityCastSession.java": "7c3ad3e8929de1f24df2abd9d8b4aa232d4d83b8f83efc2ac0aadcc4df831c91",
-    "java/com/projectinfinity/kodi/InfinityCastRelay.java": "405ca47e5f2d6c5072241c8b8236e6e74252cf2172ca72ff3e5db985dbbe7590",
+    "java/com/projectinfinity/kodi/InfinityCastSession.java": "9ea9801ebbdc718c4c400f76b3d0ceb2aaebc90a9ed9c1577a2366d08364309e",
+    "java/com/projectinfinity/kodi/InfinityCastRelay.java": "53f310b8d2e254ee3fe1f47a17559c5a3da16398508a47646420f582fdcc4e14",
     "java/com/projectinfinity/kodi/InfinityCastDialog.java": "d7bf7611ec09b680e0ad4c33ed298dca36590aa82b84640dddabd184dbfb8086",
     "java/com/projectinfinity/kodi/InfinityCastSource.java": "a1e90723c3b4ece983a2aeaf45075974b508fe72c8818e6c0b385af606105683",
     "java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
@@ -25,6 +30,6 @@
     "sha256": "945bec5c594a1ea4eadea7b4a7fa8da07813f66f48af2e577e91ae7acd47e36a"
   },
   "dex": {
-    "classes.dex": "9bd8feaf3c2c56334cf9ed154e8aeffd505dd79a28693783121b09319a39f49c"
+    "classes.dex": "e3ae83365260953da8ef6f2da3acaf68c4a034839d80b4e872da356e10a98ee2"
   }
 }

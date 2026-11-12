@@ -1,7 +1,8 @@
-"""Compile-only API jars for the HTTP implementation already in signed86.
+"""Pinned official HTTP/Kotlin inputs for private Cast-only runtime definitions.
 
-No OkHttp/Okio implementation is packaged. Actual referenced classes/members
-must exist in the immutable baseline DEX or the component audit rejects it.
+Cobra owns the already installed HTTP/Kotlin classes. Cast must not call or
+replace them. R8 privately relocates these independent dependency definitions;
+the final DEX audit rejects original Cobra namespaces and class collisions.
 """
 from pathlib import Path
 import hashlib,json,urllib.request

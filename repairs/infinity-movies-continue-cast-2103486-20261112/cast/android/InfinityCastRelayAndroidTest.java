@@ -48,7 +48,7 @@ final class InfinityCastRelayAndroidTest {
             relay.close();long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(3);
             while(InfinityCastRelay.busy() && System.nanoTime()<deadline)Thread.sleep(10);
             if(InfinityCastRelay.busy())throw new IOException("Relay did not retire");
-            return new JSONObject().put("pass",true).put("actual_existing_OkHttp",true).put("range_body",true)
+            return new JSONObject().put("pass",true).put("actual_private_HTTP_runtime",true).put("range_body",true)
                 .put("private_source_not_returned",true).put("retired",true).put("real_Cast_receiver",false);
         } catch(Exception | LinkageError failure) {
             try{return new JSONObject().put("pass",false).put("reason",failure.getClass().getSimpleName());}catch(Exception ignored){return new JSONObject();}

@@ -38,5 +38,7 @@ with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub,ZipFile(AP
  for p in sorted((COMPONENT/'dex').glob('*.dex'))+sorted(dex.glob('*.dex')):
   out.writestr('classes'+str(next_dex)+'.dex',p.read_bytes());next_dex+=1
  for name in ('resources.apk','RESOURCE-IDENTITY.json'):out.write(COMPONENT/name,'assets/infinity-cast/'+name)
+ for p in (COMPONENT/'private-resources').rglob('*'):
+  if p.is_file():out.write(p,p.relative_to(COMPONENT/'private-resources').as_posix())
 print('CI-only separate-package probe prepared; original installer/signature/data untouched')
 with ZipFile(unsigned) as z:assert len(z.namelist())==len(set(z.namelist())), 'Duplicate probe ZIP members refused'
