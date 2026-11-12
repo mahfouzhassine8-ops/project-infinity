@@ -41,6 +41,7 @@ def gate():
             '.github/workflows/infinity-core-outcomes-qa-native.yml',
             '.github/workflows/infinity-saved-navigation-android.yml',
             str(HERE.relative_to(ROOT))+'/build_cast_native.py',
+            str(HERE.relative_to(ROOT))+'/prepare_ci_tooling.sh',
             str(HERE.relative_to(ROOT))+'/cast/test_relay_host.py',
             str(HERE.relative_to(ROOT))+'/native/tests/test_cast_native.cpp'),name
     for name in (CMAKE,BUILTINS):

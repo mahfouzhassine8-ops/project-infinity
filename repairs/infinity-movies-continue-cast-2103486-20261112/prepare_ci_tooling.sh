@@ -4,7 +4,7 @@
 set -euo pipefail
 test "${GITHUB_ACTIONS:-}" = true
 test "${GITHUB_REPOSITORY:-}" = mahfouzhassine8-ops/project-infinity
-test "${GITHUB_REF:-}" = refs/heads/work/infinity-movies-continue-cast-2103486-20261112
+test "${GITHUB_REF:-}" = refs/heads/work/infinity-cast-final-from-2103488-20261112
 test -f /usr/share/keyrings/ubuntu-archive-keyring.gpg
 . /etc/os-release
 test "$ID" = ubuntu
