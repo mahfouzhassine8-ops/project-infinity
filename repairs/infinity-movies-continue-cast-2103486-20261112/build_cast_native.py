@@ -34,16 +34,8 @@ def gate():
     assert os.environ['GITHUB_REF']=='refs/heads/'+BRANCH
     assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()==os.environ['GITHUB_SHA']
     scope=json.loads((ROOT/'repairs/infinity-cast-final-2103488-20261112/SCOPE.json').read_text())
-    changed=subprocess.check_output(['git','diff','--name-only',scope['baseline_source_snapshot'],'HEAD'],cwd=ROOT,text=True).splitlines()
-    permitted=set(scope['production_allowlist'])|set(scope['allowed_new_Cast_sources'])
-    for name in changed:
-        assert name in permitted or name.startswith('repairs/infinity-cast-final-2103488-20261112/') or name.startswith(str(HERE.relative_to(ROOT))+'/cast/tests/') or name.startswith(str(HERE.relative_to(ROOT))+'/native/tests/') or name in (
-            '.github/workflows/infinity-core-outcomes-qa-native.yml',
-            '.github/workflows/infinity-saved-navigation-android.yml',
-            str(HERE.relative_to(ROOT))+'/build_cast_native.py',
-            str(HERE.relative_to(ROOT))+'/prepare_ci_tooling.sh',
-            str(HERE.relative_to(ROOT))+'/cast/test_relay_host.py',
-            str(HERE.relative_to(ROOT))+'/native/tests/test_cast_native.cpp'),name
+    reviewed=load(ROOT/'repairs/infinity-cast-final-2103488-20261112/release/gate.py','cast_final_exact_source_scope')
+    reviewed.source_scope()
     for name in (CMAKE,BUILTINS):
         path=str(HERE.relative_to(ROOT))+'/native/overlay/'+name
         assert (ROOT/path).read_bytes()==subprocess.check_output(['git','show',scope['baseline_source_snapshot']+':'+path],cwd=ROOT)
