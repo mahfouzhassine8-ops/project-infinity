@@ -13,16 +13,16 @@
   },
   "DEX_format": "035; baseline minimum Android API21 unchanged; Cast resources require API30 only when invoked",
   "feature_Java_sha256": {
+    "java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+    "java/com/projectinfinity/kodi/InfinityCastDialog.java": "d7bf7611ec09b680e0ad4c33ed298dca36590aa82b84640dddabd184dbfb8086",
+    "java/com/projectinfinity/kodi/InfinityCastSession.java": "9ea9801ebbdc718c4c400f76b3d0ceb2aaebc90a9ed9c1577a2366d08364309e",
+    "java/com/projectinfinity/kodi/InfinityCastRpc.java": "e8962a2df243a2302c293622f1adaca345d764c1621e9ddfabdb93fa3535244f",
+    "java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
+    "java/com/projectinfinity/kodi/InfinityCastNative.java": "5dd3337db1223b8a0c4fd5d7d848831eca9366f8eeb947ace8d6b044f5992e9f",
+    "java/com/projectinfinity/kodi/InfinityCastRelay.java": "53f310b8d2e254ee3fe1f47a17559c5a3da16398508a47646420f582fdcc4e14",
     "java/com/projectinfinity/kodi/InfinityCastResources.java": "1c7fc3cf02af2acd61c9b1887cc88c6ff6b2ec1ed087701f947e46b8762f1637",
     "java/com/projectinfinity/kodi/InfinityCastGateway.java": "fbe9502139c701e344ebb8882ca53a73baff38921b6db9e536e79225cc00fbed",
-    "java/com/projectinfinity/kodi/InfinityCastSession.java": "9ea9801ebbdc718c4c400f76b3d0ceb2aaebc90a9ed9c1577a2366d08364309e",
-    "java/com/projectinfinity/kodi/InfinityCastRelay.java": "53f310b8d2e254ee3fe1f47a17559c5a3da16398508a47646420f582fdcc4e14",
-    "java/com/projectinfinity/kodi/InfinityCastDialog.java": "d7bf7611ec09b680e0ad4c33ed298dca36590aa82b84640dddabd184dbfb8086",
-    "java/com/projectinfinity/kodi/InfinityCastSource.java": "a1e90723c3b4ece983a2aeaf45075974b508fe72c8818e6c0b385af606105683",
-    "java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
-    "java/com/projectinfinity/kodi/InfinityCastRpc.java": "e8962a2df243a2302c293622f1adaca345d764c1621e9ddfabdb93fa3535244f",
-    "java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
-    "java/com/projectinfinity/kodi/InfinityCastNative.java": "5dd3337db1223b8a0c4fd5d7d848831eca9366f8eeb947ace8d6b044f5992e9f"
+    "java/com/projectinfinity/kodi/InfinityCastSource.java": "a1e90723c3b4ece983a2aeaf45075974b508fe72c8818e6c0b385af606105683"
   },
   "resources": {
     "schema": 1,
@@ -31,5 +31,23 @@
   },
   "dex": {
     "classes.dex": "e3ae83365260953da8ef6f2da3acaf68c4a034839d80b4e872da356e10a98ee2"
-  }
+  },
+  "build_inputs": {
+    "cast/private_classes.py": "58cd0099e02e81d8f3e1d63e60d27d777983a4538dc35f09b57409e2d20f2e98",
+    "cast/run_probe.py": "b7de9f82021c65587a438470954016c753597c3e281a58f8fb996a9d66fd0635",
+    "cast/test_relay_host.py": "f9cf6140ec1efe4e6b31a8a9fb3f643029315035e47bb4f6bcf3310b05bae0cd",
+    "cast/resolve_sdk.py": "fa71fea9d0970e1b2a7bbeba0311dce01245adae51e9f56fd0075d2d5bfb0762",
+    "cast/dex_contract.py": "c01cce69deacb207633bfd70f1d6d1f56aa3d21972fb3685b7e9a1d7e01739e4",
+    "cast/build_sdk_component.py": "9fc29756a0967274d4c20fd9a08c1a180b1ead020f1bf73da438d96354e6d934",
+    "cast/build_probe.py": "44744fd8b16d704aacbba57362ca0fc783b929244670fc7c0aeccfbb2d7f3068",
+    "cast/audit_sdk_component.py": "be05e7e8421e4f72613f594ae0d70afae189ba0ad4c7b51ea12702436d4b6340",
+    "cast/provided_http.py": "4987f1eb8b3fb11aa9fbe2282377d19f6443b01e2003753834fe5b5ef6c1154a",
+    "cast/tooling/CastPrivateClasses.java": "79310587cd3fe6275e230c1a9a3a77eb6d991a47866823ee1fa78f691b02ce77",
+    "research/CAST-SDK-DEPENDENCIES.json": "df9bf0e1fe6d78dcfec1d9ec3c48d1c313dbe6952c734f2bd4dc6262bbcb4057",
+    "research/CAST-PROVIDED-HTTP-APIS.json": "0c15515fe3243ca8da49c697ab0280337d4ff0010fb42e25117646de47809c0e",
+    "research/CAST-BUILD-ONLY-SHADER.json": "439bac3882ee5d873ac82defaf1bc2ce083979ccb11cbc7e21f5a7e6653a5ccf"
+  },
+  "run": 43270456436,
+  "source": "7e962bd90465c97acd411a7059b1314a2c26115b",
+  "artifact": 13968376901
 }

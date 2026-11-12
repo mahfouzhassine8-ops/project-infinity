@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "baseline": 2103486,
+  "baseline_APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+  "candidate_CC": {
+    "service.py": {
+      "baseline_sha256": "934b05012d5f6e86e28174dc2291ba4f0ffd0238c880061f6476264578915397",
+      "candidate_sha256": "32bef8764419f18834fcc7d9e14d291e4d5f2208998a0dfe710e10ad892e0399",
+      "modified_functions": [
+        "InfinityPlayer.__init__",
+        "InfinityPlayer._arm_continue",
+        "InfinityPlayer.persist_continue",
+        "InfinityPlayer.poll"
+      ],
+      "added_functions": [
+        "InfinityPlayer._cast_sample",
+        "_continue_movie_route_item"
+      ],
+      "removed_functions": []
+    },
+    "cast_runtime.py": {
+      "added": true,
+      "sha256": "da2b071f120487dce2f424d98c4f8a0040e11527f9caa0eaf4336c5bb3377690"
+    },
+    "plugin.py": {
+      "baseline_sha256": "580a2d7b25bc7a415c2db059fe1fa696808107a4f997a32d544baf2468a2877a",
+      "candidate_sha256": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
+      "modified_functions": [
+        "_target"
+      ],
+      "added_functions": [],
+      "removed_functions": []
+    },
+    "default.py": {
+      "baseline_sha256": "6ecfa94ca3256d20d9605d016b7585a9e587c8cb4dd87ada8bbe0dcbacd47cc4",
+      "candidate_sha256": "1e671c44c6d0cfbb1e7c372e79843e292958b7f3ad59f06eb6756214169f494c",
+      "modified_functions": [
+        "direct_command"
+      ],
+      "added_functions": [],
+      "removed_functions": []
+    },
+    "experience.py": {
+      "baseline_sha256": "95daaaf48fc762db845b6befa8e6cd8aa6832caf236ad2883978162e5fe9a511",
+      "candidate_sha256": "c358be6a7aa18e7bc59d048b77911b44c6e6e3a8f5d7c3229fb1da8ae90bb2eb",
+      "modified_functions": [
+        "_source_contract",
+        "source_identity"
+      ],
+      "added_functions": [
+        "native_movie_route_identity"
+      ],
+      "removed_functions": []
+    }
+  },
+  "native_Cast_sources_identical_to_passed_ARM64_run": 43239137210,
+  "native_Cast_source_sha256": {
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d",
+    "xbmc/platform/android/activity/InfinityCastNative.cpp": "fe3a2567ca89a5bfc661ec80ac80298cca7c71fdea0cf64257f1bd6578c8ec0f",
+    "xbmc/platform/android/activity/CMakeLists.txt": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07"
+  },
+  "shutdown_source_changes": false,
+  "provider_source_changes": false,
+  "Search_source_changes": false,
+  "Cobra_source_changes": false,
+  "TV_changes_outside_new_optional_Cast_clock": false,
+  "record_schema_changes": false,
+  "eligibility_changes": false,
+  "installed_profiles_accessed": false,
+  "APK_built": false
+}

@@ -1,0 +1,81 @@
+{
+  "schema": 1,
+  "status": "NOT_READY_FOR_COMBINED_APK_NO_OWNER_INSTALLER",
+  "protected_baseline": 2103486,
+  "protected_lock": "e1ef672a6f24aed6c19a14ab96d2df6fe3380460",
+  "production_checkpoint": "7e962bd90465c97acd411a7059b1314a2c26115b",
+  "implemented": {
+    "movie": "Verified movie-route contracts plus safe reuse of original saved source when old stable-source stamp is absent; typed actual-item movie identity fallback",
+    "Home": "Actual-item identity fallback only. Existing eligibility/filter/store remain unchanged; Sacrifice cause NOT established",
+    "Cast": "Isolated official SDK, new two OSD controls, bounded native source-bound handoff, private progressive media relay, existing recorder clock integration"
+  },
+  "verified": [
+    {
+      "kind": "Movie host",
+      "cases": 14,
+      "Android": false
+    },
+    {
+      "kind": "Cast clock host",
+      "cases": 12,
+      "Android": false
+    },
+    {
+      "kind": "Private relay actual HTTP host",
+      "checks": 30,
+      "Android": false
+    },
+    {
+      "kind": "Full native ARM64 compilation/link/source/ABI",
+      "run": 43239137210,
+      "passed": true
+    },
+    {
+      "kind": "Complete original-key candidate81 and recovery80 module signatures",
+      "run": 43266279257,
+      "passed": true,
+      "APK": false
+    },
+    {
+      "kind": "Private Cast SDK/resource/API36 local relay/retirement/explicit-selection",
+      "run": 43270456436,
+      "passed": true,
+      "real_receiver": false,
+      "full_Infinity_playback": false
+    }
+  ],
+  "exact_source_evidence_limitations": [
+    "The owner described Infinity-2103486-Movies-Existing-Evidence.zip (22270.mp4,22274.mp4,22278.jpg and November12 diagnostic), but archive bytes are not exposed in accessible attachment paths. Targeted connected-Page searches returned only older diagnostic Pages. No claim that these videos were viewed.",
+    "Owner explicitly confirms the diagnostic omits Sacrifice actual continue-watching.json record. A Kodi Resume00:04:18 prompt does not establish a corresponding valid/nonhidden/unfinished Infinity record or its duration/identity/eligibility.",
+    "Therefore current confirmed source defects cannot yet be asserted as the complete cause of the recorded stall or missing specific Home card. No guessed record, eligibility change or replacement history is allowed."
+  ],
+  "remaining_engineering_gates": [
+    "Authenticated whole-Infinity Android saved-movie handoff, actual AV/progress/Home-card and resume verification; distinguish blocked test prerequisites from app failures",
+    "Actual Cast JNI/control integration and available receiver transfer verification; current Android PASS is component/local-transport only",
+    "Exact Cast metadata/query transformation must be admitted by the original source-bound release guard; existing historical external-player manifest exception does not authorize arbitrary additions",
+    "Reconcile/reserve current unused APK versions only after gates; assemble full candidate and forward recovery, verify original certificate/install-over and complete APK-member preservation",
+    "Independently selected post-movie normal Exit/relaunch after corrected paths; no shutdown source changes"
+  ],
+  "Cast_supported": "Google Cast video receivers on supported direct local IPv4 route; progressive MP4/M4V/WebM. No raw provider URL/headers/query sent to receiver.",
+  "Cast_unsupported": "Adaptive HLS/DASH/DRM, audio-only and unsupported/local-route/IPv6-only receiver paths fail without stopping phone playback; no universal-provider or physical receiver PASS.",
+  "protected": {
+    "shutdown_source_unchanged": true,
+    "Cobra_source_and_existing_runtime_unchanged": true,
+    "provider_implementations_unchanged": true,
+    "Search_unchanged": true,
+    "TV_behavior_outside_new_Cast_unchanged": true,
+    "eligibility_store_schema_and_settings_unchanged": true,
+    "owner_data_accessed": false
+  },
+  "release": {
+    "APK_produced": false,
+    "APK_signed": false,
+    "APK_versions_reserved": false,
+    "recovery_APK_produced": false,
+    "original_signed_modules_internal_only": true,
+    "owner_acceptance": "NOT_RUN",
+    "baseline_promoted": false
+  },
+  "new_owner_diagnostic_requested": false,
+  "new_owner_test_requested": false
+}
