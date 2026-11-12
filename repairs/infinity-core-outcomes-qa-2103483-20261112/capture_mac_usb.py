@@ -65,6 +65,12 @@ def select_usb(adb, serial):
         if len(matches) != 1:
             raise RuntimeError('The requested USB serial is not uniquely listed by adb.')
         selected = matches[0]
+    if selected['state'] == 'device' and not selected['usb']:
+        # Some Mac platform-tools omit the usb: listing field. ADB's supported
+        # -d selector still enforces a physical USB transport at the server.
+        probe = subprocess.run([adb, '-d', 'get-serialno'], capture_output=True, timeout=10)
+        selected['usb'] = (probe.returncode == 0 and
+                           probe.stdout.decode(errors='replace').strip() == selected['serial'])
     if selected['state'] != 'device' or not selected['usb']:
         raise RuntimeError('An already authorized physical USB device is required; offline, wireless and emulator transports are refused.')
     return selected['serial']

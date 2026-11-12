@@ -1,6 +1,6 @@
 {
   "status": "PASS_STATIC_CAPTURE_READONLY_COMMAND_GUARDS_ONLY",
-  "source_sha256": "4143b87293cdfbe8c698bc5a2f70f0e71c0979f23e12387f07ab53eb257d5bac",
+  "source_sha256": "789017d9ac2ea37c3c0810485a7c428f2f353d2a624add27a545a26ca75a4461",
   "known_remote_reads": [
     [
       "shell",
@@ -22,5 +22,11 @@
   "app_commands": false,
   "phone_execution": false,
   "runtime_verification": false,
-  "scope": "AST and static read-only command review; no ADB executed"
+  "scope": "AST and static read-only command review; no ADB executed",
+  "Mac_USB_without_listing_marker": "PASS_THREE_MOCKED_PHYSICAL_USB_SELECTOR_GUARDS",
+  "additional_readonly_host_command": [
+    "adb",
+    "-d",
+    "get-serialno"
+  ]
 }
