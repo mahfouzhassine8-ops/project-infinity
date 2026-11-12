@@ -116,7 +116,13 @@ def compile_native():
             assert Path(root)==TOOLS/'kodi' and pins==expected
             assert all(n.startswith('tools/depends/') for n in extra),extra
         return extra
-    compiler.checked_sources=checked;proof=compiler.compile_engine()
+    compiler.checked_sources=checked
+    previous=os.environ.get('GITHUB_WORKSPACE')
+    os.environ['GITHUB_WORKSPACE']=str(TOOLS)
+    try:proof=compiler.compile_engine()
+    finally:
+        if previous is None:os.environ.pop('GITHUB_WORKSPACE',None)
+        else:os.environ['GITHUB_WORKSPACE']=previous
     assert proof['complete_native_engine_compiled'] and proof['reviewed_file_count']==9413
     library=OUT/'libkodi.so';assert sha(library)==proof['native_sha256']
     readelf=Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
