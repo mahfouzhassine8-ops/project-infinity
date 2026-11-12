@@ -96,7 +96,15 @@ def prepare():
     assert sha(OUT/'baseline86-libkodi.so')==ENGINE86
 
 def dependencies():
-    gate();retained().dependencies()
+    gate()
+    # Frozen dependency scripts explicitly cd to GITHUB_WORKSPACE. Their
+    # source is unchanged; execute them in the verified detached tools tree.
+    previous=os.environ.get('GITHUB_WORKSPACE')
+    os.environ['GITHUB_WORKSPACE']=str(TOOLS)
+    try:retained().dependencies()
+    finally:
+        if previous is None:os.environ.pop('GITHUB_WORKSPACE',None)
+        else:os.environ['GITHUB_WORKSPACE']=previous
 
 def compile_native():
     gate();expected=json.loads((OUT/'NATIVE-SOURCE-MAP.json').read_text());assert len(expected)==9413
