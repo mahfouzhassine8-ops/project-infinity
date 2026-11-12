@@ -9,7 +9,7 @@
   "publication": false,
   "accepted_pointer_updated": false,
   "version_reserved": false,
-  "remaining": "Prepare exact83 higher-version forward recovery; repair relaunch still pending",
+  "remaining": "Forward recovery proposal; restores exact83 native and payload except required version metadata",
   "source_bindings": {
     "repairs/infinity-essential-only-shutdown-2103483-20261112/releaseprep/owner_release.py": "039777cd3b00932e6d5a2681d52cd3c89de2114d36b06edfb3ac412aac97f73e",
     "repairs/infinity-essential-only-shutdown-2103483-20261112/releaseprep/OWNER-AUTHORIZATION.json": "02e19ba2e8422ddfb95179d5a029faf5677696e8606231058e0cda90d4b34dbd",
@@ -19,8 +19,30 @@
     "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistence.h": "c7e7e758a3496c32b82b8948c0b8de00409a492e2f0c98996a6f9b74d6fdda06",
     "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3",
     "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonWriteHooks.h": "755417f20304c2bfe6300feb3813dc7538c264ea8bf7e6d1ddba60e33034b6a1",
-    "repairs/infinity-essential-only-shutdown-2103483-20261112/evidence/REVALIDATED-ACTUAL-CLOSE-43196958708.json": "6a8157d5bdac4a55e7565acf83898bbc8602a165f462d7175168f335a5484f78"
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/evidence/REVALIDATED-ACTUAL-CLOSE-43196958708.json": "6a8157d5bdac4a55e7565acf83898bbc8602a165f462d7175168f335a5484f78",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/evidence/ANDROID-FUNCTIONAL-43198525179.json": "b0c8be2e9ca426ff3712fe17a72c0ccc084d1e1d0ccd462b67bac1f84990a3bf"
   },
   "workflow_sha256": "b7d2f161cbec8d1d5f2a727666a611074ea66f4861cca7c2e81701180bcd0679",
-  "parent_authority_sha256": "0dc88a84b06c400dc0b80cf77ebdbb3667951d68dd0dde46db0922df9fb9cbd0"
+  "parent_authority_sha256": "0dc88a84b06c400dc0b80cf77ebdbb3667951d68dd0dde46db0922df9fb9cbd0",
+  "prepared_producer": {
+    "run": 43199304169,
+    "id": 13934008829,
+    "workflow_id": 397702717,
+    "source": "2db833bfc185f0480be61ddc4fea9ecd95a7a1ad",
+    "name": "Infinity-Essential-Only-recovery-Prepared-43199304169-UNSIGNED",
+    "digest": "sha256:616033c86dbde5e0fa840b0b971401c05336ee6210653c503cfd6c2908ca2949",
+    "size_in_bytes": 655856806
+  },
+  "unsigned_sha256": "1b465c60a96b69a6c6e730b8c64d1b551901791cd8e1a3ccdc84efa7053cf4d5",
+  "independent_Android_evidence": {
+    "repair_actual_Close": "PASS",
+    "repair_same_profile_relaunch": "PASS",
+    "repair_retained_data": "PASS",
+    "repair_run": 43198525179,
+    "raw_conclusion": "failure: final post-relaunch APK-file read exceeded 12 seconds",
+    "raw_artifact": 13933933896,
+    "raw_artifact_digest": "sha256:3d3d0237e67e441aaf2514d6e1c93db37b6ecbfe8e3bc77ff44648aa423fb28f",
+    "signed_pair_install_over": "PENDING_SIGNED_PAIR",
+    "Fold": "NOT_RUN"
+  }
 }
