@@ -61,5 +61,10 @@ int main()
   id=begin("release",other);messenger.Drain();contains(result(id),"\"status\":\"ok\"");
   assert(Store().token.empty() && Store().file.empty() && Store().item.expired());
   assert(InfinityAndroidCheckpoint::active && g_application.player->pauses==pauses && g_application.player->seeks==seeks);
+  // A consumed/oversized terminal result is an error, never an endless pending
+  // native operation. No player or persistence mutation is involved.
+  id=begin("release",other);messenger.Drain();
+  {auto& state=Store();std::lock_guard<std::mutex> lock(state.mutex);for(auto& slot:state.slots)if(slot.id==static_cast<uint64_t>(id))slot.result=std::string(131073,'x');}
+  contains(result(id),"native_result_limit");contains(result(id),"native_request_retired");
   std::cout<<"PASS_CAST_NATIVE_HOST_MOCK_BACKENDS_NOT_ANDROID_OR_FOLD\n";
 }

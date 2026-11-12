@@ -321,7 +321,8 @@ Java_com_projectinfinity_kodi_InfinityCastNative_poll(JNIEnv* env, jclass, jlong
       break;
     }
   }
-  if (data.empty() || data.size() > 131072) return nullptr;
+  if (data.empty()) data = "{\"status\":\"error\",\"reason\":\"native_request_retired\"}";
+  else if (data.size() > 131072) data = "{\"status\":\"error\",\"reason\":\"native_result_limit\"}";
   auto bytes = env->NewByteArray(static_cast<jsize>(data.size()));
   if (bytes) env->SetByteArrayRegion(bytes, 0, static_cast<jsize>(data.size()),
                                   reinterpret_cast<const jbyte*>(data.data()));
