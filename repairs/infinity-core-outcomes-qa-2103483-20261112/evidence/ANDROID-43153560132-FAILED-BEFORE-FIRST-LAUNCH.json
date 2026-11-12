@@ -1,0 +1,30 @@
+{
+  "APK_install_acceptance": false,
+  "APK_modified": false,
+  "Core_success_activated": false,
+  "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "before_first_launch": true,
+  "cases": [],
+  "environment": {
+    "application_installed": false,
+    "application_started": false,
+    "compatibility_overrides": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "page_size": 4096,
+    "revision": 7,
+    "sdk": 36,
+    "serial": "emulator-5554",
+    "status": "PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY",
+    "stock_bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+    "stock_bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d"
+  },
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py\", line 388, in run\n    require(len(set(paths)) == 1, 'UNIQUE_PACKAGE_NATIVE_LIBRARY_DIRECTORY')\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py\", line 46, in require\n    raise RuntimeError(message)\nRuntimeError: UNIQUE_PACKAGE_NATIVE_LIBRARY_DIRECTORY\n",
+  "native_injection": true,
+  "native_producer_source": "29c7a2d0fac736338f5a0f904d5ea511db8603ec",
+  "native_sha256": "723a85a69667a41d4518873f38967080aebc6c105d814a0a844dc1e0eb931b88",
+  "owner_device": false,
+  "shutdown": "NOT_RUN",
+  "source_commit": "a025d1e509668191212f66c156b7d97d43cb5997",
+  "status": "BLOCKED_OR_FAILED_PRE_SIGN_DIAGNOSTIC"
+}

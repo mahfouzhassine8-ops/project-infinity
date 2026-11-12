@@ -361,6 +361,88 @@ def invoke(device, inputs, out, action, sequence, nonce):
     raise TimeoutError('ACTUAL_OBSERVER_REPLY:' + action)
 
 
+def native_package_layout(installed, dump):
+    """Parse only credential-free native fields; PM's APK owns the search root.
+
+    API36 AOSP Settings.dumpPackageLPr prints legacyNativeLibraryDir. For a
+    cluster install PackageAbiHelperImpl derives codePath/lib/<instruction-set>.
+    A printed directory may therefore be the root or the ISA leaf, not a file.
+    """
+    require(re.fullmatch(r'/data/app/[A-Za-z0-9_./+=~-]+/base\.apk', installed) and
+            all(part not in ('.', '..', '') for part in installed.split('/')[1:]),
+            'EXACT_PM_OWNED_BASE_APK_PATH')
+    package_root = str(Path(installed).parent)
+    require(Path(package_root).name.startswith(base.PACKAGE + '-'), 'PM_PACKAGE_DIRECTORY_IDENTITY')
+    library_root = package_root + '/lib'
+    names = ('nativeLibraryDir', 'legacyNativeLibraryDir', 'nativeLibraryRootDir',
+             'secondaryNativeLibraryDir', 'primaryCpuAbi', 'secondaryCpuAbi', 'extractNativeLibs')
+    fields = []
+    for name, value in re.findall(r'^\s*(' + '|'.join(names) + r')=([^\r\n]*)$', dump, re.M):
+        value = value.strip()
+        if name.endswith('Dir') and value != 'null':
+            require(re.fullmatch(r'/data/app/[A-Za-z0-9_./+=~-]+', value) and
+                    all(part not in ('.', '..', '') for part in value.split('/')[1:]) and
+                    (value == library_root or str(Path(value).parent) == library_root),
+                    'NATIVE_DIRECTORY_OUTSIDE_EXACT_PACKAGE_LIB_ROOT')
+        elif name in ('primaryCpuAbi', 'secondaryCpuAbi'):
+            require(value in ('null', 'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86'), 'UNRECOGNIZED_PACKAGE_ABI')
+        elif name == 'extractNativeLibs':
+            require(value in ('true', 'false'), 'UNRECOGNIZED_EXTRACTION_FIELD')
+        fields.append(dict(name=name, value=value))
+    return dict(package_root=package_root, library_root=library_root, fields=fields)
+
+
+def discover_native(device, installed, out):
+    evidence = dict(status='NATIVE_DISCOVERY_PENDING', pm_apk_path=installed,
+                    package=base.PACKAGE, full_package_dump_saved=False,
+                    contract='API36 codePath/lib root or ISA leaf; no global native-directory search',
+                    native_fields=[], candidates=[])
+    try:
+        dump = device.shell('dumpsys', 'package', base.PACKAGE)
+        # Save only these safe PM fields even if layout validation subsequently
+        # rejects them; exclude permissions, account names, URLs and other dump.
+        for match in re.finditer(r'^\s*(nativeLibraryDir|legacyNativeLibraryDir|nativeLibraryRootDir|secondaryNativeLibraryDir|primaryCpuAbi|secondaryCpuAbi|extractNativeLibs)=([^\r\n]*)$', dump, re.M):
+            value = match.group(2).strip()
+            safe = bool(re.fullmatch(r'[A-Za-z0-9_./+=~:-]{1,512}', value))
+            evidence['native_fields'].append(dict(name=match.group(1), value=value if safe else '<unsafe-value-rejected>'))
+        base.save(out / 'PACKAGE-NATIVE-DISCOVERY.json', evidence)
+        layout = native_package_layout(installed, dump)
+        evidence.update(package_root=layout['package_root'], library_root=layout['library_root'])
+        for path in (installed, layout['package_root'], layout['library_root']):
+            actual = device.shell('readlink', '-f', path).strip()
+            require(actual == path, 'CANONICAL_PM_PACKAGE_PATH_ONLY')
+        for field in layout['fields']:
+            if field['name'].endswith('Dir') and field['value'] != 'null':
+                require(device.shell('readlink', '-f', field['value']).strip() == field['value'],
+                        'CANONICAL_PRINTED_NATIVE_DIRECTORY_ONLY')
+        # No -L: never follow directory symlinks. Depth2 includes lib itself and
+        # actual ISA child directories. The preimage hash selects no foreign ABI.
+        raw = device.shell('find', layout['library_root'], '-maxdepth', '2', '-name', 'libkodi.so', '-print')
+        require(len(raw.encode()) <= 4096, 'BOUNDED_PACKAGE_NATIVE_CANDIDATES')
+        candidates = [line for line in raw.splitlines() if line]
+        evidence['candidates'] = candidates
+        require(len(candidates) == 1, 'UNIQUE_PACKAGE_NATIVE_LIBRARY_FILE')
+        target = candidates[0]
+        require(target.endswith('/libkodi.so') and
+                (str(Path(target).parent) == layout['library_root'] or
+                 str(Path(target).parent.parent) == layout['library_root']), 'NATIVE_CANDIDATE_SCOPE')
+        info = dict(path=target, kind=device.shell('stat', '-c', '%F', target).strip(),
+                    canonical=device.shell('readlink', '-f', target).strip())
+        evidence['candidate_identity'] = info
+        require(info['kind'] == 'regular file' and info['canonical'] == target, 'REGULAR_OWNED_NATIVE_FILE_ONLY')
+        digest = device.shell('sha256sum', target).split()
+        require(len(digest) == 2 and digest[1] == target and digest[0] == OLD_NATIVE,
+                'EXACT_INSTALLED_ORIGINAL_ENGINE')
+        info['sha256'] = digest[0]
+        evidence['status'] = 'PASS_UNIQUE_CANONICAL_ORIGINAL83_NATIVE_DISCOVERY'
+        return target
+    except Exception as error:
+        evidence.update(status='BLOCKED_NATIVE_DISCOVERY_NO_INJECTION', error=str(error))
+        raise
+    finally:
+        base.save(out / 'PACKAGE-NATIVE-DISCOVERY.json', evidence)
+
+
 def run(inputs, sdk, out):
     row = selected(); proof = base.load(inputs / 'INTAKE.json')
     require(os.environ.get('GITHUB_ACTIONS') == 'true' and not out.exists(), 'CI_FRESH_OUTPUT_ONLY')
@@ -381,15 +463,11 @@ def run(inputs, sdk, out):
         base.root_reconnect(device, out)
         require(device.adb('install', '--no-streaming', proof['apk'], timeout=300).strip().endswith('Success'), 'EXACT_ORIGINAL83_INSTALL')
         require(not device.pids() and not device.shell('pidof', base.PACKAGE, check=False).strip(), 'NO_FIRST_LAUNCH_YET')
-        installed = device.shell('pm', 'path', base.PACKAGE).strip().removeprefix('package:')
+        package_paths = device.shell('pm', 'path', base.PACKAGE).splitlines()
+        require(len(package_paths) == 1 and package_paths[0].startswith('package:'), 'ONE_PM_BASE_APK')
+        installed = package_paths[0].removeprefix('package:')
         require(device.shell('sha256sum', installed).split()[0] == APK_SHA, 'ACTUAL_UNCHANGED_APK_BYTES')
-        dump = device.shell('dumpsys', 'package', base.PACKAGE)
-        paths = re.findall(r'^\s*nativeLibraryDir=(/data/app/[A-Za-z0-9_./+=~-]+)', dump, re.M)
-        require(len(set(paths)) == 1, 'UNIQUE_PACKAGE_NATIVE_LIBRARY_DIRECTORY')
-        destination = paths[0].rstrip('/') + '/libkodi.so'
-        require(device.shell('stat', '-c', '%F', destination).strip() == 'regular file' and
-                device.shell('readlink', '-f', destination).strip() == destination, 'REGULAR_OWNED_NATIVE_FILE_ONLY')
-        require(device.shell('sha256sum', destination).split()[0] == OLD_NATIVE, 'EXACT_INSTALLED_ORIGINAL_ENGINE')
+        destination = discover_native(device, installed, out)
         before = device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip()
         staged = '/data/local/tmp/infinity-core-outcomes-libkodi.so'
         device.adb('push', proof['native'], staged, timeout=300)

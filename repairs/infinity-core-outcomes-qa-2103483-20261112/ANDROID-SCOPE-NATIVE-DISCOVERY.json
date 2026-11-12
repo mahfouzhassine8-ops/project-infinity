@@ -1,0 +1,62 @@
+{
+  "status": "PASS_SIX_SELECTED_NATIVE_DISCOVERY_HOST_CONTROLS_NOT_ANDROID",
+  "helper_sha256": "70a84d98bc3d20cde10c59a420f084da7d9560f190340822f33920c6a152b357",
+  "scope": "Pure host discovery controls; AST-selected functions and in-memory command replies; no adb/SDK/application/native execution",
+  "cases": [
+    "API36 legacyNativeLibraryDir root yields its one canonical ARM64 child",
+    "nativeLibraryDir ISA leaf yields its one canonical child",
+    "foreign native directory refused before candidate traversal",
+    "multiple candidate files refused before choosing a matching hash",
+    "symlink/noncanonical native file refused",
+    "wrong original native SHA refused"
+  ],
+  "Android_run": "NOT_RUN",
+  "production_changed": false,
+  "reused_ARM64_run": 43150069291,
+  "retained_failure_run": 43153560132,
+  "official_reference": {
+    "tag": "android-16.0.0_r1",
+    "Settings.java_sha256": "d80f253471b12617011edb968136ddec08288fc5f957df97e49d0a65b580fdb1",
+    "PackageAbiHelperImpl.java_sha256": "7f4be793e84d0a2ca2bbe42d5b0aedc9c07d6ae2bef7cdf82154ad2492b04b27"
+  },
+  "testsRun": 6,
+  "results": [
+    {
+      "case": "API36 legacyNativeLibraryDir root yields its one canonical ARM64 child",
+      "status": "PASS_HOST_CONTROL",
+      "observed_refusal": null,
+      "evidence_status": "PASS_UNIQUE_CANONICAL_ORIGINAL83_NATIVE_DISCOVERY"
+    },
+    {
+      "case": "nativeLibraryDir ISA leaf yields its one canonical child",
+      "status": "PASS_HOST_CONTROL",
+      "observed_refusal": null,
+      "evidence_status": "PASS_UNIQUE_CANONICAL_ORIGINAL83_NATIVE_DISCOVERY"
+    },
+    {
+      "case": "foreign native directory refused before candidate traversal",
+      "status": "PASS_HOST_CONTROL",
+      "observed_refusal": "NATIVE_DIRECTORY_OUTSIDE_EXACT_PACKAGE_LIB_ROOT",
+      "evidence_status": "BLOCKED_NATIVE_DISCOVERY_NO_INJECTION"
+    },
+    {
+      "case": "multiple candidate files refused before choosing a matching hash",
+      "status": "PASS_HOST_CONTROL",
+      "observed_refusal": "UNIQUE_PACKAGE_NATIVE_LIBRARY_FILE",
+      "evidence_status": "BLOCKED_NATIVE_DISCOVERY_NO_INJECTION"
+    },
+    {
+      "case": "symlink/noncanonical native file refused",
+      "status": "PASS_HOST_CONTROL",
+      "observed_refusal": "REGULAR_OWNED_NATIVE_FILE_ONLY",
+      "evidence_status": "BLOCKED_NATIVE_DISCOVERY_NO_INJECTION"
+    },
+    {
+      "case": "wrong original native SHA refused",
+      "status": "PASS_HOST_CONTROL",
+      "observed_refusal": "EXACT_INSTALLED_ORIGINAL_ENGINE",
+      "evidence_status": "BLOCKED_NATIVE_DISCOVERY_NO_INJECTION"
+    }
+  ],
+  "application_executed": false
+}
