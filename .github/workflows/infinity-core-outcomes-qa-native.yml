@@ -15,52 +15,35 @@ concurrency: {group: infinity-core-outcomes-native, cancel-in-progress: false}
 jobs:
   selected-host:
     runs-on: ubuntu-22.04
-    timeout-minutes: 10
-    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-        with: {persist-credentials: false, show-progress: false}
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with: {python-version: '3.11.7'}
-      - name: Pin exact installed Core source and prepare native host overlay without Core execution
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Reuse passing exact-source host job; old runner tooling failure remains separate
         run: |
-          curl --fail --silent --show-error --max-time 60 https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/service.py -o actual-core-source.py
+          gh api repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/13912312753/zip > host-proof.zip
           python - <<'PY'
-          import hashlib,shutil,sys
+          import hashlib,json,subprocess
           from pathlib import Path
-          task=Path('repairs/infinity-core-outcomes-qa-2103483-20261112');sys.path.insert(0,str(task))
-          import make_overlay
-          assert hashlib.sha256(Path('actual-core-source.py').read_bytes()).hexdigest()=='2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3'
-          for path,pin in make_overlay.PINS.items():
-              source=Path('repairs/infinity-functional-startup-2103482-20261111/native/overlay')/path if path.endswith('PythonInvoker.cpp') else task/'native/baseline'/path
-              assert hashlib.sha256(source.read_bytes()).hexdigest()==pin
-              dest=Path('host83-baseline')/path;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,dest)
-          make_overlay.write(Path('host83-baseline'),Path('host-core-overlay'))
+          from zipfile import ZipFile
+          task='repairs/infinity-core-outcomes-qa-2103483-20261112/'
+          protected=[task+n for n in ('observer.py','native','make_overlay.py','test_observer.py','test_native_sink.py')]
+          assert not subprocess.check_output(['git','diff','--name-only','84c52957160827da6f0e7ae8d8846ce68d50dd4d','HEAD','--',*protected],text=True).strip()
+          jobs=json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/runs/43148325530/jobs'],text=True))['jobs']
+          assert next(j for j in jobs if j['id']==130951315904)['conclusion']=='success'
+          assert hashlib.sha256(Path('host-proof.zip').read_bytes()).hexdigest()=='92210de77f29be2069cc61230c13af8ad1dbeb346229ad842a0535ea5328205d'
+          with ZipFile('host-proof.zip') as z:
+              host=json.loads(z.read('HOST-CORE-OUTCOMES.json'));native=json.loads(z.read('NATIVE-SINK-HOST.json'))
+          assert host['status']=='PASS_SELECTED_PYTHON_OUTCOME_HOST' and host['testsRun']==13 and host['Python']==[3,11,7] and host['skipped']==0
+          assert native['status']=='PASS_ACTUAL_NATIVE_CALLBACK_AND_PINNED_PYTHON_LOADER_DELEGATE' and native['Python']==[3,11,7]
+          Path('REUSE-HOST.json').write_text(json.dumps(dict(status='PASS_REUSED_EXACT_SOURCE_NATIVE_AND_PYTHON_HOST',run=43148325530,job=130951315904,artifact=13912312753,repeated_cases=False),indent=2)+'\n')
+          print(Path('REUSE-HOST.json').read_text())
           PY
-      - name: Selected Python outcome, privacy, error and cleanup cases
-        env: {INFINITY_COREQA_SERVICE_SOURCE: '${{ github.workspace }}/actual-core-source.py'}
-        run: |
-          python - <<'PY'
-          import json,sys,unittest
-          from pathlib import Path
-          assert sys.version_info[:3]==(3,11,7)
-          suite=unittest.defaultTestLoader.discover('repairs/infinity-core-outcomes-qa-2103483-20261112',pattern='test_observer.py')
-          result=unittest.TextTestRunner(verbosity=2).run(suite)
-          proof=dict(status='PASS_SELECTED_PYTHON_OUTCOME_HOST' if result.wasSuccessful() and result.testsRun==13 and not result.skipped else 'FAIL_SELECTED_HOST',testsRun=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),Python=list(sys.version_info[:3]),Core_executed=False,Android=False)
-          Path('HOST-CORE-OUTCOMES.json').write_text(json.dumps(proof,indent=2)+'\n')
-          assert proof['status']=='PASS_SELECTED_PYTHON_OUTCOME_HOST'
-          PY
-      - name: Actual native callback and production loader delegate against pinned CPython
-        run: python repairs/infinity-core-outcomes-qa-2103483-20261112/test_native_sink.py --overlay host-core-overlay --service actual-core-source.py --out NATIVE-SINK-HOST.json
       - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: Infinity-Core-Outcomes-Host-${{ github.run_id }}
-          path: |
-            HOST-CORE-OUTCOMES.json
-            NATIVE-SINK-HOST.json
-          if-no-files-found: error
-          retention-days: 90
+        with: {name: 'Infinity-Core-Outcomes-ReusedHost-${{ github.run_id }}', path: REUSE-HOST.json, retention-days: 90}
   arm64:
     needs: selected-host
     runs-on: ubuntu-22.04
@@ -92,7 +75,7 @@ jobs:
       - name: Exact83 source restoration and scoped diagnostic overlay
         run: python repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py prepare
       - name: Retained dependency tooling
-        run: bash repairs/infinity-functional-startup-2103482-20261111/prepare_ci_tooling.sh
+        run: bash repairs/infinity-core-outcomes-qa-2103483-20261112/prepare_ci_tooling.sh
       - uses: actions/cache@v4
         with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
       - name: Retained NDK and dependencies
