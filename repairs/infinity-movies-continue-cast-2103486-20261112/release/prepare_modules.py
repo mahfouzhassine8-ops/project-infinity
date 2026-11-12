@@ -49,7 +49,7 @@ def stage(apk,out):
             '-signature',str(baseline/CC/(MANIFEST+'.sig')),str(baseline/CC/MANIFEST)],check=True,capture_output=True)
         source=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
         entries={}
-        for label,version in [('candidate','0.3.5.79'),('recovery','0.3.5.80')]:
+        for label,version in [('candidate','0.3.5.81'),('recovery','0.3.5.82')]:
             work=out/label;modules=work/'modules';shutil.copytree(baseline,modules)
             if label=='candidate':
                 for name in CHANGED|ADDED:(modules/CC/name).write_bytes((TASK/'overlay'/CC/name).read_bytes())

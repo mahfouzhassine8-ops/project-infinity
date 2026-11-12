@@ -20,7 +20,7 @@
     "Automatic baseline promotion or partial owner-facing APK"
   ],
   "selected_now": {
-    "host": "test_movie_routes: actual signed86 validator and target, existing installed-source hashes, exact route/identity, tamper/version refusal, TV negative controls, no progress on saving; native Movie actual-item fallback: current file/type/tag snapshots, exact URI IDs, race/contradiction refusal, no GUI reads/library ID claims",
+    "host": "test_movie_routes: actual signed86 validator and target, existing installed-source hashes, exact route/identity, tamper/version refusal, TV negative controls, no progress on saving; native Movie actual-item fallback: current file/type/tag snapshots, exact URI IDs, race/contradiction refusal, no GUI reads/library ID claims; native movie fallback with discarded untyped RPC item: exact native origin/type/clock snapshots, no HTTP source replay and no episode changes",
     "Android": "Selected: Cast SDK/resources/main-thread readiness in separate CI-only package on stock API36; not full Infinity playback or receiver transfer, no owner installer and no shutdown. Full combined movie/Continue Playing still pending.",
     "shutdown": "Only after corrected movie paths; independent workflow; no shutdown source changes",
     "Cast": "Existing SDK/resources and default APIs retained; current sender-only progressive relay: actual local HTTP range/HEAD, credentials/redirect isolation, peer/capability refusal, bounded cancellation/retirement on host; API36 separate-package local relay against original OkHttp plus existing SDK/UI checks. Not a real receiver/Infinity playback/Fold test.",
@@ -44,5 +44,6 @@
   ],
   "native_protected_changes": false,
   "native_reference_source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
-  "Cast_UI": "Dialog on existing Main activity: no Main/lifecycle/Activity-transition changes"
+  "Cast_UI": "Dialog on existing Main activity: no Main/lifecycle/Activity-transition changes",
+  "release_authorization": "Owner explicitly authorizes one complete original-key QA APK and forward recovery before the single physical Fold/receiver acceptance session; integrity/owner preservation gates mandatory. See release/OWNER-QA-AUTHORIZATION.json."
 }

@@ -92,7 +92,7 @@ with ZipFile(compile_lib,'a',ZIP_DEFLATED) as libs:
    for name in source.namelist():
     if not name.endswith('.class'):continue
     descriptor='L'+name[:-6]+';'
-    private=descriptor.startswith(('Lokhttp3/','Lokio/','Lkotlin/','Lcom/google/common/','Landroidx/concurrent/'))
+    private=descriptor.startswith(('Lokhttp3/','Lokio/','Lkotlin/','Lcom/google/common/','Landroidx/','Landroid/support/'))
     if descriptor in baseline and not private:
      reused.append(descriptor)
      if '/R$' in descriptor or descriptor.endswith('/R;'):

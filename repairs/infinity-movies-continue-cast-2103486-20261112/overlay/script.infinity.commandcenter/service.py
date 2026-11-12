@@ -840,9 +840,9 @@ def _continue_movie_route_item(item):
     inferred. A file/type/tag race or conflicting observed ID fails closed.
     """
     if (xbmc.getSkinDir() != 'skin.infinity.diggz' or not isinstance(item, dict)
-            or item.get('type') == 'episode' or not item.get('infinity_original_route')):
+            or item.get('type') == 'episode'):
         return None
-    from experience import native_movie_route_identity
+    from experience import native_movie_route_identity, stable_route
     try:
         player = xbmc.Player()
         if not player.isPlayingVideo():
@@ -854,20 +854,28 @@ def _continue_movie_route_item(item):
                     tag.getTitle(), playing.getProperty('Infinity.Resume.OriginalProvider'), tuple(str(tag.getUniqueID(name) or '').strip()
                                           for name in ('tmdb', 'tvdb', 'imdb')))
         before = snapshot()
-        if (before[2] != 'movie' or not before[3] or item.get('file') != before[0]
-                or before[4] != item['infinity_original_route']):
+        # The existing generic fallback returns {} when a non-library item
+        # has no IDs. Retain the exact native provenance at this same arming
+        # point instead of making that discarded RPC dictionary a prerequisite.
+        if (before[2] != 'movie' or not before[3] or not before[0] or not before[4]
+                or (item.get('file') and item['file'] != before[0])
+                or (item.get('infinity_original_route') and
+                    before[4] != item['infinity_original_route'])):
             return None
         raw = item.get('uniqueid') if isinstance(item.get('uniqueid'), dict) else {}
         tagged = dict(zip(('tmdb', 'tvdb', 'imdb'), before[5]))
         a, b = hub.verified_ids(raw), hub.verified_ids(tagged)
         if any(a[name] != b[name] for name in set(a) & set(b)):
             return None
-        proof = native_movie_route_identity(item['infinity_original_route'], dict(a, **b))
+        proof = native_movie_route_identity(before[4], dict(a, **b))
         if not proof:
             return None
         # A provider input ID is not a native movie database identity. Keep
         # normal Kodi resume/history ownership and the existing sync queue.
-        current = dict(item, type='movie', title=before[3], uniqueid=proof['ids'], id=-1)
+        current = dict(item, type='movie', title=before[3], file=before[0],
+                       infinity_original_route=before[4], uniqueid=proof['ids'], id=-1)
+        if not stable_route(before[0]):
+            current['infinity_transient_playback_source'] = True
         result = _continue_identity(current)
         if not player.isPlayingVideo() or snapshot() != before:
             return None

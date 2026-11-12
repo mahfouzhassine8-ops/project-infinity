@@ -9,7 +9,7 @@ import org.objectweb.asm.commons.*;
 public final class CastPrivateClasses {
     static final String PREFIX="assets/infinity/cast/privatehttp/";
     static String mapName(String name) {
-        for(String root:new String[]{"okhttp3/","okio/","kotlin/","com/google/common/","androidx/concurrent/"})
+        for(String root:new String[]{"okhttp3/","okio/","kotlin/","com/google/common/","androidx/","android/support/"})
             if(name.startsWith(root))return PREFIX+name;
         return name;
     }

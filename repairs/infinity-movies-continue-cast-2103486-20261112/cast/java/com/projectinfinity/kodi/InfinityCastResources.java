@@ -42,7 +42,7 @@ final class InfinityCastResources {
         if(loader!=null)return;
         if(Build.VERSION.SDK_INT<30)throw new IllegalStateException("Cast requires Android 11 or newer");
         String expected;
-        try(InputStream stream=context.getAssets().open("infinity-cast/RESOURCE-IDENTITY.json")) {
+        try(InputStream stream=context.getAssets().open("infinity/cast/RESOURCE-IDENTITY.json")) {
             ByteArrayOutputStream bytes=new ByteArrayOutputStream();
             byte[] buffer=new byte[1024];int count;
             while((count=stream.read(buffer))!=-1) {
@@ -63,7 +63,7 @@ final class InfinityCastResources {
         if(!target.exists()) {
             File temporary=File.createTempFile(".infinity-cast-resource-",".part",cache);
             try {
-                try(InputStream in=context.getAssets().open("infinity-cast/resources.apk");
+                try(InputStream in=context.getAssets().open("infinity/cast/resources.apk");
                     FileOutputStream out=new FileOutputStream(temporary)) {
                     byte[] data=new byte[65536];long total=0;int n;
                     while((n=in.read(data))!=-1) {

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "baseline": 2103486,
+  "baseline_APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+  "checkpoint": "34a4631f65cc1c139d39bece544636e591bdca52",
+  "authorized": ["Saved-movie native selection/playback handoff", "Qualifying movie playback into existing Continue Playing", "Infinity-only Cast player integration", "Original-key combined QA candidate and higher-version forward recovery"],
+  "owner_directive": "Do not require physical Fold testing or a real receiver test before creating the installable candidate. Those are owner acceptance tests after signing.",
+  "necessary_Cast_manifest_scope": "Two passive SDK application metadata nodes and one package visibility query only. No permission, component, startup, lifecycle, activity or existing attribute change.",
+  "signing_guards": "Preserve complete payload/owner/signature checks. Add only an exact source-bound Cast metadata transformation and its inverse recovery; never permit arbitrary manifest changes.",
+  "Cobra": "No existing source, classes, resources, data or behavior changes; Cast dependency implementation is private",
+  "shutdown_and_Python_startup": "Frozen; no code changes or test prerequisites",
+  "data": "No database migration, reset, profile replacement or fabricated progress",
+  "owner_acceptance": "PENDING_ONE_COMBINED_FOLD_SESSION",
+  "baseline_promotion": false
+}

@@ -46,7 +46,7 @@ with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub,ZipFile(AP
  next_dex=1+max(int(n[7:-4] or 1) for n in original.namelist() if re.fullmatch(r'classes\d*\.dex',n))
  for p in sorted((COMPONENT/'dex').glob('*.dex'))+sorted(dex.glob('*.dex')):
   out.writestr('classes'+str(next_dex)+'.dex',p.read_bytes());next_dex+=1
- for name in ('resources.apk','RESOURCE-IDENTITY.json'):out.write(COMPONENT/name,'assets/infinity-cast/'+name)
+ for name in ('resources.apk','RESOURCE-IDENTITY.json'):out.write(COMPONENT/name,'assets/infinity/cast/'+name)
  for p in (COMPONENT/'private-resources').rglob('*'):
   if p.is_file():out.write(p,p.relative_to(COMPONENT/'private-resources').as_posix())
 print('CI-only separate-package probe prepared; original installer/signature/data untouched')

@@ -3,7 +3,7 @@ from pathlib import Path
 import hashlib,json,os,subprocess,urllib.request
 
 PREFIX='assets.infinity.cast.privatehttp.'
-ROOTS=('okhttp3.','okio.','kotlin.','com.google.common.','androidx.concurrent.')
+ROOTS=('okhttp3.','okio.','kotlin.','com.google.common.','androidx.','android.support.')
 def rules(text):
     for root in ROOTS:text=text.replace(root,PREFIX+root)
     return text

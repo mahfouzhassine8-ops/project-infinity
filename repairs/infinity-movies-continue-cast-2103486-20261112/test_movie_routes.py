@@ -147,7 +147,7 @@ class MovieRoutes(unittest.TestCase):
         for route in ('plugin://plugin.video.thecrew/?action=play&tmdb=268', '/storage/test.mp4'):
             self.assertEqual(self.before.verified_source(entry, route), self.after.verified_source(entry, route))
 
-    def actual_movie(self, item=None, race=False, playing=True, native_route=None):
+    def actual_movie(self, item=None, race=False, playing=True, native_route=None, dropped_rpc=False):
         _, route = self.movie()
         raw = dict(type='movie', title='Fixture', uniqueid={}, file='https://media.invalid/public.mp4',
                    infinity_original_route=route)
@@ -171,7 +171,18 @@ class MovieRoutes(unittest.TestCase):
         nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and
                  n.name in ('_continue_identity', '_continue_movie_route_item')]
         exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), 'exec'), env)
-        return env['_continue_movie_route_item'](raw), calls
+        return env['_continue_movie_route_item']({} if dropped_rpc else raw), calls
+
+    def test_actual_native_movie_survives_generic_fallback_dropping_untyped_rpc_item(self):
+        result, calls = self.actual_movie(dropped_rpc=True)
+        self.assertEqual({'tmdb': '268'}, result['identity']['ids'])
+        self.assertEqual(-1, result['dbid'])
+        self.assertEqual('', result['source'])  # replay the verified provider, never the expiring stream
+        self.assertTrue(result['stable_source'].startswith('plugin://plugin.video.umbrella/'))
+        self.assertEqual(2, len(calls))
+        self.assertIsNone(self.actual_movie(dropped_rpc=True, native_route='')[0])
+        self.assertIsNone(self.actual_movie(dropped_rpc=True, race=True)[0])
+        self.assertIsNone(self.actual_movie(dropped_rpc=True, playing=False)[0])
 
     def test_actual_movie_route_supplies_exact_ids_without_guessing_a_library_id(self):
         result, calls = self.actual_movie()

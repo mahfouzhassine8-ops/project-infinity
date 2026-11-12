@@ -1,15 +1,19 @@
 {
   "APK": false,
+  "CC_versions": {
+    "candidate": "0.3.5.81",
+    "recovery": "0.3.5.82"
+  },
   "baseline_APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
   "expected_modules": {
     "candidate": {
-      "script.infinity.commandcenter/INFINITY-MODULES.v1": "4a6353ba5fbad9e542db7f726ea3b3f4b02ae923f571c3f52da977c4d4575821",
+      "script.infinity.commandcenter/INFINITY-MODULES.v1": "da54b8622e5a54850cd481a039d712e0be959a8c3c9033b7dee94d855a89e539",
       "script.infinity.commandcenter/INSTALL-BASELINE.v1": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
       "script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
       "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
       "script.infinity.commandcenter/SEARCH-STRUCTURES.json": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
       "script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
-      "script.infinity.commandcenter/addon.xml": "162b5b103a18da789d55da3e5f3b63a9b1aeca19a3bb587d1faaaaf2a45a0561",
+      "script.infinity.commandcenter/addon.xml": "dc530815be2945ac96c85d7bb87b8770381a3fde3b5af0d51e2839d32e9ea1b6",
       "script.infinity.commandcenter/cast_runtime.py": "da2b071f120487dce2f424d98c4f8a0040e11527f9caa0eaf4336c5bb3377690",
       "script.infinity.commandcenter/checkpoint_runtime.py": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
       "script.infinity.commandcenter/common.py": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
@@ -64,7 +68,7 @@
       "script.infinity.commandcenter/saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
       "script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
       "script.infinity.commandcenter/selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
-      "script.infinity.commandcenter/service.py": "32bef8764419f18834fcc7d9e14d291e4d5f2208998a0dfe710e10ad892e0399",
+      "script.infinity.commandcenter/service.py": "11a3d1e548f29fb7d36d25882125ebc2043499e0b9268a22c733d10366020aed",
       "script.infinity.commandcenter/skin_upgrade.py": "e3aadefa8345a78dc71bb9ab5ee428e947819d6e76576c772bb34e474b3eaedb",
       "script.infinity.commandcenter/structural_search.py": "dd0b200829fc63372ec88a0ba991bd98a7a3459f597853a5bc991a9e4e6693b3",
       "script.infinity.commandcenter/title_metadata.py": "115ac88c67e3fc9b3568ede2b3b019e10ab2829c6d0c14bef60d90d6248ad51e",
@@ -87,13 +91,13 @@
       "script.infinity.watchedbridge/default.py": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c"
     },
     "recovery": {
-      "script.infinity.commandcenter/INFINITY-MODULES.v1": "ca19492e2e2e7ad0fa2dd7926234ee1542b130824b574cb2f0227be20af0e8ca",
+      "script.infinity.commandcenter/INFINITY-MODULES.v1": "e4aea6e9b20431c111fa0cd864af13852a4dd8a60ed469e3c63f15994374e3e6",
       "script.infinity.commandcenter/INSTALL-BASELINE.v1": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
       "script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
       "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
       "script.infinity.commandcenter/SEARCH-STRUCTURES.json": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
       "script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
-      "script.infinity.commandcenter/addon.xml": "495fde6ea51740035851674381ad941af26df5bdf8004d52a42e51735869ea9b",
+      "script.infinity.commandcenter/addon.xml": "38347390977a01dd846584fd416d6cf8e701e4357373b236cfc22c146dd6bbae",
       "script.infinity.commandcenter/checkpoint_runtime.py": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
       "script.infinity.commandcenter/common.py": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
       "script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
@@ -170,20 +174,21 @@
       "script.infinity.watchedbridge/default.py": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c"
     }
   },
-  "note": "User authorized combined scope. Original-key module generation solely enables authenticated Android integration; not a standalone installer or final release PASS.",
+  "note": "Refresh required only for movie arming source correction. Earlier internal signed79/80 preserved; no owner APK issued. Owner explicitly accepts physical/receiver QA after signing.",
   "operation": "prepare-original86-movies-cast-modules",
   "owner_installer": false,
   "registry_mutation": false,
   "schema": 1,
   "source_bindings": {
-    "repairs/infinity-movies-continue-cast-2103486-20261112/SCOPE.json": "a7d124e8945d1d3cb4f65a6897c95cce0f8811b97fbea7ecbb1caf31bde23dee",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/SCOPE.json": "531dbf586f76c98177fe8161180f93e3742bba7d0128a7411589c54ed4d672fd",
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/cast_runtime.py": "da2b071f120487dce2f424d98c4f8a0040e11527f9caa0eaf4336c5bb3377690",
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/default.py": "1e671c44c6d0cfbb1e7c372e79843e292958b7f3ad59f06eb6756214169f494c",
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/experience.py": "c358be6a7aa18e7bc59d048b77911b44c6e6e3a8f5d7c3229fb1da8ae90bb2eb",
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/plugin.py": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/service.py": "32bef8764419f18834fcc7d9e14d291e4d5f2208998a0dfe710e10ad892e0399",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/service.py": "11a3d1e548f29fb7d36d25882125ebc2043499e0b9268a22c733d10366020aed",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/release/OWNER-QA-AUTHORIZATION.json": "a684a41be6799bbc58f5d3fac5503852e2b909c5cd7d7afbbef292ebd890942d",
     "repairs/infinity-movies-continue-cast-2103486-20261112/release/module_gate.py": "8cf2978b72180011426896ab707fa9499b67d5a28bc81bef6c86bbc256a028b3",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/release/prepare_modules.py": "edb5ea80edf7ea211fbf0a05e4992ef517e6a4560ee9073321082709b3e3fb62"
+    "repairs/infinity-movies-continue-cast-2103486-20261112/release/prepare_modules.py": "b426dcc8bf291af09402cfc8b5595452188addd4e7497a1de8a278eb9c181be7"
   },
   "workflow_sha256": "7960d4a9ca449c4b9b606204b301554895f8618252b8d8f9afb53dbdc33daee1"
 }

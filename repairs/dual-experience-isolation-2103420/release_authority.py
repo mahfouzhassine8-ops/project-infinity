@@ -30,6 +30,14 @@ def external_player_manifest_guard():
     module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
     return module
 
+def cast_manifest_guard():
+    """Fixed source-bound Cast-only metadata transformer and exact recovery."""
+    import importlib.util
+    path=HERE.parent/'infinity-movies-continue-cast-2103486-20261112/release/release_guard.py'
+    spec=importlib.util.spec_from_file_location('_infinity_cast_manifest_guard',path)
+    module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+    return module
+
 def guarded(key):
     if not key.startswith('class:Lcom/projectinfinity/kodi/'):return False
     return key.split('/')[-1].split('$')[0].rstrip(';') in GUARDED_ROOTS
@@ -61,7 +69,10 @@ def validate(authority):
     if 'launcher_icon_exception' in authority:
         launcher_icon_guard().validate(authority)
     if 'external_player_manifest_exception' in authority:
-        external_player_manifest_guard().validate(authority)
+        external_player_manifest_guard().validate(cast_manifest_guard().historical(authority)
+            if 'cast_manifest_exception' in authority else authority)
+    if 'cast_manifest_exception' in authority:
+        cast_manifest_guard().validate(authority)
     # The three displayed labels come from actual packaged metadata, not UI constants.
     # The third (app) version is read from Android's signed PackageInfo.
     labels=authority.get('experience_version_labels')
@@ -105,7 +116,9 @@ def transition(previous,proposed,targets):
         # The current user explicitly authorized only launcher artwork and safe
         # day/night resource selection.  All shared executable/native/manifest
         # and unrelated resource bytes remain subject to the original freeze.
-        if 'external_player_manifest_exception' in proposed:
+        if 'cast_manifest_exception' in proposed:
+            cast_manifest_guard().transition(previous,proposed,targets)
+        elif 'external_player_manifest_exception' in proposed:
             external_player_manifest_guard().transition(previous,proposed,targets)
         else:
             launcher_icon_guard().transition(previous,proposed,targets)
@@ -184,5 +197,8 @@ def verify_evidence(authority,read):
     if 'launcher_icon_exception' in authority:
         launcher_icon_guard().verify_evidence(authority,read)
     if 'external_player_manifest_exception' in authority:
-        external_player_manifest_guard().verify_evidence(authority,read)
+        external_player_manifest_guard().verify_evidence(cast_manifest_guard().historical(authority)
+            if 'cast_manifest_exception' in authority else authority,read)
+    if 'cast_manifest_exception' in authority:
+        cast_manifest_guard().verify_evidence(authority,read)
     return True
