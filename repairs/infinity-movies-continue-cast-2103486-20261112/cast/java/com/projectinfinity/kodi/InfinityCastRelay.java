@@ -31,6 +31,8 @@ import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.ConnectionPool;
 import okhttp3.CookieJar;
+import okhttp3.Cookie;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -58,6 +60,39 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private final String path;
     private final Resource root;
     private final OkHttpClient upstream;
+    private final CookieStore cookies=new CookieStore();
+    /** Per-transfer RAM only. Standard cookie domain/path/secure/expiry rules. */
+    private static final class CookieStore implements CookieJar {
+        private static final class Entry {
+            final Cookie cookie;final String origin;
+            Entry(Cookie cookie,String origin){this.cookie=cookie;this.origin=origin;}
+        }
+        private final java.util.LinkedHashMap<String,Entry> values=new java.util.LinkedHashMap<>();
+        private static String origin(URI uri){return uri.getScheme().toLowerCase(Locale.ROOT)+"://"+uri.getHost().toLowerCase(Locale.ROOT)+":"+(uri.getPort()>=0?uri.getPort():"https".equalsIgnoreCase(uri.getScheme())?443:80);}
+        @Override public synchronized void saveFromResponse(HttpUrl url,java.util.List<Cookie> incoming) {
+            String owner=origin(url.uri());
+            for(Cookie cookie:incoming) {
+                if(cookie.name().length()+cookie.value().length()+cookie.domain().length()+cookie.path().length()>4096)continue;
+                String key=owner+"|"+cookie.domain()+"|"+cookie.path()+"|"+cookie.name();values.remove(key);values.put(key,new Entry(cookie,owner));
+                while(values.size()>128)values.remove(values.keySet().iterator().next());
+            }
+        }
+        @Override public java.util.List<Cookie> loadForRequest(HttpUrl url){return Collections.emptyList();}
+        synchronized String header(URI target,String explicit) throws IOException {
+            java.util.LinkedHashMap<String,String> merged=new java.util.LinkedHashMap<>();
+            if(explicit!=null)for(String field:explicit.split(";")){int eq=field.indexOf('=');if(eq>0)merged.put(field.substring(0,eq).trim(),field.substring(eq+1).trim());}
+            long now=System.currentTimeMillis();HttpUrl url=HttpUrl.get(target);String owner=origin(target);
+            for(Entry entry:values.values()) {
+                Cookie cookie=entry.cookie;
+                if(owner.equals(entry.origin) && cookie.matches(url)) {
+                    if(cookie.expiresAt()<=now)merged.remove(cookie.name());else merged.put(cookie.name(),cookie.value());
+                }
+            }
+            StringBuilder result=new StringBuilder();for(Map.Entry<String,String> e:merged.entrySet()){if(result.length()>0)result.append("; ");result.append(e.getKey()).append('=').append(e.getValue());}
+            if(result.length()>16384)throw new IOException("source_cookie_limit");return result.toString();
+        }
+        synchronized void clear(){values.clear();}
+    }
     private final Map<String,Resource> resources=new ConcurrentHashMap<>();
     private final Map<String,String> ids=new ConcurrentHashMap<>();
     private final Map<String,Template> templates=new ConcurrentHashMap<>();
@@ -73,7 +108,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private InfinityCastRelay(InetAddress receiver,InetAddress local,InfinityCastSource source) throws IOException {
         this.receiver=receiver;this.source=source;
         path="/"+UUID.randomUUID().toString().replace("-","");root=new Resource(source.uri,InfinityCastAdaptive.Kind.MEDIA,source.hint);
-        upstream=new OkHttpClient.Builder().cookieJar(CookieJar.NO_COOKIES).authenticator(Authenticator.NONE)
+        upstream=new OkHttpClient.Builder().cookieJar(cookies).authenticator(Authenticator.NONE)
             .proxyAuthenticator(Authenticator.NONE).followRedirects(false).followSslRedirects(false)
             .retryOnConnectionFailure(false).cache(null).connectionPool(new ConnectionPool(6,5,TimeUnit.SECONDS))
             .connectTimeout(3500,TimeUnit.MILLISECONDS).readTimeout(8000,TimeUnit.MILLISECONDS)
@@ -195,6 +230,8 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             Request.Builder request=new Request.Builder().url(target.toASCIIString()).method(method,null)
                 .header("Accept-Encoding","identity").header("User-Agent","InfinityCast/1");
             if(privateHeaders)for(Map.Entry<String,String> header:(resource==root || resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH?source.headers:source.streamHeaders).entrySet())request.header(header.getKey(),header.getValue());
+            String explicit=privateHeaders?(resource==root || resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH?source.headers:source.streamHeaders).get("cookie"):null;
+            String cookie=cookies.header(target,explicit);if(!cookie.isEmpty())request.header("Cookie",cookie);
             if(range!=null)request.header("Range",range);
             Call call=upstream.newCall(request.build());calls.add(call);
             if(closed){call.cancel();calls.remove(call);throw new IOException("transport_closed");}
@@ -326,6 +363,6 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         try{lifecycle.execute(()->{cancelCalls();ownerDone=true;retired();});}catch(RuntimeException full){/* accept owner still closes and retires */}
     }
     private void retired() {
-        if(closed && ownerDone && jobs.get()==0)synchronized(InfinityCastRelay.class){if(active==this){active=null;InfinityCastDiagnostics.event("relay","retired",0);}}
+        if(closed && ownerDone && jobs.get()==0)synchronized(InfinityCastRelay.class){if(active==this){cookies.clear();active=null;InfinityCastDiagnostics.event("relay","retired",0);}}
     }
 }

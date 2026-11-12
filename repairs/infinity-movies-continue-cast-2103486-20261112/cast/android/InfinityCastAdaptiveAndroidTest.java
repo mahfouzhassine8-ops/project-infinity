@@ -36,9 +36,12 @@ final class InfinityCastAdaptiveAndroidTest {
                         type="application/dash+xml";body="<MPD xmlns=\"urn:mpeg:dash:schema:mpd:2011\"><Period><AdaptationSet><Representation id=\"video\" bandwidth=\"100\"><SegmentTemplate initialization=\"init.mp4?secret=init\" media=\"segment-$Number%05d$.m4s?secret=segment\" duration=\"2\"/></Representation></AdaptationSet></Period></MPD>";
                     } else if(target.startsWith("/private/movie.m3u8")) {
                         type="application/vnd.apple.mpegurl";body="#EXTM3U\n#EXT-X-TARGETDURATION:2\n#EXT-X-MAP:URI=\"init.mp4?secret=init\"\n#EXTINF:2,\nsegment.m4s?secret=segment\n#EXT-X-ENDLIST\n";
-                    } else {type="video/mp4";body="fixture-media";}
+                    } else {
+                        if(!request.contains("cookie: SourceSession=sender-private"))throw new IOException("response cookie lost");
+                        type="video/mp4";body="fixture-media";
+                    }
                     byte[] data=body.getBytes(StandardCharsets.UTF_8);
-                    socket.getOutputStream().write(("HTTP/1.1 200 OK\r\nContent-Type: "+type+"\r\nContent-Length: "+data.length+"\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.US_ASCII));if(!head)socket.getOutputStream().write(data);
+                    socket.getOutputStream().write(("HTTP/1.1 200 OK\r\nContent-Type: "+type+"\r\nContent-Length: "+data.length+"\r\nSet-Cookie: SourceSession=sender-private; Path=/private/\r\nConnection: close\r\n\r\n").getBytes(StandardCharsets.US_ASCII));if(!head)socket.getOutputStream().write(data);
                 } catch(Exception stopped){if(!closing.get())return;}
             },"CIOnlyAdaptiveSource");worker.setDaemon(true);worker.start();
             for(String name:new String[]{"movie.m3u8","movie.mpd"}) {
@@ -50,7 +53,7 @@ final class InfinityCastAdaptiveAndroidTest {
                 while(link.find())if(!link.group().contains("$")){if(!get(link.group()).equals("fixture-media"))throw new IOException("segment delivery failed");fetched=true;break;}
                 if(!fetched)throw new IOException("no rewritten init/segment endpoint");drain(relay);relay=null;
             }
-            return new JSONObject().put("pass",true).put("actual_Android_HLS_DASH_rewrite_and_segment_HTTP",true).put("property_auth_headers_preserved",authenticated.get()>4).put("drained",true).put("real_receiver",false).put("decoder",false);
+            return new JSONObject().put("pass",true).put("actual_Android_HLS_DASH_rewrite_and_segment_HTTP",true).put("property_auth_headers_preserved",authenticated.get()>4).put("origin_scoped_response_cookies",true).put("drained",true).put("real_receiver",false).put("decoder",false);
         } catch(Exception | LinkageError failure) {
             try{return new JSONObject().put("pass",false).put("reason",failure.getClass().getSimpleName());}catch(Exception ignored){return new JSONObject();}
         } finally{closing.set(true);if(relay!=null)relay.close();if(origin!=null)try{origin.close();}catch(IOException ignored){}}

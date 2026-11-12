@@ -1,6 +1,6 @@
 {
   "Android": "PENDING_REAL_COMPONENT_AND_ARM64",
-  "adaptive_authenticated_HTTP_decode_seek_checks": 51,
+  "adaptive_authenticated_HTTP_decode_seek_checks": 57,
   "adaptive_coverage": [
     "HLS MPEG-TS",
     "HLS fragmented MP4",
@@ -13,13 +13,14 @@
     "credential/private source URL isolation",
     "DRM and XML external entity refusal",
     "owned HTTP/socket cancellation and retirement",
-    "GET-authorized signed media is not rejected solely because HEAD is forbidden"
+    "GET-authorized signed media is not rejected solely because HEAD is forbidden",
+    "Origin-scoped bounded RAM response cookies, cookie-gated media decode and cross-origin cookie non-disclosure"
   ],
   "native_compile_correction": "Actual engine CGUIWindow supports SetProperty, not ClearProperty; only the Cast-owned property reset changed",
   "native_host": "Actual Cast translation unit with mocked Kodi/GUI/message backends PASS; terminal retired/oversized outcomes, source-bound RAM channel and pure release after playback stop/checkpoint admission closure",
   "native_source_sha256": "1bde0e765978944548eacccaec339c5167fb7d1de4d32618082d41b7a0e2e0f4",
   "owner_diagnostics_ZIPs": "Named but their bytes are not exposed in this workspace; no claim of reading their exact ownership blockers",
-  "progressive_HTTP_checks": 34,
+  "progressive_HTTP_checks": 38,
   "real_Cast_receiver": "NOT_RUN_OWNER_AFTER_SIGNING",
   "release_guard_cases": 6,
   "shutdown": "NOT_RUN_NO_SHUTDOWN_SOURCE_CHANGE",
@@ -31,7 +32,7 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastNative.java": "5dd3337db1223b8a0c4fd5d7d848831eca9366f8eeb947ace8d6b044f5992e9f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "097eb56dfc0ffc8134cccbdce7d058639182dc4f627753f91f993145187d8fa4",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "9a32c8fe574128b75410580a7e2f0a6f7fa78e64a471a7de16bf05313ed7f783",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastResources.java": "0dd41e1f13162c0f9cb0c19b15f05b8c40561bfa7e0ae32f6b23a6d013f848c4",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRpc.java": "ca5f9be8be9677cd67581db470b2fcc62da842e04158795aff30ac908f4cf85b",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "ff8a4f2aeb6d17737d5d2f409f53a0de7dbdd9b71317d0903d0090645bf806de",

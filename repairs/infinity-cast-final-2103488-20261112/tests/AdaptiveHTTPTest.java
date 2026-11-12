@@ -44,8 +44,14 @@ public final class AdaptiveHTTPTest {
         server.setExecutor(Executors.newFixedThreadPool(8,r->{Thread t=new Thread(r,"AdaptiveFixture");t.setDaemon(true);return t;}));
         server.createContext("/",e->{
             String path=e.getRequestURI().getPath();Path file=root.resolve(path.substring(1)).normalize();
-            if(!file.startsWith(root) || !Files.isRegularFile(file)){e.sendResponseHeaders(404,-1);e.close();return;}
-            if(!path.contains("drm") && !path.contains("entity") && !("Bearer private".equals(e.getRequestHeaders().getFirst("Authorization")) && "fixture=secret".equals(e.getRequestHeaders().getFirst("Cookie")))){denied.incrementAndGet();e.sendResponseHeaders(403,-1);e.close();return;}
+            if(!file.startsWith(root) || (!path.startsWith("/private/cookie/") && !Files.isRegularFile(file))){e.sendResponseHeaders(404,-1);e.close();return;}
+            boolean cookieSource=path.startsWith("/private/cookie/");
+            if(cookieSource) {
+                e.getResponseHeaders().set("Set-Cookie","CastSession=private-only; Path=/private/cookie/; HttpOnly");
+                if(!path.endsWith(".m3u8") && !"CastSession=private-only".equals(e.getRequestHeaders().getFirst("Cookie"))){denied.incrementAndGet();e.sendResponseHeaders(403,-1);e.close();return;}
+                file=root.resolve("private/hls/"+path.substring("/private/cookie/".length()));
+            }
+            if(!cookieSource && !path.contains("drm") && !path.contains("entity") && !("Bearer private".equals(e.getRequestHeaders().getFirst("Authorization")) && "fixture=secret".equals(e.getRequestHeaders().getFirst("Cookie")))){denied.incrementAndGet();e.sendResponseHeaders(403,-1);e.close();return;}
             String fixtureHeader=e.getRequestHeaders().getFirst("X-Cast-Fixture");
             if(fixtureHeader!=null && !(path.endsWith(".m3u8")?"manifest":"stream").equals(fixtureHeader)){denied.incrementAndGet();e.sendResponseHeaders(403,-1);e.close();return;}
             authenticated.incrementAndGet();byte[] data=Files.readAllBytes(file);String type=path.endsWith(".m3u8")?"application/vnd.apple.mpegurl":path.endsWith(".mpd")?"application/dash+xml":path.endsWith(".ts")?"video/mp2t":path.endsWith(".m4s") || path.endsWith(".mp4")?"video/mp4":"application/octet-stream";
@@ -61,6 +67,8 @@ public final class AdaptiveHTTPTest {
                 check(!manifest.contains("root-token") && !manifest.contains("fixture-token") && !manifest.contains("/private/") && !manifest.contains("Authorization") && !manifest.contains("Cookie"),"rewritten manifest never exposes source or credentials");
                 decode(r.address(),false);decode(r.address(),true);retire(r);
             }
+            InfinityCastRelay cookieRelay=relay(InfinityCastSource.parse(base+"/private/cookie/movie.m3u8"));
+            check(!text(cookieRelay.address()).contains("private-only"),"source response cookies remain sender-private");decode(cookieRelay.address(),false);decode(cookieRelay.address(),true);retire(cookieRelay);
             check(InfinityCastSource.parse(base+"/private/hls/movie.m3u8", "Authorization=Bearer%20private", "Authorization=Bearer%20private",true)==null,"declared inputstream DRM refused");
             InfinityCastRelay properties=relay(InfinityCastSource.parse(base+"/private/hls/movie.m3u8", "Authorization=Bearer%20private&Cookie=fixture%3Dsecret&X-Cast-Fixture=manifest", "Authorization=Bearer%20private&Cookie=fixture%3Dsecret&X-Cast-Fixture=stream",false));
             decode(properties.address(),false);check(text(properties.address()+"?_HLS_msn=1&_HLS_part=0").startsWith("#EXTM3U"),"bounded HLS reload query preserved through private sender URI");retire(properties);

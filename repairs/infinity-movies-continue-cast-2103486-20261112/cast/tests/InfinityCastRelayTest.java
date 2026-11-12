@@ -59,6 +59,7 @@ public final class InfinityCastRelayTest {
         };
         origin.createContext("/private/",serve);other.createContext("/private/",serve);
         origin.createContext("/redirect.mp4",e->{e.getResponseHeaders().set("Location",destination+"/private/other.mp4");e.sendResponseHeaders(302,-1);e.close();});
+        origin.createContext("/cookie-redirect.mp4",e->{e.getResponseHeaders().set("Set-Cookie","RootSecret=source-private; Path=/");e.getResponseHeaders().set("Location",destination+"/private/other.mp4");e.sendResponseHeaders(302,-1);e.close();});
         origin.createContext("/get-only.mp4",e->{if(e.getRequestMethod().equals("HEAD")){e.sendResponseHeaders(403,-1);e.close();}else serve.handle(e);});
         origin.createContext("/unsupported.mp4",e->{e.getResponseHeaders().set("Content-Type","application/vnd.apple.mpegurl");e.sendResponseHeaders(200,-1);e.close();});
         CountDownLatch stalled=new CountDownLatch(1),release=new CountDownLatch(1);
@@ -95,7 +96,8 @@ public final class InfinityCastRelayTest {
             relay=start(base+"/get-only.mp4");check(new String(request(relay.address(),"GET","","","127.0.0.1"),StandardCharsets.ISO_8859_1).startsWith("HTTP/1.1 200"),"a source that authorizes GET but rejects HEAD remains castable");retired(relay);
             observed.clear();relay=start(base+"/redirect.mp4|Authorization=Bearer%20private&Cookie=session%3Dprivate");
             request(relay.address(),"GET","","","127.0.0.1");
-            check(observed.size()==2 && observed.stream().allMatch(v->v.startsWith("null|null|")),"cross-origin redirect permanently strips private headers");retired(relay);
+            check(observed.size()==2 && observed.stream().allMatch(v->v.startsWith("null|") && !v.contains("session=private")),"cross-origin redirect strips sender credentials; destination may reuse its own response cookie");retired(relay);
+            observed.clear();relay=start(base+"/cookie-redirect.mp4");request(relay.address(),"GET","","","127.0.0.1");check(observed.size()==2 && observed.stream().noneMatch(v->v.contains("RootSecret") || v.contains("source-private")),"source-issued cookies are origin-scoped across redirects, including port changes");retired(relay);
             CountDownLatch failed=new CountDownLatch(1);AtomicReference<String> reason=new AtomicReference<>();
             relay=InfinityCastRelay.start(InetAddress.getByName("127.0.0.1"),InfinityCastSource.parse(base+"/unsupported.mp4"),(r,m,f)->{reason.set(f);failed.countDown();});
             check(failed.await(6,TimeUnit.SECONDS) && reason.get()!=null,"unsupported MIME reports failure");retired(relay);
