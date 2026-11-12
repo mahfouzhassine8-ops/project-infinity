@@ -1,5 +1,5 @@
 {
-  "status": "BLOCKED_INSTALLED_NATIVE_EFFECT_AND_COMPLETION_CONTRACT_UNPROVEN",
+  "status": "INSTALLED_IDENTITY_RESOLVED_UNSHIPPED_SOURCE_CANDIDATE_NATIVE_CONTRACT_PENDING",
   "protected_baseline": 2103483,
   "baseline_source": "2021a76c99c570f526965a169025f4b39b2f6488",
   "owner_report": {
@@ -28,12 +28,12 @@
     "process_termination": "NOT_RUN",
     "same_profile_relaunch": "NOT_RUN",
     "retained_owner_data_acceptance": "NOT_RUN",
-    "successor_signing": "NOT_RUN"
+    "successor_signing": "NOT_RUN",
+    "new_host_source_cases": "SELECTED_NOT_RUN"
   },
   "current_blockers": [
-    "Actual installed service/native image identities and effects unknown",
-    "Metadata targets/results not supplied by audit-only observations",
-    "No verified native quiescence or bounded protected-effect/durability contract"
+    "Matching native1.0.1 stop/drain/effect implementation contract unproven",
+    "Per-attempt outcomes and successful native-start history not present for the19:18 session"
   ],
   "preservation": {
     "Cobra_changed": false,
@@ -46,5 +46,7 @@
   "evidence": "REFERENCE-CONTRACT-RESULT.json",
   "review": "Targeted GPT6.1 read-only review: no safe production exemption/retirement adapter justified; no broad audit or duplicate tests",
   "private_Nov11_summary": "READ; original ZIP and installed Core bytes not attached to Page",
-  "existing_artifact_search": "EXISTING-ARTIFACT-SEARCH.json"
+  "existing_artifact_search": "EXISTING-ARTIFACT-SEARCH.json",
+  "identity": "INSTALLED-IDENTITY-MATCH.json",
+  "unshipped_candidate": "CANDIDATE.json"
 }

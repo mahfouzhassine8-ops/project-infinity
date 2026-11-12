@@ -17,5 +17,29 @@
   "owner_data_access": false,
   "service_disabled": false,
   "shutdown_safety_bypassed": false,
-  "raw_diagnostic_committed": false
+  "raw_diagnostic_committed": false,
+  "actual_installed_identity": {
+    "source": "Owner ADB evidence supplied in this turn; hashes match independently held bytes",
+    "addon_version": "1.0.2",
+    "native_version": "1.0.1",
+    "service_sha256": "2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3",
+    "library_sha256": "c4a8a8d1e046cab6a42934b8fba31246efb21a002a90beb2bffa555623a383a9"
+  },
+  "authorized_source_candidates": [
+    "Exact Infinity process suffix to package identity mapping, unshipped pending native contract",
+    "Truthful stop return/error reporting with no durability receipt, unshipped"
+  ],
+  "selected_new_host_cases": [
+    "Original exact process reaches external fallback",
+    "Exact Infinity process uses correct package-private staging",
+    "Other process identities unchanged",
+    "Failed load never calls native start",
+    "Return1 never interpreted as native completion",
+    "Stop exception reported without false success or exception message exposure",
+    "No native handle means no native stop call",
+    "Only start_engine/run_kodi_service AST bodies differ",
+    "Unknown source generation rejected",
+    "Preparation unshipped/read-only input/no output overwrite"
+  ],
+  "selected_new_host_environment": "Manual existing Core host workflow; CPython3.11.7; fake filesystem and native callable boundaries only; no actual library, Kodi, phone, shutdown or APK execution"
 }

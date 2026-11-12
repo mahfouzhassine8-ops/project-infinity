@@ -11,6 +11,7 @@ permissions:
   contents: read
 jobs:
   focused-source-tests:
+    if: github.ref != 'refs/heads/work/infinity-2103483-native-writer-shutdown-20261112'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -22,3 +23,47 @@ jobs:
         run: |
           python -m compileall -q repairs/infinity-close-startup-2103480-20261110/provider-compat/service.adulthideout.core/service.py
           python -m unittest discover -s repairs/infinity-close-startup-2103480-20261110/provider-compat -p 'test_core_loader_guard.py' -v
+  installed83-source-corrections:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-2103483-native-writer-shutdown-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      CORE_SOURCE: '${{ github.workspace }}/verified-installed-match-service.py'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Bind publisher source to owner-confirmed installed hash; never execute native Core
+        run: |
+          curl --fail --silent --show-error --max-time 60 https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/service.py -o "$CORE_SOURCE"
+          python repairs/infinity-native-writer-shutdown-2103483-20261112/prepare_service_candidate.py --source "$CORE_SOURCE" --out core-source-UNSHIPPED
+      - name: Selected ten host source cases only; no native activation or Android acceptance
+        run: |
+          python - <<'PY'
+          import hashlib,json,os,sys,unittest
+          from pathlib import Path
+          assert sys.version_info[:3]==(3,11,7)
+          task=Path('repairs/infinity-native-writer-shutdown-2103483-20261112')
+          suite=unittest.defaultTestLoader.discover(str(task),pattern='test_service_candidate.py')
+          result=unittest.TextTestRunner(verbosity=2).run(suite)
+          passed=result.wasSuccessful() and result.testsRun==10
+          proof=dict(status='PASS_TEN_HOST_SOURCE_CASES_NO_NATIVE_ACTIVATION' if passed else 'FAIL_SELECTED_HOST_CASES',
+            source=os.environ['GITHUB_SHA'],python=list(sys.version_info[:3]),testsRun=result.testsRun,
+            failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),
+            hashes={f.name:hashlib.sha256(f.read_bytes()).hexdigest() for f in (task/'prepare_service_candidate.py',task/'test_service_candidate.py')},
+            native_Core_executed=False,Android=False,native_completion_proven=False,activation_allowed=False)
+          Path('core-source-UNSHIPPED/HOST-SOURCE-RESULT.json').write_text(json.dumps(proof,indent=2)+'\n')
+          print(json.dumps(proof,sort_keys=True))
+          raise SystemExit(0 if passed else 1)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity83-Core-Source-Host-${{ github.run_id }}-NO-INSTALLER-DO-NOT-DEPLOY
+          path: |
+            core-source-UNSHIPPED/*.json
+            core-source-UNSHIPPED/*.patch
+          retention-days: 90
+          if-no-files-found: error

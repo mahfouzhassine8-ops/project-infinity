@@ -1,0 +1,23 @@
+--- installed-1.0.2/service.py
++++ unshipped/service.py
+@@ -431,0 +432,4 @@
++                    # Infinity's engine process suffix is not part of its
++                    # Android package/private directory identity.
++                    if pkg_name == "com.projectinfinity.kodi:kodi":
++                        pkg_name = "com.projectinfinity.kodi"
+@@ -659 +663 @@
+-    # Clean shutdown
++    # Python service retirement is not a native durability receipt.
+@@ -662,3 +666,6 @@
+-            loaded_lib.stop_core_service()
+-        except Exception:
+-            pass
++            result = loaded_lib.stop_core_service()
++            _log(f"Native stop requested (result={result}); completion is unverified",
++                 xbmc.LOGWARNING if xbmc else None)
++        except Exception as exc:
++            _log(f"Native stop failed ({type(exc).__name__}); completion is unverified",
++                 xbmc.LOGWARNING if xbmc else None)
+@@ -672 +679 @@
+-    _log("Service stopped cleanly.")
++    _log("Python service stopped; native completion remains unverified.")
