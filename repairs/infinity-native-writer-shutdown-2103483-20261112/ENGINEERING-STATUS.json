@@ -1,0 +1,48 @@
+{
+  "status": "BLOCKED_INSTALLED_NATIVE_EFFECT_AND_COMPLETION_CONTRACT_UNPROVEN",
+  "protected_baseline": 2103483,
+  "baseline_source": "2021a76c99c570f526965a169025f4b39b2f6488",
+  "owner_report": {
+    "when": "November11 19:18:12",
+    "failed": [
+      "native_admission",
+      "python_services"
+    ],
+    "other_owners_complete": 15,
+    "source": "User-supplied summary; original newer diagnostic not available here"
+  },
+  "new_verified": [
+    "Actual83 audit/retirement/protected-seal header hashes match actual original native build map",
+    "Pinned publisher ARM64 image matches publisher manifest",
+    "Static native stop/running flag accesses recorded without inferring worker join or durability"
+  ],
+  "reused": [
+    "Prior copy2 metadata/load audit fingerprint",
+    "Existing fail-closed native ledger/coordinator host cases",
+    "Signed83 ARM64/startup evidence; no shutdown claim"
+  ],
+  "production_changes": [],
+  "gates": {
+    "correction_ARM64": "NOT_RUN_NO_JUSTIFIED_COMPLETE_PATCH",
+    "same_profile_shutdown": "NOT_RUN",
+    "process_termination": "NOT_RUN",
+    "same_profile_relaunch": "NOT_RUN",
+    "retained_owner_data_acceptance": "NOT_RUN",
+    "successor_signing": "NOT_RUN"
+  },
+  "current_blockers": [
+    "Actual installed service/native image identities and effects unknown",
+    "Metadata targets/results not supplied by audit-only observations",
+    "No verified native quiescence or bounded protected-effect/durability contract"
+  ],
+  "preservation": {
+    "Cobra_changed": false,
+    "service_disabled": false,
+    "safety_waived": false,
+    "owner_data_accessed": false,
+    "original83_artifact_changed": false,
+    "registry_changed": false
+  },
+  "evidence": "REFERENCE-CONTRACT-RESULT.json",
+  "review": "Targeted GPT6.1 read-only review: no safe production exemption/retirement adapter justified; no broad audit or duplicate tests"
+}
