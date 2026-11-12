@@ -37,7 +37,8 @@ final class InfinityCastAdaptiveAndroidTest {
                     } else if(target.startsWith("/private/movie.m3u8")) {
                         type="application/vnd.apple.mpegurl";body="#EXTM3U\n#EXT-X-TARGETDURATION:2\n#EXT-X-MAP:URI=\"init.mp4?secret=init\"\n#EXTINF:2,\nsegment.m4s?secret=segment\n#EXT-X-ENDLIST\n";
                     } else {
-                        if(!request.contains("cookie: SourceSession=sender-private"))throw new IOException("response cookie lost");
+                        java.util.regex.Matcher cookie=Pattern.compile("(?im)^cookie:[ \t]*([^\\r\\n]*)").matcher(request);
+                        if(!cookie.find() || !cookie.group(1).equals("SourceSession=sender-private"))throw new IOException("response cookie lost");
                         type="video/mp4";body="fixture-media";
                     }
                     byte[] data=body.getBytes(StandardCharsets.UTF_8);

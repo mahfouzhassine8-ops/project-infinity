@@ -69,7 +69,7 @@ def compiled(r):
   if p.is_file():c.require(c.sha(p)==source_map[p.relative_to(OLD/'native/overlay').as_posix()],'EXACT_NATIVE_CAST_SOURCE')
  sdk_root=c.obtain(r['inputs']['sdk'],'final-sdk');component=c.unique(sdk_root,'COMPONENT-RESULT.json').parent;proof=c.load(component/'COMPONENT-RESULT.json');android=c.load(c.unique(sdk_root,'ANDROID-CAST-COMPONENT.json'))
  c.require(proof['baseline_APK_sha256']==c.BASE and not proof['duplicate_classes'] and not proof['Cobra_owned_type_references'] and not proof['missing_baseline_APIs'],'PRIVATE_CAST_ABI_AND_COBRA_ISOLATION')
- c.require(android['pass'] is True and android['failed_transfer_cleanup'] is True and android['failed_transfer_cleanup_cycles']==5,'ACTUAL_ANDROID_CAST_COMPONENT_AND_FAILED_CLEANUP')
+ c.require(android['pass'] is True and android['failed_transfer_cleanup'] is True and android['failed_transfer_cleanup_cycles']==5 and android['idle_callback_released'] is True and android['relay']['adaptive']['origin_scoped_response_cookies'] is True,'ACTUAL_ANDROID_CAST_COMPONENT_AND_FAILED_CLEANUP')
  for n,h in proof['feature_Java_sha256'].items():c.require(c.sha(OLD/'cast'/n)==h,'COMPILED_FINAL_CAST_JAVA:'+n)
  for n,h in proof['build_inputs'].items():c.require(c.sha(OLD/n)==h,'COMPILED_FINAL_CAST_INPUT:'+n)
  c.require(list(proof['dex'])==['classes.dex'],'ONE_EXISTING_CAST_DEX_REPLACEMENT')
