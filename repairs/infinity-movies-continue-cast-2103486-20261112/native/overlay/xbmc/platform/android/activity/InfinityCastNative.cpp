@@ -35,7 +35,7 @@ enum class Phase { Free, Queued, Running, Done };
 
 struct Slot
 {
-  MESSAGING::ThreadMessageCallback callback{};
+  KODI::MESSAGING::ThreadMessageCallback callback{};
   uint64_t id{0};
   Phase phase{Phase::Free};
   bool cancelled{false};
@@ -224,7 +224,9 @@ void Run(void* pointer)
   {
     result = Error("native_operation_failed");
   }
-  const std::string encoded = CJSONVariantWriter::Write(result, false);
+  std::string encoded;
+  if (!CJSONVariantWriter::Write(result, encoded, true))
+    encoded = "{\"status\":\"error\",\"reason\":\"native_result_encode_failed\"}";
   std::lock_guard<std::mutex> lock(state.mutex);
   slot.result = encoded;
   slot.phase = slot.consumed ? Phase::Free : Phase::Done;

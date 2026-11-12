@@ -39,10 +39,10 @@ public:
   std::map<std::string,CVariant> fields;
 };
 struct CJSONVariantWriter {
-  static std::string Write(const CVariant& x, bool) {
-    std::string result="{";
-    for(const auto& entry:x.fields) result+='"'+entry.first+'"'+':'+entry.second.value+',';
-    return result+'}';
+  static bool Write(const CVariant& x, std::string& result, bool) {
+    result="{";bool first=true;
+    for(const auto& entry:x.fields) {if(!first)result+=',';first=false;result+='"'+entry.first+'"'+':'+entry.second.value;}
+    result+='}';return true;
   }
 };
 struct CVideoInfoTag { std::string m_type="movie",m_strTitle="Fixture"; int m_iSeason=-1,m_iEpisode=-1; };
@@ -78,11 +78,11 @@ struct Application {
   std::shared_ptr<CFileItem> CurrentFileItemPtr() { return item; }
 };
 inline Application g_application;
-namespace MESSAGING { struct ThreadMessageCallback { void(*callback)(void*);void* userptr; }; }
+namespace KODI { namespace MESSAGING { struct ThreadMessageCallback { void(*callback)(void*);void* userptr; }; } }
 constexpr int TMSG_CALLBACK=800;
 struct Messenger {
-  std::vector<MESSAGING::ThreadMessageCallback*> pending;
-  void PostMsg(int,int,int,void* p) { pending.push_back(static_cast<MESSAGING::ThreadMessageCallback*>(p)); }
+  std::vector<KODI::MESSAGING::ThreadMessageCallback*> pending;
+  void PostMsg(int,int,int,void* p) { pending.push_back(static_cast<KODI::MESSAGING::ThreadMessageCallback*>(p)); }
   void Drain() { auto queue=pending;pending.clear();for(auto* cb:queue) cb->callback(cb->userptr); }
 };
 inline Messenger messenger;
