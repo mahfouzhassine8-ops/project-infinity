@@ -20,6 +20,7 @@ ENGINE86='b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635'
 CERT='d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7'
 CPP='xbmc/platform/android/activity/InfinityCastNative.cpp'
 CMAKE='xbmc/platform/android/activity/CMakeLists.txt'
+BUILTINS='xbmc/interfaces/builtins/AndroidBuiltins.cpp'
 
 def sha(p):
     with Path(p).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
@@ -73,16 +74,17 @@ def prepare():
     cmake=(HERE/'native/overlay'/CMAKE).read_bytes()
     assert cmake.replace(b'\n            InfinityCastNative.cpp',b'',1)==(native/CMAKE).read_bytes()
     after=dict(before)
-    for name in (CMAKE,CPP):
+    for name in (CMAKE,BUILTINS,CPP):
         data=(HERE/'native/overlay'/name).read_bytes();(native/name).write_bytes(data)
         after[name]=hashlib.sha256(data).hexdigest()
     assert CPP not in before and len(after)==9413
     hasher=load(TOOLS/'repairs/infinity-native-touch-2103451-20261105/compile_only.py','frozen_native_source_hasher')
     assert hasher.hashes(native)==after
     save('NATIVE-SOURCE-MAP.json',after)
-    save('CAST-SOURCE-PRESERVATION.json',dict(status='PASS_EXACT86_PLUS_CAST_ONLY_CPP_AND_CMAKE_ENTRY',
+    save('CAST-SOURCE-PRESERVATION.json',dict(status='PASS_EXACT86_PLUS_CAST_CPP_CMAKE_AND_DIALOG_BUILTIN',
         source=os.environ['GITHUB_SHA'],baseline86_engine_sha256=ENGINE86,baseline86_reference_source=REFERENCE,
-        unchanged86_native_files=9411,added={CPP:after[CPP]},changed={CMAKE:dict(before=before[CMAKE],after=after[CMAKE])},
+        unchanged86_native_files=9410,added={CPP:after[CPP]},
+        changed={n:dict(before=before[n],after=after[n]) for n in (CMAKE,BUILTINS)},
         shutdown_changed=False,persistence_protections_changed=False,Cobra_changed=False,
         Python_startup_changed=False,providers_changed=False,old_API_changed=False,Android='NOT_RUN'))
     apk=ROOT/'signed86/Infinity-2103486-Combined-Original-Signer.apk';assert sha(apk)==APK86

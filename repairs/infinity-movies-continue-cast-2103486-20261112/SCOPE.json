@@ -36,8 +36,10 @@
   ],
   "native_Cast_only_changes": [
     "xbmc/platform/android/activity/InfinityCastNative.cpp (new)",
-    "xbmc/platform/android/activity/CMakeLists.txt (one source-list addition)"
+    "xbmc/platform/android/activity/CMakeLists.txt (one source-list addition)",
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp (new Cast-only dialog command, existing command unchanged)"
   ],
   "native_protected_changes": false,
-  "native_reference_source": "9ce852ebb044a82853ef93af24e34a07ed96daff"
+  "native_reference_source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+  "Cast_UI": "Dialog on existing Main activity: no Main/lifecycle/Activity-transition changes"
 }
