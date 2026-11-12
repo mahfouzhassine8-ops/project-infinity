@@ -64,7 +64,18 @@ def processes(device,uid):
 # fixtures, test matrices, shutdown commands or reset/cleanup behavior.
 old=ROOT/'repairs/infinity-final-closure-2103407/android17_shutdown_probe.py'
 node=next(n for n in ast.parse(old.read_text()).body if isinstance(n,ast.FunctionDef) and n.name=='verify_receipt')
-exec(compile(ast.Module(body=[node],type_ignores=[]),str(old), 'exec'))
+def combined_java_seal(value):
+ # Protected CombinedDurability.valid() requires owners-v1 and three owner
+ # proofs. This scenario never activates/retains Cobra: all three are UUIDs,
+ # not a missing/retained owner. Runtime authorization flags remain mandatory.
+ if not isinstance(value,str):return False
+ parts=value.split('|')
+ return len(parts)==4 and parts[0]=='owners-v1' and all(re.fullmatch(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}',p) for p in parts[1:])
+receipt_source=ast.get_source_segment(old.read_text(),node)
+legacy="all(re.fullmatch(r'[0-9a-f-]{36}',receipt.get(k,'')) for k in ('engine_java_save_seal','coordinator_java_save_seal'))"
+current="all(combined_java_seal(receipt.get(k,'')) for k in ('engine_java_save_seal','coordinator_java_save_seal'))"
+require(receipt_source.count(legacy)==1,'EXACT_LEGACY_SEAL_ASSERTION_ONLY')
+exec(compile(receipt_source.replace(legacy,current),str(old), 'exec'))
 def run(inputs,sdk,out):
  row=selected();proof=base.load(inputs/'INTAKE.json');require(not out.exists() and proof['selection_sha256']==sha(SELECTION),'CURRENT_FRESH_INPUTS')
  out.mkdir();report=dict(status='RUNNING',source=os.environ['SELECTED_SOURCE'],native_source=row['native']['source'],native_sha256=row['native']['native_sha256'],baseline_APK_sha256=prior.APK_SHA,native_injection=True,APK_install_acceptance=False,Fold='NOT_RUN',Core_path_changed=False,shutdown='NOT_RUN');device=None
