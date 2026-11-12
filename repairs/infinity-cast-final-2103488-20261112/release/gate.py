@@ -27,6 +27,24 @@ def request(canonical=False):
  c.require(c.sha(ROOT/c.WORKFLOW)==r['workflow_sha256'],'SOURCE_BOUND_ORIGINAL_WORKFLOW')
  c.tools();return r
 
+def source_scope():
+ scope=c.load(ROOT/SCOPE);baseline=scope['baseline_source_snapshot']
+ permitted=set(scope['production_allowlist'])|set(scope['allowed_new_Cast_sources'])
+ tools={'.github/workflows/infinity-core-outcomes-qa-native.yml','.github/workflows/infinity-saved-navigation-android.yml',c.WORKFLOW,
+   str(OLD.relative_to(ROOT))+'/build_cast_native.py',str(OLD.relative_to(ROOT))+'/prepare_ci_tooling.sh',
+   str(OLD.relative_to(ROOT))+'/release/release_guard.py',str(OLD.relative_to(ROOT))+'/release/test_release_guard.py',
+   'repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json',c.AUTHORITY}
+ tools|={str(OLD.relative_to(ROOT))+'/cast/'+n for n in ('test_relay_host.py','build_sdk_component.py','build_probe.py','audit_sdk_component.py')}
+ changed=c.git('diff','--name-only',baseline,'HEAD').decode().splitlines()
+ for name in changed:
+  c.require(name in permitted or name in tools or name.startswith(PREFIX) or name.startswith(str(OLD.relative_to(ROOT))+'/cast/tests/') or name.startswith(str(OLD.relative_to(ROOT))+'/cast/android/') or name.startswith(str(OLD.relative_to(ROOT))+'/native/tests/'),'OUT_OF_CAST_SOURCE_SCOPE:'+name)
+ for name in ('experience.py','plugin.py','service.py','default.py','cast_runtime.py'):
+  path=str(OLD.relative_to(ROOT))+'/overlay/script.infinity.commandcenter/'+name
+  c.require((ROOT/path).read_bytes()==c.git('show',baseline+':'+path),'PROTECTED_MOVIES_TRACKING_OR_PYTHON_CHANGED:'+name)
+ for name in ('xbmc/interfaces/builtins/AndroidBuiltins.cpp','xbmc/platform/android/activity/CMakeLists.txt'):
+  path=str(OLD.relative_to(ROOT))+'/native/overlay/'+name;c.require((ROOT/path).read_bytes()==c.git('show',baseline+':'+path),'NON_CAST_NATIVE_CHANGED:'+name)
+ return dict(status='PASS_FROZEN_CAST_ONLY_SOURCE_ALLOWLIST',baseline=baseline,changed_files=changed,production_allowlist=scope['production_allowlist'],added_Cast_sources=scope['allowed_new_Cast_sources'],Command_Center_changed=False,skin_changed=False,Cobra_changed=False,shutdown_changed=False)
+
 def owners(row,kind):
  c.producer(row);folder=ROOT/'cast-final-owner-input';folder.mkdir(exist_ok=True);archive=folder/'authenticated.zip'
  if not archive.exists():
@@ -101,12 +119,12 @@ def bundle(src,dst,owner,version,changes,new_classes=None,old_classes=None,dex=N
  return meta
 
 def prepare():
- r=request();parent=c.api('git/ref/heads/'+c.CANONICAL)['object']['sha'];c.require(parent==r['registry_parent_source'],'RECONCILE_REGISTRY_RACE')
+ r=request();source_proof=source_scope();parent=c.api('git/ref/heads/'+c.CANONICAL)['object']['sha'];c.require(parent==r['registry_parent_source'],'RECONCILE_REGISTRY_RACE')
  a=json.loads(c.git('show',parent+':'+c.AUTHORITY));c.require((a['generation'],a['candidate_versionCode'])==(74,2103489),'UNUSED_NEXT90_91_FROM_ACTUAL_REGISTRY')
  base=c.unique(c.obtain(r['inputs']['baseline'],'final-base'),'Infinity-2103488-Combined-Original-Signer.apk');c.require(c.sha(base)==c.BASE,'EXACT_SIGNED88_STARTING_APK');c.signature(base)
  owner_root,catalog=owners(r['inputs']['owners'],'candidate');recovery_owners,recovery_catalog=owners(r['inputs']['owners'],'recovery');native,component,dex,proof=compiled(r)
  recovery_base=c.unique(c.obtain(r['inputs']['protected_recovery'],'final-recovery-base'),'Infinity-2103489-Combined-Original-Signer.apk');c.require(c.sha(recovery_base)==RECOVERY_SHA,'EXACT_PROTECTED86_FORWARD_RECOVERY89');c.signature(recovery_base)
- inventory,cb,_,_,review=c.tools();out=ROOT/'cast-final-prepared';out.mkdir(exist_ok=False)
+ inventory,cb,_,_,review=c.tools();out=ROOT/'cast-final-prepared';out.mkdir(exist_ok=False);c.save(out/'SOURCE-PRESERVATION.json',source_proof)
  olddex=out/'baseline-cast.dex'
  with ZipFile(base) as z:olddex.write_bytes(z.read(DEX))
  old_classes=class_rows(olddex,out,'old-cast');new_classes=class_rows(dex,out,'new-cast');olddex.unlink()

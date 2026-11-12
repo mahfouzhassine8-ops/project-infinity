@@ -1,0 +1,46 @@
+{
+  "API": 36,
+  "Activity_Cast_id": 0,
+  "Activity_original_after": 2131034174,
+  "Application_Cast_id": -2146697183,
+  "Application_original_after": 2131034174,
+  "artifact": 13986707336,
+  "artifact_digest": "sha256:4c4ea032c4ca032007def5915cee98a39e835c304403b16008a2d1ba23f3b46e",
+  "explicit_receiver_selection_required": true,
+  "failed_transfer_cleanup": true,
+  "failed_transfer_cleanup_cycles": 5,
+  "full_Infinity_playback": "NOT_TESTED",
+  "main_thread_pulses": 31,
+  "original_APK_modified": false,
+  "original_resource_id": 2131034174,
+  "owner_APK": false,
+  "owner_device": "NOT_TESTED",
+  "pass": true,
+  "private_HTTP_resource_readable": true,
+  "reason": "SDK_resources_adaptive_transport_and_failed_cleanup_verified",
+  "receiver_transfer": "NOT_TESTED",
+  "relay": {
+    "adaptive": {
+      "actual_Android_HLS_DASH_rewrite_and_segment_HTTP": true,
+      "decoder": false,
+      "drained": true,
+      "pass": true,
+      "property_auth_headers_preserved": true,
+      "real_receiver": false
+    },
+    "pass": true,
+    "progressive": {
+      "actual_private_HTTP_runtime": true,
+      "pass": true,
+      "private_source_not_returned": true,
+      "range_body": true,
+      "real_Cast_receiver": false,
+      "retired": true
+    }
+  },
+  "run": 43311587557,
+  "schema": 1,
+  "scope": "Cast SDK/resource/UI-thread, private isolated HTTP relay/resource and explicit-selection guard; no real receiver or Infinity playback",
+  "shutdown": "NOT_SELECTED",
+  "source": "1af5d580a72ef63bf1fd437312825db36231149a"
+}

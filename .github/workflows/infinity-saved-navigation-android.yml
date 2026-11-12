@@ -2180,7 +2180,7 @@ jobs:
 
   movies-cast-install:
     name: Signed86 to complete QA to forward recovery; PackageManager only, no app launch or shutdown
-    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-install' && github.ref == 'refs/heads/work/infinity-movies-continue-cast-2103486-20261112'
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-install' && github.ref == 'refs/heads/work/infinity-cast-final-from-2103488-20261112'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1', SELECTED_SOURCE: '${{ inputs.source_ref }}'}
@@ -2197,7 +2197,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SELECTED_SOURCE"
-          python repairs/infinity-movies-continue-cast-2103486-20261112/release/verify_install.py prepare
+          python repairs/infinity-cast-final-2103488-20261112/release/verify_install.py prepare
           sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
@@ -2209,11 +2209,11 @@ jobs:
           avd-name: infinity-movies-cast-install-only
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python repairs/infinity-movies-continue-cast-2103486-20261112/release/verify_install.py run
+          script: python repairs/infinity-cast-final-2103488-20261112/release/verify_install.py run
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity86-Movies-Home-Cast-Install-Recovery-${{ github.run_id }}-NO-APK
-          path: movies-cast-install-results/
+          name: Infinity88-CastFinal-Install-Recovery-${{ github.run_id }}-NO-APK
+          path: cast-final-install-results/
           if-no-files-found: warn
           retention-days: 90
