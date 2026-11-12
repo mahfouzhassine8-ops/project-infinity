@@ -9,7 +9,7 @@
   "publication": false,
   "accepted_pointer_updated": false,
   "version_reserved": false,
-  "remaining": "Unsigned preparation authorized after full ARM64 verification; Android verification and permanent signing pending",
+  "remaining": "Authority proposal only; no signing until focused engineering continuation completes",
   "native_producer": {
     "run": 43186634362,
     "id": 13931682124,
@@ -29,8 +29,27 @@
     "repairs/infinity-essential-only-shutdown-2103483-20261112/BASE83-NATIVE-SOURCE-MAP.json": "c5b46fd24452b901fadb55568a8605283d6d0b6758b94ea24ccacdcef63f18a5",
     "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistence.h": "c7e7e758a3496c32b82b8948c0b8de00409a492e2f0c98996a6f9b74d6fdda06",
     "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3",
-    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonWriteHooks.h": "755417f20304c2bfe6300feb3813dc7538c264ea8bf7e6d1ddba60e33034b6a1"
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonWriteHooks.h": "755417f20304c2bfe6300feb3813dc7538c264ea8bf7e6d1ddba60e33034b6a1",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/evidence/REVALIDATED-ACTUAL-CLOSE-43196958708.json": "6a8157d5bdac4a55e7565acf83898bbc8602a165f462d7175168f335a5484f78"
   },
   "parent_authority_sha256": "41ce6dde3aac642e4ca8b90d5575bde8bf4fd90acc50ebae4bf76274a0e7baf5",
-  "independent_Android_evidence": "PENDING; unsigned owner preparation only; no signing before selected result passes"
+  "independent_Android_evidence": {
+    "actual_Close": "PASS_REVALIDATED_RECEIPT",
+    "run": 43196958708,
+    "raw_workflow_conclusion": "failure: outdated single-UUID test assertion; not concealed",
+    "artifact": 13934470426,
+    "artifact_digest": "sha256:fd1ad61d3c2a231264d44c0cdc501661b164082e183d61f7c491f0b64e5f929d",
+    "relaunch": "PENDING_CONTINUATION",
+    "Fold": "NOT_RUN"
+  },
+  "prepared_producer": {
+    "run": 43193780823,
+    "id": 13931523877,
+    "workflow_id": 397702717,
+    "source": "41d9596073e5b7445531105696ede325746ddf5b",
+    "name": "Infinity-Essential-Only-repair-Prepared-43193780823-UNSIGNED",
+    "digest": "sha256:5a69efa2bda09ab543e75a59e930415408f9db32c3863ad9a176dcb8ad4465d2",
+    "size_in_bytes": 655958790
+  },
+  "unsigned_sha256": "42e59c07a4dbe1ca3b6dcc9578e0cccfa9f15fcc5748e8ef6101036096875686"
 }
