@@ -1,0 +1,51 @@
+{
+  "enabled": true,
+  "shutdown_tests": true,
+  "owner_device": false,
+  "Core_path_correction": false,
+  "baseline": {
+    "run_id": 43119348510,
+    "artifact_id": 13899912993,
+    "workflow_id": 397702717,
+    "workflow_path": ".github/workflows/infinity-combined-release.yml",
+    "source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+    "name": "Infinity2103483-OriginalSigned-Startup-Internal-QA-43119348510-FOLD-PENDING",
+    "sha256": "df8aa2cd1ba52a83d0da60927bbd51e6fbc5de3808d4a9e2279e9eb759f820e7",
+    "size_in_bytes": 328376479
+  },
+  "native": {
+    "run_id": 43186634362,
+    "artifact_id": 13931682124,
+    "workflow_id": 415461484,
+    "workflow_path": ".github/workflows/infinity-core-outcomes-qa-native.yml",
+    "source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+    "name": "Infinity-Essential-Only-ARM64-43186634362-NO-INSTALLER",
+    "sha256": "4dda29a8bd59e1267f47cdf0b0501c93be74a5a67f5997953f43df43e6eda768",
+    "size_in_bytes": 192742935,
+    "native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635"
+  },
+  "publisher": {
+    "commit": "6d38cce274bb45e2b658a63dd44a01e94c8ae990",
+    "files": [
+      {
+        "name": "addon.xml",
+        "url": "https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/addon.xml",
+        "sha256": "36d1fdc578c678aa677bb71b540b9cbcd69303d8ce2bbfe3c9960c48a9a10313",
+        "size": 2844
+      },
+      {
+        "name": "service.py",
+        "url": "https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/service.py",
+        "sha256": "2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3",
+        "size": 26797
+      },
+      {
+        "name": "libadulthideout_core.so",
+        "url": "https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/core-binaries/android-arm64-v8a/libadulthideout_core.so",
+        "sha256": "c4a8a8d1e046cab6a42934b8fba31246efb21a002a90beb2bffa555623a383a9",
+        "size": 3504952
+      }
+    ]
+  },
+  "scope": "Independent actual original Core normal Close, essential durability, full app UID death, same-profile relaunch and retained synthetic/native data; no additional app tests"
+}
