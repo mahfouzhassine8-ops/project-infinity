@@ -80,7 +80,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         if(view.get()==value)view.clear();
         stopDiscovery();
         // Close Controls dismisses presentation only; transfer/session owns its bounded cleanup.
-        if(!selecting && !transferStarted && !handedOff && !cleanupPending && !token.isEmpty())leaveReceiver(false);
+        if(!selecting && !transferStarted && !handedOff && !cleanupPending){if(!token.isEmpty())leaveReceiver(false);else unlisten();}
         // The process-owned session keeps no Activity/View reference.
     }
     private void changed(){View target=view.get();if(target!=null)target.changed();}
@@ -106,11 +106,10 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             CastContext.getSharedInstance(context,initialization)
                     .addOnSuccessListener(value->ui.post(()->{
                         sdk=value;initializing=false;initialized=true;
-                        listen();
                         router=MediaRouter.getInstance(context);
                         selector=new MediaRouteSelector.Builder().addControlCategory(
                             CastMediaControlIntent.categoryForCast(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID)).build();
-                        if(view.get()!=null){discover();capture();}
+                        if(view.get()!=null){listen();discover();capture();}
                     }))
                     .addOnFailureListener(error->ui.post(()->unavailable("Cast is unavailable on this device. Phone playback is unchanged.")));
         } catch(Exception | LinkageError error) {unavailable("The Cast component could not initialize. Phone playback is unchanged.");}

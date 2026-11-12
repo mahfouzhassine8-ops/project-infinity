@@ -107,7 +107,10 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
     private void result(boolean passed,String reason) {
         if(finished)return;finished=true;
         try {
-            JSONObject value=new JSONObject().put("schema",1).put("pass",passed).put("reason",reason)
+            if(cast!=null)cast.detach(this);
+            boolean idleCallbacksReleased=cast==null || (!(Boolean)field("listening") && !(Boolean)field("discovering"));
+            if(passed && !idleCallbacksReleased){passed=false;reason="idle_Cast_callbacks_not_released";}
+            JSONObject value=new JSONObject().put("schema",1).put("pass",passed).put("reason",reason).put("idle_callback_released",idleCallbacksReleased)
                 .put("main_thread_pulses",pulses).put("API",android.os.Build.VERSION.SDK_INT)
                 .put("original_resource_id",oldResource).put("Activity_original_after",activityResourceAfter)
                 .put("Application_original_after",applicationResourceAfter).put("Application_Cast_id",applicationCastResource)
