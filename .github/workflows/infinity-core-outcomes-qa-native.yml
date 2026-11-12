@@ -1,17 +1,13 @@
-name: Infinity Core outcomes - scoped diagnostic host and ARM64
+name: Infinity Essential-only repair - scoped host and ARM64
 on:
   push:
-    branches: [work/infinity-core-outcomes-qa-20261112]
+    branches: [work/infinity-essential-only-shutdown-2103483-20261112]
     paths:
       - .github/workflows/infinity-core-outcomes-qa-native.yml
-      - repairs/infinity-core-outcomes-qa-2103483-20261112/observer.py
-      - repairs/infinity-core-outcomes-qa-2103483-20261112/native/**
-      - repairs/infinity-core-outcomes-qa-2103483-20261112/make_overlay.py
-      - repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py
-      - repairs/infinity-core-outcomes-qa-2103483-20261112/test*.py
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/**
   workflow_dispatch:
 permissions: {contents: read, actions: read}
-concurrency: {group: infinity-core-outcomes-native, cancel-in-progress: false}
+concurrency: {group: infinity-essential-only-native, cancel-in-progress: false}
 jobs:
   selected-host:
     runs-on: ubuntu-22.04
@@ -22,43 +18,13 @@ jobs:
         with: {persist-credentials: false, show-progress: false}
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with: {python-version: '3.11.7'}
-      - name: Pin exact installed Core source and prepare native host overlay without Core execution
-        run: |
-          curl --fail --silent --show-error --max-time 60 https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/service.py -o actual-core-source.py
-          python - <<'PY'
-          import hashlib,shutil,sys
-          from pathlib import Path
-          task=Path('repairs/infinity-core-outcomes-qa-2103483-20261112');sys.path.insert(0,str(task))
-          import make_overlay
-          assert hashlib.sha256(Path('actual-core-source.py').read_bytes()).hexdigest()=='2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3'
-          for path,pin in make_overlay.PINS.items():
-              source=Path('repairs/infinity-functional-startup-2103482-20261111/native/overlay')/path if path.endswith('PythonInvoker.cpp') else task/'native/baseline'/path
-              assert hashlib.sha256(source.read_bytes()).hexdigest()==pin
-              dest=Path('host83-baseline')/path;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copyfile(source,dest)
-          make_overlay.write(Path('host83-baseline'),Path('host-core-overlay'))
-          PY
-      - name: Selected Python outcome, privacy, error and cleanup cases
-        env: {INFINITY_COREQA_SERVICE_SOURCE: '${{ github.workspace }}/actual-core-source.py'}
-        run: |
-          python - <<'PY'
-          import json,sys,unittest
-          from pathlib import Path
-          assert sys.version_info[:3]==(3,11,7)
-          suite=unittest.defaultTestLoader.discover('repairs/infinity-core-outcomes-qa-2103483-20261112',pattern='test_observer.py')
-          result=unittest.TextTestRunner(verbosity=2).run(suite)
-          proof=dict(status='PASS_SELECTED_PYTHON_OUTCOME_HOST' if result.wasSuccessful() and result.testsRun==18 and not result.skipped else 'FAIL_SELECTED_HOST',testsRun=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),Python=list(sys.version_info[:3]),Core_executed=False,Android=False)
-          Path('HOST-CORE-OUTCOMES.json').write_text(json.dumps(proof,indent=2)+'\n')
-          assert proof['status']=='PASS_SELECTED_PYTHON_OUTCOME_HOST'
-          PY
-      - name: Actual native callback and production loader delegate against pinned CPython
-        run: python repairs/infinity-core-outcomes-qa-2103483-20261112/test_native_sink.py --overlay host-core-overlay --service actual-core-source.py --out NATIVE-SINK-HOST.json
+      - name: Selected actual native metadata and essential-write safety cases
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/test_native.py --out HOST-ESSENTIAL-ONLY.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity-Core-Outcomes-Host-${{ github.run_id }}
-          path: |
-            HOST-CORE-OUTCOMES.json
-            NATIVE-SINK-HOST.json
+          name: Infinity-Essential-Only-Host-${{ github.run_id }}
+          path: HOST-ESSENTIAL-ONLY.json
           if-no-files-found: error
           retention-days: 90
   arm64:
@@ -89,25 +55,25 @@ jobs:
         with: {artifact-ids: '13595626273', run-id: '42425522122', merge-multiple: true, github-token: '${{ github.token }}', path: exact464}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
-      - name: Exact83 source restoration and scoped diagnostic overlay
-        run: python repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py prepare
+      - name: Exact83 source restoration and scoped shutdown overlay
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py prepare
       - name: Retained dependency tooling
-        run: bash repairs/infinity-core-outcomes-qa-2103483-20261112/prepare_ci_tooling.sh
+        run: bash repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh
       - uses: actions/cache@v4
         with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
       - name: Retained NDK and dependencies
         run: |
           bash repairs/android-checkpoint-shutdown/install_ndk.sh
-          python repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py dependencies
+          python repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py dependencies
       - name: Actual full ARM64 compilation and ABI verification
-        run: python repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py compile
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py compile
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity-Core-Outcomes-ARM64-${{ github.run_id }}-NO-INSTALLER
+          name: Infinity-Essential-Only-ARM64-${{ github.run_id }}-NO-INSTALLER
           path: |
-            core-outcomes-native/libkodi.so
-            core-outcomes-native/*.json
-            core-outcomes-native/*.txt
+            essential-only-native/libkodi.so
+            essential-only-native/*.json
+            essential-only-native/*.txt
           if-no-files-found: error
           retention-days: 90
