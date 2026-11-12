@@ -1,0 +1,59 @@
+{
+  "status": "SIGNED_FUNCTIONAL_REPAIR_READY_FOR_OWNER_FOLD_ACCEPTANCE",
+  "protected_baseline": 2103483,
+  "current_owner_diagnostic": 2103484,
+  "repair": 2103486,
+  "forward_recovery": 2103487,
+  "package": "com.projectinfinity.kodi",
+  "native_source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signatures": "PASS_ORIGINAL_V1_V2_V3_BOTH_APKS",
+  "repair_signing_run": 43200317103,
+  "recovery_signing_run": 43201341671,
+  "ARM64_build_and_link": {
+    "status": "PASS",
+    "run": 43186634362
+  },
+  "functional_Android": {
+    "status": "PASS_SELECTED_CLOSE_UID_DEATH_DURABILITY_RELAUNCH_DATA_CHECKS",
+    "run": 43198525179,
+    "raw_run": "FAIL_FINAL_POST_RELAUNCH_APK_FILE_READ_TIMEOUT_12_SECONDS",
+    "signed_APK_runtime": false,
+    "native_injection": true,
+    "environment": "Disposable stock API36 x86_64 with real ARM64 engine via native bridge"
+  },
+  "signed_install_over": {
+    "status": "PASS_SELECTED_JOB",
+    "run": 43202390845,
+    "job": 131128869066,
+    "raw_workflow": "FAIL_SEPARATE_UNSELECTED_LEGACY_SCOPE_GUARD",
+    "artifact": 13935109346,
+    "artifact_digest": "sha256:5c761ecacf76f39077e3b03ce8d81fd834984defb7b8bfa3e2c5e4435ef14682",
+    "UID_retained": true,
+    "data_directory_retained": true,
+    "synthetic_record_bytes_ownership_modes_retained": true,
+    "application_launched": false,
+    "shutdown": "NOT_RUN"
+  },
+  "preservation": {
+    "native_source_files_unchanged": 9409,
+    "production_headers_changed": 3,
+    "repair_APK_payload_members_unchanged": 7766,
+    "recovery_APK_payload_members_unchanged": 7767,
+    "Cobra_changed": false,
+    "Core_path_activated": false,
+    "Core_disabled": false,
+    "essential_safety_waived": false,
+    "providers_changed": false,
+    "Java_DEX_changed": false,
+    "user_data_migration": false
+  },
+  "remaining": [
+    "Owner physical Fold shutdown/relaunch and real-profile acceptance NOT RUN",
+    "Baseline-reproduced talloc_lib_init+32 native-bridge startup SIGSEGV remains unresolved; not declared PASS",
+    "Post-relaunch original83 APK hash command timed out in functional run; exact final signed APK hashes separately passed actual installed-package verification",
+    "Unknown successfully loaded native engines or genuine unfinished essential writes still require valid ownership/drain evidence"
+  ],
+  "accepted_pointer_updated": false,
+  "public_release": false
+}

@@ -1,0 +1,95 @@
+{
+  "Fold": "NOT_RUN",
+  "application_launched": false,
+  "baseline": {
+    "APK_path": "/data/app/~~7pPWnVQdOZg07hU2zTjBeg==/com.projectinfinity.kodi-1OzfrpYGZuSPe3G9wWt6Lw==/base.apk",
+    "APK_sha256": "c876d4adb674dfc85e1f3c6e1a18618e955196fa94b89be1953f44b8afcda5b8",
+    "UID": "10216",
+    "data_directory": "/data/user/0/com.projectinfinity.kodi",
+    "extracted_native_path": "/data/app/~~7pPWnVQdOZg07hU2zTjBeg==/com.projectinfinity.kodi-1OzfrpYGZuSPe3G9wWt6Lw==/lib/arm64/libkodi.so",
+    "extracted_native_sha256": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33",
+    "package_UID_query": "package:com.projectinfinity.kodi uid:10216\n",
+    "versionCode": 2103484
+  },
+  "environment": {
+    "application_installed": false,
+    "application_started": false,
+    "compatibility_overrides": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "page_size": 4096,
+    "revision": 7,
+    "sdk": 36,
+    "serial": "emulator-5554",
+    "status": "PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY",
+    "stock_bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+    "stock_bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d"
+  },
+  "native_injection": false,
+  "native_runtime": "NOT_RUN",
+  "real_userdata": "NOT_RUN",
+  "scope": "essential-only-signed-upgrade-recovery",
+  "shutdown": "NOT_RUN",
+  "source": "75994d11478166d14b68d4ce3dc0cd2e09e43ee3",
+  "status": "PASS_ORIGINAL_SIGNED84_REPAIR86_FORWARD87_INSTALL_OVER_SYNTHETIC_RETENTION_NO_APP_LAUNCH",
+  "steps": [
+    {
+      "installed": {
+        "APK_path": "/data/app/~~teQNxGsslVTERWNRc5Lqrw==/com.projectinfinity.kodi-XolzgFT7DE979h7f5IvOOw==/base.apk",
+        "APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+        "UID": "10216",
+        "data_directory": "/data/user/0/com.projectinfinity.kodi",
+        "extracted_native_path": "/data/app/~~teQNxGsslVTERWNRc5Lqrw==/com.projectinfinity.kodi-XolzgFT7DE979h7f5IvOOw==/lib/arm64/libkodi.so",
+        "extracted_native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+        "package_UID_query": "package:com.projectinfinity.kodi uid:10216\n",
+        "versionCode": 2103486
+      },
+      "passed": true,
+      "role": "repair",
+      "sentinels": {
+        "/data/user/0/com.projectinfinity.kodi/files/infinity-signed-install-qa/c2d5ec6ee9e542948ec75da13fc6ba92/sentinel.bin": {
+          "sha256": "ad87f8f2726c6541ac44ca08dfa26caf6780494e147371c50c262b2135a2fa6e",
+          "uid_gid_mode_size": "10216:10216:600:86"
+        },
+        "/sdcard/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-signed-install-qa/c2d5ec6ee9e542948ec75da13fc6ba92/sentinel.bin": {
+          "sha256": "9131d029540dd8567777f609bec539b3f186e9d00346a1ce3c0015e3d3666b2c",
+          "uid_gid_mode_size": "0:1078:666:95"
+        }
+      }
+    },
+    {
+      "installed": {
+        "APK_path": "/data/app/~~tESJZ3vE8P1lpo80Lr5Sww==/com.projectinfinity.kodi-zkrYRrnZFqonGlzZcQjx4Q==/base.apk",
+        "APK_sha256": "a0962db899df2256f74935a35cf7ced32193437497f6cb48a2781c42a1cc4a0c",
+        "UID": "10216",
+        "data_directory": "/data/user/0/com.projectinfinity.kodi",
+        "extracted_native_path": "/data/app/~~tESJZ3vE8P1lpo80Lr5Sww==/com.projectinfinity.kodi-zkrYRrnZFqonGlzZcQjx4Q==/lib/arm64/libkodi.so",
+        "extracted_native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+        "package_UID_query": "package:com.projectinfinity.kodi uid:10216\n",
+        "versionCode": 2103487
+      },
+      "passed": true,
+      "role": "recovery",
+      "sentinels": {
+        "/data/user/0/com.projectinfinity.kodi/files/infinity-signed-install-qa/c2d5ec6ee9e542948ec75da13fc6ba92/sentinel.bin": {
+          "sha256": "ad87f8f2726c6541ac44ca08dfa26caf6780494e147371c50c262b2135a2fa6e",
+          "uid_gid_mode_size": "10216:10216:600:86"
+        },
+        "/sdcard/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-signed-install-qa/c2d5ec6ee9e542948ec75da13fc6ba92/sentinel.bin": {
+          "sha256": "9131d029540dd8567777f609bec539b3f186e9d00346a1ce3c0015e3d3666b2c",
+          "uid_gid_mode_size": "0:1078:666:95"
+        }
+      }
+    }
+  ],
+  "synthetic_before": {
+    "/data/user/0/com.projectinfinity.kodi/files/infinity-signed-install-qa/c2d5ec6ee9e542948ec75da13fc6ba92/sentinel.bin": {
+      "sha256": "ad87f8f2726c6541ac44ca08dfa26caf6780494e147371c50c262b2135a2fa6e",
+      "uid_gid_mode_size": "10216:10216:600:86"
+    },
+    "/sdcard/Android/data/com.projectinfinity.kodi/files/.kodi/userdata/infinity-signed-install-qa/c2d5ec6ee9e542948ec75da13fc6ba92/sentinel.bin": {
+      "sha256": "9131d029540dd8567777f609bec539b3f186e9d00346a1ce3c0015e3d3666b2c",
+      "uid_gid_mode_size": "0:1078:666:95"
+    }
+  }
+}
