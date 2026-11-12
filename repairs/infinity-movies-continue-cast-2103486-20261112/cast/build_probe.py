@@ -29,7 +29,8 @@ manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:androi
 shell=OUT/'shell.apk';run([SDK/'aapt2','link','--manifest',manifest,'-I',SDK/'android.jar','-o',shell])
 unsigned=OUT/'CI-ONLY-UNSIGNED-NOT-OWNER-INSTALLER.apk'
 with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub,ZipFile(APK) as original:
- for n in stub.namelist():out.writestr(n,stub.read(n))
+ for n in stub.namelist():
+  if n!='resources.arsc':out.writestr(n,stub.read(n))
  for n in original.namelist():
   if re.fullmatch(r'classes\d*\.dex',n) or n=='resources.arsc' or n.startswith('res/'):
    out.writestr(n,original.read(n),compress_type=0 if n=='resources.arsc' else ZIP_DEFLATED)
@@ -38,3 +39,4 @@ with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub,ZipFile(AP
   out.writestr('classes'+str(next_dex)+'.dex',p.read_bytes());next_dex+=1
  for name in ('resources.apk','RESOURCE-IDENTITY.json'):out.write(COMPONENT/name,'assets/infinity-cast/'+name)
 print('CI-only separate-package probe prepared; original installer/signature/data untouched')
+with ZipFile(unsigned) as z:assert len(z.namelist())==len(set(z.namelist())), 'Duplicate probe ZIP members refused'

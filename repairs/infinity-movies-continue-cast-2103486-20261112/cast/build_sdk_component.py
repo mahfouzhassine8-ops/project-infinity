@@ -7,7 +7,7 @@ resource identifiers live in package 0x80; original 0x7f resources are untouched
 """
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
-import hashlib,json,os,re,struct,subprocess,sys
+import hashlib,json,os,re,shutil,struct,subprocess,sys
 from dex_contract import Dex, class_contract
 
 HERE=Path(__file__).resolve().parent
@@ -100,8 +100,21 @@ rules.write_text('''-keep class com.projectinfinity.kodi.InfinityCast* { *; }
 -keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*
 -printmapping '''+str(OUT/'mapping.txt')+'\n')
 dex=OUT/'dex';dex.mkdir(exist_ok=True)
-run(['java','-Xmx2g','-cp',SDK/'d8.jar','com.android.tools.r8.R8','--release','--min-api','21',
-     '--lib',SDK/'android.jar','--lib',compile_lib,'--output',dex,'--pg-conf',rules]+
-    [x for p in consumer for x in ('--pg-conf',p)]+filtered)
+reuse=os.environ.get('INFINITY_CAST_VERIFIED_COMPONENT')
+if reuse:
+ verified=Path(reuse).resolve();receipt=json.loads((verified/'COMPONENT-RESULT.json').read_text())
+ assert receipt['status']=='PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT'
+ assert receipt['baseline_APK_sha256']=='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197'
+ assert receipt['feature_Java_sha256']==source_hashes, 'Java input changed; cannot reuse prior SDK component'
+ assert receipt['resources']['sha256']==hashlib.sha256(resource_apk.read_bytes()).hexdigest(), 'Resource input changed; cannot reuse prior SDK component'
+ for name,digest in receipt['dex'].items():
+  assert re.fullmatch(r'classes\d*\.dex',name)
+  data=(verified/'dex'/name).read_bytes();assert hashlib.sha256(data).hexdigest()==digest
+  (dex/name).write_bytes(data)
+ print('REUSED_VERIFIED_CAST_COMPONENT_R8_NOT_REPEATED')
+else:
+ run(['java','-Xmx2g','-cp',SDK/'d8.jar','com.android.tools.r8.R8','--release','--min-api','21',
+      '--lib',SDK/'android.jar','--lib',compile_lib,'--output',dex,'--pg-conf',rules]+
+     [x for p in consumer for x in ('--pg-conf',p)]+filtered)
 from audit_sdk_component import verify
 verify(APK,SDK,OUT)

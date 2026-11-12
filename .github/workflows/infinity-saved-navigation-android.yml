@@ -2120,6 +2120,7 @@ jobs:
     env:
       PYTHONDONTWRITEBYTECODE: '1'
       CAST_AUTHORIZATION: '${{ inputs.authorization }}'
+      INFINITY_CAST_VERIFIED_COMPONENT: '${{ github.workspace }}/cast-sdk-reuse/component-reuse86'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
@@ -2131,6 +2132,8 @@ jobs:
         with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with: {artifact-ids: '13935631408', run-id: '43200317103', merge-multiple: true, github-token: '${{ github.token }}', path: signed86}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13958281946', run-id: '43247850465', merge-multiple: true, github-token: '${{ github.token }}', path: cast-sdk-reuse}
       - name: Build isolated component using locked official SDK and existing immutable baseline APIs
         run: |
           set -euo pipefail
