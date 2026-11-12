@@ -29,6 +29,10 @@ prior.selected=selected;prior.SELECTION=SELECTION
 class Device(prior.Device):
  METHODS=prior.Device.METHODS|{'Favourites.AddFavourite','Favourites.GetFavourites'}
  def rpc(self,method,params=None,timeout=5):
+  if method=='Addons.SetAddonEnabled' and params in [dict(addonid=n,enabled=True) for n in ('script.infinity.commandcenter','service.infinity.compat')]:
+   # The retained generic shutdown fixture normally enables these required
+   # bundled services through this same supported Kodi API on a fresh VM.
+   return prior.RetainedDevice.rpc(self,method,params,timeout)
   if method=='Favourites.AddFavourite':require(params==dict(title=FAVOURITE,type='window',window='home'),'ONLY_SYNTHETIC_NATIVE_FAVOURITE')
   if method=='Favourites.GetFavourites':require(params==dict(properties=['window','windowparameter']),'READ_ONLY_FAVOURITES')
   return super().rpc(method,params,timeout)
@@ -88,6 +92,19 @@ def run(inputs,sdk,out):
   uid=device.shell('stat','-c','%u','/data/user/0/'+base.PACKAGE).strip();require(uid.isdigit(),'ACTUAL_APP_UID')
   device.shell('chown','-R',uid+':'+uid,'/data/media/0/Android/data/'+base.PACKAGE);device.shell('restorecon','-RF','/data/media/0/Android/data/'+base.PACKAGE)
   device.adb('forward','tcp:19090','tcp:9090');report['startup']=base.start_once(device,1,out);save()
+  report['first_party_activation']={}
+  with ZipFile(proof['apk']) as archive:
+   import xml.etree.ElementTree as ET
+   for name in ('script.infinity.commandcenter','service.infinity.compat'):
+    expected=ET.fromstring(archive.read('assets/addons/'+name+'/addon.xml')).get('version')
+    details=device.rpc('Addons.GetAddonDetails',dict(addonid=name,properties=['version','enabled']))['addon']
+    require(details['version']==expected,'EXACT_BUNDLED_FIRST_PARTY_VERSION:'+name)
+    before=dict(details)
+    if not details['enabled']:require(device.rpc('Addons.SetAddonEnabled',dict(addonid=name,enabled=True))=='OK','NORMAL_FIRST_PARTY_ENABLE')
+    after=device.rpc('Addons.GetAddonDetails',dict(addonid=name,properties=['version','enabled']))['addon']
+    require(after['enabled'] is True,'FIRST_PARTY_ENABLED')
+    report['first_party_activation'][name]=dict(before=before,after=after)
+  save()
   gui.install_zip(device,proof['qa'],dict(remote_zip_directory=prior.REMOTE),out,'local-observer')
   report['local_python']=prior.invoke(device,proof,out,'local-python',1,uuid.uuid4().hex);save()
   gui.install_zip(device,proof['core'],dict(remote_zip_directory=prior.REMOTE),out,'original-core');report['core_enable']=prior.enable(device,prior.CORE);save()
@@ -108,6 +125,7 @@ def run(inputs,sdk,out):
   deadline=time.monotonic()+120
   while time.monotonic()<deadline:
    active=read_json(device,control+'/active.json');engine=read_json(device,control+'/engine.json');compat=read_json(device,control+'/compat-active.json');participant=read_json(device,control+'/participant.json')
+   report['essential_readiness_observed']=dict(active=active,engine=engine,compat=compat,participant=participant);save()
    if (active.get('owner')==engine.get('owner')==compat.get('owner')==owner['owner'] and
        active.get('pid')==engine.get('pid')==compat.get('pid')==owner['pid'] and
        active.get('status')=='ACTIVE' and participant):break
@@ -147,7 +165,7 @@ def run(inputs,sdk,out):
  finally:
   save()
   if device:
-   for path,name in [(base.HOME+'/temp/kodi.log','kodi.log'),('/data/user/0/'+base.PACKAGE+'/files/infinity-checkpoint-close.json','close.json'),('/data/user/0/'+base.PACKAGE+'/files/infinity-shutdown-native.jsonl','native-shutdown.jsonl')]:
+   for path,name in [(base.HOME+'/temp/kodi.log','kodi.log'),('/data/user/0/'+base.PACKAGE+'/files/infinity-checkpoint-close.json','close.json'),('/data/user/0/'+base.PACKAGE+'/files/infinity-shutdown-native.jsonl','native-shutdown.jsonl')]+[(base.PROFILE+'/addon_data/script.infinity.commandcenter/.android-checkpoint/'+n,n) for n in ('active.json','engine.json','compat-active.json','participant.json')]:
     try:device.adb('pull',path,out/name,check=False,timeout=15)
     except Exception:pass
    try:(out/'logcat.txt').write_text(device.adb('logcat','-d','-v','threadtime',timeout=15))
