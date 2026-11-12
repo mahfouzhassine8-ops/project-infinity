@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, startup82-local-python, startup-internal-qa, core-outcomes-native-qa, core-outcomes-signed-install, core-outcomes-baseline-startup]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, startup82-local-python, startup-internal-qa, core-outcomes-native-qa, core-outcomes-signed-install, core-outcomes-baseline-startup, essential-only-signed-upgrade-recovery]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -2437,5 +2437,78 @@ jobs:
             core-signed-install-sdk/
             core-outcomes-sdk/official-ubuntu-sources.txt
             core-signed-install-emulator-setup/
+          retention-days: 90
+          if-no-files-found: warn
+
+  selected-essential-only-signed-upgrade:
+    name: Original signed84 to repair86 and forward87; synthetic retention only, no launch
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'essential-only-signed-upgrade-recovery' && github.ref == 'refs/heads/work/infinity-essential-only-shutdown-2103483-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      SELECTED_FEATURE: essential-only-signed-upgrade-recovery
+      SELECTED_SOURCE: '${{ inputs.source_ref }}'
+      AUTHORIZED_SCOPE: '${{ inputs.authorization }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Disabled or unbound selection refuses before artifact acquisition or device setup
+        run: python3 repairs/infinity-essential-only-shutdown-2103483-20261112/signed_upgrade.py gate
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - name: Authenticate completed original397 signed84, repair86 and forward87 artifact archives
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/signed_upgrade.py fetch --out essential-signed-upgrade-inputs
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {cmdline-tools-version: '15859902', packages: 'platform-tools build-tools;35.0.0 cmdline-tools;22.0', log-accepted-android-sdk-licenses: false}
+      - name: Verify all three original certificates and v1 v2 v3 signatures; exact three-member payload delta
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/signed_upgrade.py stage --inputs essential-signed-upgrade-inputs --sdk "$ANDROID_HOME"
+      - name: Reuse qualified stock API36 SDK setup without old application suites
+        run: |
+          python - <<'PYSDK'
+          import ast,json,os,subprocess
+          from pathlib import Path
+          retained='a4a89977f085480c720a7b6e73489374d01395dc'
+          source=subprocess.check_output(['git','show',retained+':repairs/four-repair-20261018/android37_gate.py'],text=True)
+          node=next(n for n in ast.parse(source).body if isinstance(n,ast.FunctionDef) and n.name=='pin_tools')
+          exec(compile(ast.Module(body=[node],type_ignores=[]),'retained-sdk-tools','exec'))
+          pin_tools(os.environ['ANDROID_HOME'],'essential-signed-upgrade-sdk')
+          path=Path('essential-signed-upgrade-sdk/prepare_android_emulator.py')
+          path.write_bytes(subprocess.check_output(['git','show',retained+':repairs/android-checkpoint-shutdown/runtime-tests/prepare_android_emulator.py']))
+          PYSDK
+          if ! dpkg-query -W -f='${Status}' libpulse0 2>/dev/null | grep -q 'install ok installed'; then
+            bash repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh emulator
+          fi
+          python essential-signed-upgrade-sdk/prepare_android_emulator.py --out essential-signed-upgrade-emulator-setup
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        timeout-minutes: 20
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 10G
+          avd-name: infinity-tracking-baseline-api36
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python repairs/infinity-essential-only-shutdown-2103483-20261112/signed_upgrade.py run --inputs essential-signed-upgrade-inputs --sdk "$ANDROID_HOME" --out essential-signed-upgrade-results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Essential-Only-Signed-Upgrade-Recovery-${{ github.run_id }}-SYNTHETIC-ONLY-NOT-FOLD
+          path: |
+            essential-signed-upgrade-results/
+            essential-signed-upgrade-inputs/FETCH.json
+            essential-signed-upgrade-inputs/INTAKE.json
+            essential-signed-upgrade-inputs/*-ORIGINAL-SIGNATURE.txt
+            essential-signed-upgrade-inputs/*-BADGING.txt
+            essential-signed-upgrade-inputs/*/API-PROVENANCE.json
+            essential-signed-upgrade-sdk/
+            essential-only-sdk/official-ubuntu-sources.txt
+            essential-signed-upgrade-emulator-setup/
           retention-days: 90
           if-no-files-found: warn
