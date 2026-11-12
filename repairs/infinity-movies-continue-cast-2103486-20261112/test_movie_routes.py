@@ -179,20 +179,53 @@ class MovieRoutes(unittest.TestCase):
         self.assertIsNone(result)
         self.assertEqual([], calls)
 
-    def test_existing_progress_function_and_eligibility_are_not_modified(self):
+    def test_cast_clock_uses_existing_recorder_and_never_marks_an_unfinished_remote_movie_completed(self):
+        tree=ast.parse((HERE/'overlay/script.infinity.commandcenter/service.py').read_text())
+        function=next(n for c in tree.body if isinstance(c,ast.ClassDef) and c.name=='InfinityPlayer'
+                      for n in c.body if isinstance(n,ast.FunctionDef) and n.name=='persist_continue')
+        function.decorator_list=[]
+        movie,_=self.actual_movie()
+        for clock,local_ended in ((dict(position=258.,duration=7200.,completed=False,hold=False),False),
+                                  (dict(position=258.,duration=7200.,completed=False,hold=False),True),
+                                  (dict(hold=True),False)):
+            data=dict(schema=2,items={},watched={},watchlist={},collection={},later={},lists={});saved=[]
+            env=dict(hub=self.hub,time=time,setting_bool=lambda *a:True,_prop=lambda *a:'active-cast-channel',
+                     xbmc=types.SimpleNamespace(getSkinDir=lambda:'skin.infinity.diggz'),
+                     _load_continue=lambda profile:copy.deepcopy(data),
+                     _save_continue=lambda profile,value:saved.append(copy.deepcopy(value)))
+            exec(compile(ast.Module(body=[function],type_ignores=[]),'actual-cast-recorder','exec'),env)
+            def no_phone_clock():raise AssertionError('Cast must not overwrite progress with its paused phone clock')
+            instance=types.SimpleNamespace(cw_item=dict(movie,playback_occurrence='a'*32),cw_key=movie['key'],
+              cw_occurrence='a'*32,cw_pending=False,cw_last_save=0.,profile=self.root,
+              _cast_sample=lambda:clock,getTime=no_phone_clock,getTotalTime=no_phone_clock,isPlayingVideo=lambda:True)
+            env['persist_continue'](instance,completed=local_ended,force=True)
+            if clock.get('hold'):self.assertEqual([],saved)
+            else:
+                self.assertEqual(258.,saved[-1]['items'][movie['key']]['position'])
+                self.assertEqual({},saved[-1]['watched'])
+
+    def test_existing_eligibility_and_default_phone_clock_are_not_modified(self):
         def function(path):
             tree = ast.parse(path.read_text())
             return next(n for c in tree.body if isinstance(c, ast.ClassDef) and c.name == 'InfinityPlayer'
                         for n in c.body if isinstance(n, ast.FunctionDef) and n.name == 'persist_continue')
         old = function(BASE / 'service.py')
         new = function(HERE / 'overlay/script.infinity.commandcenter/service.py')
-        self.assertEqual(ast.dump(old), ast.dump(new))
+        def eligibility(function):
+            index=next(i for i,n in enumerate(function.body) if isinstance(n,ast.Assign) and
+                       any(isinstance(t,ast.Name) and t.id=='percent' for t in n.targets))
+            return ast.dump(ast.Module(body=function.body[index:],type_ignores=[]))
+        self.assertEqual(eligibility(old),eligibility(new))
+        old_clock=next(n for n in old.body if isinstance(n,ast.Try))
+        new_clock=next(n for n in new.body if isinstance(n,ast.Try))
+        self.assertEqual(ast.dump(ast.Module(body=old_clock.body,type_ignores=[])),
+                         ast.dump(ast.Module(body=new_clock.body[0].orelse,type_ignores=[])))
         new.decorator_list = []
         movie, _ = self.actual_movie()
         for position, expected in ((29, 0), (258, 1)):
             saved = []
             data = dict(schema=2, items={}, watched={}, watchlist={}, collection={}, later={}, lists={})
-            env = dict(hub=self.hub, time=time, setting_bool=lambda *a: True,
+            env = dict(hub=self.hub, time=time, setting_bool=lambda *a: True, _prop=lambda *a:'',
                        xbmc=types.SimpleNamespace(getSkinDir=lambda: 'skin.infinity.diggz'),
                        _load_continue=lambda profile: copy.deepcopy(data),
                        _save_continue=lambda profile, value: saved.append(copy.deepcopy(value)))

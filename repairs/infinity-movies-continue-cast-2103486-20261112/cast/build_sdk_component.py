@@ -1,0 +1,107 @@
+"""Compile the isolated Cast component, not an installer or signing workflow.
+
+The official SDK and its private support dependencies are optimized together by
+the Android build tools. Existing APK classes/resources are never input program
+code. Reject every class-name collision with the exact accepted APK. Generated
+resource identifiers live in package 0x80; original 0x7f resources are untouched.
+"""
+from pathlib import Path
+from zipfile import ZipFile, ZIP_DEFLATED
+import hashlib,json,os,re,struct,subprocess,sys
+from dex_contract import Dex, class_contract
+
+HERE=Path(__file__).resolve().parent
+WORK=Path(sys.argv[1]).resolve();APK=Path(sys.argv[2]).resolve()
+SDK=WORK/'tools';DEPS=WORK/'maven';OUT=WORK/'component-reuse86';OUT.mkdir(exist_ok=True)
+assert hashlib.file_digest(APK.open('rb'),'sha256').hexdigest()=='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197'
+baseline={}
+with ZipFile(APK) as z:
+ for n in z.namelist():
+  if re.fullmatch(r'classes\d*\.dex',n):baseline.update(Dex(z.read(n)).classes)
+proof=json.loads((DEPS/'SDK-DEPENDENCIES.json').read_text())
+def run(args):subprocess.run([str(x) for x in args],check=True)
+program=[];resources=[];packages=[];consumer=[]
+for row in proof['artifacts']:
+ src=DEPS/row['file'];assert hashlib.sha256(src.read_bytes()).hexdigest()==row['sha256']
+ if row['type']=='jar':
+  jars=OUT/'jars';jars.mkdir(exist_ok=True);local=jars/(row['coordinate'].replace(':','_')+'.jar')
+  local.write_bytes(src.read_bytes());program.append(local);continue
+ folder=OUT/row['coordinate'].replace(':','_');folder.mkdir(exist_ok=True)
+ with ZipFile(src) as z:
+  for n in z.namelist():
+   if n.endswith('/') or not (n in ('AndroidManifest.xml','classes.jar','proguard.txt') or n.startswith(('res/','META-INF/proguard/'))):continue
+   p=folder/n;assert folder in p.resolve().parents;p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(z.read(n))
+  if (folder/'classes.jar').exists():program.append(folder/'classes.jar')
+  text=(folder/'AndroidManifest.xml').read_text()
+  package=re.search(r'\bpackage="([A-Za-z0-9_.]+)"',text)
+  if package:packages.append(package.group(1))
+  if (folder/'res').is_dir():
+   archive=folder/'flat.zip';run([SDK/'aapt2','compile','--dir',folder/'res','-o',archive]);resources.append(archive)
+  if (folder/'proguard.txt').exists():consumer.append(folder/'proguard.txt')
+  consumer.extend((folder/'META-INF/proguard').glob('*'))
+manifest=OUT/'AndroidManifest.xml'
+manifest.write_text('<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.cast.resources"><uses-sdk android:minSdkVersion="30"/><application android:hasCode="false"/></manifest>')
+generated=OUT/'generated';generated.mkdir(exist_ok=True)
+resource_apk=OUT/'resources.apk'
+run([SDK/'aapt2','link','--manifest',manifest,'--package-id','0x80','--auto-add-overlay',
+     '--java',generated,'--extra-packages',':'.join(sorted(set(packages))),'-I',SDK/'android.jar',
+     '-o',resource_apk]+[x for p in resources for x in ('-R',p)])
+classes=OUT/'classes';classes.mkdir(exist_ok=True)
+stubs=OUT/'stubs/com/projectinfinity/kodi';stubs.mkdir(parents=True,exist_ok=True)
+(stubs/'Main.java').write_text('package com.projectinfinity.kodi; public class Main extends android.app.NativeActivity {public static Main MainActivity;}')
+(stubs/'XBMCJsonRPC.java').write_text('package com.projectinfinity.kodi; public class XBMCJsonRPC {public String request_string(String request){throw new UnsupportedOperationException("compile only");}}')
+snapshot=OUT/'source-copy';snapshot.mkdir(exist_ok=True)
+source_hashes={}
+for p in (HERE/'java').rglob('*.java'):
+ name=p.relative_to(HERE).as_posix();data=p.read_bytes();source_hashes[name]=hashlib.sha256(data).hexdigest()
+ copy=snapshot/name;copy.parent.mkdir(parents=True,exist_ok=True);copy.write_bytes(data)
+(OUT/'SOURCE-JAVA.json').write_text(json.dumps(source_hashes,indent=2)+'\n')
+sources=list((snapshot/'java').rglob('*.java'))+list(generated.rglob('*.java'))+list(stubs.glob('*.java'))
+run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-bootclasspath',os.pathsep.join(str(SDK/n) for n in ('android.jar','core-lambda-stubs.jar')),'-classpath',os.pathsep.join(str(p) for p in [SDK/'android.jar']+program),'-d',classes]+sources)
+compile_lib=OUT/'baseline-api-compile-only.jar';feature=OUT/'feature.jar'
+with ZipFile(compile_lib,'w',ZIP_DEFLATED) as libs,ZipFile(feature,'w',ZIP_DEFLATED) as app:
+ for p in classes.rglob('*.class'):
+  name=p.relative_to(classes).as_posix()
+  (libs if name in ('com/projectinfinity/kodi/Main.class','com/projectinfinity/kodi/XBMCJsonRPC.class') else app).writestr(name,p.read_bytes())
+with ZipFile(compile_lib,'a',ZIP_DEFLATED) as libs:
+ # Compile/link against existing APIs; never include a second AndroidX copy.
+ # Resource library declarations deliberately have no ConstantValue. Reads
+ # must resolve to the accepted APK's actual identifiers, not new 0x80 IDs.
+ reused=[];filtered=[]
+ resource_stubs=OUT/'resource-api';resource_stubs.mkdir(exist_ok=True)
+ for jar in program+[feature]:
+  target=OUT/('only-new-'+jar.parent.name+'-'+jar.name)
+  with ZipFile(jar) as source,ZipFile(target,'w',ZIP_DEFLATED) as output:
+   for name in source.namelist():
+    if not name.endswith('.class'):continue
+    descriptor='L'+name[:-6]+';'
+    if descriptor in baseline:
+     reused.append(descriptor)
+     if '/R$' in descriptor or descriptor.endswith('/R;'):
+      package,leaf=name[:-6].rsplit('/',1)
+      fields=baseline[descriptor]['fields'];assert all(t in ('I','[I') for _,t in fields)
+      path=resource_stubs/package/(leaf+'.java');path.parent.mkdir(parents=True,exist_ok=True)
+      path.write_text('package '+package.replace('/','.')+'; public class '+leaf+' {'+
+          ''.join('public static '+('int[]' if t=='[I' else 'int')+' '+n+';' for n,t in fields)+'}')
+     else:libs.writestr(name,source.read(name))
+    else:output.writestr(name,source.read(name))
+  filtered.append(target)
+ # R classes are declarations only. Existing original field names/values are
+ # owned by immutable baseline DEX, including shared tag/styleable identifiers.
+ resource_classes=OUT/'resource-api-classes';resource_classes.mkdir(exist_ok=True)
+ resource_sources=list(resource_stubs.rglob('*.java'))
+ # Different packages can have the same R$ leaf, so use separate source paths.
+ if resource_sources:
+  run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-d',resource_classes]+resource_sources)
+  for p in resource_classes.rglob('*.class'):libs.writestr(p.relative_to(resource_classes).as_posix(),p.read_bytes())
+rules=OUT/'component.pro'
+rules.write_text('''-keep class com.projectinfinity.kodi.InfinityCast* { *; }
+-repackageclasses com.projectinfinity.kodi.castdeps
+-keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*
+-printmapping '''+str(OUT/'mapping.txt')+'\n')
+dex=OUT/'dex';dex.mkdir(exist_ok=True)
+run(['java','-Xmx2g','-cp',SDK/'d8.jar','com.android.tools.r8.R8','--release','--min-api','21',
+     '--lib',SDK/'android.jar','--lib',compile_lib,'--output',dex,'--pg-conf',rules]+
+    [x for p in consumer for x in ('--pg-conf',p)]+filtered)
+from audit_sdk_component import verify
+verify(APK,SDK,OUT)

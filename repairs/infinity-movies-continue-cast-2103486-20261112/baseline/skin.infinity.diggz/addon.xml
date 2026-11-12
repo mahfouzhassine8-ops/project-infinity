@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<addon id="skin.infinity.diggz" version="1.0.5.273" name="Infinity" provider-name="Infinity">
+  <requires>
+    <import addon="xbmc.gui" version="5.17.0" />
+    <import addon="script.skinshortcuts" version="2.0.1" />
+    <import addon="resource.images.studios.white" version="0.0.1" />
+    <import addon="resource.images.recordlabels.white" version="0.0.1" />
+    <import addon="script.infinity.commandcenter" version="0.3.5.61" />
+    <import addon="xbmc.python" version="3.0.0" />
+    <import addon="script.infinity.rails" version="0.2.5" />
+    <import addon="script.infinity.uirepair" version="0.1.0" />
+  </requires>
+  <extension point="xbmc.gui.skin" debugging="false">
+    <res width="1080" height="2400" aspect="9:20" default="true" folder="unified" />
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Infinity — Entertainment Without Limits.</summary>
+    <description lang="en_GB">Infinity .225 experimental Phase D: forward from exact .224. Coordinated motion policy, asynchronous artwork, adaptive dialog and Settings geometry, and focus/touch corrections. Existing watched/recovery, ZIP preview, Rails, playback, Cobra and shutdown retained. Physical Galaxy Fold acceptance pending.</description>
+    <platform>all</platform>
+    <assets>
+      <icon>resources/icon.png</icon>
+      <fanart>resources/fanart.jpg</fanart>
+    </assets>
+  </extension>
+</addon>

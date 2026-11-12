@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
+        options: [select-a-feature, movies-cast-sdk, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1812,7 +1812,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
+    if: inputs.feature != 'movies-cast-sdk' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -2111,3 +2111,67 @@ jobs:
             watchlist-qa-emulator-setup/
           retention-days: 90
           if-no-files-found: warn
+
+  movies-cast-sdk:
+    name: Cast SDK with accepted86 APIs/resources, separate CI package; no owner installer or shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-sdk' && github.ref == 'refs/heads/work/infinity-movies-continue-cast-2103486-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    env:
+      PYTHONDONTWRITEBYTECODE: '1'
+      CAST_AUTHORIZATION: '${{ inputs.authorization }}'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13935631408', run-id: '43200317103', merge-multiple: true, github-token: '${{ github.token }}', path: signed86}
+      - name: Build isolated component using locked official SDK and existing immutable baseline APIs
+        run: |
+          set -euo pipefail
+          task=repairs/infinity-movies-continue-cast-2103486-20261112
+          test -n "$CAST_AUTHORIZATION"
+          mkdir -p cast-sdk-work/tools
+          ln -s "$ANDROID_HOME/platforms/android-34/android.jar" cast-sdk-work/tools/android.jar
+          ln -s "$ANDROID_HOME/build-tools/35.0.0/aapt2" cast-sdk-work/tools/aapt2
+          ln -s "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" cast-sdk-work/tools/d8.jar
+          ln -s "$ANDROID_HOME/build-tools/35.0.0/core-lambda-stubs.jar" cast-sdk-work/tools/core-lambda-stubs.jar
+          python "$task/cast/resolve_sdk.py" cast-sdk-work/maven
+          python "$task/cast/build_sdk_component.py" cast-sdk-work signed86/Infinity-2103486-Combined-Original-Signer.apk
+          python "$task/cast/build_probe.py" cast-sdk-work signed86/Infinity-2103486-Combined-Original-Signer.apk
+      - name: Separate disposable test package identity, standard CI-only key; never the owner installer
+        run: |
+          set -euo pipefail
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -f 4 cast-sdk-work/probe/CI-ONLY-UNSIGNED-NOT-OWNER-INSTALLER.apk cast-sdk-work/probe/aligned.apk
+          keytool -genkeypair -keystore cast-sdk-work/probe/component-ci-only.jks -storepass component-ci-only -keypass component-ci-only -alias component -dname 'CN=Disposable Cast Component CI' -keyalg RSA -keysize 2048 -validity 2 -noprompt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks cast-sdk-work/probe/component-ci-only.jks --ks-pass pass:component-ci-only --out cast-sdk-work/probe/CI-ONLY-OTHER-PACKAGE.apk cast-sdk-work/probe/aligned.apk
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 6G
+          avd-name: infinity-cast-sdk-component
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python repairs/infinity-movies-continue-cast-2103486-20261112/cast/run_probe.py cast-sdk-android cast-sdk-work/probe/CI-ONLY-OTHER-PACKAGE.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity86-CastSDK-Component-${{ github.run_id }}-NOT-AN-INSTALLER
+          path: |
+            cast-sdk-android/
+            cast-sdk-work/component-reuse86/COMPONENT-RESULT.json
+            cast-sdk-work/component-reuse86/RESOURCE-IDENTITY.json
+            cast-sdk-work/component-reuse86/resources.apk
+            cast-sdk-work/component-reuse86/dex/
+            cast-sdk-work/maven/SDK-DEPENDENCIES.json
+          if-no-files-found: warn
+          retention-days: 90

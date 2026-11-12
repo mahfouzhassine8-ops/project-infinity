@@ -1120,7 +1120,25 @@ class InfinityPlayer(xbmc.Player):
         self.experience = None
         self.shutdown_checkpoint = None
         self.cw_identity_limitation = False
+        self._cast_clock = None
 
+    def _cast_sample(self):
+        try:
+            # The adapter is lazy and read-only. No Cast work, connection or import
+            # occurs on the ordinary playback path.
+            if not _prop('Infinity.Cast.Channel', ''):
+                if self._cast_clock is not None and self._cast_clock.owned:
+                    return self._cast_clock.sample(self)
+                self._cast_clock = None
+                return None
+            if self._cast_clock is None:
+                from cast_runtime import Clock
+                self._cast_clock = Clock(xbmc, xbmcgui)
+            return self._cast_clock.sample(self)
+        except (RuntimeError, OSError, ValueError, TypeError, AttributeError):
+            # A failed optional Cast observer must neither kill the existing
+            # recorder nor overwrite a receiver position with a paused clock.
+            return {'hold': True} if getattr(self._cast_clock, 'owned', False) else None
     @_serialized_callback
     def onAVStarted(self):
         if self.shutdown_checkpoint and self.shutdown_checkpoint.record_event('started'):
@@ -1179,6 +1197,8 @@ class InfinityPlayer(xbmc.Player):
         hub.flush_kodi_sync(self.profile)
 
     def poll(self):
+        if _prop('Infinity.Cast.Channel', '') or (self._cast_clock is not None and self._cast_clock.owned):
+            self._cast_sample()
         if self.isPlayingVideo() and setting_bool('continue_watching_enabled', True):
             if self.cw_pending or not self.cw_item:
                 self._arm_continue()
@@ -1246,8 +1266,18 @@ class InfinityPlayer(xbmc.Player):
             if completed:
                 self.cw_pending = False
             return
+        cast_clock = self._cast_sample() if (_prop('Infinity.Cast.Channel', '') or
+                      (getattr(self, '_cast_clock', None) is not None and self._cast_clock.owned)) else None
+        if cast_clock and cast_clock.get('hold'):
+            return
+        if cast_clock:
+            completed = bool(cast_clock['completed'])
         data = _load_continue(self.profile)
         items = data.setdefault('items', {})
+
+        if (cast_clock and completed and
+                hub.occurrence_completed(data, self.cw_key, self.cw_occurrence)):
+            return
 
         if completed:
             data, watched_entry = hub.mark_watched_data(data, self.cw_key, self.cw_item, completed=True)
@@ -1264,8 +1294,12 @@ class InfinityPlayer(xbmc.Player):
             return
 
         try:
-            position = max(0.0, float(self.getTime()))
-            duration = max(0.0, float(self.getTotalTime()))
+            if cast_clock:
+                position = max(0.0, float(cast_clock['position']))
+                duration = max(0.0, float(cast_clock['duration']))
+            else:
+                position = max(0.0, float(self.getTime()))
+                duration = max(0.0, float(self.getTotalTime()))
         except Exception:
             position = 0.0
             duration = 0.0
