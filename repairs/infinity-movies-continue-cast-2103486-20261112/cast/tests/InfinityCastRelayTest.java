@@ -59,6 +59,7 @@ public final class InfinityCastRelayTest {
         };
         origin.createContext("/private/",serve);other.createContext("/private/",serve);
         origin.createContext("/redirect.mp4",e->{e.getResponseHeaders().set("Location",destination+"/private/other.mp4");e.sendResponseHeaders(302,-1);e.close();});
+        origin.createContext("/get-only.mp4",e->{if(e.getRequestMethod().equals("HEAD")){e.sendResponseHeaders(403,-1);e.close();}else serve.handle(e);});
         origin.createContext("/unsupported.mp4",e->{e.getResponseHeaders().set("Content-Type","application/vnd.apple.mpegurl");e.sendResponseHeaders(200,-1);e.close();});
         CountDownLatch stalled=new CountDownLatch(1),release=new CountDownLatch(1);
         origin.createContext("/stall.mp4",e->{stalled.countDown();try{release.await(8,TimeUnit.SECONDS);}catch(InterruptedException interrupted){Thread.currentThread().interrupt();}e.close();});
@@ -91,6 +92,7 @@ public final class InfinityCastRelayTest {
             slow.getOutputStream().write("G".getBytes(StandardCharsets.US_ASCII));
             check(slow.getInputStream().read()==-1,"incomplete request has total deadline");slow.close();
             retired(relay);
+            relay=start(base+"/get-only.mp4");check(new String(request(relay.address(),"GET","","","127.0.0.1"),StandardCharsets.ISO_8859_1).startsWith("HTTP/1.1 200"),"a source that authorizes GET but rejects HEAD remains castable");retired(relay);
             observed.clear();relay=start(base+"/redirect.mp4|Authorization=Bearer%20private&Cookie=session%3Dprivate");
             request(relay.address(),"GET","","","127.0.0.1");
             check(observed.size()==2 && observed.stream().allMatch(v->v.startsWith("null|null|")),"cross-origin redirect permanently strips private headers");retired(relay);

@@ -115,7 +115,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                     .addOnFailureListener(error->ui.post(()->unavailable("Cast is unavailable on this device. Phone playback is unchanged.")));
         } catch(Exception | LinkageError error) {unavailable("The Cast component could not initialize. Phone playback is unchanged.");}
     }
-    private void unavailable(String reason){initializing=false;message=reason;changed();}
+    private void unavailable(String reason){initializing=false;if(!initialized)initializationAttempted=false;message=reason;changed();}
     private void listen(){if(sdk!=null && !listening){sdk.getSessionManager().addSessionManagerListener(this,CastSession.class);listening=true;}}
     private void unlisten(){if(sdk!=null && listening){sdk.getSessionManager().removeSessionManagerListener(this,CastSession.class);listening=false;}}
     private void discover() {
@@ -140,7 +140,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             if(!ok(value)){unavailable("No supported active video is available. Phone playback is unchanged.");return;}
             source=value;privateSource=readSource(value);mime=null;
             if(privateSource==null || !value.optBoolean("can_pause") || !value.optBoolean("can_seek")) {
-                privateSource=null;message="This source does not expose a supported HTTP video transport. Phone playback is unchanged.";
+                privateSource=null;message=value.optBoolean("cast_drm")?"This source requires DRM; Cast cannot transfer it. Phone playback continues.":"This source does not expose a supported seekable HTTP video transport. Phone playback is unchanged.";
             } else message="Choose a Cast device.";
             changed();
         });
@@ -183,7 +183,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             if(!expected.equals(token) || cleanupPending)return;
             if(!ok(value)){message="No supported active video is available. Phone playback is unchanged.";changed();return;}
             source=value;privateSource=readSource(value);
-            if(privateSource==null){message="Unsupported current video transport. Phone playback is unchanged.";changed();return;}
+            if(privateSource==null || !value.optBoolean("can_pause") || !value.optBoolean("can_seek")){privateSource=null;message=value.optBoolean("cast_drm")?"This source requires DRM; Cast cannot transfer it. Phone playback continues.":"Unsupported current video transport. Phone playback is unchanged.";changed();return;}
             for(int i=0;i<devices.size();i++)if(routeId.equals(devices.get(i).getId())){choose(i);return;}
             message="That receiver is no longer available.";changed();
         });

@@ -17,6 +17,8 @@ LABEL='assets/experience-component-updates.properties';LIB='lib/arm64-v8a/libkod
 PREFIX='repairs/infinity-cast-final-2103488-20261112/'
 SCOPE='repairs/infinity-cast-final-2103488-20261112/SCOPE.json'
 BASE_SOURCE='f0aa976d90b262373cea56942a44c9e382ccfaa3'
+RECOVERY_SOURCE='ab5f3e41721291091e5fe177787156408193c0fa'
+RECOVERY_SHA='5fa350dd945fcb8f294975be6fd16ee3c4432ffa1519089aa70bbde680fdf834'
 
 def request(canonical=False):
  c.context(canonical);r=c.load(HERE/'REQUEST.json')
@@ -25,7 +27,7 @@ def request(canonical=False):
  c.require(c.sha(ROOT/c.WORKFLOW)==r['workflow_sha256'],'SOURCE_BOUND_ORIGINAL_WORKFLOW')
  c.tools();return r
 
-def owners(row):
+def owners(row,kind):
  c.producer(row);folder=ROOT/'cast-final-owner-input';folder.mkdir(exist_ok=True);archive=folder/'authenticated.zip'
  if not archive.exists():
   with archive.open('xb') as out:subprocess.run(['gh','api','repos/'+c.REPO+'/actions/artifacts/'+str(row['id'])+'/zip'],stdout=out,check=True,timeout=900)
@@ -35,10 +37,10 @@ def owners(row):
   c.require(len(z.namelist())==len(set(z.namelist())) and sum(x.file_size for x in z.infolist())<8*1024**3,'SAFE_COMPLETE_OWNER_ARCHIVE')
   for item in z.infolist():
    p=Path(item.filename);c.require(not p.is_absolute() and '..' not in p.parts and '\\' not in item.filename and not stat.S_ISLNK(item.external_attr>>16),'SAFE_OWNER_MEMBER')
-   if not item.is_dir() and item.filename.startswith('candidate/components/'):
+   if not item.is_dir() and item.filename.startswith(kind+'/components/'):
     target=dest/p;target.parent.mkdir(parents=True,exist_ok=True)
     with z.open(item) as src,target.open('wb') as dst:shutil.copyfileobj(src,dst,1024*1024)
- root=dest/'candidate/components';catalog=c.load(root/'catalog.json');a=json.loads(c.git('show',BASE_SOURCE+':'+c.AUTHORITY))
+ root=dest/kind/'components';catalog=c.load(root/'catalog.json');a=json.loads(c.git('show',(BASE_SOURCE if kind=='candidate' else RECOVERY_SOURCE)+':'+c.AUTHORITY))
  c.require(catalog==a['bundle_catalog'],'EXACT_SIGNED88_APPROVED_OWNER_CATALOG');return root,catalog
 
 def compiled(r):
@@ -73,7 +75,7 @@ def preservation(base,apk,kind,changes):
    else:same+=1
   c.require(set(rows)==({'AndroidManifest.xml',LABEL,LIB,DEX} if kind=='candidate' else {'AndroidManifest.xml',LABEL}),'EXACT_FOUR_OR_TWO_METADATA_CHANGES')
   c.require(cb.normalize_manifest(a.read('AndroidManifest.xml'))[0]==cb.normalize_manifest(b.read('AndroidManifest.xml'))[0],'NO_MANIFEST_CHANGE_EXCEPT_VERSION')
- return dict(status='PASS_EXACT_SIGNED88_CAST_ONLY_MEMBER_VECTOR',baseline_APK_sha256=c.BASE,versionCode=VERSIONS[kind],kind=kind,changed_members=rows,unchanged_payload_members=same,added_members=[],removed_members=[],original_five_DEX_unchanged=True,Cobra_changed=False,Command_Center_or_movie_or_tracking_changed=False,skin_changed=False,providers_or_Search_changed=False,shutdown_or_persistence_guards_changed=False,Python_startup_changed=False,profiles_or_databases_read_or_changed=False,Fold_acceptance='PENDING_OWNER_ONE_SESSION')
+ return dict(status='PASS_EXACT_SIGNED88_CAST_ONLY_MEMBER_VECTOR',baseline_APK_sha256=c.BASE if kind=='candidate' else RECOVERY_SHA,protected_recovery_functional_baseline=2103486,versionCode=VERSIONS[kind],kind=kind,changed_members=rows,unchanged_payload_members=same,added_members=[],removed_members=[],original_five_DEX_unchanged=True,Cobra_changed=False,Command_Center_or_movie_or_tracking_changed=False,skin_changed=False,providers_or_Search_changed=False,shutdown_or_persistence_guards_changed=False,Python_startup_changed=False,profiles_or_databases_read_or_changed=False,Fold_acceptance='PENDING_OWNER_ONE_SESSION')
 
 def class_rows(dex,out,label):
  inventory,_,_,_,_=c.tools();mini=out/(label+'.zip');folder=out/(label+'-smali')
@@ -89,7 +91,7 @@ def bundle(src,dst,owner,version,changes,new_classes=None,old_classes=None,dex=N
    raw_hash=old.data_hash(value);normal=c.digest(cb.normalize_manifest(value)[0]) if name=='AndroidManifest.xml' else raw_hash
    meta['payload']['member:'+name]=dict(owner=owner,sha256=normal);meta['members'][name]=dict(meta['members'][name],sha256=raw_hash);replacements['payload/'+name]=value
   if owner=='INFINITY' and new_classes is not None:
-   for name in old_classes:c.require(meta['payload'].pop('class:'+name)['owner']=='INFINITY','OLD_CAST_DEX_OWNER')
+   for name,row in old_classes.items():c.require(meta['payload'].pop('class:'+name)==dict(owner='INFINITY',sha256=row['sha256']),'OLD_CAST_DEX_OWNER_AND_BYTES')
    for name,row in new_classes.items():
     c.require('class:'+name not in meta['payload'],'CAST_CANNOT_REPLACE_AN_ORIGINAL_FIVE_DEX_CLASS');meta['payload']['class:'+name]=dict(owner='INFINITY',sha256=row['sha256'])
    c.require('dex/cast-private.dex' in meta['dex'],'EXACT_EXISTING_CAST_DEX');meta['dex']['dex/cast-private.dex']=c.sha(dex);replacements['dex/cast-private.dex']=dex
@@ -102,7 +104,8 @@ def prepare():
  r=request();parent=c.api('git/ref/heads/'+c.CANONICAL)['object']['sha'];c.require(parent==r['registry_parent_source'],'RECONCILE_REGISTRY_RACE')
  a=json.loads(c.git('show',parent+':'+c.AUTHORITY));c.require((a['generation'],a['candidate_versionCode'])==(74,2103489),'UNUSED_NEXT90_91_FROM_ACTUAL_REGISTRY')
  base=c.unique(c.obtain(r['inputs']['baseline'],'final-base'),'Infinity-2103488-Combined-Original-Signer.apk');c.require(c.sha(base)==c.BASE,'EXACT_SIGNED88_STARTING_APK');c.signature(base)
- owner_root,catalog=owners(r['inputs']['owners']);native,component,dex,proof=compiled(r)
+ owner_root,catalog=owners(r['inputs']['owners'],'candidate');recovery_owners,recovery_catalog=owners(r['inputs']['owners'],'recovery');native,component,dex,proof=compiled(r)
+ recovery_base=c.unique(c.obtain(r['inputs']['protected_recovery'],'final-recovery-base'),'Infinity-2103489-Combined-Original-Signer.apk');c.require(c.sha(recovery_base)==RECOVERY_SHA,'EXACT_PROTECTED86_FORWARD_RECOVERY89');c.signature(recovery_base)
  inventory,cb,_,_,review=c.tools();out=ROOT/'cast-final-prepared';out.mkdir(exist_ok=False)
  olddex=out/'baseline-cast.dex'
  with ZipFile(base) as z:olddex.write_bytes(z.read(DEX))
@@ -118,17 +121,15 @@ def prepare():
   c.require(z.read('assets/infinity/cast/RESOURCE-IDENTITY.json')==(component/'RESOURCE-IDENTITY.json').read_bytes() and old.member_sha(z,'assets/infinity/cast/resources.apk')==c.sha(component/'resources.apk'),'UNCHANGED_CAST_RESOURCES')
   for n,h in proof['private_resources'].items():c.require(old.member_sha(z,n)==h,'UNCHANGED_DEPENDENCY_RESOURCE')
  for kind,version in VERSIONS.items():
-  dest=out/kind;dest.mkdir();components=dest/'components';components.mkdir();changes=updates(base,kind,native,dex,version);apk=dest/('Infinity-'+str(version)+'-UNSIGNED-NOT-INSTALLABLE.apk')
-  with ZipFile(base) as src,ZipFile(apk,'w',allowZip64=True) as target:
+  dest=out/kind;dest.mkdir();components=dest/'components';components.mkdir();selected_base=base if kind=='candidate' else recovery_base;selected_owners=owner_root if kind=='candidate' else recovery_owners;selected_catalog=catalog if kind=='candidate' else recovery_catalog;changes=updates(selected_base,kind,native,dex,version);apk=dest/('Infinity-'+str(version)+'-UNSIGNED-NOT-INSTALLABLE.apk')
+  with ZipFile(selected_base) as src,ZipFile(apk,'w',allowZip64=True) as target:
    for n in src.namelist():
     if n not in inventory.SIGNATURE:old.copy_entry(src,target,n,changes.get(n))
-  proof_pres=preservation(base,apk,kind,changes);proof_pres.update(unsigned_sha256=c.sha(apk),source=os.environ['GITHUB_SHA']);c.save(dest/'PRESERVATION.json',proof_pres)
-  cat=copy.deepcopy(catalog);cat['source']=os.environ['GITHUB_SHA'];cat['release_approved']=False
+  proof_pres=preservation(selected_base,apk,kind,changes);proof_pres.update(unsigned_sha256=c.sha(apk),source=os.environ['GITHUB_SHA']);c.save(dest/'PRESERVATION.json',proof_pres)
+  cat=copy.deepcopy(selected_catalog);cat['source']=os.environ['GITHUB_SHA'];cat['release_approved']=False
   for owner in cb.OWNED:
-   row=cat['bundles'][owner];source=owner_root/row['file'];target=components/row['file']
+   row=cat['bundles'][owner];source=selected_owners/row['file'];target=components/row['file']
    if owner=='COBRA':shutil.copyfile(source,target)
-   elif kind=='recovery' and owner=='MINIMAL_ANDROID_CONTRACT':
-    oldcat=c.load(out/'candidate/components/catalog.json');row=cat['bundles'][owner]=oldcat['bundles'][owner];shutil.copyfile(out/'candidate/components'/row['file'],target)
    else:
     meta=bundle(source,target,owner,version,changes,new_classes if kind=='candidate' and owner=='INFINITY' else None,old_classes,dex)
     row.update(sha256=c.sha(target),**{k:meta[k] for k in ('version','digest','approved_source')})
@@ -142,7 +143,8 @@ def prepared(r):
  c.require(receipt['status']=='PASS_CAST_ONLY_COMPLETE_PAIR_PREPARATION' and receipt['inputs']==r['inputs'] and receipt['source']==r['prepared_producer']['source'],'EXACT_PREPARED_CAST_PAIR');return p.parent
 
 def verify(r,kind,apk):
- base=c.unique(c.obtain(r['inputs']['baseline'],'final-base'),'Infinity-2103488-Combined-Original-Signer.apk');c.require(c.sha(base)==c.BASE,'EXACT_SIGNED88_BASE');native,component,dex,proof=compiled(r)
+ role='baseline' if kind=='candidate' else 'protected_recovery';version=2103488 if kind=='candidate' else 2103489;expected=c.BASE if kind=='candidate' else RECOVERY_SHA
+ base=c.unique(c.obtain(r['inputs'][role],'final-verify-'+kind),'Infinity-'+str(version)+'-Combined-Original-Signer.apk');c.require(c.sha(base)==expected,'EXACT_APPROVED_STARTING_APK');native,component,dex,proof=compiled(r)
  return preservation(base,apk,kind,updates(base,kind,native,dex,VERSIONS[kind]))
 
 def propose():
@@ -152,14 +154,14 @@ def propose():
  c.require(c.api('git/ref/heads/'+c.CANONICAL)['object']['sha']==os.environ['GITHUB_SHA'],'CURRENT_ORIGINAL_SIGNER_HEAD')
  c.require(c.load(c.CORE/'ownership-reviewed-roots.json')==c.load(root/'OWNERSHIP-POLICY-PROPOSAL.json'),'EXACT_CAST_ONLY_CLASS_POLICY')
  catalog=c.load(root/kind/'components/catalog.json');meta={o:cb.read_bundle(root/kind/'components'/row['file'],row) for o,row in catalog['bundles'].items()}
- targets=['INFINITY','CHOOSER_SHELL']+(['MINIMAL_ANDROID_CONTRACT'] if kind=='candidate' else [])
+ targets=['INFINITY','CHOOSER_SHELL','MINIMAL_ANDROID_CONTRACT']
  result=copy.deepcopy(current);result.update(generation=GENERATIONS[kind],candidate_versionCode=VERSIONS[kind],last_issued_versionCode=current['candidate_versionCode'],previous_authority_sha256=inventory.digest(inventory.canonical(current)),target_owners=targets,update_kind='owner_update',payload={n:v for m in meta.values() for n,v in m['payload'].items()},bundle_catalog=catalog,experience_version_labels=dict(INFINITY=VERSIONS[kind],COBRA=2103445),workflow_sha256=c.sha(ROOT/c.WORKFLOW))
  for owner in targets:
   result['components'][owner]={k:meta[owner][k] for k in ('version','digest','approved_source','settings_schema')};result['components'][owner]['revision']=current['components'][owner]['revision']+1
   result['bundle_sources'][owner]=dict(run_id=r['prepared_producer']['run'],build_source=r['prepared_producer']['source'],artifact=r['prepared_producer']['name'],path=kind+'/components/'+owner+'.zip')
  for n in result['source_files']:result['source_files'][n]=c.sha(ROOT/n)
- result['cast_manifest_exception']=dict(schema=1,mode='candidate',baseline_APK_sha256=release_guard.APK,reference=release_guard.REFERENCE,reference_sha256=release_guard.REFERENCE_SHA,baseline_normalized_sha256=release_guard.NORMALIZED,candidate_manifest_sha256=release_guard.expected('candidate'),source_inputs={n:c.sha(ROOT/n) for n in release_guard.SOURCE_NAMES})
- result['owner_update_evidence']=dict(owner='INFINITY_CAST_FINAL_'+kind.upper(),producer_run=r['prepared_producer']['run'],producer_source=r['prepared_producer']['source'],artifact={k:r['prepared_producer'][k] for k in ('id','name','digest','size_in_bytes')},source_files=dict(r['source_bindings'],**{str((HERE/'REQUEST.json').relative_to(ROOT)):c.sha(HERE/'REQUEST.json')}),baseline_APK_sha256=c.BASE,preparation_sha256=c.sha(root/kind/'PRESERVATION.json'),Fold='OWNER_ACCEPTANCE_AFTER_SIGNING',Cast_receiver='OWNER_ACCEPTANCE_AFTER_SIGNING',original_five_DEX_unchanged=True,Cobra_changed=False,shutdown_source_changed=False,accepted_pointer_updated=False,publication=False,public_release=False,owner_delivery_cleared=False,verification_toolchain=current['owner_update_evidence']['verification_toolchain'])
+ result['cast_manifest_exception']=dict(schema=1,mode='candidate' if kind=='candidate' else 'recovery',baseline_APK_sha256=release_guard.APK,reference=release_guard.REFERENCE,reference_sha256=release_guard.REFERENCE_SHA,baseline_normalized_sha256=release_guard.NORMALIZED,candidate_manifest_sha256=release_guard.expected('candidate' if kind=='candidate' else 'recovery'),source_inputs={n:c.sha(ROOT/n) for n in release_guard.SOURCE_NAMES})
+ result['owner_update_evidence']=dict(owner='INFINITY_CAST_FINAL_'+kind.upper(),producer_run=r['prepared_producer']['run'],producer_source=r['prepared_producer']['source'],artifact={k:r['prepared_producer'][k] for k in ('id','name','digest','size_in_bytes')},source_files=dict(r['source_bindings'],**{str((HERE/'REQUEST.json').relative_to(ROOT)):c.sha(HERE/'REQUEST.json')}),baseline_APK_sha256=c.BASE,protected_recovery_baseline_APK_sha256='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197',preparation_sha256=c.sha(root/kind/'PRESERVATION.json'),Fold='OWNER_ACCEPTANCE_AFTER_SIGNING',Cast_receiver='OWNER_ACCEPTANCE_AFTER_SIGNING',original_five_DEX_unchanged=True,Cobra_changed=False,shutdown_source_changed=False,accepted_pointer_updated=False,publication=False,public_release=False,owner_delivery_cleared=False,verification_toolchain=current['owner_update_evidence']['verification_toolchain'])
  ra.transition(current,result,targets);ra.verify_evidence(result,lambda n:(ROOT/n).read_bytes());ra.verify(result,{n:v['sha256'] for n,v in result['payload'].items()},VERSIONS[kind],GENERATIONS[kind])
  out=ROOT/'cast-final-authority';out.mkdir(exist_ok=False);(out/'AUTHORITY-PROPOSAL.json').write_bytes(inventory.canonical(result));c.save(out/'PRESERVATION.json',proof);print('PASS_CAST_ONLY_AUTHORITY_PROPOSAL_NO_KEY_ACCESS')
 

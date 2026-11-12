@@ -221,7 +221,8 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         Response response=open(root,"HEAD",null);String type=null;
         try {
             if(response.code()==200 || response.code()==206)type=InfinityCastSource.mime(response.header("Content-Type"),source.hint);
-            else if(response.code()!=405 && response.code()!=501)throw new IOException("source_http_"+response.code());
+            // A method-bound signed source may reject HEAD yet permit GET.
+            // Only the actual bounded GET response may reject that source.
             if(type!=null && !InfinityCastAdaptive.adaptive(type))return type;
         } finally {release(response);}
         response=open(root,"GET",null);

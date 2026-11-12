@@ -174,10 +174,10 @@ final class InfinityCastAdaptive {
     private static byte[] dash(byte[] input,URI base,Links links) throws IOException {
         try {
             // Reject DTDs before parsing, in addition to parser-level controls.
-            String raw=utf8(input);if(raw.toUpperCase(Locale.ROOT).contains("<!DOCTYPE") || raw.toUpperCase(Locale.ROOT).contains("<!ENTITY"))throw new IOException("external_xml_refused");
+            String raw=utf8(input);if(raw.indexOf(0)>=0 || raw.toLowerCase(Locale.ROOT).contains("http://www.w3.org/2001/xinclude"))throw new IOException("external_xml_refused");if(raw.toUpperCase(Locale.ROOT).contains("<!DOCTYPE") || raw.toUpperCase(Locale.ROOT).contains("<!ENTITY"))throw new IOException("external_xml_refused");
             DocumentBuilderFactory factory=DocumentBuilderFactory.newInstance();factory.setNamespaceAware(true);
             factory.setExpandEntityReferences(false);
-            try{factory.setXIncludeAware(false);}catch(UnsupportedOperationException unsupported){if(factory.isXIncludeAware())throw new IOException("external_xml_refused");}
+            try{factory.setXIncludeAware(false);}catch(UnsupportedOperationException unsupported){/* Android has no XInclude implementation; fresh factory default is off. XInclude input is refused above and by namespace validation. */}
             Document document=factory.newDocumentBuilder().parse(new ByteArrayInputStream(input));prune(document);Element root=document.getDocumentElement();
             if(!"MPD".equals(root.getLocalName()))throw new IOException("invalid_dash_manifest");
             NodeList all=root.getElementsByTagNameNS("*","*");if(all.getLength()>20000)throw new IOException("manifest_entry_limit");
@@ -207,6 +207,6 @@ final class InfinityCastAdaptive {
             }
             StringBuilder output=new StringBuilder("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             serialize(root,output);return output.toString().getBytes(StandardCharsets.UTF_8);
-        } catch(IOException failure){throw failure;}catch(Exception invalid){InfinityCastDiagnostics.event("manifest_xml",invalid.getClass().getSimpleName().toLowerCase(Locale.ROOT),0);throw new IOException("invalid_or_unsupported_dash_manifest");}
+        } catch(IOException failure){throw failure;}catch(Exception invalid){InfinityCastDiagnostics.event("manifest_xml",invalid.getClass().getSimpleName().toLowerCase(Locale.ROOT),0);if(invalid.getStackTrace().length>0){StackTraceElement top=invalid.getStackTrace()[0];String api=(top.getClassName().substring(top.getClassName().lastIndexOf('.')+1)+"_"+top.getMethodName()).toLowerCase(Locale.ROOT).replaceAll("[^a-z_]", "_");InfinityCastDiagnostics.event("manifest_api",api.substring(0,Math.min(48,api.length())),0);}throw new IOException("invalid_or_unsupported_dash_manifest");}
     }
 }

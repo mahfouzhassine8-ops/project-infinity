@@ -68,8 +68,13 @@ def transition(previous,proposed,targets):
             require(previous['candidate_versionCode']==2103487 and proposed['candidate_versionCode']==2103488 and previous.get('cast_manifest_exception') is None,'EXACT_RECONCILED87_TO88_CAST')
         require(a['member:AndroidManifest.xml']['sha256']==NORMALIZED,'ACCEPTED86_MANIFEST_REQUIRED')
     else:
-        require(previous['candidate_versionCode']==2103488 and proposed['candidate_versionCode']==2103489 and
-                validate(previous)['mode']=='candidate','EXACT88_TO89_FORWARD_RECOVERY')
+        if previous['candidate_versionCode']==2103490 and proposed['candidate_versionCode']==2103491:
+            evidence=proposed.get('owner_update_evidence',{})
+            require(validate(previous)['mode']=='candidate' and evidence.get('owner')=='INFINITY_CAST_FINAL_RECOVERY' and
+                    evidence.get('protected_recovery_baseline_APK_sha256')==APK,'EXACT90_TO91_PROTECTED86_FORWARD_RECOVERY')
+        else:
+            require(previous['candidate_versionCode']==2103488 and proposed['candidate_versionCode']==2103489 and
+                    validate(previous)['mode']=='candidate','EXACT88_TO89_FORWARD_RECOVERY')
         require(b['member:AndroidManifest.xml']['sha256']==NORMALIZED,'EXACT86_MANIFEST_RECOVERY')
     return proof
 def verify_evidence(authority,read):
