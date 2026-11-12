@@ -1,19 +1,19 @@
 {
   "APK": false,
   "CC_versions": {
-    "candidate": "0.3.5.81",
-    "recovery": "0.3.5.82"
+    "candidate": "0.3.5.83",
+    "recovery": "0.3.5.84"
   },
   "baseline_APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
   "expected_modules": {
     "candidate": {
-      "script.infinity.commandcenter/INFINITY-MODULES.v1": "da54b8622e5a54850cd481a039d712e0be959a8c3c9033b7dee94d855a89e539",
+      "script.infinity.commandcenter/INFINITY-MODULES.v1": "df66656d30cc4c6ad3d94866ddd7a09de7f064cd2947026517f4b65db9054b40",
       "script.infinity.commandcenter/INSTALL-BASELINE.v1": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
       "script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
       "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
       "script.infinity.commandcenter/SEARCH-STRUCTURES.json": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
       "script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
-      "script.infinity.commandcenter/addon.xml": "dc530815be2945ac96c85d7bb87b8770381a3fde3b5af0d51e2839d32e9ea1b6",
+      "script.infinity.commandcenter/addon.xml": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4",
       "script.infinity.commandcenter/cast_runtime.py": "da2b071f120487dce2f424d98c4f8a0040e11527f9caa0eaf4336c5bb3377690",
       "script.infinity.commandcenter/checkpoint_runtime.py": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
       "script.infinity.commandcenter/common.py": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
@@ -68,7 +68,7 @@
       "script.infinity.commandcenter/saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
       "script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
       "script.infinity.commandcenter/selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
-      "script.infinity.commandcenter/service.py": "11a3d1e548f29fb7d36d25882125ebc2043499e0b9268a22c733d10366020aed",
+      "script.infinity.commandcenter/service.py": "ed0c9a2a1856c7eeae21603fdcd8b2c3f068bf33e53dbbe10d3faf74590a872b",
       "script.infinity.commandcenter/skin_upgrade.py": "e3aadefa8345a78dc71bb9ab5ee428e947819d6e76576c772bb34e474b3eaedb",
       "script.infinity.commandcenter/structural_search.py": "dd0b200829fc63372ec88a0ba991bd98a7a3459f597853a5bc991a9e4e6693b3",
       "script.infinity.commandcenter/title_metadata.py": "115ac88c67e3fc9b3568ede2b3b019e10ab2829c6d0c14bef60d90d6248ad51e",
@@ -91,13 +91,13 @@
       "script.infinity.watchedbridge/default.py": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c"
     },
     "recovery": {
-      "script.infinity.commandcenter/INFINITY-MODULES.v1": "e4aea6e9b20431c111fa0cd864af13852a4dd8a60ed469e3c63f15994374e3e6",
+      "script.infinity.commandcenter/INFINITY-MODULES.v1": "ecbaea134dc409042cea832c5a66c25e561394f6d9288be4e392543844878a6d",
       "script.infinity.commandcenter/INSTALL-BASELINE.v1": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
       "script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
       "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
       "script.infinity.commandcenter/SEARCH-STRUCTURES.json": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
       "script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
-      "script.infinity.commandcenter/addon.xml": "38347390977a01dd846584fd416d6cf8e701e4357373b236cfc22c146dd6bbae",
+      "script.infinity.commandcenter/addon.xml": "6093225c6856803dcc86c6048bee3f4f2e97cc142ccc2dbdeb911d70afc9d0fd",
       "script.infinity.commandcenter/checkpoint_runtime.py": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
       "script.infinity.commandcenter/common.py": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
       "script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
@@ -174,7 +174,7 @@
       "script.infinity.watchedbridge/default.py": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c"
     }
   },
-  "note": "Refresh required only for movie arming source correction. Earlier internal signed79/80 preserved; no owner APK issued. Owner explicitly accepts physical/receiver QA after signing.",
+  "note": "Final movie local-snapshot confirmation fix; older internal generations remain preserved. Native and SDK unchanged.",
   "operation": "prepare-original86-movies-cast-modules",
   "owner_installer": false,
   "registry_mutation": false,
@@ -185,10 +185,10 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/default.py": "1e671c44c6d0cfbb1e7c372e79843e292958b7f3ad59f06eb6756214169f494c",
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/experience.py": "c358be6a7aa18e7bc59d048b77911b44c6e6e3a8f5d7c3229fb1da8ae90bb2eb",
     "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/plugin.py": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/service.py": "11a3d1e548f29fb7d36d25882125ebc2043499e0b9268a22c733d10366020aed",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/service.py": "ed0c9a2a1856c7eeae21603fdcd8b2c3f068bf33e53dbbe10d3faf74590a872b",
     "repairs/infinity-movies-continue-cast-2103486-20261112/release/OWNER-QA-AUTHORIZATION.json": "a684a41be6799bbc58f5d3fac5503852e2b909c5cd7d7afbbef292ebd890942d",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/release/module_gate.py": "8cf2978b72180011426896ab707fa9499b67d5a28bc81bef6c86bbc256a028b3",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/release/prepare_modules.py": "b426dcc8bf291af09402cfc8b5595452188addd4e7497a1de8a278eb9c181be7"
+    "repairs/infinity-movies-continue-cast-2103486-20261112/release/module_gate.py": "93629339696052facd1efc436baf5c98e20c7065bc0095e67d7b89fe25e16300",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/release/prepare_modules.py": "3b891bccbe2507b3e0e03ca07af01838a4c125fe498b574f9db5e03bcf82c8e5"
   },
-  "workflow_sha256": "7960d4a9ca449c4b9b606204b301554895f8618252b8d8f9afb53dbdc33daee1"
+  "workflow_sha256": "d94bba05f572389b0d3a7e3fba9b70ac0b7ac337de0e9220bdc9d63550354bdc"
 }

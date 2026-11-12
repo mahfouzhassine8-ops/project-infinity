@@ -171,7 +171,8 @@ class MovieRoutes(unittest.TestCase):
         nodes = [n for n in tree.body if isinstance(n, ast.FunctionDef) and
                  n.name in ('_continue_identity', '_continue_movie_route_item')]
         exec(compile(ast.Module(body=nodes, type_ignores=[]), str(source), 'exec'), env)
-        return env['_continue_movie_route_item']({} if dropped_rpc else raw), calls
+        self.actual_input = {} if dropped_rpc else raw
+        return env['_continue_movie_route_item'](self.actual_input), calls
 
     def test_actual_native_movie_survives_generic_fallback_dropping_untyped_rpc_item(self):
         result, calls = self.actual_movie(dropped_rpc=True)
@@ -180,6 +181,9 @@ class MovieRoutes(unittest.TestCase):
         self.assertEqual('', result['source'])  # replay the verified provider, never the expiring stream
         self.assertTrue(result['stable_source'].startswith('plugin://plugin.video.umbrella/'))
         self.assertEqual(2, len(calls))
+        self.assertEqual('movie', self.actual_input['type'])
+        self.assertEqual(result['stable_source'], self.actual_input['infinity_original_route'])
+        self.assertEqual(-1, self.actual_input['id'])
         self.assertIsNone(self.actual_movie(dropped_rpc=True, native_route='')[0])
         self.assertIsNone(self.actual_movie(dropped_rpc=True, race=True)[0])
         self.assertIsNone(self.actual_movie(dropped_rpc=True, playing=False)[0])

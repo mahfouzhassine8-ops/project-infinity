@@ -142,7 +142,8 @@ def stage():
     with ZipFile(mini,'w') as z:z.write(dex,'classes.dex')
     inventory.disassemble(mini,c.jars(),out/'cast-smali');classes,calls,_=inventory.parse_dex(out/'cast-smali')
     c.require(len(classes)==component['new_classes'],'ALL_ACTUAL_CAST_CLASSES_FINGERPRINTED')
-    policy=c.load(c.CORE/'ownership-reviewed-roots.json');proposed=policy_for_new(classes,policy)
+    policy=json.loads(c.git('show','e1ef672a6f24aed6c19a14ab96d2df6fe3380460:repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json'))
+    proposed=policy_for_new(classes,policy)
     for n,row in classes.items():c.require(review.class_owner(n,'',proposed)=='INFINITY','CAST_CLASS_OWNER')
     c.save(out/'OWNERSHIP-POLICY-PROPOSAL.json',proposed);c.save(out/'CAST-CLASSES.json',classes)
     module_root=c.unique(inputs['modules'],'ORIGINAL-SIGNATURE-VERIFICATION.json').parent

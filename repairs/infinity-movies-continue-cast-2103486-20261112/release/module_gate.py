@@ -26,7 +26,7 @@ def gate():
     run=json.loads(subprocess.check_output(['gh','api','repos/'+REPO+'/actions/runs/'+os.environ['GITHUB_RUN_ID']]))
     assert run['workflow_id']==397702717 and run['head_sha']==os.environ['GITHUB_SHA'],'Sole existing original signer workflow required'
     before=git('show',LOCK+':'+WORKFLOW).decode().rstrip()
-    expected=before.replace('sign-essential-recovery]','sign-essential-recovery, prepare-movies-cast-modules]',1)
+    expected=before.replace('sign-essential-recovery]','sign-essential-recovery, prepare-movies-cast-modules, prepare-movies-cast-release, review-movies-cast-release, sign-movies-cast]',1)
     current=(ROOT/WORKFLOW).read_text()
     assert current.split('\n  prepare-movies-cast-modules:\n')[0].rstrip()==expected,'Pre-existing signer jobs changed'
     assert sha(current.encode())==request['workflow_sha256']

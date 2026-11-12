@@ -879,6 +879,11 @@ def _continue_movie_route_item(item):
         result = _continue_identity(current)
         if not player.isPlayingVideo() or snapshot() != before:
             return None
+        if result:
+            # Existing saved-navigation confirmation consumes this local RPC
+            # snapshot. Supply only the now-proved actual movie, so a discarded
+            # untyped response cannot leave a successful recovery pending.
+            item.update(current)
         return result
     except (AttributeError, RuntimeError, ValueError, TypeError):
         return None
