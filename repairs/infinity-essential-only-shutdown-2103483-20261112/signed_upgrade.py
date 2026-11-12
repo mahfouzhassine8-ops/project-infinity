@@ -57,7 +57,15 @@ def run(inputs,sdk,out):
  require(not out.exists(),'FRESH_RESULTS');r,base,tools,paths=stage(inputs,sdk);out.mkdir(parents=True)
  report=dict(status='RUNNING',scope=FEATURE,source=os.environ['SELECTED_SOURCE'],application_launched=False,shutdown='NOT_RUN',native_runtime='NOT_RUN',native_injection=False,real_userdata='NOT_RUN',Fold='NOT_RUN',steps=[]);device=None
  try:
-  device=base.Device(out,sdk);report['environment']=base.environment(device,out);require(not device.shell('pm','list','packages',old.PACKAGE).strip(),'NEW_DISPOSABLE_VM')
+  # Integrity hashing of a 330 MB APK/large native image is a file read,
+  # not a UI or shutdown deadline. The functional run's final 12-second
+  # hash command timed out after successful relaunch. Retain all exact
+  # hashes; give only these read commands a bounded 120-second budget.
+  class IntegrityDevice(base.Device):
+   def shell(self,*args,timeout=12,check=True):
+    if args and args[0]=='sha256sum':timeout=max(timeout,120)
+    return super().shell(*args,timeout=timeout,check=check)
+  device=IntegrityDevice(out,sdk);report['environment']=base.environment(device,out);require(not device.shell('pm','list','packages',old.PACKAGE).strip(),'NEW_DISPOSABLE_VM')
   base.root_reconnect(device,out)
   require(device.adb('install','--no-streaming',paths['baseline'],timeout=300).strip().endswith('Success'),'SIGNED84_INSTALL')
   pin=r['packages']['baseline'];before=old.installed(device,tools,pin['versionCode'],pin['APK_sha256'],pin['native_sha256']);sentinels,original=old.seed(device,before,out);report['baseline']=before;report['synthetic_before']=original
