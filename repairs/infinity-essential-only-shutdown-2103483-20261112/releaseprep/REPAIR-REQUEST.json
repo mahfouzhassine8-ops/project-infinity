@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "kind": "repair",
   "versionCode": 2103486,
   "generation": 71,
@@ -9,5 +9,28 @@
   "publication": false,
   "accepted_pointer_updated": false,
   "version_reserved": false,
-  "remaining": "Awaiting completed native proof and independently selected Android Close verification before owner preparation"
+  "remaining": "Unsigned preparation authorized after full ARM64 verification; Android verification and permanent signing pending",
+  "native_producer": {
+    "run": 43186634362,
+    "id": 13931682124,
+    "workflow_id": 415461484,
+    "source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+    "name": "Infinity-Essential-Only-ARM64-43186634362-NO-INSTALLER",
+    "digest": "sha256:4dda29a8bd59e1267f47cdf0b0501c93be74a5a67f5997953f43df43e6eda768",
+    "size_in_bytes": 192742935
+  },
+  "native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+  "workflow_sha256": "6b860596b849e4e029ce1f424b1abc9454e5732d35651e1965746450a2566cee",
+  "source_bindings": {
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/releaseprep/owner_release.py": "039777cd3b00932e6d5a2681d52cd3c89de2114d36b06edfb3ac412aac97f73e",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/releaseprep/OWNER-AUTHORIZATION.json": "02e19ba2e8422ddfb95179d5a029faf5677696e8606231058e0cda90d4b34dbd",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/SCOPE.json": "d4f020ec6759715aaf5a087ce4d09f9e2b51b994de2bca8d7f5c96d3b5242e28",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/BASELINE-SOURCE.json": "72a2733142a8e6ef16363e8f2236f3ecaed11c2f26a1d1398a4613be12f87b77",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/BASE83-NATIVE-SOURCE-MAP.json": "c5b46fd24452b901fadb55568a8605283d6d0b6758b94ea24ccacdcef63f18a5",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistence.h": "c7e7e758a3496c32b82b8948c0b8de00409a492e2f0c98996a6f9b74d6fdda06",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonWriteHooks.h": "755417f20304c2bfe6300feb3813dc7538c264ea8bf7e6d1ddba60e33034b6a1"
+  },
+  "parent_authority_sha256": "41ce6dde3aac642e4ca8b90d5575bde8bf4fd90acc50ebae4bf76274a0e7baf5",
+  "independent_Android_evidence": "PENDING; unsigned owner preparation only; no signing before selected result passes"
 }
