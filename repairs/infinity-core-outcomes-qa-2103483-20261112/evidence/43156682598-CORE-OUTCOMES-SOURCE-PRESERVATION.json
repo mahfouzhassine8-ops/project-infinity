@@ -1,0 +1,35 @@
+{
+  "Android": "NOT_RUN",
+  "Cobra_changed": false,
+  "Core_path_correction_activated": false,
+  "Core_source_changed": false,
+  "admission_or_durability_waivers": false,
+  "baseline83_native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "changed": {
+    "xbmc/interfaces/python/InfinityCoreOutcomeSource.h": {
+      "after": "335026378a7c91db4b2f59c1270b08f9089b42d6b12c678e68a30e8949c9e7ed",
+      "before": null
+    },
+    "xbmc/interfaces/python/InfinityCoreOutcomeTrace.h": {
+      "after": "235551956e9a94965b9d3bf513f3369d392ae7a0bde29a51f2a0f2a953899423",
+      "before": null
+    },
+    "xbmc/interfaces/python/InfinityPythonPersistence.h": {
+      "after": "f6a33cdc628cd1ed9583cfc4876a56170eb8bd877c515d5f51ae24be57608df7",
+      "before": "a7513d681cb7ef6dfba5dc49e2210446185ff3c26005415d0f4426648c6ede3b"
+    },
+    "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": {
+      "after": "b557e19e895b0cc5a463ba3d8057b3cced4d2cb516bcc27e669e120d743bd7ca",
+      "before": "5ceb321b2a68b5c1b73709a1004a05ad1234bcefdb00bc0ab9a719fed0548aa8"
+    },
+    "xbmc/interfaces/python/PythonInvoker.cpp": {
+      "after": "39e55158e8a7d97d93d827a73ab56b2273d625a423c946ce2760eb3d937606f5",
+      "before": "8765370da585cef37918ebd31a4322035901793e0b0f4275868ca11e2e1ff724"
+    }
+  },
+  "diagnostic_only": true,
+  "signed": false,
+  "source_commit": "f5b38189201e0401aa62b652e1320c73f50f37e0",
+  "status": "PASS_EXACT83_PLUS_THREE_DIAGNOSTIC_FILES_TWO_HEADERS",
+  "unchanged83_native_sources": 9409
+}

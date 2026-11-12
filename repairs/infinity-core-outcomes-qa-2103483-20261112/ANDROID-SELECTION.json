@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "enabled": false,
-  "application_tests": false,
+  "enabled": true,
+  "application_tests": true,
   "feature": "core-outcomes-native-qa",
   "branch": "work/infinity-core-outcomes-qa-20261112",
   "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
@@ -23,15 +23,15 @@
     "size_in_bytes": 328376479
   },
   "native": {
-    "run_id": 43150069291,
-    "artifact_id": 13913629679,
+    "run_id": 43156682598,
+    "artifact_id": 13919086222,
     "workflow_id": 415461484,
     "workflow_path": ".github/workflows/infinity-core-outcomes-qa-native.yml",
-    "source": "29c7a2d0fac736338f5a0f904d5ea511db8603ec",
-    "name": "Infinity-Core-Outcomes-ARM64-43150069291-NO-INSTALLER",
-    "sha256": "dea95b87c6ffd9dc1e2ca00a303d97c52ae8601df959acbc5ea0e63ed2ef434d",
-    "size_in_bytes": 192700656,
-    "native_sha256": "723a85a69667a41d4518873f38967080aebc6c105d814a0a844dc1e0eb931b88"
+    "source": "f5b38189201e0401aa62b652e1320c73f50f37e0",
+    "name": "Infinity-Core-Outcomes-ARM64-43156682598-NO-INSTALLER",
+    "sha256": "57bb8364e3d4cdf9710cc4715b6d6ccde0a3f0b47ed22c60d7d62352fae55711",
+    "size_in_bytes": 192712885,
+    "native_sha256": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33"
   },
   "publisher": {
     "commit": "6d38cce274bb45e2b658a63dd44a01e94c8ae990",
@@ -57,19 +57,19 @@
     ]
   },
   "source_bindings": {
-    ".github/workflows/infinity-saved-navigation-android.yml": "4548b75d256e4992dba6f3a4eb4f1faed93fc930a0bce8ce1ecff64f82649167",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/NATIVE-BINDINGS.json": "28cb72d69b7185ece4fe7582d5d8f3b1e6b5088e230ad5f8be7b25f96bdbbb31",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/SCOPE.json": "e42124623d2fef9096c7242d0864a3b0bccce2bfd29c042476ab5efaed28fad8",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py": "70a84d98bc3d20cde10c59a420f084da7d9560f190340822f33920c6a152b357",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py": "53ce04b5567e44bd22b3e507750083e886e1d4c03b99b3778d2a6f17a3085381",
+    ".github/workflows/infinity-saved-navigation-android.yml": "daa3bc06bd5c65f629c273a7da207057fe03a28f82c0754673e192a1d594e70f",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/NATIVE-BINDINGS.json": "b0f62e84af2d0d0b609082866dcffcaffb01d8659c364dcff1e111312bbdeff5",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/SCOPE.json": "2a0141e120483194f93edce3daf763eb57ed223596eca1f4432ae273688c46f1",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py": "0425da7f85c6169fbf37c3076b4a3aa402ecc0792450b6231863f1647c1078df",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py": "c27f767f96aa67afd1c53584602eb352dbeb4c6722e0b2cd661caffcbb7d3081",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/make_overlay.py": "7e8c56e05f454b942222631b5059dd079b6a52819f90400923d1351b806e0a68",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/native/InfinityCoreOutcomeTrace.h": "e58c5cb6236a088a8a38f25aba8fe109959a0329ef77aa3c516f824592663269",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityCoreOutcomeSource.h": "1376aaebd3f9911611e2cae3a227ce43ab206a9874b07883e75a7f5af11b5be6",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityCoreOutcomeTrace.h": "2e748730d295169c24c0882468ff0949ee72811689c40895f13bea4866ea58a7",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/native/InfinityCoreOutcomeTrace.h": "079b9eade6060ca68e48fc29a8ea376d64b764ca0b47edb999507d36c6f32c73",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityCoreOutcomeSource.h": "335026378a7c91db4b2f59c1270b08f9089b42d6b12c678e68a30e8949c9e7ed",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityCoreOutcomeTrace.h": "235551956e9a94965b9d3bf513f3369d392ae7a0bde29a51f2a0f2a953899423",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistence.h": "f6a33cdc628cd1ed9583cfc4876a56170eb8bd877c515d5f51ae24be57608df7",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "b557e19e895b0cc5a463ba3d8057b3cced4d2cb516bcc27e669e120d743bd7ca",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/native/overlay/xbmc/interfaces/python/PythonInvoker.cpp": "39e55158e8a7d97d93d827a73ab56b2273d625a423c946ce2760eb3d937606f5",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/observer.py": "75b5fdc471ea0929e14889518ef842b6a4eb3f082e5d14f09c5262fee1e25911",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/observer.py": "0e21784844ea4047a5d3e2ed0f6c87f28f9d18b3dc99c15bf81006ae817596b5",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/prepare_ci_tooling.sh": "e5c1c0b071a7e2da5ef501b6ee24b393649c755edf72b354137718ac46d1ffa1",
     "repairs/infinity-performance-ui-2103477-20261110/baseline.py": "9db30720394914920a965e726d8989ba7dad8d1e9ac7a0d9e92640d07eb9554e",
     "repairs/infinity-tracking-integration-2103469-20261108/prepare_tracking_release.py": "49c4d49bd679b2dd2ae2819ab45b8a673d4b362f80fc30090223553d3abc9e0b",
@@ -91,5 +91,5 @@
     "Owner data/device",
     "APK installation acceptance"
   ],
-  "blocker": "Actual Android run43154927627 coverage.code_mismatch; await corrected full-field code verification, new ARM64 and Android evidence"
+  "blocker": null
 }
