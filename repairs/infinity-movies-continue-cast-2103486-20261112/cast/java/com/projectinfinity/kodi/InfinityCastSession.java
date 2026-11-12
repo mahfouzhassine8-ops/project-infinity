@@ -335,7 +335,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 if(finished && lastDuration>0)lastPosition=lastDuration;
                 if(!returning && status.getPlayerState()==MediaStatus.PLAYER_STATE_IDLE && status.getIdleReason()==MediaStatus.IDLE_REASON_ERROR) {
                     InfinityCastDiagnostics.event("receiver","media_idle_error",status.getIdleReason());
-                    message=relay!=null && !relay.failure().isEmpty()?mediaFailure(relay.failure()):"TV playback failed. Returning to phone playback.";aborting=true;restorePhone(false);
+                    message=relay!=null && !relay.failure().isEmpty()?mediaFailure(relay.failure()):"TV playback failed. Returning to phone playback.";abortTransfer();
                 }
             }
         } else if(handedOff)message="The receiver is playing different content. Return to phone playback.";
@@ -379,7 +379,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     void returnToPhone(){
         if(returning)return;
         if(!handedOff && !mayHavePaused){abortTransfer();return;}
-        returnDeadline=0;returning=true;++returnEpoch;restorePhone(handedOff);
+        returnDeadline=0;returning=true;++returnEpoch;restorePhone(everPlayed);
     }
     private void restorePhone(boolean useRemotePosition) {restorePhone(useRemotePosition,token);}
     private void restorePhone(boolean useRemotePosition,String expected) {
