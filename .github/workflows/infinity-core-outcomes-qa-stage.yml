@@ -130,5 +130,8 @@ jobs:
             CORE-OUTCOMES-STAGE-ADMISSION.json
             repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json
             repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/BASELINE83.json
+            core-outcomes-qa-prepared/UNSIGNED-QA-PRESERVATION.json
+            core-outcomes-qa-prepared/ORIGINAL83-SIGNATURE.txt
+            core-outcomes-qa-prepared/components/catalog.json
           if-no-files-found: warn
           retention-days: 90

@@ -1,0 +1,26 @@
+{
+  "status": "PASS_STATIC_CAPTURE_READONLY_COMMAND_GUARDS_ONLY",
+  "source_sha256": "4143b87293cdfbe8c698bc5a2f70f0e71c0979f23e12387f07ab53eb257d5bac",
+  "known_remote_reads": [
+    [
+      "shell",
+      "stat"
+    ],
+    [
+      "exec-out",
+      "head"
+    ],
+    [
+      "shell",
+      "pidof"
+    ],
+    [
+      "shell",
+      "ps"
+    ]
+  ],
+  "app_commands": false,
+  "phone_execution": false,
+  "runtime_verification": false,
+  "scope": "AST and static read-only command review; no ADB executed"
+}

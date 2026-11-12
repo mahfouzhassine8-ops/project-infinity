@@ -156,6 +156,8 @@ def request():
     stage_request = Path(r['stage_request'])
     required = {Path(__file__).resolve().relative_to(ROOT).as_posix(),
                 (HERE / 'stage.py').relative_to(ROOT).as_posix(), (HERE / 'BASELINE83.json').relative_to(ROOT).as_posix(),
+                (HERE.parent / 'capture_mac_usb.py').relative_to(ROOT).as_posix(),
+                (HERE.parent / 'CAPTURE-MAC-USB.md').relative_to(ROOT).as_posix(),
                 stage_request.as_posix()}
     require(set(r['source_bindings']) == required and stage_request.parent == HERE.relative_to(ROOT), 'EXACT_TASK_TOOL_AND_STAGE_INPUT_BINDINGS')
     for name, wanted in r['source_bindings'].items():
