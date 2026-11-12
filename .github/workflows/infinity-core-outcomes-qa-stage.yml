@@ -2,6 +2,9 @@ name: Infinity locked83 | key-free diagnostic unsigned QA staging
 
 on:
   workflow_dispatch:
+  push:
+    branches: [work/infinity-core-outcomes-qa-20261112]
+    paths: [repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json]
 
 permissions:
   contents: read
