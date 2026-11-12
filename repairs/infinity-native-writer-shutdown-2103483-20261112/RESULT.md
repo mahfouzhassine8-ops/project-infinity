@@ -8,10 +8,10 @@ Status: **native effect/completion proof blocked; no production patch or success
 
 The owner's November11 summary reports19:18:12 failure of native_admission and
 python_services, with the other15 owners complete. This is accepted as an
-owner-reported observation. Its original newer diagnostic is not accessible in
-this workspace or the connected diagnostic Page. The available Page contains
-November10 evidence only. No new capture or phone test has been requested.
-An asynchronous request asks for the newer **existing** file's location.
+owner-reported observation. The subsequently supplied private November11 Page corroborates the reported
+checkpoint fields. It expressly has no attached raw ZIP or Core source/image
+bytes. Its summary is accessible; original byte/CRC verification has not been
+repeated here. No new capture or phone test has been requested.
 
 The original audit-ratio reproduction, fail-closed ledger cases, Core source
 attribution, old loader prototype and signed83 startup/ARM64 evidence are reused.
@@ -113,3 +113,21 @@ process termination, relaunch and retained-data acceptance: **NOT_RUN** because
 there is no complete justified correction to exercise. A baseline Close without
 the implicated native service would not verify this failure, so none was used
 to manufacture a success. No successor was signed.
+
+## Existing-artifact search follow-up
+
+Read-only search found no named Core members in181 readable retained archives
+and195 nested source/component bundles, including eleven large owner bundles
+whose central directories were read through bounded streams. One local partial
+82 ZIP is unreadable; authenticated original82 and83 member-preservation results
+already cover its provenance, so it was not downloaded again. No Core identity
+was located in the existing installed-source inventories. The four earlier Fold
+exports cover Command Center, Umbrella, POV and Trakt, not this service.
+
+The only located Core library is the previously authenticated publisher
+reference. Search limits and counts are in `EXISTING-ARTIFACT-SEARCH.json`; the
+full local artifact-path inventory stays private. This is a named-package/member
+search, not proof that the Fold lacks the user-installed service. The next
+necessary source evidence remains the installed service code/manifests and its
+actual native image bytes. The November11 diagnostic summary supplies neither;
+another shutdown attempt would not substitute. Production remains unchanged.
