@@ -2,7 +2,7 @@
 
 Baseline: owner lock2021a76c; exact signed83 APK
 `0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236`.
-Status: **native effect/completion proof blocked; no production patch or successor**.
+Current status: **installed identity resolved; two unshipped source corrections and10 host cases PASS; native effect/completion proof remains blocked; no successor**. Earlier evidence limits below are historical and superseded where stated in the final update.
 
 ## Current evidence and reuse
 
@@ -134,3 +134,67 @@ Unknown hashes require the corresponding code/image bytes before effect
 analysis. The November11 summary supplies neither installed identity nor this
 completion contract; another shutdown attempt would not substitute. Production
 remains unchanged.
+
+## Installed1.0.2 targeted correction update
+
+The owner supplied ADB-collected installed SHA-256 identities. Service1.0.2
+`2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3`
+exactly matches the publisher source already held. Native1.0.1
+`c4a8a8d1e046cab6a42934b8fba31246efb21a002a90beb2bffa555623a383a9`
+exactly matches the previously authenticated and inspected ARM64 image.
+**Installed identity is no longer a blocker; no new source export is required.**
+The native image has not been activated during this engineering task.
+
+A hash-bound, unshipped source patch now changes only two service functions:
+
+* start_engine maps the exact Infinity engine process name to its Android
+  package directory. Other process/package identities remain unchanged.
+* run_kodi_service reports the native stop return or exception class and
+  explicitly states that native completion is unverified. It no longer prints
+  an unconditional clean-stop assertion. This is reporting correctness, not a
+  new native stop/drain implementation or a durability receipt.
+
+Metadata copying, retries, source resolution, native API calls, subprocess
+handling, other service functions and all Infinity audit/final-seal rules are
+unchanged. The patch is not an installer and has not been deployed or included
+in an APK. Changing the path could activate a previously blocked engine, so
+activation remains prohibited until its completion contract is proven.
+
+Actions43142422868 passed10 explicitly selected host cases on CPython3.11.7
+(source1c3486fb). These reproduce the original exact-process path failure;
+exercise corrected/foreign identities and failed load; check stop result/error
+and no-handle reporting; enforce only two changed AST function bodies; reject
+unknown source; and prevent output overwrite. Native callables/filesystem
+boundaries are test doubles. No actual Core image, Kodi, Android or owner data
+is executed by these cases. Original earlier tests were not rerun.
+
+The prior morning extracts contain233 distinct namespace-rejected attempts
+(229+4). Those actual failures did not load the target image. They do not prove
+that no worker started in another attempt or later session. In1.0.2 the
+start_engine body is AST-identical to the prior reference; the release added
+Linux architecture handling and failed-start backoff. The current source hash
+does not identify the source used during every historical morning attempt.
+
+The actual metadata audit still lacks each target/result/completion pair.
+copy2 can return while some unsupported xattr operations were caught internally;
+the explicit chmod catches its own exception; the audit fires before each
+operation. Neither an audit row nor a copied-library message proves that every
+metadata effect succeeded or completed durably. No historical blocker is cleared.
+
+**Remaining engineering prerequisite:** implementation matching this native
+Core1.0.1 image for start/stop and all controlled worker/callback/persistence
+owners, or a verified native drain API/effect contract. It must establish closed
+work admission, completed native work, bounded actual protected effects and no
+protected writes after its completion receipt. The publisher repository offers
+the image and Python wrapper, but no matching Rust implementation was found;
+authenticated access to its referenced PhantomFlare repository returns404. The
+existing running flag/stop return cannot substitute. Existing restart code also
+uses an unchecked stop and fixed sleep; no arbitrary delay was added as proof.
+
+The passing unchanged83 ARM64 build is retained. A new compile of unchanged
+Kodi source would not prove this third-party library's completion semantics.
+New correction ARM64/Android shutdown, actual process termination, same-profile
+relaunch and retained owner-data acceptance remain NOT_RUN. No successor was
+signed. All protected83 APK payloads, Cobra, providers, Search, skin, tracking,
+settings and owner data remain untouched. Exact results and source hashes are
+in `TARGETED-CORRECTION-RESULT.json` and `HOST-SOURCE-RESULT.json`.

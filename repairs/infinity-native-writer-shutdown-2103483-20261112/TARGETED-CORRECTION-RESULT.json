@@ -1,0 +1,41 @@
+{
+  "status": "MATCHED_INSTALLED_SOURCE_TWO_UNSHIPPED_CORRECTIONS_HOST_PASS_NATIVE_COMPLETION_BLOCKED",
+  "identity": "INSTALLED-IDENTITY-MATCH.json",
+  "candidate": "CANDIDATE.json",
+  "source_patch": "SERVICE-CANDIDATE.patch",
+  "host_proof": "HOST-SOURCE-RESULT.json",
+  "host_run": 43142422868,
+  "host_cases": 10,
+  "CPython": [
+    3,
+    11,
+    7
+  ],
+  "unchanged_loading_body_from_previous_1_0_1_reference": true,
+  "retained_morning_load_evidence": {
+    "known_namespace_failures": 233,
+    "earlier_report": 229,
+    "later_report": 4,
+    "proof": "../infinity-functional-startup-2103482-20261111/EXISTING-EVIDENCE-RESULTS.json",
+    "scope": "Selected morning extracts only; current1.0.2 hash does not retroactively identify historical source",
+    "native_start_success_outside_those_errors": "UNKNOWN",
+    "November11_191812_native_start_history": "UNKNOWN"
+  },
+  "metadata_effects": {
+    "copy2": "Original metadata operation sequence retained; no audit exception waived",
+    "chmod": "Original explicit call still catches OSError; per-attempt outcomes not recorded",
+    "utime_setxattr": "Pre-operation audit observes names; available evidence lacks each target/result pair",
+    "ctypes": "Known namespace errors establish failed image loads for those calls; no general failed-load exemption"
+  },
+  "remaining_blocker": "Implementation matching Core1.0.1 start/stop and its native worker/persistence owners, or an independently verified native quiesce/drain/effect completion API. Existing stop return/running flag is insufficient.",
+  "identity_collection_blocker": false,
+  "source_reexport_requested": false,
+  "native_activated": false,
+  "successor_signed": false,
+  "checks": {
+    "existing83_full_ARM64": "PASS_REUSED43040415571; no new engine source changes",
+    "new_Core_native_completion": "UNPROVEN",
+    "Android_same_profile_shutdown_process_death_relaunch": "NOT_RUN; activation blocked",
+    "retained_owner_data": "NOT_MODIFIED; acceptanceNOT_RUN"
+  }
+}
