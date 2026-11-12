@@ -1,0 +1,17 @@
+This is a functional shutdown repair based on exact signed 2103483, not the diagnostic 2103484 engine.
+
+The verified failure mechanism is a pre-operation audit being retained as a permanent protected-writer failure. `shutil.copy2()` invokes ordinary `utime`, xattr and chmod primitives; the original audit records `unclassified_native_persistence_operation` even when those synchronous calls finish. A rejected `ctypes.dlopen()` is similarly recorded before the original loader returns. Essential-first already excludes optional Python retirement, but these historical failures subsequently veto `SealEssentialWrites()`.
+
+Only three production headers change:
+
+- `InfinityPythonWriteHooks.h`: the existing native CPython call adapters lease chmod/chown/utime/setxattr/removexattr through the real return or exception, including cached function aliases. Existing admission and converted-target checks remain authoritative. Other interpreter contexts use the unchanged native primitive.
+- `InfinityPythonPersistence.h`: `Audit()` checks metadata lease ownership and actual converted paths instead of creating a permanent opaque-writer failure for a covered synchronous call. The original native dlopen is captured once before add-on execution; `CheckedDlopen()` retains an in-flight ledger obligation and resolves the actual native result. Only an exact top-level Bionic namespace/not-found rejection excludes native execution. A loaded unknown image, unverified error or loader bypass retains its safety blocker. Original errors/results are preserved. The coordination lease preserves existing removed-file durability evidence.
+- `InfinityPythonPersistenceSource.h`: `Observer.install_crypto_loads()` binds the original native loader to that native-owned outcome adapter. All original library paths, reviewed crypto redirects and add-on code remain unchanged.
+
+No changes to `InfinityScriptPersistence.h`, `InfinityProtectedWrites.h`, the shutdown coordinator, essential participant registration, Core source/path, providers, user data, settings, DEX, skin, chooser behavior or Cobra. Actual active essential/unknown operations, dirty buffers, transactions and durability failures retain independent protection. Only explicitly authenticated first-party participants have participant admission.
+
+Focused host evidence: run 43177007227, source 73a06584b061a3de80ae85de14b6141c1f40959e. Thirteen candidate cases PASS on actual pinned CPython 3.11.7. The same copy2 sequence on unchanged 2103483 reproduces refused essential-write authorization; the corrected candidate seals safely. Active essential/unknown work, a loaded unverified image and a cached loader bypass remain refused. This is not Android/Fold acceptance.
+
+Full ARM64 compilation/linking and source-map/ABI verification: IN PROGRESS in run 43177007227. Independently selected Android normal Close, whole-UID process death, same-profile relaunch and retained data: PENDING. Original signing: NOT RUN. APK delivery: NOT READY. No physical Fold PASS is claimed.
+
+2103485 is already reserved by authority generation70 and is not reused. Provisional next repair/recovery are 2103486/2103487, subject to live registry checks. Signing uses only the original workflow397702717 and unchanged permanent signer/owner tools after necessary engineering verification. 2103483 remains protected.
