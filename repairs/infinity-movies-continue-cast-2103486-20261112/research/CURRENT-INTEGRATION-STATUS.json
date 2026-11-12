@@ -1,81 +1,103 @@
 {
-  "schema": 1,
-  "status": "NOT_READY_FOR_COMBINED_APK_NO_OWNER_INSTALLER",
+  "accepted_pointer_updated": false,
+  "implemented": {
+    "Cast": "Requested existing-player controls, explicit receiver selection, private progressive relay, remote controls, guarded phone return and existing-recorder clock",
+    "Continue_Playing": "Actual typed movie identity fallback into unchanged recorder and Resume Hub; no altered eligibility or invented records",
+    "Movies": "Verified native movie contracts, preservation of valid saved source, actual-playback navigation confirmation"
+  },
+  "limitations": [
+    "Actual Sacrifice continue-watching.json record unavailable; its existing Home eligibility was not inferred from a Kodi Resume prompt.",
+    "Real Infinity movie/Home behavior, physical Fold layouts, Cast receiver transfer and normal shutdown remain owner acceptance checks, not host/component PASS claims.",
+    "Cast supports progressive MP4/M4V/WebM with compatible Google Cast video receivers and a supported local IPv4 route. HLS/DASH, DRM, unsupported Kodi transport options, audio-only receivers and unsupported routes are refused without replacing phone playback."
+  ],
+  "owner_instructions": "FOLD-QA.md",
+  "preservation": {
+    "Cobra_changed": false,
+    "Python_startup_changed": false,
+    "candidate_added_members": 6,
+    "candidate_modified_existing_members": 14,
+    "candidate_unchanged_members": 7755,
+    "databases_or_profile_read_or_modified": false,
+    "original_five_DEX_unchanged": true,
+    "provider_implementations_changed": false,
+    "recovery_added_members": 0,
+    "recovery_modified_metadata_members": 8,
+    "recovery_unchanged_members": 7761,
+    "shutdown_source_changed": false
+  },
+  "production_checkpoint": "e1d0cdf78b03b6d62ee9840f91c5e3cf642fd90e",
   "protected_baseline": 2103486,
   "protected_lock": "e1ef672a6f24aed6c19a14ab96d2df6fe3380460",
-  "production_checkpoint": "7e962bd90465c97acd411a7059b1314a2c26115b",
-  "implemented": {
-    "movie": "Verified movie-route contracts plus safe reuse of original saved source when old stable-source stamp is absent; typed actual-item movie identity fallback",
-    "Home": "Actual-item identity fallback only. Existing eligibility/filter/store remain unchanged; Sacrifice cause NOT established",
-    "Cast": "Isolated official SDK, new two OSD controls, bounded native source-bound handoff, private progressive media relay, existing recorder clock integration"
-  },
-  "verified": [
-    {
-      "kind": "Movie host",
-      "cases": 14,
-      "Android": false
+  "report": "DELIVERY-REPORT.md",
+  "schema": 2,
+  "signed_inputs": {
+    "baseline": {
+      "APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+      "digest": "sha256:9317bf844c2dc52a44f70ef19497fa13152251183f8279596f2d533b183a5bb8",
+      "id": 13935631408,
+      "name": "Infinity-Essential-Only-repair-OriginalSigned-43200317103-Fold-Pending",
+      "run": 43200317103,
+      "size_in_bytes": 346419095,
+      "source": "fe44ec40cd3e43fb5498084dec24c59dd63c3f3a",
+      "workflow_id": 397702717
     },
-    {
-      "kind": "Cast clock host",
-      "cases": 12,
-      "Android": false
+    "candidate": {
+      "APK_sha256": "4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566",
+      "digest": "sha256:84f6b84f5773c482ec69e75ea43ef625b06231228fc945da75a3ed542dfd7935",
+      "id": 13979655699,
+      "name": "Infinity86-Movies-Home-Cast-OriginalSigned-43294871896-QA-Fold-Pending",
+      "run": 43294871896,
+      "size_in_bytes": 347790363,
+      "source": "f0aa976d90b262373cea56942a44c9e382ccfaa3",
+      "workflow_id": 397702717
     },
-    {
-      "kind": "Private relay actual HTTP host",
-      "checks": 30,
-      "Android": false
-    },
-    {
-      "kind": "Full native ARM64 compilation/link/source/ABI",
-      "run": 43239137210,
-      "passed": true
-    },
-    {
-      "kind": "Complete original-key candidate81 and recovery80 module signatures",
-      "run": 43266279257,
-      "passed": true,
-      "APK": false
-    },
-    {
-      "kind": "Private Cast SDK/resource/API36 local relay/retirement/explicit-selection",
-      "run": 43270456436,
-      "passed": true,
-      "real_receiver": false,
-      "full_Infinity_playback": false
+    "recovery": {
+      "APK_sha256": "5fa350dd945fcb8f294975be6fd16ee3c4432ffa1519089aa70bbde680fdf834",
+      "digest": "sha256:a8c344b903e89240ec3c0260a6489f9c0cf9ad671282e9cbe577c46da8afb3a1",
+      "id": 13979418392,
+      "name": "Infinity86-Movies-Home-Cast-OriginalSigned-43295951138-QA-Fold-Pending",
+      "run": 43295951138,
+      "size_in_bytes": 346420116,
+      "source": "ab5f3e41721291091e5fe177787156408193c0fa",
+      "workflow_id": 397702717
     }
-  ],
-  "exact_source_evidence_limitations": [
-    "The owner described Infinity-2103486-Movies-Existing-Evidence.zip (22270.mp4,22274.mp4,22278.jpg and November12 diagnostic), but archive bytes are not exposed in accessible attachment paths. Targeted connected-Page searches returned only older diagnostic Pages. No claim that these videos were viewed.",
-    "Owner explicitly confirms the diagnostic omits Sacrifice actual continue-watching.json record. A Kodi Resume00:04:18 prompt does not establish a corresponding valid/nonhidden/unfinished Infinity record or its duration/identity/eligibility.",
-    "Therefore current confirmed source defects cannot yet be asserted as the complete cause of the recorded stall or missing specific Home card. No guessed record, eligibility change or replacement history is allowed."
-  ],
-  "remaining_engineering_gates": [
-    "Authenticated whole-Infinity Android saved-movie handoff, actual AV/progress/Home-card and resume verification; distinguish blocked test prerequisites from app failures",
-    "Actual Cast JNI/control integration and available receiver transfer verification; current Android PASS is component/local-transport only",
-    "Exact Cast metadata/query transformation must be admitted by the original source-bound release guard; existing historical external-player manifest exception does not authorize arbitrary additions",
-    "Reconcile/reserve current unused APK versions only after gates; assemble full candidate and forward recovery, verify original certificate/install-over and complete APK-member preservation",
-    "Independently selected post-movie normal Exit/relaunch after corrected paths; no shutdown source changes"
-  ],
-  "Cast_supported": "Google Cast video receivers on supported direct local IPv4 route; progressive MP4/M4V/WebM. No raw provider URL/headers/query sent to receiver.",
-  "Cast_unsupported": "Adaptive HLS/DASH/DRM, audio-only and unsupported/local-route/IPv6-only receiver paths fail without stopping phone playback; no universal-provider or physical receiver PASS.",
-  "protected": {
-    "shutdown_source_unchanged": true,
-    "Cobra_source_and_existing_runtime_unchanged": true,
-    "provider_implementations_unchanged": true,
-    "Search_unchanged": true,
-    "TV_behavior_outside_new_Cast_unchanged": true,
-    "eligibility_store_schema_and_settings_unchanged": true,
-    "owner_data_accessed": false
   },
-  "release": {
-    "APK_produced": false,
-    "APK_signed": false,
-    "APK_versions_reserved": false,
-    "recovery_APK_produced": false,
-    "original_signed_modules_internal_only": true,
-    "owner_acceptance": "NOT_RUN",
-    "baseline_promoted": false
-  },
-  "new_owner_diagnostic_requested": false,
-  "new_owner_test_requested": false
+  "status": "COMPLETE_COMBINED_ORIGINAL_SIGNED_QA_AND_FORWARD_RECOVERY_READY_OWNER_ACCEPTANCE_PENDING",
+  "verification": {
+    "ARM64_compile_link_ABI": {
+      "run": 43239137210,
+      "status": "PASS"
+    },
+    "Cast_clock_host": "12 PASS",
+    "actual_Android_install_over_and_recovery": {
+      "application_launch": false,
+      "run": 43296801035,
+      "status": "PASS"
+    },
+    "candidate_original_signing": {
+      "run": 43294871896,
+      "status": "PASS"
+    },
+    "complete_package_preservation": {
+      "run": 43293634100,
+      "status": "PASS"
+    },
+    "forward_recovery_original_signing": {
+      "run": 43295951138,
+      "status": "PASS"
+    },
+    "movie_host": "15 retained focused cases; affected three confirmation/race/eligibility cases passed after final source change",
+    "original_signed_CC83_84": {
+      "run": 43292767635,
+      "status": "PASS"
+    },
+    "physical_Fold": "NOT_RUN_OWNER_COMBINED_ACCEPTANCE",
+    "private_Cast_Android_API36": {
+      "run": 43285053644,
+      "status": "PASS_COMPONENT_ONLY_NO_REAL_RECEIVER"
+    },
+    "real_Cast_receiver": "NOT_RUN_OWNER_COMBINED_ACCEPTANCE",
+    "relay_HTTP_host": "30 assertions PASS",
+    "shutdown": "NOT_RUN_OWNER_COMBINED_ACCEPTANCE_SOURCE_UNCHANGED"
+  }
 }
