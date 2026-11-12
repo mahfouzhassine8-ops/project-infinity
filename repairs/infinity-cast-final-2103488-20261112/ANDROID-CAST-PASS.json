@@ -1,46 +1,95 @@
 {
-  "API": 36,
-  "Activity_Cast_id": 0,
-  "Activity_original_after": 2131034174,
-  "Application_Cast_id": -2146697183,
-  "Application_original_after": 2131034174,
-  "artifact": 13986707336,
-  "artifact_digest": "sha256:4c4ea032c4ca032007def5915cee98a39e835c304403b16008a2d1ba23f3b46e",
-  "explicit_receiver_selection_required": true,
-  "failed_transfer_cleanup": true,
-  "failed_transfer_cleanup_cycles": 5,
-  "full_Infinity_playback": "NOT_TESTED",
-  "main_thread_pulses": 31,
-  "original_APK_modified": false,
-  "original_resource_id": 2131034174,
-  "owner_APK": false,
-  "owner_device": "NOT_TESTED",
-  "pass": true,
-  "private_HTTP_resource_readable": true,
-  "reason": "SDK_resources_adaptive_transport_and_failed_cleanup_verified",
-  "receiver_transfer": "NOT_TESTED",
-  "relay": {
-    "adaptive": {
-      "actual_Android_HLS_DASH_rewrite_and_segment_HTTP": true,
-      "decoder": false,
-      "drained": true,
-      "pass": true,
-      "property_auth_headers_preserved": true,
-      "real_receiver": false
-    },
-    "pass": true,
-    "progressive": {
-      "actual_private_HTTP_runtime": true,
-      "pass": true,
-      "private_source_not_returned": true,
-      "range_body": true,
-      "real_Cast_receiver": false,
-      "retired": true
-    }
+  "artifact": {
+    "digest": "sha256:489c7428da0b45cf26df5377eb369d59657a93865f9dc079fd79fa8f5d192502",
+    "id": 13990717354,
+    "size_in_bytes": 1348222
   },
-  "run": 43311587557,
+  "build_inputs": {
+    "cast/audit_sdk_component.py": "e83fd14ec8f28504c907a1de2aa443192726ded9353001faf3cf6a47c73165b8",
+    "cast/build_probe.py": "30f5bbd342752b0d17ed1199583b8c442f37982f6822fe4688a963fa1f75e962",
+    "cast/build_sdk_component.py": "a09a3024abc9610f91f74c68d72241a56f2c0147b520c16f8842f80c018ca10c",
+    "cast/dex_contract.py": "c01cce69deacb207633bfd70f1d6d1f56aa3d21972fb3685b7e9a1d7e01739e4",
+    "cast/private_classes.py": "b0e85c4156de38f61934c809ef07ed28f36101cc7d3b9a7ad7be092ad50b3214",
+    "cast/provided_http.py": "4987f1eb8b3fb11aa9fbe2282377d19f6443b01e2003753834fe5b5ef6c1154a",
+    "cast/resolve_sdk.py": "fa71fea9d0970e1b2a7bbeba0311dce01245adae51e9f56fd0075d2d5bfb0762",
+    "cast/run_probe.py": "b7de9f82021c65587a438470954016c753597c3e281a58f8fb996a9d66fd0635",
+    "cast/test_relay_host.py": "f147055a0afabfe11da6700b0a9970e873ad955b60e45bcc62f4aea34395e58b",
+    "cast/tooling/CastPrivateClasses.java": "3b8f5516856f6c31f621cf82bcc93a892a2106564c9f6c19350910906e9265da",
+    "research/CAST-BUILD-ONLY-SHADER.json": "439bac3882ee5d873ac82defaf1bc2ce083979ccb11cbc7e21f5a7e6653a5ccf",
+    "research/CAST-PROVIDED-HTTP-APIS.json": "0c15515fe3243ca8da49c697ab0280337d4ff0010fb42e25117646de47809c0e",
+    "research/CAST-SDK-DEPENDENCIES.json": "df9bf0e1fe6d78dcfec1d9ec3c48d1c313dbe6952c734f2bd4dc6262bbcb4057"
+  },
+  "checkout_not_run": 43320669355,
+  "feature_Java_sha256": {
+    "java/com/projectinfinity/kodi/InfinityCastAdaptive.java": "aa0b978cf26910ace0919b221a7e03888b36602621cae117fe2b3a808dabce08",
+    "java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+    "java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": "fbafd4f04ebf94811bb54aec350052f782dc7f4bca466e7c461f079a120feb96",
+    "java/com/projectinfinity/kodi/InfinityCastDialog.java": "cd5a50b94d2c4d7777ab386e26042a1719f5a19bdc85cdcab624c62fc0d90dc9",
+    "java/com/projectinfinity/kodi/InfinityCastGateway.java": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
+    "java/com/projectinfinity/kodi/InfinityCastNative.java": "5dd3337db1223b8a0c4fd5d7d848831eca9366f8eeb947ace8d6b044f5992e9f",
+    "java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
+    "java/com/projectinfinity/kodi/InfinityCastRelay.java": "9a32c8fe574128b75410580a7e2f0a6f7fa78e64a471a7de16bf05313ed7f783",
+    "java/com/projectinfinity/kodi/InfinityCastResources.java": "0dd41e1f13162c0f9cb0c19b15f05b8c40561bfa7e0ae32f6b23a6d013f848c4",
+    "java/com/projectinfinity/kodi/InfinityCastRpc.java": "ca5f9be8be9677cd67581db470b2fcc62da842e04158795aff30ac908f4cf85b",
+    "java/com/projectinfinity/kodi/InfinityCastSession.java": "bb5e2271daa6460c794bea3a57cce37b2a4451afd8d28186642391703640a276",
+    "java/com/projectinfinity/kodi/InfinityCastSource.java": "5b3f30822ce141ef04fba3b752ed8c707ae0af00e4804dd63bb54a62907fecdc"
+  },
+  "historical_failed_probes": [
+    43308435013,
+    43310234055,
+    43317767658,
+    43318821635,
+    43320793910
+  ],
+  "historical_pass_before_response_cookies": 43311587557,
+  "report": {
+    "API": 36,
+    "Activity_Cast_id": 0,
+    "Activity_original_after": 2131034174,
+    "Application_Cast_id": -2146697183,
+    "Application_original_after": 2131034174,
+    "activity_recreations": 1,
+    "explicit_receiver_selection_required": true,
+    "failed_transfer_cleanup": true,
+    "failed_transfer_cleanup_cycles": 5,
+    "full_Infinity_playback": "NOT_TESTED",
+    "idle_callback_released": true,
+    "main_thread_pulses": 18,
+    "one_transport_probe_per_process": true,
+    "original_APK_modified": false,
+    "original_resource_id": 2131034174,
+    "owner_APK": false,
+    "owner_device": "NOT_TESTED",
+    "pass": true,
+    "private_HTTP_resource_readable": true,
+    "reason": "SDK_resources_adaptive_transport_and_failed_cleanup_verified",
+    "receiver_transfer": "NOT_TESTED",
+    "relay": {
+      "adaptive": {
+        "actual_Android_HLS_DASH_rewrite_and_segment_HTTP": true,
+        "decoder": false,
+        "drained": true,
+        "origin_scoped_response_cookies": true,
+        "pass": true,
+        "property_auth_headers_preserved": true,
+        "real_receiver": false
+      },
+      "pass": true,
+      "progressive": {
+        "actual_private_HTTP_runtime": true,
+        "pass": true,
+        "private_source_not_returned": true,
+        "range_body": true,
+        "real_Cast_receiver": false,
+        "retired": true
+      }
+    },
+    "schema": 1,
+    "scope": "Cast SDK/resource/UI-thread, private isolated HTTP relay/resource and explicit-selection guard; no real receiver or Infinity playback",
+    "shutdown": "NOT_SELECTED"
+  },
+  "run": 43321698528,
   "schema": 1,
-  "scope": "Cast SDK/resource/UI-thread, private isolated HTTP relay/resource and explicit-selection guard; no real receiver or Infinity playback",
-  "shutdown": "NOT_SELECTED",
-  "source": "1af5d580a72ef63bf1fd437312825db36231149a"
+  "source": "83c359c24c6237c9ac694ff2446222fc5dd924c7",
+  "status": "PASS_ANDROID_API36_CAST_COMPONENT_NOT_REAL_RECEIVER"
 }

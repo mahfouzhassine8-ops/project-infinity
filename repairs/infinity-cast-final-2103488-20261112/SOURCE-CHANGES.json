@@ -1,0 +1,69 @@
+{
+  "Cobra_changed": false,
+  "Command_Center_changed": false,
+  "allowlisted_but_unchanged": [
+    {
+      "baseline_sha256": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+      "candidate_sha256": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastChannel.java"
+    }
+  ],
+  "baseline_APK_sha256": "4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566",
+  "baseline_source_snapshot": "f631bafeda7e3a781cb31da12ed85524cb913bda",
+  "baseline_versionCode": 2103488,
+  "build_and_release_metadata": "Separate explicitly accounted scoped files; final APK vector must pass gate.py preservation",
+  "changed_production_files": [
+    {
+      "baseline_sha256": null,
+      "candidate_sha256": "aa0b978cf26910ace0919b221a7e03888b36602621cae117fe2b3a808dabce08",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastAdaptive.java"
+    },
+    {
+      "baseline_sha256": null,
+      "candidate_sha256": "fbafd4f04ebf94811bb54aec350052f782dc7f4bca466e7c461f079a120feb96",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java"
+    },
+    {
+      "baseline_sha256": "d7bf7611ec09b680e0ad4c33ed298dca36590aa82b84640dddabd184dbfb8086",
+      "candidate_sha256": "cd5a50b94d2c4d7777ab386e26042a1719f5a19bdc85cdcab624c62fc0d90dc9",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java"
+    },
+    {
+      "baseline_sha256": "fbe9502139c701e344ebb8882ca53a73baff38921b6db9e536e79225cc00fbed",
+      "candidate_sha256": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java"
+    },
+    {
+      "baseline_sha256": "53f310b8d2e254ee3fe1f47a17559c5a3da16398508a47646420f582fdcc4e14",
+      "candidate_sha256": "9a32c8fe574128b75410580a7e2f0a6f7fa78e64a471a7de16bf05313ed7f783",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java"
+    },
+    {
+      "baseline_sha256": "e8962a2df243a2302c293622f1adaca345d764c1621e9ddfabdb93fa3535244f",
+      "candidate_sha256": "ca5f9be8be9677cd67581db470b2fcc62da842e04158795aff30ac908f4cf85b",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRpc.java"
+    },
+    {
+      "baseline_sha256": "9ea9801ebbdc718c4c400f76b3d0ceb2aaebc90a9ed9c1577a2366d08364309e",
+      "candidate_sha256": "bb5e2271daa6460c794bea3a57cce37b2a4451afd8d28186642391703640a276",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java"
+    },
+    {
+      "baseline_sha256": "a1e90723c3b4ece983a2aeaf45075974b508fe72c8818e6c0b385af606105683",
+      "candidate_sha256": "5b3f30822ce141ef04fba3b752ed8c707ae0af00e4804dd63bb54a62907fecdc",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java"
+    },
+    {
+      "baseline_sha256": "fe3a2567ca89a5bfc661ec80ac80298cca7c71fdea0cf64257f1bd6578c8ec0f",
+      "candidate_sha256": "1bde0e765978944548eacccaec339c5167fb7d1de4d32618082d41b7a0e2e0f4",
+      "file": "repairs/infinity-movies-continue-cast-2103486-20261112/native/overlay/xbmc/platform/android/activity/InfinityCastNative.cpp"
+    }
+  ],
+  "providers_or_Search_changed": false,
+  "schema": 1,
+  "settings_schema_changed": false,
+  "shutdown_or_persistence_changed": false,
+  "skin_changed": false,
+  "status": "FROZEN_CAST_ONLY_PRODUCTION_VECTOR",
+  "tracking_or_resume_changed": false
+}

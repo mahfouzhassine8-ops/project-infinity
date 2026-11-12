@@ -1,0 +1,51 @@
+{
+  "artifact": {
+    "digest": "sha256:b24251f2c8eaba625fd155bff69fbc7a117e8c20e37b9628aeed95c372d5ae2f",
+    "id": 13990558917,
+    "size_in_bytes": 202779192
+  },
+  "base_composition": "Exact signed88 APK; unchanged native engine sources retained from protected86 plus the reviewed Cast-only source already integrated in88",
+  "current_overlay_matches_compiled_source": true,
+  "evidence_artifact": {
+    "digest": "sha256:40260f1a980d5cf65f4ac22e337a4d92b0f45e9b5006f991b49adb2c643822ec",
+    "id": 13990673992,
+    "size_in_bytes": 8478027
+  },
+  "full_Kodi_Android_runtime": "NOT_EXECUTED_NO_REAL_RECEIVER",
+  "proof": {
+    "Android": "NOT_RUN",
+    "Cast_JNI": [
+      "Java_com_projectinfinity_kodi_InfinityCastNative_cancel",
+      "Java_com_projectinfinity_kodi_InfinityCastNative_poll",
+      "Java_com_projectinfinity_kodi_InfinityCastNative_request"
+    ],
+    "Cobra_changed": false,
+    "baseline86_native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+    "dependencies": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "native_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+    "new_exports": [
+      "Java_com_projectinfinity_kodi_InfinityCastNative_cancel",
+      "Java_com_projectinfinity_kodi_InfinityCastNative_poll",
+      "Java_com_projectinfinity_kodi_InfinityCastNative_request"
+    ],
+    "preserved_exports": 71213,
+    "shutdown_source_changed": false,
+    "signed": false,
+    "source": "16df356f0acffbf9ca28ab7095f3a21233998d6d",
+    "status": "PASS_FULL_REAL_ARM64_LINK_AND_BASELINE86_ABI"
+  },
+  "run": 43314732573,
+  "schema": 1
+}

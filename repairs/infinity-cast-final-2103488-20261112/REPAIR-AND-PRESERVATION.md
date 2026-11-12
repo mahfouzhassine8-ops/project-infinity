@@ -13,7 +13,7 @@ Original certificate:
 |---|---|
 | `InfinityCastSource.java` | Recognize HLS/DASH and other supported video MIME types; sniff opaque streams. Accept explicitly declared current-item manifest/stream headers through the existing strict header parser. Reject declared DRM, unsupported transport overrides and injected headers. |
 | `InfinityCastAdaptive.java` (new) | Rewrite HLS playlists/renditions/init/key/segment URLs and DASH representation/segment templates, timelines, lists and base URLs into registered local capabilities. Resolve relative URLs on the sender. Reject DRM, external XML, unsupported manifest extensions and unbounded manifests/resources. |
-| `InfinityCastRelay.java` | Deliver those registered assets through the existing private HTTP client, with byte ranges and authenticated source requests. Keep credentials, cookies, source URLs and cross-origin redirect credentials away from the receiver. Close listener, clients and upstream calls on cancellation. Permit legitimate GET media when HEAD is rejected. |
+| `InfinityCastRelay.java` | Deliver those registered assets through the existing private HTTP client, with byte ranges and authenticated source requests. Keep credentials, cookies, source URLs and cross-origin redirect credentials away from the receiver. Close listener, clients and upstream calls on cancellation. Permit legitimate GET media when HEAD is rejected. Maintain source-issued cookies in bounded per-transfer RAM with origin/path/secure/expiry checks; no global or persisted cookie store. |
 | `InfinityCastSession.java` | Auto-transfer on explicit video-receiver selection; distinguish media loading from actual receiver PLAYING. Remove the optional recorder acknowledgment as a prerequisite for playback, while permitting remote progress only after its existing identity acknowledgment. Reconcile return with actual native phone state and release resources after failed/end/disconnect paths. Close Controls keeps an active transfer/session. |
 | `InfinityCastGateway.java` | Run one cleanup continuation after the actual terminal native result. A committed operation is reconciled rather than represented as undone. |
 | `InfinityCastRpc.java` | Retain read-only theme queries; remove the Python-script channel-registration path from Cast cleanup. |
@@ -30,18 +30,21 @@ owner-reported receiver or shutdown failure.
 
 ## Evidence and remaining acceptance
 
-- **PASS:** 34 progressive/authentication/privacy/cancellation HTTP checks.
-- **PASS:** 51 authenticated adaptive HTTP checks, including actual FFmpeg
+- **PASS:** 38 progressive/authentication/privacy/cancellation HTTP checks.
+- **PASS:** 57 authenticated adaptive HTTP checks, including actual FFmpeg
   decoding/seeking of MPEG-TS HLS, fMP4 HLS, separate audio/video HLS renditions,
   HLS AES-128, DASH templates/timelines and single-file byte-range lists.
-- **PASS:** Android API 36 component run **43311587557**: HLS/DASH manifest and
-  segment delivery, property headers, resource isolation and five repeated
+- **PASS:** Android API 36 component run **43321698528**: progressive byte ranges, HLS/DASH manifest and
+  segment delivery, property headers, origin-scoped response cookies, resource
+  isolation, released idle callbacks and five repeated
   failed-transfer cleanup cycles. Its disposable probe has no real Kodi JNI
   player or real receiver; it does not claim phone-return/TV playback acceptance.
 - **PASS:** focused actual Cast C++ translation-unit tests using mocked
   player/GUI/message backends and six focused release-guard cases.
-- ARM64 compilation/linking and final packaging/signing results remain recorded
-  separately as they complete. Run **43307594150** exposed an actual Kodi API
+- **PASS:** full Android ARM64 compile/link run **43314732573**, retaining all
+  71,213 protected native exports and the same 11 library dependencies. Current
+  Cast overlay hashes match the compiled artifact. Final packaging/signing is
+  recorded separately. Run **43307594150** exposed an actual Kodi API
   mismatch (`CGUIWindow::ClearProperty`); the source was corrected to the
   supported `SetProperty` call. That failed run is retained as failure evidence.
 - **NOT RUN:** real receiver media transfer, physical Fold UI behavior and
@@ -70,8 +73,8 @@ only four existing payload members to change:
 There are no candidate additions/removals. The original five DEX, Command Center
 0.3.5.83, skin 1.0.5.274, both Cast entry-point locations, all Movies/Home/TV code,
 Search/provider implementations and Cobra 2103445 remain byte-identical.
-All old class owners remain unchanged; only the exact Adaptive/Diagnostics Cast
-class roots are added to the existing ownership policy.
+All old class owners remain unchanged; only the Adaptive/Diagnostics source roots and the exact private Cast SDK
+root `castdeps/hg` from the compiled isolated component are added to the existing ownership policy.
 
 The matching higher-version recovery is derived from the verified signed
 **2103489** recovery to protected **2103486** functionality. It retains the
