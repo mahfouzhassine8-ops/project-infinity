@@ -11,7 +11,7 @@ with APK.open('rb') as stream:assert hashlib.file_digest(stream,'sha256').hexdig
 classes=OUT/'classes';classes.mkdir(exist_ok=True)
 inputs=list(COMPONENT.glob('*/classes.jar'))+list((COMPONENT/'jars').glob('*.jar'))+[COMPONENT/'feature.jar',COMPONENT/'baseline-api-compile-only.jar']
 run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-bootclasspath',os.pathsep.join(str(SDK/n) for n in ('android.jar','core-lambda-stubs.jar')),
-     '-classpath',os.pathsep.join(str(x) for x in [SDK/'android.jar']+inputs),'-d',classes,HERE/'android/InfinityCastProbeActivity.java'])
+     '-classpath',os.pathsep.join(str(x) for x in [SDK/'android.jar']+inputs),'-d',classes]+list((HERE/'android').glob('*.java')))
 jar=OUT/'probe.jar'
 with ZipFile(jar,'w',ZIP_DEFLATED) as z:
  for p in classes.rglob('*.class'):z.writestr(p.relative_to(classes).as_posix(),p.read_bytes())
@@ -22,7 +22,7 @@ manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:androi
 <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="35"/>
 <uses-permission android:name="android.permission.INTERNET"/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/><uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 <queries><package android:name="com.google.android.gms.policy_cast_dynamite"/></queries>
-<application android:label="Cast Component CI" android:theme="@android:style/Theme.Material.NoActionBar">
+<application android:label="Cast Component CI" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="true">
 <meta-data android:name="com.google.android.gms.version" android:value="12451000"/>
 <meta-data android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME" android:value="com.projectinfinity.kodi.InfinityCastOptions"/>
 <activity android:name="com.projectinfinity.kodi.InfinityCastProbeActivity" android:exported="true"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>''')

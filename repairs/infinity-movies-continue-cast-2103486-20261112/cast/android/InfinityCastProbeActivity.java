@@ -16,6 +16,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
     private InfinityCastSession cast;
     private int oldResource;
     private int activityResourceAfter,applicationResourceAfter,applicationCastResource,activityCastResource;
+    private volatile JSONObject relayResult;
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
         oldResource=getResources().getIdentifier("tag_accessibility_pane_title","id","com.projectinfinity.kodi");
@@ -23,6 +24,8 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
         if(getResources().getIdentifier("cast_device_chooser_title","string","com.projectinfinity.cast.resources")!=0){
             result(false,"Cast_resource_loaded_before_request");return;}
         deadline=SystemClock.uptimeMillis()+20000;
+        Thread relayProbe=new Thread(()->relayResult=InfinityCastRelayAndroidTest.run(),"CIOnlyCastRelayProbe");
+        relayProbe.setDaemon(true);relayProbe.start();
         cast=InfinityCastSession.get(this);cast.attach(this);
         pulse();
     }
@@ -49,7 +52,8 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
                 if(!"Cast probe".contentEquals(androidx.core.view.ViewCompat.getAccessibilityPaneTitle(view))){
                     result(false,"existing_core_tag_contract_failed");return;}
                 // Require repeated main-thread callbacks, not just a class load.
-                if(pulses>=10){result(true,"SDK_initialized_resources_isolated_original_Core_API_usable");return;}
+                if(relayResult!=null && !relayResult.optBoolean("pass")){result(false,"relay_probe_failed");return;}
+                if(pulses>=10 && relayResult!=null){result(true,"SDK_resources_existing_API_and_local_relay_verified");return;}
             }
         } catch(Exception | LinkageError failure){result(false,failure.getClass().getSimpleName());return;}
         if(SystemClock.uptimeMillis()>deadline){result(false,"SDK_initialization_deadline");return;}
@@ -63,6 +67,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
                 .put("original_resource_id",oldResource).put("Activity_original_after",activityResourceAfter)
                 .put("Application_original_after",applicationResourceAfter).put("Application_Cast_id",applicationCastResource)
                 .put("Activity_Cast_id",activityCastResource)
+                .put("relay",relayResult==null?JSONObject.NULL:relayResult)
                 .put("full_Infinity_playback","NOT_TESTED").put("receiver_transfer","NOT_TESTED")
                 .put("shutdown","NOT_SELECTED").put("owner_APK",false);
             android.util.Log.i("InfinityCastProbe",value.toString());

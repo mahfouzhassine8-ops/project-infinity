@@ -78,13 +78,14 @@ class MovieRoutes(unittest.TestCase):
         return entry, route
 
     def target(self, policy, entry, sources=None):
-        tree = ast.parse((BASE / 'plugin.py').read_text())
+        target_source = HERE / 'overlay/script.infinity.commandcenter/plugin.py' if policy is self.after else BASE / 'plugin.py'
+        tree = ast.parse(target_source.read_text())
         node = next(n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name == '_target')
         env = dict(hub=self.hub, setting_bool=lambda *a: True, number=policy.number,
                    _render_verified_source=lambda entry, route, render: policy.verified_source(entry, route),
                    _has_addon=lambda *a: True, _has_tmdb_helper=lambda *a: True,
                    _local_next_proof=lambda entry: None, stable_route=policy.stable_route)
-        exec(compile(ast.Module(body=[node], type_ignores=[]), 'actual-signed86-target', 'exec'), env)
+        exec(compile(ast.Module(body=[node], type_ignores=[]), str(target_source), 'exec'), env)
         return env['_target'](entry, sources or {})
 
     def test_original86_wrongly_falls_back_but_candidate_retains_both_actual_routes(self):
@@ -92,6 +93,19 @@ class MovieRoutes(unittest.TestCase):
             entry, route = self.movie(provider)
             self.assertIn('plugin.video.themoviedb.helper/', self.target(self.before, entry))
             self.assertEqual(route, self.target(self.after, entry))
+
+    def test_existing_saved_movie_without_old_stable_stamp_reuses_verified_original_uri(self):
+        for provider in ('plugin.video.umbrella','plugin.video.pov'):
+            entry,route=self.movie(provider)
+            entry.pop('stable_source',None);entry['source']=route
+            self.assertIn('plugin.video.themoviedb.helper/',self.target(self.before,entry))
+            self.assertEqual(route,self.target(self.after,entry))
+            self.assertEqual([],self.writes)
+
+    def test_original_uri_does_not_retry_a_twice_failed_preference(self):
+        entry,route=self.movie();entry.pop('stable_source',None);entry['source']=route
+        sources={entry['key']:dict(route=route,failures=2)}
+        self.assertIn('plugin.video.themoviedb.helper/',self.target(self.after,entry,sources))
 
     def test_movie_interface_file_tampering_is_not_accepted(self):
         entry, route = self.movie()

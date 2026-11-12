@@ -33,6 +33,9 @@ def verify(apk,sdk,out):
   return any(resolves(p,member,kind,seen) for p in [definition['parent']]+definition['interfaces'] if p)
  missing=[]
  for d in outputs:
+  for descriptor in d.types:
+   if descriptor.startswith(('Lokhttp3/','Lokio/')) and descriptor not in baseline:
+    missing.append(['provided HTTP class',descriptor])
   for kind,refs in [('methods',d.methods),('fields',d.fields)]:
    for owner,name,signature in refs:
     if owner in baseline and not resolves(owner,(name,signature),kind):missing.append([kind,owner,name,signature])
@@ -44,6 +47,7 @@ def verify(apk,sdk,out):
   duplicate_classes=overlap,missing_baseline_APIs=missing,reused_existing_classes=reused,
   original_APK_modified=False,Android='NOT_RUN',receiver='NOT_RUN',installer=False,
   resources=identity,dex={p.name:sha(p) for p in (out/'dex').glob('*.dex')})
+ result['provided_HTTP']='Existing OkHttp4.12/Okio classes only; no HTTP implementation replacements/additions permitted'
  root=Path(__file__).resolve().parent
  compiled_sources=json.loads((out/'SOURCE-JAVA.json').read_text())
  current_sources={p.relative_to(root).as_posix():sha(p) for p in (root/'java').rglob('*.java')}

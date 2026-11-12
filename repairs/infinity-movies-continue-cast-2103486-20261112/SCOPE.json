@@ -23,7 +23,7 @@
     "host": "test_movie_routes: actual signed86 validator and target, existing installed-source hashes, exact route/identity, tamper/version refusal, TV negative controls, no progress on saving; native Movie actual-item fallback: current file/type/tag snapshots, exact URI IDs, race/contradiction refusal, no GUI reads/library ID claims",
     "Android": "Selected: Cast SDK/resources/main-thread readiness in separate CI-only package on stock API36; not full Infinity playback or receiver transfer, no owner installer and no shutdown. Full combined movie/Continue Playing still pending.",
     "shutdown": "Only after corrected movie paths; independent workflow; no shutdown source changes",
-    "Cast": "Actual SDK compile, DEX035 and baseline API/class isolation; bounded same-PID read-only clock/freshness/item-occurrence checks; existing recorder default behavior and unchanged eligibility; Android/receiver NOT RUN",
+    "Cast": "Existing SDK/resources and default APIs retained; current sender-only progressive relay: actual local HTTP range/HEAD, credentials/redirect isolation, peer/capability refusal, bounded cancellation/retirement on host; API36 separate-package local relay against original OkHttp plus existing SDK/UI checks. Not a real receiver/Infinity playback/Fold test.",
     "native": "Cast-only queue/cancellation/source-occurrence/admission unit checks, then real full ARM64 engine compilation/link and exact baseline86 native-source/ABI preservation; no shutdown or owner tests"
   },
   "movie_production_file": "script.infinity.commandcenter/experience.py",
@@ -31,8 +31,11 @@
   "new_APK": "NOT_RESERVED_NOT_BUILT_NOT_SIGNED",
   "owner_acceptance": "NOT_RUN",
   "movie_production_files": [
-    "script.infinity.commandcenter/experience.py",
-    "script.infinity.commandcenter/service.py: movie actual-item fallback only"
+    "script.infinity.commandcenter/experience.py: current verified movie routes",
+    "script.infinity.commandcenter/plugin.py:_target: validate existing unstamped original movie URI",
+    "script.infinity.commandcenter/service.py: actual typed movie fallback and Cast-only optional clock",
+    "script.infinity.commandcenter/default.py: Cast-only channel registration",
+    "script.infinity.commandcenter/cast_runtime.py: new bounded same-process remote clock"
   ],
   "native_Cast_only_changes": [
     "xbmc/platform/android/activity/InfinityCastNative.cpp (new)",

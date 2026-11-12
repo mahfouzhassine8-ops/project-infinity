@@ -9,6 +9,7 @@ from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED
 import hashlib,json,os,re,shutil,struct,subprocess,sys
 from dex_contract import Dex, class_contract
+from provided_http import obtain as provided_http
 
 HERE=Path(__file__).resolve().parent
 WORK=Path(sys.argv[1]).resolve();APK=Path(sys.argv[2]).resolve()
@@ -19,6 +20,7 @@ with ZipFile(APK) as z:
  for n in z.namelist():
   if re.fullmatch(r'classes\d*\.dex',n):baseline.update(Dex(z.read(n)).classes)
 proof=json.loads((DEPS/'SDK-DEPENDENCIES.json').read_text())
+provided=provided_http(WORK)
 def run(args):subprocess.run([str(x) for x in args],check=True)
 program=[];resources=[];packages=[];consumer=[]
 for row in proof['artifacts']:
@@ -46,18 +48,22 @@ resource_apk=OUT/'resources.apk'
 run([SDK/'aapt2','link','--manifest',manifest,'--package-id','0x80','--auto-add-overlay',
      '--java',generated,'--extra-packages',':'.join(sorted(set(packages))),'-I',SDK/'android.jar',
      '-o',resource_apk]+[x for p in resources for x in ('-R',p)])
-classes=OUT/'classes';classes.mkdir(exist_ok=True)
+classes=OUT/'classes'
+if classes.exists():shutil.rmtree(classes)
+classes.mkdir()
 stubs=OUT/'stubs/com/projectinfinity/kodi';stubs.mkdir(parents=True,exist_ok=True)
 (stubs/'Main.java').write_text('package com.projectinfinity.kodi; public class Main extends android.app.NativeActivity {public static Main MainActivity;}')
 (stubs/'XBMCJsonRPC.java').write_text('package com.projectinfinity.kodi; public class XBMCJsonRPC {public String request_string(String request){throw new UnsupportedOperationException("compile only");}}')
-snapshot=OUT/'source-copy';snapshot.mkdir(exist_ok=True)
+snapshot=OUT/'source-copy'
+if snapshot.exists():shutil.rmtree(snapshot)
+snapshot.mkdir()
 source_hashes={}
 for p in (HERE/'java').rglob('*.java'):
  name=p.relative_to(HERE).as_posix();data=p.read_bytes();source_hashes[name]=hashlib.sha256(data).hexdigest()
  copy=snapshot/name;copy.parent.mkdir(parents=True,exist_ok=True);copy.write_bytes(data)
 (OUT/'SOURCE-JAVA.json').write_text(json.dumps(source_hashes,indent=2)+'\n')
 sources=list((snapshot/'java').rglob('*.java'))+list(generated.rglob('*.java'))+list(stubs.glob('*.java'))
-run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-bootclasspath',os.pathsep.join(str(SDK/n) for n in ('android.jar','core-lambda-stubs.jar')),'-classpath',os.pathsep.join(str(p) for p in [SDK/'android.jar']+program),'-d',classes]+sources)
+run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-bootclasspath',os.pathsep.join(str(SDK/n) for n in ('android.jar','core-lambda-stubs.jar')),'-classpath',os.pathsep.join(str(p) for p in [SDK/'android.jar']+program+provided),'-d',classes]+sources)
 compile_lib=OUT/'baseline-api-compile-only.jar';feature=OUT/'feature.jar'
 with ZipFile(compile_lib,'w',ZIP_DEFLATED) as libs,ZipFile(feature,'w',ZIP_DEFLATED) as app:
  for p in classes.rglob('*.class'):
@@ -99,7 +105,9 @@ rules.write_text('''-keep class com.projectinfinity.kodi.InfinityCast* { *; }
 -repackageclasses com.projectinfinity.kodi.castdeps
 -keepattributes Signature,InnerClasses,EnclosingMethod,*Annotation*
 -printmapping '''+str(OUT/'mapping.txt')+'\n')
-dex=OUT/'dex';dex.mkdir(exist_ok=True)
+dex=OUT/'dex'
+if dex.exists():shutil.rmtree(dex)
+dex.mkdir()
 reuse=os.environ.get('INFINITY_CAST_VERIFIED_COMPONENT')
 if reuse:
  candidates=list(Path(reuse).resolve().rglob('COMPONENT-RESULT.json'))
@@ -117,6 +125,7 @@ if reuse:
 else:
  run(['java','-Xmx2g','-cp',SDK/'d8.jar','com.android.tools.r8.R8','--release','--min-api','21',
       '--lib',SDK/'android.jar','--lib',compile_lib,'--output',dex,'--pg-conf',rules]+
+     [x for p in provided for x in ('--lib',p)]+
      [x for p in consumer for x in ('--pg-conf',p)]+filtered)
 from audit_sdk_component import verify
 verify(APK,SDK,OUT)

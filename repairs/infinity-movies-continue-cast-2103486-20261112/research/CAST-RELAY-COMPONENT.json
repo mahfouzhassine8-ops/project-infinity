@@ -1,0 +1,30 @@
+{
+  "status": "PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT",
+  "baseline_APK_sha256": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+  "baseline_classes": 9077,
+  "new_classes": 794,
+  "duplicate_classes": [],
+  "missing_baseline_APIs": [],
+  "provided_HTTP": "Existing OkHttp4.12/Okio classes only; no HTTP implementation replacements/additions permitted",
+  "DEX_format": "035; baseline minimum Android API21 unchanged; Cast resources require API30 only when invoked",
+  "feature_Java_sha256": {
+    "java/com/projectinfinity/kodi/InfinityCastResources.java": "1c7fc3cf02af2acd61c9b1887cc88c6ff6b2ec1ed087701f947e46b8762f1637",
+    "java/com/projectinfinity/kodi/InfinityCastGateway.java": "fbe9502139c701e344ebb8882ca53a73baff38921b6db9e536e79225cc00fbed",
+    "java/com/projectinfinity/kodi/InfinityCastSession.java": "7c3ad3e8929de1f24df2abd9d8b4aa232d4d83b8f83efc2ac0aadcc4df831c91",
+    "java/com/projectinfinity/kodi/InfinityCastRelay.java": "405ca47e5f2d6c5072241c8b8236e6e74252cf2172ca72ff3e5db985dbbe7590",
+    "java/com/projectinfinity/kodi/InfinityCastDialog.java": "d7bf7611ec09b680e0ad4c33ed298dca36590aa82b84640dddabd184dbfb8086",
+    "java/com/projectinfinity/kodi/InfinityCastSource.java": "a1e90723c3b4ece983a2aeaf45075974b508fe72c8818e6c0b385af606105683",
+    "java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
+    "java/com/projectinfinity/kodi/InfinityCastRpc.java": "e8962a2df243a2302c293622f1adaca345d764c1621e9ddfabdb93fa3535244f",
+    "java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+    "java/com/projectinfinity/kodi/InfinityCastNative.java": "5dd3337db1223b8a0c4fd5d7d848831eca9366f8eeb947ace8d6b044f5992e9f"
+  },
+  "resources": {
+    "schema": 1,
+    "resource_package_id": 128,
+    "sha256": "945bec5c594a1ea4eadea7b4a7fa8da07813f66f48af2e577e91ae7acd47e36a"
+  },
+  "dex": {
+    "classes.dex": "9bd8feaf3c2c56334cf9ed154e8aeffd505dd79a28693783121b09319a39f49c"
+  }
+}
