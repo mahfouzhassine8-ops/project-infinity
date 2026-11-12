@@ -1,0 +1,57 @@
+{
+  "allowed_new_Cast_sources": [
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastAdaptive.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java"
+  ],
+  "baseline_APK_sha256": "4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566",
+  "baseline_signing_source": "f0aa976d90b262373cea56942a44c9e382ccfaa3",
+  "baseline_source_snapshot": "f631bafeda7e3a781cb31da12ed85524cb913bda",
+  "baseline_versionCode": 2103488,
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "diagnostics_not_available": [
+    "Infinity-Diagnostics-20261112-152110.zip",
+    "Infinity-Diagnostics-20261112-150836.zip"
+  ],
+  "no_false_diagnostic_attribution": true,
+  "owner_acceptance": "ONE_COMBINED_FOLD_AND_REAL_RECEIVER_SESSION_AFTER_SIGNING",
+  "packaging_scope": [
+    "replace only Cast classes6.dex and Cast resource identity if required",
+    "libkodi.so only if Cast-only release correction validated; all other native sources frozen",
+    "version/experience labels and complete original-signed manifests only",
+    "owner registry, exact original workflow allowlist, Cast build/test paths"
+  ],
+  "production_allowlist": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "d7bf7611ec09b680e0ad4c33ed298dca36590aa82b84640dddabd184dbfb8086",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java": "fbe9502139c701e344ebb8882ca53a73baff38921b6db9e536e79225cc00fbed",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "53f310b8d2e254ee3fe1f47a17559c5a3da16398508a47646420f582fdcc4e14",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRpc.java": "e8962a2df243a2302c293622f1adaca345d764c1621e9ddfabdb93fa3535244f",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "9ea9801ebbdc718c4c400f76b3d0ceb2aaebc90a9ed9c1577a2366d08364309e",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java": "a1e90723c3b4ece983a2aeaf45075974b508fe72c8818e6c0b385af606105683",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/native/overlay/xbmc/platform/android/activity/InfinityCastNative.cpp": "fe3a2567ca89a5bfc661ec80ac80298cca7c71fdea0cf64257f1bd6578c8ec0f"
+  },
+  "protected_recovery_baseline": 2103486,
+  "schema": 1,
+  "scope": "CAST_ONLY_FROM_EXACT_SIGNED2103488",
+  "tests_selected": [
+    "Cast progressive/HLS/DASH actual HTTP delivery and authentication privacy",
+    "Cast load/session/return/failure lifecycle and cleanup",
+    "compact UI before/after transfer and receiver filtering",
+    "Cast-only native release source/ARM64 linkage if changed",
+    "unchanged movie/tracker/protection source comparisons",
+    "Android Cast component and APK installation/recovery",
+    "post-Cast shutdown only through separate explicitly selected shutdown workflow where executable"
+  ],
+  "unchanged": [
+    "Cobra",
+    "all original Movies/Infinity Movies/Home/TV code",
+    "all existing Command Center Python modules and recording/eligibility",
+    "shutdown/coordinator/persistence protection/deadlines",
+    "Python startup",
+    "Search/provider implementations",
+    "all skin controls and entry locations",
+    "native engine except the one Cast-only source",
+    "dependency versions and private relocation",
+    "user data/settings/schema"
+  ]
+}
