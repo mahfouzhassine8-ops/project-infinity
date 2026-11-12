@@ -96,7 +96,10 @@ jobs:
     timeout-minutes: 180
     env:
       GH_TOKEN: '${{ github.token }}'
-      KODI_BUILD_DIR: '${{ github.workspace }}/kodi-build'
+      NDK_VER: '21.4.7075529'
+      DEPENDS: '${{ github.workspace }}/android-tools/xbmc-depends'
+      TARBALLS: '${{ github.workspace }}/android-tools/xbmc-tarballs'
+      BUILD_DIR: '${{ github.workspace }}/kodi-build'
       PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
