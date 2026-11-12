@@ -1,0 +1,466 @@
+#!/usr/bin/env python3
+"""Pre-sign diagnostic: unchanged signed83 APK, replaced engine on disposable VM.
+
+This is not APK installation acceptance. No Core path repair, success activation,
+shutdown, service disablement, owner-device access, or substitute signer.
+"""
+import argparse
+import ast
+import codecs
+import hashlib
+import json
+import os
+from pathlib import Path
+import re
+import socket
+import stat
+import subprocess
+import sys
+import time
+import traceback
+import uuid
+from urllib.parse import parse_qs, urlsplit
+from zipfile import ZipFile, ZIP_DEFLATED
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+BRANCH = 'work/infinity-core-outcomes-qa-20261112'
+FEATURE = 'core-outcomes-native-qa'
+SELECTION = HERE / 'ANDROID-SELECTION.json'
+APK_SHA = '0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236'
+OLD_NATIVE = 'f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c'
+CORE = 'service.adulthideout.core'
+CORE_SOURCE = '2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3'
+CORE_BINARY = 'c4a8a8d1e046cab6a42934b8fba31246efb21a002a90beb2bffa555623a383a9'
+QA = 'script.infinity.coreoutcomesqa'
+sys.path.insert(0, str(ROOT / 'repairs/infinity-tracking-integration-2103469-20261108'))
+import qualify_android_baseline as base
+import verify_tracking_android as gui
+QP = base.PROFILE + '/addon_data/' + QA
+REMOTE = '/sdcard/Download/infinity-core-outcomes-qa/'
+
+
+def require(value, message):
+    if not value:
+        raise RuntimeError(message)
+
+
+def sha(path):
+    digest = hashlib.sha256()
+    with Path(path).open('rb') as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b''):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def selected():
+    row = base.load(SELECTION)
+    require(row.get('enabled') is True and row.get('application_tests') is True,
+            'ANDROID_SELECTION_DISABLED_PENDING_COMPLETED_NATIVE_PROOF')
+    require(row['feature'] == FEATURE and row['branch'] == BRANCH and
+            row['baseline_APK_sha256'] == APK_SHA and row['baseline_native_sha256'] == OLD_NATIVE,
+            'EXACT_ORIGINAL83_SCOPE')
+    require(row['native_injection'] is True and row['APK_modified'] is False and
+            row['before_first_launch'] is True and row['owner_device'] is False and
+            row['shutdown_tests'] is False and row['Core_path_correction'] is False,
+            'DISPOSABLE_PRELAUNCH_DIAGNOSTIC_ONLY')
+    require(re.fullmatch('[0-9a-f]{64}', row['native']['native_sha256'] or '') and
+            row['native']['native_sha256'] != OLD_NATIVE, 'FROZEN_NEW_NATIVE_REQUIRED')
+    require(row['source_bindings'], 'SOURCE_BOUND_SELECTION_REQUIRED')
+    for name, wanted in row['source_bindings'].items():
+        path = ROOT / name
+        require(path.resolve().is_relative_to(ROOT) and sha(path) == wanted, 'SOURCE_BINDING:' + name)
+    if os.environ.get('GITHUB_ACTIONS') == 'true':
+        require(os.environ.get('GITHUB_REPOSITORY') == 'mahfouzhassine8-ops/project-infinity' and
+                os.environ.get('GITHUB_REF') == 'refs/heads/' + BRANCH and
+                os.environ.get('SELECTED_FEATURE') == FEATURE, 'EXACT_MANUAL_CI_ROUTE')
+    return row
+
+
+# Reuse only the frozen bounded Device class, never the performance runner.
+transport = ROOT / 'repairs/infinity-performance-ui-2103477-20261110/baseline.py'
+tree = ast.parse(transport.read_text())
+node = next(n for n in tree.body if isinstance(n, ast.ClassDef) and n.name == 'Device')
+exec(compile(ast.Module(body=[node], type_ignores=[]), str(transport), 'exec'), globals())
+RetainedDevice = Device
+
+
+class Device(RetainedDevice):
+    METHODS = RetainedDevice.METHODS | {'Addons.SetAddonEnabled', 'Files.GetDirectory'}
+
+    def rpc(self, method, params=None, timeout=5):
+        if method == 'Addons.SetAddonEnabled':
+            require(params in [dict(addonid=n, enabled=True) for n in
+                               (CORE, 'script.kodihealthcenter')], 'ONLY_NORMAL_SELECTED_ENABLE')
+        if method == 'Files.GetDirectory':
+            require(params == dict(directory='plugin://script.infinity.commandcenter/?action=commands',
+                                   media='files'), 'ONLY_EXISTING_LOCAL_CC_COMMANDS')
+        return super().rpc(method, params, timeout)
+
+    def alive(self):
+        super().alive()
+        path = getattr(self, 'core_log', None)
+        if path:
+            rows = events(path, self.pid)
+            reject_success(rows)
+
+
+def api(path):
+    return json.loads(subprocess.check_output(
+        ['gh', 'api', 'repos/mahfouzhassine8-ops/project-infinity/' + path], text=True, timeout=45))
+
+
+def artifact(pin, out):
+    require(all(pin.get(k) is not None for k in ('run_id', 'artifact_id', 'workflow_id',
+            'workflow_path', 'source', 'name', 'sha256', 'size_in_bytes')), 'UNBOUND_ARTIFACT')
+    run = api('actions/runs/' + str(pin['run_id']))
+    require(run['status'] == 'completed' and run['conclusion'] == 'success' and
+            run['workflow_id'] == pin['workflow_id'] and run['path'] == pin['workflow_path'] and
+            run['head_sha'] == pin['source'], 'COMPLETED_EXACT_PRODUCER_REQUIRED')
+    row = api('actions/artifacts/' + str(pin['artifact_id']))
+    require(not row['expired'] and row['workflow_run']['id'] == pin['run_id'] and
+            row['name'] == pin['name'] and row['digest'] == 'sha256:' + pin['sha256'] and
+            row['size_in_bytes'] == pin['size_in_bytes'], 'EXACT_ARTIFACT_API_IDENTITY')
+    out.mkdir(parents=True, exist_ok=False)
+    archive = out / 'artifact.zip'
+    with archive.open('wb') as stream:
+        subprocess.run(['gh', 'api', 'repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/' +
+                        str(pin['artifact_id']) + '/zip'], stdout=stream, check=True, timeout=300)
+    require(sha(archive) == pin['sha256'] and archive.stat().st_size == pin['size_in_bytes'],
+            'WHOLE_ARTIFACT_ZIP_DIGEST_AND_SIZE')
+    with ZipFile(archive) as zip:
+        names = zip.namelist()
+        require(len(names) == len(set(names)) and len(names) <= 20000 and
+                sum(i.file_size for i in zip.infolist()) <= 2 * 1024**3, 'BOUNDED_UNIQUE_ARTIFACT')
+        for item in zip.infolist():
+            p = Path(item.filename)
+            require(not p.is_absolute() and '..' not in p.parts and '\\' not in item.filename and
+                    '\0' not in item.filename and not stat.S_ISLNK(item.external_attr >> 16), 'SAFE_ARTIFACT_PATH')
+        zip.extractall(out / 'files')
+    base.save(out / 'API-PROVENANCE.json', dict(run=run, artifact=row, zip_sha256=sha(archive)))
+    return out / 'files'
+
+
+def one(root, name):
+    matches = list(root.rglob(name))
+    require(len(matches) == 1, 'UNIQUE_INPUT:' + name)
+    return matches[0]
+
+
+def fetch(out):
+    row = selected()
+    require(not out.exists(), 'FRESH_INTAKE')
+    baseline = artifact(row['baseline'], out / 'baseline')
+    native = artifact(row['native'], out / 'native')
+    apk = one(baseline, 'Infinity-2103483-Combined-Original-Signer.apk')
+    library = one(native, 'libkodi.so')
+    proof = base.load(one(native, 'CORE-OUTCOMES-ARM64.json'))
+    require(sha(apk) == APK_SHA and sha(library) == row['native']['native_sha256'], 'EXACT_APK_AND_ENGINE')
+    require(proof['status'] == 'PASS_FULL_ARM64_CORE_OUTCOMES_LINK_AND_BASELINE_ABI' and
+            proof['source_commit'] == row['native']['source'] and proof['native_sha256'] == sha(library) and
+            proof['baseline83_native_sha256'] == OLD_NATIVE and proof['diagnostic_only'] is True and
+            proof['Core_path_correction_activated'] is False and proof['signed'] is False,
+            'ACTUAL_COMPLETED_ARM64_SOURCE_ABI_PROOF')
+    with ZipFile(apk) as zip:
+        require(hashlib.sha256(zip.read('lib/arm64-v8a/libkodi.so')).hexdigest() == OLD_NATIVE,
+                'ORIGINAL83_NATIVE_PREIMAGE')
+        require(not any(n.startswith('assets/addons/' + CORE + '/') for n in zip.namelist()),
+                'CORE_NOT_PACKAGED_IN_BASE83')
+    fixture = out / 'publisher'; fixture.mkdir()
+    for item in row['publisher']['files']:
+        require(item['url'].startswith('https://raw.githubusercontent.com/Vashiel/repository.adulthideout/' +
+                row['publisher']['commit'] + '/'), 'PINNED_PUBLISHER_URL')
+        target = fixture / item['name']
+        require(target.parent == fixture, 'FLAT_PUBLISHER_INPUT')
+        import urllib.request
+        with urllib.request.urlopen(item['url'], timeout=45) as response:
+            data = response.read(item['size'] + 1)
+        require(len(data) == item['size'] and hashlib.sha256(data).hexdigest() == item['sha256'],
+                'UNMODIFIED_PUBLISHER_BYTES:' + item['name'])
+        target.write_bytes(data)
+    require(sha(fixture / 'service.py') == CORE_SOURCE and
+            sha(fixture / 'libadulthideout_core.so') == CORE_BINARY, 'EXACT_CORE_SOURCE_AND_BINARY')
+    base.save(out / 'FETCH.json', dict(status='PASS_AUTHENTICATED_PRE_SIGN_INPUTS_NOT_APPLICATION_TEST',
+        apk=str(apk.resolve()), native=str(library.resolve()), publisher=str(fixture.resolve()),
+        selection_sha256=sha(SELECTION), native_source=row['native']['source']))
+
+
+OBSERVER = r'''
+import hashlib,json,os,time
+import xbmc,xbmcaddon,xbmcgui,xbmcvfs
+def require(v,m):
+    if not v:raise RuntimeError(m)
+root=xbmcvfs.translatePath('special://profile/addon_data/script.infinity.coreoutcomesqa/')
+with open(root+'request.json') as stream:r=json.load(stream)
+with open('/proc/self/stat') as stream:started=stream.read().rsplit(') ',1)[1].split()[19]
+require(r['pid']==os.getpid() and r['process_start']==started,'ACTUAL_PROCESS_REQUEST')
+out=dict(pid=os.getpid(),process_start=started,nonce=r['nonce'],sequence=r['sequence'],action=r['action'],passed=False)
+if r['action']=='local-python':
+    out.update(passed=True,arithmetic=sum([1,2,3]))
+elif r['action']=='health-center':
+    path=xbmcvfs.translatePath(xbmcaddon.Addon('script.kodihealthcenter').getAddonInfo('path'))
+    for name,wanted in r['health_sources'].items():
+        with open(os.path.join(path,name),'rb') as stream:actual=hashlib.sha256(stream.read()).hexdigest()
+        require(actual==wanted,'EXACT_HEALTH_CENTER_SOURCE')
+    require(not xbmc.getCondVisibility('Window.IsVisible(1188)'),'HEALTH_INITIAL_ABSENT')
+    xbmc.executebuiltin('RunScript(script.kodihealthcenter)')
+    deadline=time.monotonic()+40
+    while time.monotonic()<deadline:
+        if xbmcgui.getCurrentWindowDialogId()==11188 and xbmcgui.Window(10000).getProperty('KHC.Version')=='2.5.26':
+            owner=xbmcgui.Window(11188);control=owner.getControl(1188101)
+            require(isinstance(control,xbmcgui.ControlButton),'HEALTH_BUTTON_TYPE')
+            label=control.getLabel()
+            require(label=='Scan Kodi' and xbmcgui.getCurrentWindowDialogId()==11188,'REAL_HEALTH_CONTROL')
+            out.update(passed=True,label=label,dialog=11188);break
+        xbmc.sleep(100)
+else:raise RuntimeError('UNSELECTED_ACTION')
+with open(root+'reply.pending','w') as stream:json.dump(out,stream)
+os.replace(root+'reply.pending',root+'reply.json')
+'''
+
+
+def stage(inputs, sdk):
+    row = selected(); proof = base.load(inputs / 'FETCH.json')
+    require(proof['selection_sha256'] == sha(SELECTION), 'CURRENT_INPUT_SELECTION')
+    apk = Path(proof['apk'])
+    require(sha(apk) == APK_SHA and sha(Path(proof['native'])) == row['native']['native_sha256'], 'INPUTS_UNCHANGED')
+    signature = base.command([sdk / 'build-tools/35.0.0/apksigner', 'verify', '--verbose', '--print-certs', apk], timeout=60)
+    require(re.findall(r'certificate SHA-256 digest: ([0-9a-f]+)', signature) == [base.CERT], 'ORIGINAL_CERTIFICATE')
+    for scheme in ('v1', 'v2', 'v3'):
+        require(any(line.startswith('Verified using ' + scheme + ' scheme') and line.endswith(': true')
+                    for line in signature.splitlines()), 'ORIGINAL_SIGNATURE_' + scheme)
+    (inputs / 'ORIGINAL-SIGNATURE.txt').write_text(signature)
+    qa = inputs / 'core-outcomes-observer.zip'
+    with ZipFile(qa, 'x', ZIP_DEFLATED) as zip:
+        zip.writestr(QA + '/addon.xml', '<addon id="' + QA + '" name="Internal Core outcomes observer" version="1.0.0" provider-name="Infinity QA"><requires><import addon="xbmc.python" version="3.0.0"/></requires><extension point="xbmc.python.script" library="default.py"/></addon>')
+        zip.writestr(QA + '/default.py', OBSERVER)
+    core = inputs / 'service.adulthideout.core-1.0.2.zip'
+    with ZipFile(core, 'x', ZIP_DEFLATED) as zip:
+        for name in ('addon.xml', 'service.py'):
+            zip.write(Path(proof['publisher']) / name, CORE + '/' + name)
+        zip.write(Path(proof['publisher']) / 'libadulthideout_core.so', CORE + '/bin/android-arm64-v8a/libadulthideout_core.so')
+        zip.writestr(CORE + '/bin/android-arm64-v8a/version.txt', '1.0.1\n')
+    health = {}
+    with ZipFile(apk) as zip:
+        for name in ('default.py', 'khc_contracts.py'):
+            health[name] = hashlib.sha256(zip.read('assets/addons/script.kodihealthcenter/' + name)).hexdigest()
+    proof.update(status='PASS_STAGED_PRE_SIGN_DIAGNOSTIC_INPUTS', health_sources=health,
+        qa=dict(addon=QA, version='1.0.0', archive=qa.name, sha256=sha(qa)),
+        core=dict(addon=CORE, version='1.0.2', archive=core.name, sha256=sha(core)))
+    base.save(inputs / 'INTAKE.json', proof)
+
+
+def events(path, pid):
+    if not path.exists():
+        return []
+    require(path.stat().st_size <= 8 * 1024**2, 'BOUNDED_NATIVE_DIAGNOSTIC_LOG')
+    rows = []
+    for line in path.read_text(errors='replace').splitlines():
+        try:
+            row = json.loads(line)
+        except ValueError:
+            continue  # logcat headers/partial last line are retained raw.
+        if row.get('native_pid') == pid and isinstance(row.get('data'), dict):
+            rows.append(row)
+    return rows
+
+
+def reject_success(rows):
+    require(not any(r['data'].get('event') == 'core.load.returned' or
+            (r['data'].get('event', '').startswith('native_call.') and
+             r['data'].get('symbol') == 'start_core_service') for r in rows),
+            'UNEXPECTED_CORE_SUCCESS_OR_REAL_NATIVE_START_ABORT_REMAINING_DIAGNOSTIC')
+
+
+def outcome(rows):
+    reject_success(rows)
+    for first in rows:
+        data = first['data']; invoker = first.get('invoker')
+        if data.get('event') != 'coverage.begin' or data.get('actor') != 'core_service' or data.get('source_sha') != CORE_SOURCE:
+            continue
+        owned = [r['data'] for r in rows if r.get('invoker') == invoker]
+        if not any(r.get('event') == 'coverage.installed' and r.get('actor') == 'core_service' for r in owned):
+            continue
+        require(not any(r.get('event') in ('coverage.disabled', 'coverage.limit', 'coverage.code_mismatch',
+                    'coverage.trace_error') for r in owned), 'CORE_OBSERVER_COVERAGE_INCOMPLETE')
+        begins = [r for r in owned if r.get('event') == 'operation.begin']
+        terminals = [r for r in owned if r.get('event') in ('operation.return', 'operation.error')]
+        paired = [dict(begin=b, end=t) for b in begins for t in terminals
+                  if b.get('ticket') == t.get('ticket') and b.get('operation') == t.get('operation')]
+        if not any(p['begin']['operation'] == 'copy2' for p in paired) or not any(
+                p['begin']['operation'] in ('chmod', 'utime', 'setxattr') for p in paired):
+            continue
+        for i, begin in enumerate(owned):
+            if begin.get('event') != 'core.load.begin':
+                continue
+            target = begin.get('target', '')
+            require(target.endswith('/.kodi/temp/libadulthideout_core.so') and
+                    target.startswith(('/storage/emulated/0/Android/data/' + base.PACKAGE + '/',
+                                       '/sdcard/Android/data/' + base.PACKAGE + '/')),
+                    'ORIGINAL_EXTERNAL_TEMP_CORE_LOAD_PATH_REQUIRED')
+            for j in range(i + 1, len(owned)):
+                failed = owned[j]
+                if failed.get('event') == 'core.load.error' and failed.get('ticket') == begin['ticket']:
+                    require(failed.get('namespace_rejected') is True, 'EXPECTED_NAMESPACE_REJECTION_REQUIRED')
+                    maps = next((r for r in owned[j + 1:] if r.get('event') == 'core.maps' and
+                                 r.get('moment') == 'load_error'), None)
+                    if maps is None:
+                        continue
+                    require(maps.get('complete') is True and maps.get('map_entries') == 0 and
+                            maps.get('executable_mapping') is False, 'OWN_PROCESS_CORE_MAPS_MUST_BE_COMPLETE_AND_EMPTY')
+                    return dict(status='PASS_OBSERVED_ORIGINAL_CORE_NAMESPACE_FAILURE_NOT_CORE_SUCCESS',
+                                invoker=invoker, coverage=first, operations=paired,
+                                load_begin=begin, load_error=failed, own_process_maps=maps)
+    return None
+
+
+def enable(device, addon):
+    before = device.rpc('Addons.GetAddonDetails', dict(addonid=addon, properties=['version', 'enabled']))['addon']
+    if before['enabled'] is False:
+        require(device.rpc('Addons.SetAddonEnabled', dict(addonid=addon, enabled=True)) == 'OK', 'NORMAL_ENABLE')
+    after = device.rpc('Addons.GetAddonDetails', dict(addonid=addon, properties=['version', 'enabled']))['addon']
+    require(after['enabled'] is True, 'SELECTED_SERVICE_NOT_ENABLED')
+    return dict(before=before, after=after)
+
+
+def invoke(device, inputs, out, action, sequence, nonce):
+    request = dict(pid=device.pid, process_start=device.start_time, nonce=nonce, sequence=sequence,
+                   action=action, health_sources=inputs['health_sources'])
+    path = out / 'request.json'; base.save(path, request)
+    device.adb('push', path, QP + '/request.pending'); device.shell('mv', QP + '/request.pending', QP + '/request.json')
+    device.rpc('Addons.ExecuteAddon', dict(addonid=QA))
+    deadline = time.monotonic() + 50
+    while time.monotonic() < deadline:
+        device.alive()
+        try:
+            reply = json.loads(device.shell('head', '-c', '65536', QP + '/reply.json', check=False))
+        except ValueError:
+            reply = {}
+        if all(reply.get(k) == request[k] for k in ('pid', 'process_start', 'nonce', 'sequence', 'action')):
+            base.save(out / ('case-%d-%s.json' % (sequence, action)), reply)
+            require(reply.get('passed') is True, 'ACTUAL_LOCAL_FUNCTIONAL_CASE:' + action)
+            return reply
+        time.sleep(.2)
+    raise TimeoutError('ACTUAL_OBSERVER_REPLY:' + action)
+
+
+def run(inputs, sdk, out):
+    row = selected(); proof = base.load(inputs / 'INTAKE.json')
+    require(os.environ.get('GITHUB_ACTIONS') == 'true' and not out.exists(), 'CI_FRESH_OUTPUT_ONLY')
+    require(proof['selection_sha256'] == sha(SELECTION) and sha(Path(proof['apk'])) == APK_SHA and
+            sha(Path(proof['native'])) == row['native']['native_sha256'], 'EXACT_CURRENT_ADMITTED_INPUTS')
+    for key in ('qa', 'core'):
+        require(sha(inputs / proof[key]['archive']) == proof[key]['sha256'], 'STAGED_ZIP_UNCHANGED')
+    out.mkdir(parents=True)
+    report = dict(status='RUNNING', native_injection=True, APK_modified=False, before_first_launch=True,
+        owner_device=False, baseline_APK_sha256=APK_SHA, native_sha256=row['native']['native_sha256'],
+        source_commit=os.environ['GITHUB_SHA'], native_producer_source=proof['native_source'],
+        APK_install_acceptance=False, Core_success_activated=False, shutdown='NOT_RUN', cases=[])
+    device = reader = None
+    def checkpoint(): base.save(out / 'ANDROID-CORE-OUTCOMES.json', report)
+    try:
+        device = Device(out, sdk); report['environment'] = base.environment(device, out)
+        require(not device.shell('pm', 'list', 'packages', base.PACKAGE).strip(), 'NEW_DISPOSABLE_VM_ONLY')
+        base.root_reconnect(device, out)
+        require(device.adb('install', '--no-streaming', proof['apk'], timeout=300).strip().endswith('Success'), 'EXACT_ORIGINAL83_INSTALL')
+        require(not device.pids() and not device.shell('pidof', base.PACKAGE, check=False).strip(), 'NO_FIRST_LAUNCH_YET')
+        installed = device.shell('pm', 'path', base.PACKAGE).strip().removeprefix('package:')
+        require(device.shell('sha256sum', installed).split()[0] == APK_SHA, 'ACTUAL_UNCHANGED_APK_BYTES')
+        dump = device.shell('dumpsys', 'package', base.PACKAGE)
+        paths = re.findall(r'^\s*nativeLibraryDir=(/data/app/[A-Za-z0-9_./+=~-]+)', dump, re.M)
+        require(len(set(paths)) == 1, 'UNIQUE_PACKAGE_NATIVE_LIBRARY_DIRECTORY')
+        destination = paths[0].rstrip('/') + '/libkodi.so'
+        require(device.shell('sha256sum', destination).split()[0] == OLD_NATIVE, 'EXACT_INSTALLED_ORIGINAL_ENGINE')
+        before = device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip()
+        staged = '/data/local/tmp/infinity-core-outcomes-libkodi.so'
+        device.adb('push', proof['native'], staged)
+        require(device.shell('sha256sum', staged).split()[0] == row['native']['native_sha256'], 'PUSHED_ENGINE_SHA')
+        device.shell('cp', staged, destination)
+        require(device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip() == before, 'NATIVE_FILE_OWNER_MODE_LABEL_PRESERVED')
+        require(device.shell('sha256sum', destination).split()[0] == row['native']['native_sha256'], 'INJECTED_ENGINE_READBACK')
+        require(device.shell('sha256sum', installed).split()[0] == APK_SHA and not device.pids(), 'APK_UNCHANGED_BEFORE_FIRST_LAUNCH')
+        report['injection'] = dict(status='PASS_PRELAUNCH_NATIVE_INJECTION_NOT_APK_INSTALL_ACCEPTANCE',
+                                   destination=destination, before=OLD_NATIVE, after=row['native']['native_sha256'])
+        device.shell('mkdir', '-p', base.PROFILE, REMOTE, QP)
+        settings = out / 'HARNESS_BOOTSTRAP-guisettings.xml'
+        settings.write_text('<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting><setting id="general.addonupdates">2</setting><setting id="addons.unknownsources">true</setting><setting id="services.esenabled">true</setting><setting id="services.esallinterfaces">true</setting></settings>')
+        sources = out / 'HARNESS_BOOTSTRAP-sources.xml'
+        sources.write_text('<sources><files><source><name>Internal Core outcomes QA</name><path pathversion="1">' + REMOTE + '</path><allowsharing>false</allowsharing></source></files></sources>')
+        device.adb('push', settings, base.PROFILE + '/guisettings.xml'); device.adb('push', sources, base.PROFILE + '/sources.xml')
+        for key in ('qa', 'core'):
+            device.adb('push', inputs / proof[key]['archive'], REMOTE + proof[key]['archive'])
+        binary_dir = base.PROFILE + '/addon_data/' + CORE + '/bin/android-arm64-v8a'
+        device.shell('mkdir', '-p', binary_dir)
+        device.adb('push', Path(proof['publisher']) / 'libadulthideout_core.so', binary_dir + '/libadulthideout_core.so')
+        version = out / 'FRESH-FIXTURE-version.txt'; version.write_text('1.0.1\n')
+        device.adb('push', version, binary_dir + '/version.txt')
+        require(device.shell('sha256sum', binary_dir + '/libadulthideout_core.so').split()[0] == CORE_BINARY,
+                'SYNTHETIC_PRELAUNCH_CORE_BINARY_EXACT')
+        uid = device.shell('stat', '-c', '%u', '/data/user/0/' + base.PACKAGE).strip()
+        require(uid.isdigit(), 'ACTUAL_FRESH_VM_UID')
+        device.shell('chown', '-R', uid + ':' + uid, '/data/media/0/Android/data/' + base.PACKAGE)
+        device.shell('restorecon', '-RF', '/data/media/0/Android/data/' + base.PACKAGE)
+        device.adb('forward', 'tcp:19090', 'tcp:9090')
+        device.core_log = out / 'InfinityCoreQA.raw.log'
+        with device.core_log.open('wb') as stream, (out / 'logcat.stderr').open('wb') as error:
+            reader = subprocess.Popen(['timeout', '--signal=TERM', '--kill-after=2', '1200',
+                str(device.adb_bin), '-s', device.serial, 'logcat', '-v', 'raw', '-s', 'InfinityCoreQA:I', '*:S'],
+                stdout=stream, stderr=error, stdin=subprocess.DEVNULL, close_fds=True)
+        report['startup'] = base.start_once(device, 1, out); checkpoint()
+        require(device.shell('sha256sum', destination).split()[0] == row['native']['native_sha256'], 'RUNTIME_ENGINE_FILE_UNCHANGED')
+        gui.install_zip(device, proof['qa'], dict(remote_zip_directory=REMOTE), out, 'local-observer')
+        nonce = uuid.uuid4().hex
+        report['cases'].append(invoke(device, proof, out, 'local-python', 1, nonce)); checkpoint()
+        gui.install_zip(device, proof['core'], dict(remote_zip_directory=REMOTE), out, 'original-core-source')
+        report['core_enable'] = enable(device, CORE); checkpoint()
+        deadline = time.monotonic() + 60
+        while time.monotonic() < deadline:
+            device.alive(); observed = outcome(events(device.core_log, device.pid))
+            if observed:
+                report['core_outcome'] = observed; checkpoint(); break
+            time.sleep(.2)
+        else: raise TimeoutError('ORIGINAL_CORE_OUTCOME_COVERAGE_NOT_OBSERVED')
+        report['health_enable'] = enable(device, 'script.kodihealthcenter')
+        report['cases'].append(invoke(device, proof, out, 'health-center', 2, nonce)); checkpoint()
+        device.screenshot('real-health-center'); device.rpc('Input.Back'); device.rpc('Input.Home')
+        report['cases'].append(invoke(device, proof, out, 'local-python', 3, nonce)); checkpoint()
+        listing = device.rpc('Files.GetDirectory', dict(directory='plugin://script.infinity.commandcenter/?action=commands', media='files'), timeout=25)
+        files = listing.get('files', [])
+        for label, key in [('Health Center', 'health-center'), ('Resume Hub', 'resume-hub')]:
+            matches = [f for f in files if f.get('label') == label]
+            require(len(matches) == 1, 'EXISTING_CC_COMMAND:' + key)
+            route = urlsplit(matches[0]['file'])
+            require(route.scheme == 'plugin' and route.netloc == base.CC and route.path == '/' and
+                    parse_qs(route.query) == {'action': ['command'], 'command': [key]}, 'UNCHANGED_CC_ROUTE')
+        report['command_center'] = dict(status='PASS_REAL_LOCAL_PLUGIN_EXECUTION', rows=files, activated=False)
+        base.crash_free_alive(device)
+        reject_success(events(device.core_log, device.pid))
+        require(device.shell('sha256sum', installed).split()[0] == APK_SHA, 'FINAL_APK_BYTES_UNCHANGED')
+        report['status'] = 'PASS_SELECTED_PRE_SIGN_ANDROID_CORE_OUTCOME_DIAGNOSTIC_ONLY'
+    except Exception:
+        report.update(status='BLOCKED_OR_FAILED_PRE_SIGN_DIAGNOSTIC', error=traceback.format_exc())
+        raise
+    finally:
+        # Stop ONLY the host log reader. No application Quit/Close/force-stop.
+        if reader:
+            reader.terminate()
+            try: reader.wait(timeout=5)
+            except subprocess.TimeoutExpired: reader.kill(); reader.wait(timeout=3)
+        if device:
+            for name in ('kodi.log', 'kodi.old.log'):
+                try: device.adb('pull', base.HOME + '/temp/' + name, out / name, check=False)
+                except Exception: pass
+            try: (out / 'crash.log').write_text(device.shell('logcat', '-b', 'crash', '-d', timeout=5))
+            except Exception: pass
+        checkpoint()
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('operation', choices=['gate', 'fetch', 'stage', 'run'])
+    parser.add_argument('--inputs', type=Path); parser.add_argument('--sdk', type=Path); parser.add_argument('--out', type=Path)
+    args = parser.parse_args()
+    if args.operation == 'gate': selected()
+    elif args.operation == 'fetch': fetch(args.out)
+    elif args.operation == 'stage': stage(args.inputs, args.sdk)
+    else: run(args.inputs, args.sdk, args.out)

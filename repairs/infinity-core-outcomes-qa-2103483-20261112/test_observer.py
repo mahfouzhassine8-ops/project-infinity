@@ -314,6 +314,28 @@ class ObserverContract(unittest.TestCase):
             self.assertIsNone(os.chmod(path, 0o600))
             with self.assertRaises(FileNotFoundError): os.utime(str(self.root / 'missing'))
 
+    def test_symlink_copystat_and_capability_sets_are_preserved(self):
+        self.assertIn(os.utime, os.supports_follow_symlinks)
+        capabilities = {name: set(getattr(os, name)) for name in
+                        ('supports_fd', 'supports_dir_fd', 'supports_follow_symlinks')}
+        source, target = self.root/'source', self.root/'target'
+        source.write_bytes(b'source'); target.write_bytes(b'target')
+        src, dst = self.root/'source-link', self.root/'target-link'
+        src.symlink_to(source); dst.symlink_to(target)
+        stamp = 1600000000123456789
+        os.utime(src, ns=(stamp, stamp), follow_symlinks=False)
+        shutil.copystat(src, dst, follow_symlinks=False)
+        expected = os.lstat(dst).st_mtime_ns
+        os.utime(dst, ns=(1700000000000000000, 1700000000000000000), follow_symlinks=False)
+        with self.observing():
+            self.assertIn(os.utime, os.supports_follow_symlinks)
+            shutil.copystat(src, dst, follow_symlinks=False)
+            self.assertEqual(os.lstat(dst).st_mtime_ns, expected)
+            self.assertEqual(os.readlink(dst), str(target))
+            self.assertEqual(target.read_bytes(), b'target')
+        for name, original in capabilities.items():
+            self.assertEqual(getattr(os, name), original)
+
     def test_actual_core_service_source_remains_byte_identical_without_execution(self):
         path = Path(os.environ.get('INFINITY_COREQA_SERVICE_SOURCE', '/tmp/infinity-core-service-reference.py'))
         self.assertTrue(path.is_file(), 'Provide the exact83 Core source via INFINITY_COREQA_SERVICE_SOURCE')

@@ -25,6 +25,7 @@ class State:
         self.observe_loads = observe_loads
         self.local = threading.local()
         self.bindings = []
+        self.capabilities = []
         self.serial = 0
         self.events = 0
         self.started = time.monotonic()
@@ -170,6 +171,14 @@ class State:
                 value = getattr(module, name, None)
                 if value is original:
                     self.bindings.append((module, name, original, wrapper))
+                    # stdlib copystat consults callable membership for symlink
+                    # semantics. Preserve it for the diagnostic delegate while
+                    # retaining cached original callables in the same sets.
+                    for capability in ('supports_fd', 'supports_dir_fd', 'supports_follow_symlinks'):
+                        supported = getattr(os, capability, None)
+                        if type(supported) is set and original in supported and wrapper not in supported:
+                            supported.add(wrapper)
+                            self.capabilities.append((supported, wrapper))
                     setattr(module, name, wrapper)
 
     def wrap(self, module, name, operation):
@@ -285,6 +294,9 @@ class State:
                 setattr(module, name, original)
             else:
                 self.record('coverage.binding_replaced', binding=name)
+        for supported, wrapper in reversed(self.capabilities):
+            supported.discard(wrapper)
+        self.capabilities.clear()
         self.record('coverage.retired', successful_load_calls=self.loads if self.observe_loads else None,
                     observed_start_returns=self.start_returns, native_drain='UNVERIFIED')
         self.bindings.clear()
