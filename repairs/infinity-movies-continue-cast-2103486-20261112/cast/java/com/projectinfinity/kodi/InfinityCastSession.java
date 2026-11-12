@@ -52,7 +52,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private InfinityCastSource privateSource;
     private InfinityCastRelay relay;
     private boolean phoneClockReady;
-    private boolean handedOff,everPlayed,finished,returning,aborting,transferStarted,ticking,leaving;
+    private boolean handedOff,everPlayed,finished,returning,aborting,transferStarted,ticking,leaving,selecting;
     private boolean phoneWasPaused,mayHavePaused,restoreInFlight;
     private long lastPosition,lastDuration,epoch,nextNativePoll,returnDeadline,returnEpoch;
     String message="Preparing Infinity Cast…";
@@ -148,7 +148,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     long duration(){return lastDuration;}
     void choose(int index) {
         if(transferStarted || handedOff || index<0 || index>=devices.size() || privateSource==null || phone.busy() || source==null)return;
-        aborting=returning=false;message="Connecting to "+devices.get(index).getName()+"…";changed();
+        aborting=returning=false;selecting=true;message="Connecting to "+devices.get(index).getName()+"…";changed();
         final long generation=++epoch;
         devices.get(index).select();
         if(connected())connectedSession(session);
@@ -158,7 +158,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     }
     private boolean ok(JSONObject value){return value!=null && "ok".equals(value.optString("status"));}
     private void connectedSession(CastSession value) {
-        if(transferStarted || aborting || source==null || privateSource==null)return;
+        if(!selecting || transferStarted || aborting || source==null || privateSource==null)return;
         transferStarted=true;phoneClockReady=false;
         session=value;remote=value.getRemoteMediaClient();
         CastDevice device=value.getCastDevice();
@@ -401,7 +401,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         boolean releaseClock=!handedOff || phoneClockReady;
         if(remote!=null)remote.unregisterCallback(mediaEvents);
         boolean end=session!=null;
-        handedOff=false;everPlayed=false;finished=false;returning=false;transferStarted=false;
+        handedOff=false;everPlayed=false;finished=false;returning=false;transferStarted=false;selecting=false;
         returnDeadline=0;mayHavePaused=false;restoreInFlight=false;
         if(channel!=null) {
             if(releaseClock)InfinityCastRpc.channel(channel.name,true);
@@ -420,7 +420,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     @Override public void onSessionResumed(CastSession s,boolean suspended){if(!handedOff)connectedSession(s);}
     @Override public void onSessionStartFailed(CastSession s,int error){if(session!=null && s!=session)return;unavailable("Cast connection failed. Phone playback is unchanged.");abortTransfer();}
     @Override public void onSessionResumeFailed(CastSession s,int error){onSessionStartFailed(s,error);}
-    @Override public void onSessionEnded(CastSession s,int error){if(leaving || s!=session)return;if(handedOff){message="Cast disconnected. Return to phone playback.";returning=false;}else if(transferStarted)abortTransfer();else session=null;changed();}
+    @Override public void onSessionEnded(CastSession s,int error){if(leaving || s!=session)return;if(relay!=null){relay.close();relay=null;}if(handedOff){message="Cast disconnected. Return to phone playback.";returning=false;}else if(transferStarted)abortTransfer();else session=null;changed();}
     @Override public void onSessionSuspended(CastSession s,int reason){message="Cast connection interrupted. Return to phone playback.";changed();}
     @Override public void onSessionStarting(CastSession s){if(!handedOff)session=s;}
     @Override public void onSessionResuming(CastSession s,String id){}
