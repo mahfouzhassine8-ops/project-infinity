@@ -1,0 +1,72 @@
+{
+  "accepted_pointer_updated": false,
+  "baseline_versionCode": 2103488,
+  "candidate": {
+    "APK_sha256": "63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733",
+    "digest": "sha256:93fe36a47f71463b78e90df6ed64e2b627a280e25cdd097e04c4ff2ee17ba404",
+    "id": 13992273256,
+    "name": "Infinity88-CastFinal-OriginalSigned-43325382217-QA-Fold-Pending",
+    "run": 43325382217,
+    "size_in_bytes": 347814304,
+    "source": "d311f22ddd30d3c7313a3f8f009c8f8a8e3325cd",
+    "workflow_id": 397702717
+  },
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "engineering": {
+    "Android_component_run": 43321698528,
+    "Android_install_recovery_run": 43327402170,
+    "adaptive_authenticated_HTTP_FFmpeg_decode_seek_checks": 57,
+    "full_ARM64_link_run": 43314732573,
+    "native_Cast_host": "PASS",
+    "original_signing_runs": [
+      43325382217,
+      43326721200
+    ],
+    "preparation_run": 43323900250,
+    "progressive_HTTP_checks": 38,
+    "registry_review_runs": [
+      43324721387,
+      43326213071
+    ],
+    "release_guard_cases": 6
+  },
+  "package": "com.projectinfinity.kodi",
+  "physical": {
+    "Fold": "PENDING_OWNER",
+    "layouts_and_themes": "PENDING_OWNER",
+    "phone_return": "PENDING_OWNER",
+    "post_Cast_shutdown": "NOT_TESTED",
+    "real_receiver_streaming_provider_transfer": "NOT_TESTED"
+  },
+  "preservation": {
+    "Cobra_changed": false,
+    "Command_Center_or_skin_changed": false,
+    "Movies_or_TV_or_tracking_or_Search_or_providers_changed": false,
+    "added_members": [],
+    "candidate_changed_payload_members": [
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties",
+      "classes6.dex",
+      "lib/arm64-v8a/libkodi.so"
+    ],
+    "original_five_DEX_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_source_changed": false,
+    "unchanged_candidate_members": 7771,
+    "user_data_accessed_or_modified": false
+  },
+  "protected_recovery_baseline": 2103486,
+  "recovery": {
+    "APK_sha256": "78af2c811e471007ef4e2280b0f4c65050020656bd226425997ebfc7128562c0",
+    "digest": "sha256:44d2b68e75d649798531934fa48d01075aeeefa2aecb27e15a590da5abf18363",
+    "id": 13993745514,
+    "name": "Infinity88-CastFinal-OriginalSigned-43326721200-QA-Fold-Pending",
+    "run": 43326721200,
+    "size_in_bytes": 346419526,
+    "source": "9ad36336b23c91d45de7dec8d45a192a2702868d",
+    "workflow_id": 397702717
+  },
+  "schema": 1,
+  "status": "ORIGINAL_SIGNED_CAST_ONLY_QA_READY_FOR_ONE_OWNER_SESSION",
+  "uninstall_or_reset_or_forced_downgrade": false
+}

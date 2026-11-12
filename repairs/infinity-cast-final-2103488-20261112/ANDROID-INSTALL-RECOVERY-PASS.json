@@ -1,0 +1,60 @@
+{
+  "artifact": {
+    "digest": "sha256:2912eb483b9baf48cbffae84eafb7ca5dc85430ee068411e745a6f3dc926d8bc",
+    "id": 13994360311,
+    "size_in_bytes": 909
+  },
+  "report": {
+    "Fold_acceptance": "NOT_RUN",
+    "application_launch": false,
+    "application_startup": "NOT_SELECTED",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "data_preservation": "PackageManager retained UID, dataDir and firstInstallTime. No owner profile/database opened or modified.",
+    "data_reset": false,
+    "emulator_abis": "x86_64,arm64-v8a",
+    "forced_downgrade": false,
+    "playback": "OWNER_QA_AFTER_SIGNING",
+    "schema": 1,
+    "shutdown": "OWNER_QA_AFTER_SIGNING",
+    "source": "1ca4ade2e8d51b1f6c2cabf42473234cfa0940ae",
+    "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+    "steps": [
+      {
+        "APK_sha256": "4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566",
+        "kind": "baseline",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-12 23:20:11",
+          "uid": "10216",
+          "versionCode": 2103488
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733",
+        "kind": "candidate",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-12 23:20:11",
+          "uid": "10216",
+          "versionCode": 2103490
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "78af2c811e471007ef4e2280b0f4c65050020656bd226425997ebfc7128562c0",
+        "kind": "recovery",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-12 23:20:11",
+          "uid": "10216",
+          "versionCode": 2103491
+        },
+        "status": "PASS"
+      }
+    ],
+    "uninstall": false
+  },
+  "run": 43327402170,
+  "schema": 1
+}
