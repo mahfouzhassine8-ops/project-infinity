@@ -1,0 +1,25 @@
+{
+  "APK_assembly_signing_native_or_app_execution": false,
+  "not_selected": [
+    "Nativecompile",
+    "APKassembly/signing",
+    "Android/emulator/app",
+    "Original39oroldhostsuite rerun",
+    "Registry/ref mutation"
+  ],
+  "results": [
+    "PASS_SYNTAX_WITHOUT_ORIGINAL_TOOL_IMPORT",
+    "REFUSED_DISABLED_REQUEST_BEFORE_IMPORT_API_OR_OUTPUT",
+    "REFUSED_NONPASS_PROOF_STATUS",
+    "REFUSED_MISMATCHED_PROOF_BINDING",
+    "PASS_EXACT_THREE_MEMBER_ALLOWLIST_NO_CORE_OR_PYTHON"
+  ],
+  "scope": "New key-free releaseprep guards only; no APK assembly or behavior suites",
+  "selected": [
+    "AllnewPython syntax parses without importing unavailabletoolkit",
+    "Disabledrequest rejects beforetoolimport/output/API",
+    "Proofreceipt rejects nonPASS status and mismatchedrequiredfields",
+    "AllowedAPKchanges exactlynative/version/Infinitylabel; noCore/Python/sourceallowance"
+  ],
+  "status": "PASS_FIVE_NEW_STAGE_INPUT_SOURCE_GUARDS_ONLY"
+}
