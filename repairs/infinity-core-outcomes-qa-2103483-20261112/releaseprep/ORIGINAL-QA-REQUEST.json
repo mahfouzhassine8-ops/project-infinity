@@ -1,0 +1,75 @@
+{
+  "enabled": true,
+  "operation": "original-owner-core-outcomes-native-observation-internal-QA",
+  "sign_operation": "sign-core-outcomes-qa",
+  "versionCode": 2103484,
+  "generation": 69,
+  "original_signer_workflow_id": 397702717,
+  "baseline_source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+  "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "Core_path_or_source_patch": false,
+  "Fold_cause_established": false,
+  "owner_delivery": false,
+  "publication": false,
+  "accepted_pointer_updated": false,
+  "native_producer": {
+    "run": 43156682598,
+    "workflow_id": 415461484,
+    "source": "f5b38189201e0401aa62b652e1320c73f50f37e0",
+    "id": 13919086222,
+    "name": "Infinity-Core-Outcomes-ARM64-43156682598-NO-INSTALLER",
+    "digest": "sha256:57bb8364e3d4cdf9710cc4715b6d6ccde0a3f0b47ed22c60d7d62352fae55711",
+    "size_in_bytes": 192712885
+  },
+  "android_producer": {
+    "run": 43163420602,
+    "workflow_id": 393886994,
+    "source": "151970a1a7aecdb501c77e921debe6ebc4ca770d",
+    "id": 13919505849,
+    "name": "Infinity-Core-Outcomes-PreSign-Android-43163420602-MODIFIED-RUNTIME-NOT-INSTALL-ACCEPTANCE",
+    "digest": "sha256:adfec9058d3c32adedf45cd3f10c5930d5a79d81817413ce51490fa1debf3659",
+    "size_in_bytes": 1492757
+  },
+  "prepared_producer": {
+    "run": 43167997052,
+    "workflow_id": 415639547,
+    "source": "6f7520ead53db8e3217765f1bfb3990631c463dd",
+    "id": 13920857701,
+    "name": "Infinity-Core-Outcomes-Unsigned-QA-43167997052-NOT-INSTALLABLE",
+    "digest": "sha256:dbcc2c84a172c87a339c2e60e0107ad7e6d593f82657fead15372d58d8877131",
+    "size_in_bytes": 637868223
+  },
+  "unsigned_workflow_additions": [
+    {
+      "id": 415461484,
+      "path": ".github/workflows/infinity-core-outcomes-qa-native.yml",
+      "source": "f5b38189201e0401aa62b652e1320c73f50f37e0",
+      "workflow_sha256": "93e8840a14ea3b1192b2b2b6e15c837b37b643748ac588eccc4ab956bfede147",
+      "original_key_access": false,
+      "review_role": "Exact Core observation source, selected host proofs and full ARM64 linkage; read-only keys-free"
+    },
+    {
+      "id": 415639547,
+      "path": ".github/workflows/infinity-core-outcomes-qa-stage.yml",
+      "source": "6f7520ead53db8e3217765f1bfb3990631c463dd",
+      "workflow_sha256": "853248712b11e675f342bbdc9f1c4bd0d538cae1c6b51fcacec56f8da8e0eae0",
+      "original_key_access": false,
+      "review_role": "Exact83 key-free unsigned QA assembly with owner-accepted unresolved emulator risk; no signing-key expressions"
+    }
+  ],
+  "signer_policy_sha256": "f75c70ec6f6737fb07c62b90087fed257bf7cd9b116adf2d02a5f5adf21776c6",
+  "workflow_sha256": "5457f4e0f7c191039600d0a8d6f2999be36d63b63d969af9ed7f5680549d2aea",
+  "stage_request": "repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json",
+  "native_sha256": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33",
+  "unsigned_sha256": "17e7ec0a1c6e0a9df6e70d9a8012a9e7aa836c15d20dae75f9e902f3d9701bdf",
+  "Android_proof_sha256": "97b37900cc244b21735ffa30980664f03a483c45a6382512c3d471f7d78fbd53",
+  "source_bindings": {
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py": "aee06e3e580122a1a43d0edfd4330e47d7650af30f2451620f5b93f51af0e5e5",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/stage.py": "3ee6e7b259deeffeabbf2ab108e7ba97a136e619dc6fcbb5cc3603e52f9c9e13",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/BASELINE83.json": "c70a5be8f56d3f8601d20b86b2e98677c2c35b3696503614838712635faeffa3",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json": "5f4f8e9bbf4956dece1d977f75a43cdf3afbb02dcca4a1fc2cab2ab49eede05a",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/OWNER-QA-AUTHORIZATION.json": "434d230a614ec3d1f98cc15a34e9fb0fbd4670565c95578b6f3319f18fac1f31",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/capture_mac_usb.py": "789017d9ac2ea37c3c0810485a7c428f2f353d2a624add27a545a26ca75a4461",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/CAPTURE-MAC-USB.md": "40fa4832ffc2da3d624d437852eee8a32caf6eac12b8a57d63e772fbaf127563"
+  }
+}

@@ -216,9 +216,25 @@
       "workflow_sha256": "b0f8f1862367ff518f41e29a0a8696626cb6f884c17c4be681e19b2a7d7b41b2",
       "original_key_access": false,
       "review_role": "Exact authenticated unsigned QA assembly only; source and native archive bindings; read-only actions/contents; no key access"
+    },
+    {
+      "id": 415461484,
+      "path": ".github/workflows/infinity-core-outcomes-qa-native.yml",
+      "source": "f5b38189201e0401aa62b652e1320c73f50f37e0",
+      "workflow_sha256": "93e8840a14ea3b1192b2b2b6e15c837b37b643748ac588eccc4ab956bfede147",
+      "original_key_access": false,
+      "review_role": "Exact Core observation source, selected host proofs and full ARM64 linkage; read-only keys-free"
+    },
+    {
+      "id": 415639547,
+      "path": ".github/workflows/infinity-core-outcomes-qa-stage.yml",
+      "source": "6f7520ead53db8e3217765f1bfb3990631c463dd",
+      "workflow_sha256": "853248712b11e675f342bbdc9f1c4bd0d538cae1c6b51fcacec56f8da8e0eae0",
+      "original_key_access": false,
+      "review_role": "Exact83 key-free unsigned QA assembly with owner-accepted unresolved emulator risk; no signing-key expressions"
     }
   ],
-  "audit_workflows": 642,
+  "audit_workflows": 644,
   "retired_original_key_workflows": [
     {
       "id": 370925114,
@@ -2973,7 +2989,9 @@
     414251549,
     414737362,
     414757668,
-    415259347
+    415259347,
+    415461484,
+    415639547
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",

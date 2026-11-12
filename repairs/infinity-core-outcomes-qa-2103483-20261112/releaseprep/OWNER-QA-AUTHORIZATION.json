@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "authorization": "OWNER_EXPLICIT_EXPERIMENTAL_FOLD_QA_WITH_UNRESOLVED_EMULATOR_SIGSEGV",
+  "protected_baseline": 2103483,
+  "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "native_producer_run": 43156682598,
+  "native_sha256": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33",
+  "failed_emulator_run": 43163420602,
+  "emulator_SIGSEGV": "UNRESOLVED_RISK_NOT_PASS_NOT_PROOF_OF_FOLD_FAILURE",
+  "owner_accepts_controlled_internal_QA": true,
+  "production_approval": false,
+  "required": [
+    "Full ARM64 compile/link and source/ABI proof",
+    "Exact83 APK preservation",
+    "Original permanent certificate and install-over compatibility"
+  ],
+  "waived_only": "Full emulator functional acceptance prerequisite for this experimental internal QA",
+  "Core_path_correction": false,
+  "shutdown_safety_weakened": false,
+  "Cobra_changes": false,
+  "accepted_baseline_updated": false,
+  "successor_candidate": 2103484,
+  "forward_recovery_if_feasible": 2103485
+}

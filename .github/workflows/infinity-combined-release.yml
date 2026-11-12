@@ -2,7 +2,7 @@ name: Infinity combined release | owner gate before original signing
 on:
   push:
     branches: [work/infinity-final-release-462-20261107, work/infinity-tracking-integration-20261108, work/infinity-exact69-forward-2103476-20261109, work/infinity-exact74-retest-2103477-20261109, work/infinity-2103460-nine-corrections-20261106]
-    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-SIGN-REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-ORIGINAL-SIGN-REQUEST.json, repairs/infinity-functional-startup-2103482-20261111/QA-SIGN-REQUEST.json]
+    paths: [repairs/infinity-final-release-462-20261107/REQUEST.json, repairs/infinity-tracking-integration-2103469-20261108/MODULE-REQUEST.json, repairs/infinity-exact69-forward-2103476/REQUEST.json, repairs/infinity-exact74-retest-2103477/REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-SIGN-REQUEST.json, repairs/infinity-close-startup-2103480-20261110/build_candidate/SHUTDOWN-ORIGINAL-SIGN-REQUEST.json, repairs/infinity-functional-startup-2103482-20261111/QA-SIGN-REQUEST.json, repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/ORIGINAL-QA-REQUEST.json]
   workflow_dispatch:
     inputs:
       operation:
@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa, sign-core-outcomes-qa]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -3291,5 +3291,163 @@ jobs:
         with:
           name: Infinity2103483-OriginalSigner-Refusal-${{ github.run_id }}-NO-APK
           path: startup-qa-gate/*.json
+          retention-days: 90
+          if-no-files-found: warn
+
+  core-outcomes-keyfree-authority-proposal:
+    name: Exact ARM64 and Android-verified Core-observation QA authority proposal; no key
+    if: github.event_name == 'push' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && startsWith(github.event.head_commit.message, 'Prepare Core outcomes QA:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    permissions: {contents: read, actions: read}
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Bind task admission source before importing task helpers or touching keys
+        run: |
+          python3 - <<'PYCORE'
+          import hashlib,json
+          from pathlib import Path
+          task=Path('repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep')
+          request=json.loads((task/'ORIGINAL-QA-REQUEST.json').read_bytes())
+          assert request['enabled'] is True and request['operation']=='original-owner-core-outcomes-native-observation-internal-QA'
+          assert request['versionCode']==2103484 and request['generation']==69 and request['publication'] is False
+          assert request['original_signer_workflow_id']==397702717
+          for name,wanted in request['source_bindings'].items():
+              path=Path(name)
+              assert not path.is_absolute() and '..' not in path.parts
+              assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,name
+          assert str(task/'original_gate.py') in request['source_bindings']
+          workflow=Path('.github/workflows/infinity-combined-release.yml')
+          assert hashlib.sha256(workflow.read_bytes()).hexdigest()==request['workflow_sha256']
+          PYCORE
+      - name: Fetch only authenticated ARM64 and Android-verified unsigned staging input
+        run: python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py download
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13899912993', run-id: '43119348510', merge-multiple: true, github-token: '${{ github.token }}', path: signed83}
+      - name: Original owner authority transition and exact APK preservation
+        run: python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py propose --out core-outcomes-qa-authority-proposal
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Core-Outcomes-QA-Authority-Proposal-${{ github.run_id }}-NO-KEY
+          path: core-outcomes-qa-authority-proposal/
+          retention-days: 90
+          if-no-files-found: error
+
+  core-outcomes-original-key-internal-qa:
+    name: Exactly registered Core-observation internal QA through original permanent signing key
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && ((github.event_name == 'push' && startsWith(github.event.head_commit.message, 'Sign Core outcomes QA:')) || (github.event_name == 'workflow_dispatch' && inputs.operation == 'sign-core-outcomes-qa'))
+    runs-on: ubuntu-22.04
+    timeout-minutes: 100
+    permissions: {contents: read, actions: read}
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Bind task admission source before importing task helpers or touching keys
+        run: |
+          python3 - <<'PYCORE'
+          import hashlib,json
+          from pathlib import Path
+          task=Path('repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep')
+          request=json.loads((task/'ORIGINAL-QA-REQUEST.json').read_bytes())
+          assert request['enabled'] is True and request['operation']=='original-owner-core-outcomes-native-observation-internal-QA'
+          assert request['versionCode']==2103484 and request['generation']==69 and request['publication'] is False
+          assert request['original_signer_workflow_id']==397702717
+          for name,wanted in request['source_bindings'].items():
+              path=Path(name)
+              assert not path.is_absolute() and '..' not in path.parts
+              assert hashlib.file_digest(path.open('rb'),'sha256').hexdigest()==wanted,name
+          assert str(task/'original_gate.py') in request['source_bindings']
+          workflow=Path('.github/workflows/infinity-combined-release.yml')
+          assert hashlib.sha256(workflow.read_bytes()).hexdigest()==request['workflow_sha256']
+          PYCORE
+      - name: Verify registered generation69 exact owner update and sole original signer before keys
+        run: |
+          set -euo pipefail
+          python3 -m py_compile repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py
+          python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py admit
+          mkdir -p core-outcomes-qa-gate
+          python3 repairs/dual-experience-isolation-2103420/signer_policy.py check --out core-outcomes-qa-gate/SIGNER-ROUTES.json
+          test -x "$ANDROID_HOME/build-tools/35.0.0/zipalign"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+      - name: Bind local staging files to authenticated raw artifact ZIP
+        run: python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py download
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13899912993', run-id: '43119348510', merge-multiple: true, github-token: '${{ github.token }}', path: signed83}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {run-id: '39867073954', name: Infinity-Receipt-Race-Android17-Investigation, github-token: '${{ github.token }}', path: tools}
+      - name: Prove exact signed83 parent and unsigned candidate with only approved member differences
+        run: |
+          (cd signed83 && sha256sum -c SHA256SUMS)
+          python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py inputs
+      - name: Run unchanged original pre-sign source, ownership and DEX guards
+        run: |
+          python3 repairs/dual-experience-isolation-2103420/release_gate.py \
+            --apk core-outcomes-qa-prepared/Infinity-2103484-Core-Outcomes-UNSIGNED-NOT-INSTALLABLE.apk \
+            --jars tools/receipt-evidence/tool-jars --work core-outcomes-qa-gate/dex \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 69 \
+            --out core-outcomes-qa-gate/RELEASE-DECISION.json
+          python3 - <<'PY82'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('core-outcomes-qa-gate/RELEASE-DECISION.json').read_text())
+          assert d['status']=='PRE_SIGN_PAYLOAD_VERIFIED' and d['versionCode']==2103484 and d['generation']==69
+          print('PASS original release authority gate, safe to call existing signer',flush=True)
+          PY82
+      - name: Sign only the admitted source with existing original permanent key
+        env:
+          INFINITY_KEYSTORE_B64: '${{ secrets.INFINITY_KEYSTORE_B64 }}'
+          INFINITY_STORE_PASSWORD: '${{ secrets.INFINITY_STORE_PASSWORD }}'
+          INFINITY_KEY_PASSWORD: '${{ secrets.INFINITY_KEY_PASSWORD }}'
+          INFINITY_KEY_ALIAS: '${{ secrets.INFINITY_KEY_ALIAS }}'
+        run: |
+          python3 repairs/dual-experience-isolation-2103420/assemble.py sign \
+            --apk core-outcomes-qa-prepared/Infinity-2103484-Core-Outcomes-UNSIGNED-NOT-INSTALLABLE.apk \
+            --jars tools/receipt-evidence/tool-jars --work core-outcomes-qa-gate/dex-signer \
+            --repository . --expected-head "$GITHUB_SHA" --expected-generation 69 \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out core-outcomes-qa-original-signed
+      - name: Verify signed v1/v2/v3, original certificate and member preservation; Android installation remains separate
+        run: python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/original_gate.py post --sdk "$ANDROID_HOME/build-tools/35.0.0"
+      - name: Include source-bound read-only Mac capture helper outside the signed APK
+        run: |
+          cp repairs/infinity-core-outcomes-qa-2103483-20261112/capture_mac_usb.py core-outcomes-qa-original-signed/
+          cp repairs/infinity-core-outcomes-qa-2103483-20261112/CAPTURE-MAC-USB.md core-outcomes-qa-original-signed/
+          (cd core-outcomes-qa-original-signed && sha256sum capture_mac_usb.py > CAPTURE-SHA256.txt)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103484-OriginalSigned-Core-Outcomes-Internal-QA-${{ github.run_id }}-FOLD-PENDING
+          path: core-outcomes-qa-original-signed/
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity2103484-Core-Outcomes-Signature-Preservation-${{ github.run_id }}-RECEIPTS
+          path: |
+            core-outcomes-qa-original-signed/BUILD-RECEIPT.json
+            core-outcomes-qa-original-signed/QA-PRESERVATION.json
+            core-outcomes-qa-original-signed/QA-SIGNATURE.txt
+            core-outcomes-qa-original-signed/SHA256SUMS
+            core-outcomes-qa-original-signed/CAPTURE-SHA256.txt
+          retention-days: 90
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: Infinity2103484-Core-Outcomes-OriginalSigner-Refusal-${{ github.run_id }}-NO-APK
+          path: core-outcomes-qa-gate/*.json
           retention-days: 90
           if-no-files-found: warn
