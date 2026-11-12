@@ -13,7 +13,7 @@ OUT=ROOT/'cast-native-output'
 TOOLS=ROOT/'cast-native-frozen-tools'
 REFERENCE='9ce852ebb044a82853ef93af24e34a07ed96daff'
 LOCK='e1ef672a6f24aed6c19a14ab96d2df6fe3380460'
-BRANCH='work/infinity-movies-continue-cast-2103486-20261112'
+BRANCH='work/infinity-cast-final-from-2103488-20261112'
 OLD='repairs/infinity-essential-only-shutdown-2103483-20261112'
 APK86='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197'
 ENGINE86='b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635'
@@ -33,11 +33,19 @@ def gate():
     assert os.environ['GITHUB_REPOSITORY']=='mahfouzhassine8-ops/project-infinity'
     assert os.environ['GITHUB_REF']=='refs/heads/'+BRANCH
     assert subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()==os.environ['GITHUB_SHA']
-    changed=subprocess.check_output(['git','diff','--name-only',LOCK,'HEAD'],cwd=ROOT,text=True).splitlines()
-    assert all(n.startswith(str(HERE.relative_to(ROOT))+'/') or n in (
-        '.github/workflows/infinity-core-outcomes-qa-native.yml',
-        '.github/workflows/infinity-saved-navigation-android.yml') for n in changed),changed
-    assert json.loads((HERE/'SCOPE.json').read_text())['native_protected_changes'] is False
+    scope=json.loads((ROOT/'repairs/infinity-cast-final-2103488-20261112/SCOPE.json').read_text())
+    changed=subprocess.check_output(['git','diff','--name-only',scope['baseline_source_snapshot'],'HEAD'],cwd=ROOT,text=True).splitlines()
+    permitted=set(scope['production_allowlist'])|set(scope['allowed_new_Cast_sources'])
+    for name in changed:
+        assert name in permitted or name.startswith('repairs/infinity-cast-final-2103488-20261112/') or name.startswith(str(HERE.relative_to(ROOT))+'/cast/tests/') or name in (
+            '.github/workflows/infinity-core-outcomes-qa-native.yml',
+            '.github/workflows/infinity-saved-navigation-android.yml',
+            str(HERE.relative_to(ROOT))+'/build_cast_native.py',
+            str(HERE.relative_to(ROOT))+'/cast/test_relay_host.py',
+            str(HERE.relative_to(ROOT))+'/native/tests/test_cast_native.cpp'),name
+    for name in (CMAKE,BUILTINS):
+        path=str(HERE.relative_to(ROOT))+'/native/overlay/'+name
+        assert (ROOT/path).read_bytes()==subprocess.check_output(['git','show',scope['baseline_source_snapshot']+':'+path],cwd=ROOT)
 
 def load(path,name):
     spec=importlib.util.spec_from_file_location(name,path);m=importlib.util.module_from_spec(spec)

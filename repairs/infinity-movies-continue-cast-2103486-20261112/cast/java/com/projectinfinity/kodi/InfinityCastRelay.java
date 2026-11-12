@@ -25,6 +25,8 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import okhttp3.Authenticator;
 import okhttp3.Call;
 import okhttp3.ConnectionPool;
@@ -33,130 +35,187 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-/** One current progressive stream, one chosen receiver, bounded owned I/O.
- * No provider credentials/URI leave the phone. No global client, socket, DNS,
- * proxy or cookie settings are changed. No files/database/server service.
- * Uses private Cast-only HTTP code; no existing Cobra class is called/replaced.
- */
-final class InfinityCastRelay implements AutoCloseable {
+/** One selected receiver and one actual source; all adaptive URLs stay sender-side. */
+final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Links {
     interface Ready {void ready(InfinityCastRelay relay,String mime,String failure);}
-    private static final ThreadPoolExecutor io=new ThreadPoolExecutor(0,2,30,TimeUnit.SECONDS,
+    private static final ThreadPoolExecutor io=new ThreadPoolExecutor(0,6,30,TimeUnit.SECONDS,
         new SynchronousQueue<>(),r->{Thread t=new Thread(r,"InfinityCastMediaIO");t.setDaemon(true);return t;});
     private static final ThreadPoolExecutor lifecycle=new ThreadPoolExecutor(0,1,30,TimeUnit.SECONDS,
         new LinkedBlockingQueue<>(2),r->{Thread t=new Thread(r,"InfinityCastMediaOwner");t.setDaemon(true);return t;});
+    private static final Pattern VARIABLE=Pattern.compile("\\$(Number|Time)(?:%0([1-9][0-9]?)d)?\\$");
     private static InfinityCastRelay active;
+    private static final class Resource {
+        final URI uri;final InfinityCastAdaptive.Kind kind;final String hint;
+        Resource(URI uri,InfinityCastAdaptive.Kind kind,String hint){this.uri=uri;this.kind=kind;this.hint=hint;}
+    }
+    private static final class Template {
+        final String value;final String[] names;
+        Template(String value,String[] names){this.value=value;this.names=names;}
+    }
     private final InfinityCastSource source;
     private final InetAddress receiver;
     private final ServerSocket listener;
     private final String path;
+    private final Resource root;
     private final OkHttpClient upstream;
+    private final Map<String,Resource> resources=new ConcurrentHashMap<>();
+    private final Map<String,String> ids=new ConcurrentHashMap<>();
+    private final Map<String,Template> templates=new ConcurrentHashMap<>();
     private final Set<Socket> clients=Collections.newSetFromMap(new ConcurrentHashMap<Socket,Boolean>());
     private final Set<Call> calls=Collections.newSetFromMap(new ConcurrentHashMap<Call,Boolean>());
     private final Map<Response,Call> responses=new ConcurrentHashMap<>();
-    private final AtomicInteger jobs=new AtomicInteger();
+    private final AtomicInteger jobs=new AtomicInteger(),requests=new AtomicInteger();
     private volatile boolean closed,ownerDone;
-    private volatile String mime;
+    private volatile String mime,lastFailure="";
     private InfinityCastRelay(InetAddress receiver,InetAddress local,InfinityCastSource source) throws IOException {
         this.receiver=receiver;this.source=source;
-        path="/"+UUID.randomUUID().toString().replace("-","")+"/media";
+        path="/"+UUID.randomUUID().toString().replace("-","");root=new Resource(source.uri,InfinityCastAdaptive.Kind.MEDIA,source.hint);
         upstream=new OkHttpClient.Builder().cookieJar(CookieJar.NO_COOKIES).authenticator(Authenticator.NONE)
             .proxyAuthenticator(Authenticator.NONE).followRedirects(false).followSslRedirects(false)
-            .retryOnConnectionFailure(false).cache(null).connectionPool(new ConnectionPool(2,5,TimeUnit.SECONDS))
-            .connectTimeout(3500,TimeUnit.MILLISECONDS).readTimeout(4000,TimeUnit.MILLISECONDS)
+            .retryOnConnectionFailure(false).cache(null).connectionPool(new ConnectionPool(6,5,TimeUnit.SECONDS))
+            .connectTimeout(3500,TimeUnit.MILLISECONDS).readTimeout(8000,TimeUnit.MILLISECONDS)
             .writeTimeout(4000,TimeUnit.MILLISECONDS).build();
         listener=new ServerSocket();listener.setReuseAddress(false);
-        try{listener.bind(new InetSocketAddress(local,0),2);}catch(IOException failed){listener.close();throw failed;}
+        try{listener.bind(new InetSocketAddress(local,0),8);}catch(IOException failed){listener.close();throw failed;}
     }
     static synchronized InfinityCastRelay start(InetAddress receiver,InfinityCastSource source,Ready callback) throws IOException {
-        if(active!=null)throw new IOException("Previous Cast transport still owned");
-        if(!(receiver instanceof Inet4Address) || receiver.isAnyLocalAddress() || source==null)
-            throw new IOException("Unsupported receiver address or source");
-        InetAddress local=localAddress(receiver);
-        InfinityCastRelay relay=new InfinityCastRelay(receiver,local,source);active=relay;relay.jobs.incrementAndGet();
+        if(active!=null)throw new IOException("previous_transport_draining");
+        if(!(receiver instanceof Inet4Address) || receiver.isAnyLocalAddress() || source==null)throw new IOException("unsupported_receiver_route");
+        InfinityCastRelay relay=new InfinityCastRelay(receiver,localAddress(receiver),source);active=relay;relay.jobs.incrementAndGet();
         try {
             io.execute(()->{
-                String problem=null;String type=null;
+                String problem=null,type=null;
                 try {
-                    type=relay.probe();
-                    if(relay.closed)return;
-                    if(type==null)throw new IOException("Unsupported progressive media");
-                    relay.mime=type;
-                    lifecycle.execute(relay::accept);
-                } catch(Exception failure){relay.close();problem="Media transport unavailable or unsupported";}
+                    type=relay.probe();if(relay.closed)return;
+                    if(type==null)throw new IOException("unsupported_media_type");
+                    relay.mime=type;lifecycle.execute(relay::accept);
+                    InfinityCastDiagnostics.event("relay","prepared",0);
+                } catch(Exception failure){problem=relay.reason(failure);relay.close();}
                 finally {relay.jobs.decrementAndGet();relay.retired();}
-                // A consumer exception cannot turn a delivered success into a
-                // second failure callback, or strand the transport owner.
                 try{callback.ready(relay,type,problem);}catch(RuntimeException rejected){relay.close();}
             });
-        } catch(RuntimeException unavailable){relay.jobs.decrementAndGet();relay.close();throw new IOException("Cast transport busy");}
+        } catch(RuntimeException unavailable){relay.jobs.decrementAndGet();relay.close();throw new IOException("transport_busy");}
         return relay;
+    }
+    private String reason(Exception error) {
+        String code=error.getMessage();if(code==null || !code.matches("[a-z_]{1,48}(?:_[0-9]{3})?"))code="source_network_or_transport_failure";
+        lastFailure=code;InfinityCastDiagnostics.event("relay",code,0);return code;
     }
     private static InetAddress localAddress(InetAddress peer) throws IOException {
         for(NetworkInterface network:Collections.list(NetworkInterface.getNetworkInterfaces())) {
             if(!network.isUp())continue;
             for(InterfaceAddress address:network.getInterfaceAddresses()) {
                 InetAddress value=address.getAddress();
-                if(!(value instanceof Inet4Address) || value.isAnyLocalAddress() ||
-                    (value.isLoopbackAddress()!=peer.isLoopbackAddress()))continue;
+                if(!(value instanceof Inet4Address) || value.isAnyLocalAddress() || (value.isLoopbackAddress()!=peer.isLoopbackAddress()))continue;
                 int prefix=address.getNetworkPrefixLength();if(prefix<1 || prefix>32)continue;
                 byte[] a=value.getAddress(),b=peer.getAddress();boolean match=true;
                 for(int bit=0;bit<prefix;bit++)if((a[bit/8]&(1<<(7-bit%8)))!=(b[bit/8]&(1<<(7-bit%8)))){match=false;break;}
                 if(match)return value;
             }
         }
-        throw new IOException("No direct local route to receiver");
+        throw new IOException("no_direct_receiver_route");
     }
-    String address(){return "http://"+listener.getInetAddress().getHostAddress()+":"+listener.getLocalPort()+path;}
+    private String base(){return "http://"+listener.getInetAddress().getHostAddress()+":"+listener.getLocalPort()+path;}
+    String address(){return base()+"/media";}
     boolean closed(){return closed;}
+    String failure(){return lastFailure;}
     static synchronized boolean busy(){return active!=null;}
-    private boolean sameOrigin(URI a,URI b) {
+    private static boolean sameOrigin(URI a,URI b) {
         int ap=a.getPort()<0?("https".equalsIgnoreCase(a.getScheme())?443:80):a.getPort();
         int bp=b.getPort()<0?("https".equalsIgnoreCase(b.getScheme())?443:80):b.getPort();
         return a.getScheme().equalsIgnoreCase(b.getScheme()) && a.getHost().equalsIgnoreCase(b.getHost()) && ap==bp;
     }
-    private Response open(String method,String range) throws IOException {
-        URI target=source.uri;boolean privateHeaders=true;
+    @Override public synchronized String resource(URI uri,InfinityCastAdaptive.Kind kind) throws IOException {
+        String key=kind+":"+uri.toASCIIString(),id=ids.get(key);
+        if(id==null) {
+            if(closed || resources.size()+templates.size()>=8192)throw new IOException("manifest_resource_limit");
+            id=UUID.randomUUID().toString().replace("-","");ids.put(key,id);
+            String hint=kind==InfinityCastAdaptive.Kind.HLS?"application/vnd.apple.mpegurl":kind==InfinityCastAdaptive.Kind.DASH?"application/dash+xml":null;
+            resources.put(id,new Resource(uri,kind,hint));
+        }
+        return base()+"/r/"+id;
+    }
+    @Override public synchronized String template(URI base,String value,String representation,String bandwidth) throws IOException {
+        if(value.contains("$RepresentationID$") && !representation.matches("[a-zA-Z0-9_.-]{1,128}"))throw new IOException("unsupported_representation_id");
+        if(value.contains("$Bandwidth$") && !bandwidth.matches("[0-9]{1,16}"))throw new IOException("invalid_representation_bandwidth");
+        String expanded=value.replace("$RepresentationID$",representation).replace("$Bandwidth$",bandwidth);
+        expanded=InfinityCastAdaptive.resolve(base,expanded).toASCIIString();
+        Matcher matcher=VARIABLE.matcher(expanded);java.util.LinkedHashSet<String> names=new java.util.LinkedHashSet<>();
+        while(matcher.find()){if(matcher.group(2)!=null && Integer.parseInt(matcher.group(2))>20)throw new IOException("template_format_limit");names.add(matcher.group(1));}
+        if(expanded.replace("$$","").replaceAll(VARIABLE.pattern(),"").contains("$"))throw new IOException("unsupported_dash_template");
+        if(names.isEmpty())return resource(URI.create(expanded.replace("$$","$")),InfinityCastAdaptive.Kind.MEDIA);
+        String key="template:"+expanded,id=ids.get(key);
+        if(id==null) {
+            if(closed || resources.size()+templates.size()>=8192)throw new IOException("manifest_resource_limit");
+            id=UUID.randomUUID().toString().replace("-","");ids.put(key,id);templates.put(id,new Template(expanded,names.toArray(new String[0])));
+        }
+        StringBuilder local=new StringBuilder(base()+"/t/"+id);for(String name:names)local.append("/$").append(name).append('$');return local.toString();
+    }
+    private Resource resolveRequest(String raw) throws IOException {
+        if(raw.equals(path+"/media"))return root;
+        if(!raw.startsWith(path+"/"))return null;
+        String rest=raw.substring(path.length()+1);String[] bits=rest.split("/",-1);
+        if(bits.length==2 && bits[0].equals("r") && bits[1].matches("[a-f0-9]{32}"))return resources.get(bits[1]);
+        if(bits.length>=3 && bits[0].equals("t")) {
+            Template template=templates.get(bits[1]);if(template==null || bits.length!=template.names.length+2)return null;
+            Map<String,String> values=new java.util.HashMap<>();
+            for(int i=0;i<template.names.length;i++){if(!bits[i+2].matches("[0-9]{1,18}"))return null;values.put(template.names[i],bits[i+2]);}
+            Matcher m=VARIABLE.matcher(template.value);StringBuffer out=new StringBuffer();
+            while(m.find()) {
+                String number=values.get(m.group(1));if(m.group(2)!=null)number=String.format(Locale.ROOT,"%0"+m.group(2)+"d",Long.parseLong(number));
+                m.appendReplacement(out,Matcher.quoteReplacement(number));
+            }
+            m.appendTail(out);return new Resource(URI.create(out.toString().replace("$$","$")),InfinityCastAdaptive.Kind.MEDIA,null);
+        }
+        return null;
+    }
+    private Response open(Resource resource,String method,String range) throws IOException {
+        URI target=resource.uri;boolean privateHeaders=sameOrigin(source.uri,target);
         for(int redirects=0;redirects<=5;redirects++) {
-            if(closed)throw new IOException("Cast transport closed");
+            if(closed)throw new IOException("transport_closed");
             Request.Builder request=new Request.Builder().url(target.toASCIIString()).method(method,null)
                 .header("Accept-Encoding","identity").header("User-Agent","InfinityCast/1");
             if(privateHeaders)for(Map.Entry<String,String> header:source.headers.entrySet())request.header(header.getKey(),header.getValue());
             if(range!=null)request.header("Range",range);
             Call call=upstream.newCall(request.build());calls.add(call);
-            if(closed){call.cancel();calls.remove(call);throw new IOException("Cast transport closed");}
+            if(closed){call.cancel();calls.remove(call);throw new IOException("transport_closed");}
             Response result;
-            try {result=call.execute();} catch(IOException | RuntimeException failed){call.cancel();calls.remove(call);throw new IOException("Source connection unavailable");}
-            if(closed){result.close();calls.remove(call);throw new IOException("Cast transport closed");}
+            try {result=call.execute();}catch(IOException | RuntimeException failed){call.cancel();calls.remove(call);throw new IOException("source_connection_failure");}
+            if(closed){result.close();calls.remove(call);throw new IOException("transport_closed");}
             int code=result.code();
             if(code==301 || code==302 || code==303 || code==307 || code==308) {
                 String location=result.header("Location");result.close();calls.remove(call);
-                if(location==null || redirects==5)throw new IOException("Source redirect unavailable");
-                URI next;
-                try {next=target.resolve(location);}catch(IllegalArgumentException invalid){throw new IOException("Invalid source redirect");}
-                if(next.getHost()==null || next.getRawUserInfo()!=null ||
-                    !("http".equalsIgnoreCase(next.getScheme()) || "https".equalsIgnoreCase(next.getScheme())) ||
-                    ("https".equalsIgnoreCase(target.getScheme()) && !"https".equalsIgnoreCase(next.getScheme())))
-                    throw new IOException("Unsupported source redirect");
-                if(!sameOrigin(target,next))privateHeaders=false;
-                target=next;continue;
+                if(location==null || redirects==5)throw new IOException("source_redirect_limit");
+                URI next=InfinityCastAdaptive.resolve(target,location);if(!sameOrigin(target,next))privateHeaders=false;target=next;continue;
             }
             responses.put(result,call);return result;
         }
-        throw new IOException("Source redirect limit");
+        throw new IOException("source_redirect_limit");
     }
-    private void release(Response response) {
-        try{response.close();}finally{Call call=responses.remove(response);if(call!=null)calls.remove(call);}
+    private void release(Response response) {try{response.close();}finally{Call call=responses.remove(response);if(call!=null)calls.remove(call);}}
+    private static byte[] read(InputStream input,int limit) throws IOException {
+        ByteArrayOutputStream out=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int count;
+        while((count=input.read(buffer,0,Math.min(buffer.length,limit+1-out.size())))!=-1){out.write(buffer,0,count);if(out.size()>limit)throw new IOException("manifest_size_limit");}
+        return out.toByteArray();
     }
     private String probe() throws IOException {
-        Response response=open("HEAD",null);
+        Response response=open(root,"HEAD",null);String type=null;
         try {
-            if(response.code()==200 || response.code()==206)return InfinityCastSource.mime(response.header("Content-Type"),source.hint);
-            if(response.code()!=405 && response.code()!=501)throw new IOException("Source metadata unavailable");
+            if(response.code()==200 || response.code()==206)type=InfinityCastSource.mime(response.header("Content-Type"),source.hint);
+            else if(response.code()!=405 && response.code()!=501)throw new IOException("source_http_"+response.code());
+            if(type!=null && !InfinityCastAdaptive.adaptive(type))return type;
         } finally {release(response);}
-        response=open("GET","bytes=0-0");
+        response=open(root,"GET",null);
         try {
-            if(response.code()!=200 && response.code()!=206)throw new IOException("Source metadata unavailable");
-            return InfinityCastSource.mime(response.header("Content-Type"),source.hint);
+            if(response.code()!=200 || response.body()==null)throw new IOException("source_http_"+response.code());
+            InputStream input=response.body().byteStream();byte[] prefix=new byte[8192];int used=0,count;
+            while(used<prefix.length && (count=input.read(prefix,used,prefix.length-used))!=-1){used+=count;if(used>=512)break;}
+            byte[] sample=java.util.Arrays.copyOf(prefix,used);type=InfinityCastSource.sniff(sample,response.header("Content-Type"),source.hint);
+            if(InfinityCastAdaptive.adaptive(type)) {
+                ByteArrayOutputStream all=new ByteArrayOutputStream();all.write(sample);all.write(read(input,InfinityCastAdaptive.LIMIT-used));
+                InfinityCastAdaptive.rewrite(all.toByteArray(),type,response.request().url().uri(),this);
+            }
+            return type;
         } finally {release(response);}
     }
     private void accept() {
@@ -164,73 +223,76 @@ final class InfinityCastRelay implements AutoCloseable {
             while(!closed) {
                 Socket client=listener.accept();
                 if(closed || !receiver.equals(client.getInetAddress())){client.close();continue;}
-                clients.add(client);
-                if(closed){clients.remove(client);client.close();continue;}
+                clients.add(client);if(closed){clients.remove(client);client.close();continue;}
                 jobs.incrementAndGet();
-                try {io.execute(()->{try{serve(client);}finally{clients.remove(client);try{client.close();}catch(IOException ignored){}
-                    jobs.decrementAndGet();retired();}});}
+                try {io.execute(()->{try{serve(client);}finally{clients.remove(client);try{client.close();}catch(IOException ignored){}jobs.decrementAndGet();retired();}});}
                 catch(RuntimeException busy){jobs.decrementAndGet();clients.remove(client);client.close();}
             }
-        } catch(IOException stopped) {} finally {close();cancelCalls();ownerDone=true;retired();}
+        } catch(IOException stopped){}finally{close();cancelCalls();ownerDone=true;retired();}
     }
     private void serve(Socket client) {
         Response response=null;
         try {
-            long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(2);
-            client.setSoTimeout(2000);InputStream input=client.getInputStream();ByteArrayOutputStream header=new ByteArrayOutputStream();
-            int value,tail=0;
-            while(header.size()<8192) {
-                long remaining=deadline-System.nanoTime();if(remaining<=0)return;
-                client.setSoTimeout((int)Math.max(1,TimeUnit.NANOSECONDS.toMillis(remaining)));
-                value=input.read();if(value==-1)break;
-                header.write(value);tail=(tail<<8)|value;if(tail==0x0d0a0d0a)break;
-            }
+            long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(2);client.setSoTimeout(2000);
+            InputStream input=client.getInputStream();ByteArrayOutputStream header=new ByteArrayOutputStream();int value,tail=0;
+            while(header.size()<8192){long remaining=deadline-System.nanoTime();if(remaining<=0)return;client.setSoTimeout((int)Math.max(1,TimeUnit.NANOSECONDS.toMillis(remaining)));value=input.read();if(value==-1)break;header.write(value);tail=(tail<<8)|value;if(tail==0x0d0a0d0a)break;}
             if(tail!=0x0d0a0d0a)return;
-            String[] lines=header.toString("US-ASCII").split("\r\n");String[] first=lines[0].split(" ");
-            if(first.length!=3 || !first[1].equals(path) || !(first[2].equals("HTTP/1.1") || first[2].equals("HTTP/1.0")))return;
+            String[] lines=header.toString("US-ASCII").split("\r\n"),first=lines[0].split(" ");
+            if(first.length!=3 || !(first[2].equals("HTTP/1.1") || first[2].equals("HTTP/1.0")))return;
+            Resource resource=resolveRequest(first[1]);if(resource==null)return;
             String method=first[0];OutputStream output=client.getOutputStream();
-            if(method.equals("OPTIONS")){reply(output,204,null,-1,null);return;}
+            if(method.equals("OPTIONS")){reply(output,204,null,0,null);return;}
             if(!(method.equals("GET") || method.equals("HEAD")))return;
-            String range=null;
-            for(int i=1;i<lines.length;i++)if(lines[i].toLowerCase(Locale.ROOT).startsWith("range:")) {
-                if(range!=null)return;range=lines[i].substring(6).trim();
-                if(!range.matches("bytes=[0-9]{0,16}-[0-9]{0,16}") || range.equals("bytes=-"))return;
+            String range=null;for(int i=1;i<lines.length;i++)if(lines[i].toLowerCase(Locale.ROOT).startsWith("range:")) {
+                if(range!=null)return;range=lines[i].substring(6).trim();if(!range.matches("bytes=[0-9]{0,16}-[0-9]{0,16}") || range.equals("bytes=-"))return;
             }
-            response=open(method,range);
-            if(response.code()!=200 && response.code()!=206){reply(output,502,null,-1,null);return;}
-            if(!mime.equals(InfinityCastSource.mime(response.header("Content-Type"),source.hint))){reply(output,502,null,-1,null);return;}
+            if(requests.incrementAndGet()==1)InfinityCastDiagnostics.event("receiver_access","received",0);
+            boolean knownManifest=resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH || (resource==root && InfinityCastAdaptive.adaptive(mime));
+            response=open(resource,knownManifest?"GET":method,knownManifest?null:range);
+            if(response.code()!=200 && response.code()!=206)throw new IOException("source_http_"+response.code());
+            String contentType=response.header("Content-Type"),type=InfinityCastSource.mime(contentType,resource==root?mime:resource.hint);
+            if(knownManifest || InfinityCastAdaptive.adaptive(type)) {
+                if(response.body()==null || response.code()!=200)throw new IOException("invalid_manifest_response");
+                String manifestType=type!=null?type:resource.kind==InfinityCastAdaptive.Kind.DASH?"application/dash+xml":"application/vnd.apple.mpegurl";
+                byte[] translated=InfinityCastAdaptive.rewrite(read(response.body().byteStream(),InfinityCastAdaptive.LIMIT),manifestType,response.request().url().uri(),this);
+                reply(output,200,manifestType,translated.length,null);if(method.equals("GET"))output.write(translated);return;
+            }
+            if(type==null) {
+                String raw=contentType==null?"":contentType.split(";",2)[0].trim().toLowerCase(Locale.ROOT);
+                if(resource==root || raw.contains("html") || raw.contains("xml") || raw.contains("json"))throw new IOException("unsupported_media_response");
+                type=resource.kind==InfinityCastAdaptive.Kind.TEXT?"text/plain":resource.kind==InfinityCastAdaptive.Kind.KEY?"application/octet-stream":
+                    raw.startsWith("video/") || raw.startsWith("audio/")?raw:"application/octet-stream";
+            }
+            if(resource.kind==InfinityCastAdaptive.Kind.KEY && method.equals("GET")) {
+                byte[] key=read(response.body().byteStream(),16);if(key.length!=16)throw new IOException("unsupported_hls_key");
+                reply(output,200,"application/octet-stream",16,null);output.write(key);return;
+            }
             String contentRange=response.header("Content-Range");
-            if(response.code()==206 && (contentRange==null || !contentRange.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}"))){reply(output,502,null,-1,null);return;}
-            long length=response.body()==null?-1:response.body().contentLength();
-            String declared=response.header("Content-Length");
+            if(response.code()==206 && (contentRange==null || !contentRange.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}")))throw new IOException("invalid_source_range");
+            long length=response.body()==null?-1:response.body().contentLength();String declared=response.header("Content-Length");
             if(method.equals("HEAD") && declared!=null && declared.matches("[0-9]{1,16}"))length=Long.parseLong(declared);
-            reply(output,response.code(),mime,length,contentRange);
-            if(method.equals("GET") && response.body()!=null) {
-                InputStream body=response.body().byteStream();byte[] buffer=new byte[65536];int count;
-                while(!closed && (count=body.read(buffer))!=-1)output.write(buffer,0,count);
-            }
-        } catch(IOException | RuntimeException ignored) {
-            // No URI, upstream headers, credentials, cookies or exception text.
-        } finally {if(response!=null)release(response);}
+            reply(output,response.code(),type,length,contentRange);
+            if(method.equals("GET") && response.body()!=null){InputStream body=response.body().byteStream();byte[] buffer=new byte[65536];int count;while(!closed && (count=body.read(buffer))!=-1)output.write(buffer,0,count);}
+        } catch(IOException | RuntimeException failure){if(!closed)reason(failure);}
+        finally{if(response!=null)release(response);}
     }
     private void reply(OutputStream output,int code,String type,long length,String range) throws IOException {
         String response="HTTP/1.1 "+code+" "+(code==200?"OK":code==206?"Partial Content":code==204?"No Content":"Unavailable")+"\r\n"+
-            "Connection: close\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\n"+
-            "Access-Control-Allow-Methods: GET, HEAD, OPTIONS\r\nAccess-Control-Allow-Headers: Range\r\nAccess-Control-Allow-Private-Network: true\r\n";
-        if(type!=null)response+="Content-Type: "+type+"\r\n";
-        if(length>=0)response+="Content-Length: "+length+"\r\n";
-        if(range!=null && range.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}"))response+="Content-Range: "+range+"\r\n";
+            "Connection: close\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nAccept-Ranges: bytes\r\n"+
+            "Access-Control-Allow-Methods: GET, HEAD, OPTIONS\r\nAccess-Control-Allow-Headers: Range\r\n"+
+            "Access-Control-Expose-Headers: Content-Range, Content-Length, Accept-Ranges\r\nAccess-Control-Allow-Private-Network: true\r\n";
+        if(type!=null)response+="Content-Type: "+type+"\r\n";if(length>=0)response+="Content-Length: "+length+"\r\n";if(range!=null)response+="Content-Range: "+range+"\r\n";
         output.write((response+"\r\n").getBytes(StandardCharsets.US_ASCII));output.flush();
     }
     private void cancelCalls(){for(Call call:new ArrayList<>(calls))call.cancel();upstream.connectionPool().evictAll();}
     @Override public synchronized void close() {
-        if(closed)return;closed=true;
-        try{listener.close();}catch(IOException ignored){}
+        if(closed)return;closed=true;try{listener.close();}catch(IOException ignored){}
         for(Socket client:new ArrayList<>(clients))try{client.close();}catch(IOException ignored){}
-        try {lifecycle.execute(()->{cancelCalls();ownerDone=true;retired();});}
-        catch(RuntimeException full){/* one accept and one cancellation only; original owner retains cleanup */}
+        // cancel() is nonblocking; do not queue it behind an accept() owner.
+        for(Call call:new ArrayList<>(calls))call.cancel();
+        try{lifecycle.execute(()->{cancelCalls();ownerDone=true;retired();});}catch(RuntimeException full){/* accept owner still closes and retires */}
     }
     private void retired() {
-        if(closed && ownerDone && jobs.get()==0)synchronized(InfinityCastRelay.class){if(active==this)active=null;}
+        if(closed && ownerDone && jobs.get()==0)synchronized(InfinityCastRelay.class){if(active==this){active=null;InfinityCastDiagnostics.event("relay","retired",0);}}
     }
 }

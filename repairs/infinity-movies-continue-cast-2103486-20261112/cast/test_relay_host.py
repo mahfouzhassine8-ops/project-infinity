@@ -7,7 +7,7 @@ here=Path(__file__).resolve().parent
 work=Path(sys.argv[1]).resolve();out=work/'relay-host';out.mkdir(exist_ok=True)
 jars=obtain(work)
 cp=os.pathsep.join(map(str,jars))
-sources=[here/'java/com/projectinfinity/kodi'/n for n in ('InfinityCastSource.java','InfinityCastRelay.java')]
+sources=[here/'java/com/projectinfinity/kodi'/n for n in ('InfinityCastSource.java','InfinityCastRelay.java','InfinityCastAdaptive.java','InfinityCastDiagnostics.java')]
 sources.append(here/'tests/InfinityCastRelayTest.java')
 subprocess.run(['java','com.sun.tools.javac.Main','-source','8','-target','8','-cp',cp,'-d',str(out),*map(str,sources)],check=True)
 subprocess.run(['java','-cp',str(out)+os.pathsep+cp,'com.projectinfinity.kodi.InfinityCastRelayTest'],check=True)

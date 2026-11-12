@@ -124,6 +124,16 @@ CVariant Snapshot(const std::shared_ptr<CFileItem>& item,
 
 CVariant Execute(Slot& slot, const std::string& op, const std::string& token, int64_t position)
 {
+  if (op == "release")
+  {
+    auto& state = Store();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    if (!state.token.empty() && state.token != token) return Error("stale_session");
+    state.token.clear(); state.item.reset(); state.file.clear(); state.origin.clear();
+    CVariant result(CVariant::VariantTypeObject);
+    result["status"] = "ok";
+    return result;
+  }
   // Read the existing admission state; never modify shutdown or reopen a gate.
   if (g_application.IsStopping() || InfinityAndroidCheckpoint::IsActive())
     return Error("closing");

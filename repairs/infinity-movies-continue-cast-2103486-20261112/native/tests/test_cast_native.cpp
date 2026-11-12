@@ -54,5 +54,12 @@ int main()
   for(auto queuedId:queued) assert(Java_com_projectinfinity_kodi_InfinityCastNative_cancel(&env,nullptr,queuedId)==JNI_TRUE);
   assert(begin("snapshot",other)==0);messenger.Drain();
   id=begin("snapshot",other);assert(id);messenger.Drain();contains(result(id),"\"status\":\"ok\"");
+  // Releasing Cast RAM remains possible after playback stops or checkpoint
+  // admission closes. It never changes a player or persistence admission gate.
+  const auto pauses=g_application.player->pauses,seeks=g_application.player->seeks;
+  g_application.player->playing=false;InfinityAndroidCheckpoint::active=true;
+  id=begin("release",other);messenger.Drain();contains(result(id),"\"status\":\"ok\"");
+  assert(Store().token.empty() && Store().file.empty() && Store().item.expired());
+  assert(InfinityAndroidCheckpoint::active && g_application.player->pauses==pauses && g_application.player->seeks==seeks);
   std::cout<<"PASS_CAST_NATIVE_HOST_MOCK_BACKENDS_NOT_ANDROID_OR_FOLD\n";
 }

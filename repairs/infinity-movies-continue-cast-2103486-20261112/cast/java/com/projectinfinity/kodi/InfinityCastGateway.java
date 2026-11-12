@@ -14,6 +14,9 @@ final class InfinityCastGateway {
     }
     private final Handler handler=new Handler(Looper.getMainLooper());
     private Pending pending;
+    private Runnable idle;
+    void afterIdle(Runnable action){idle=action;notifyIdle();}
+    private void notifyIdle(){if(pending==null && idle!=null){Runnable action=idle;idle=null;handler.post(action);}}
     private static final class Pending {
         long id,deadline;
         boolean warned;
@@ -61,7 +64,7 @@ final class InfinityCastGateway {
             pending=null;completed=error("native_result_unavailable");
         }
         // Callback exceptions cannot be mistaken for a second native outcome.
-        if(completed!=null){request.result.done(completed);return;}
+        if(completed!=null){try{request.result.done(completed);}finally{notifyIdle();}return;}
         if(warn)request.result.pendingCommit();
         handler.postDelayed(()->poll(request),request.warned?250:16);
     }
@@ -69,7 +72,7 @@ final class InfinityCastGateway {
         Pending request=pending;if(request==null)return;
         try {
             if(InfinityCastNative.cancel(request.id)) {
-                pending=null;request.result.done(error("cancelled_before_commit"));
+                pending=null;try{request.result.done(error("cancelled_before_commit"));}finally{notifyIdle();}
             } else if(!request.warned) { request.warned=true;request.result.pendingCommit(); }
         } catch(LinkageError ignored) {}
     }

@@ -91,7 +91,7 @@ jobs:
 
   movies-cast-native:
     name: Accepted86 Cast-only native commands, full ARM64 and preservation; no application or shutdown tests
-    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-movies-continue-cast-2103486-20261112'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-cast-final-from-2103488-20261112'
     runs-on: ubuntu-22.04
     timeout-minutes: 180
     env:

@@ -65,7 +65,7 @@ public final class InfinityCastRelayTest {
         origin.start();other.start();
         try {
             check(InfinityCastSource.parse("plugin://provider/action")==null,"no independent provider invocation");
-            check(InfinityCastSource.parse(base+"/a.m3u8")==null,"no adaptive rewrite");
+            check(InfinityCastSource.parse(base+"/a.m3u8")!=null,"adaptive source goes through implemented private rewriting");
             check(InfinityCastSource.parse(base+"/a.mp4|verifypeer=false")==null,"no TLS override");
             check(InfinityCastSource.parse(base+"/a.mp4|Cookie=a%0D%0Ab")==null,"no header injection");
             check(InfinityCastSource.parse("http://user:secret@127.0.0.1/a.mp4")==null,"no ambiguous URL userinfo");
