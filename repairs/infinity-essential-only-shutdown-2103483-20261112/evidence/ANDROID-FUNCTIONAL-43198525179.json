@@ -1,0 +1,52 @@
+{
+  "status": "PASS_FUNCTIONAL_CLOSE_RELAUNCH_DATA_CHECKS_RAW_FINAL_HASH_TIMEOUT_RETAINED",
+  "run": 43198525179,
+  "raw_workflow_conclusion": "failure",
+  "artifact": {
+    "id": 13933933896,
+    "digest": "sha256:3d3d0237e67e441aaf2514d6e1c93db37b6ecbfe8e3bc77ff44648aa423fb28f"
+  },
+  "native_source": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+  "native_sha256": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+  "raw_report_sha256": "b2ba4640be267888aace6d6837f8f9ae2e8996d038e35beff47ab726b837e345",
+  "normal_Close": "PASS_NORMAL_CLOSE_ESSENTIAL_DURABILITY_AND_UID_DEATH",
+  "remaining_UID_processes": [],
+  "essential_owners": 16,
+  "protected_writes_durable": true,
+  "relaunch": "PASS_SAME_PROFILE_NEW_PROCESS_OWNER",
+  "saved_Python_record": "PASS_BEFORE_AND_AFTER_RELAUNCH",
+  "saved_native_favourite": "PASS_BEFORE_FINAL_SOURCE_ASSERTION",
+  "native_bytes_after_relaunch": "PASS_FIRST_OPERAND_OF_FINAL_ASSERTION",
+  "local_Python_before": {
+    "action": "local-python",
+    "arithmetic": 6,
+    "nonce": "b3c0177a18da45db9a3b3d1c1f67e254",
+    "passed": true,
+    "pid": 5279,
+    "process_start": "25812",
+    "sequence": 1
+  },
+  "local_Python_after": {
+    "action": "local-python",
+    "arithmetic": 6,
+    "nonce": "2040b466d6f4438e85e2b203c6c908e8",
+    "passed": true,
+    "pid": 6437,
+    "process_start": "32114",
+    "sequence": 2
+  },
+  "database_integrity": [
+    "ViewModes6.db",
+    "MyMusic83.db",
+    "Addons33.db",
+    "Epg16.db",
+    "Textures13.db",
+    "TV46.db",
+    "MyVideos131.db"
+  ],
+  "final_APK_hash_after_relaunch": "NOT_VERIFIED_READ_COMMAND_TIMED_OUT_12_SECONDS",
+  "original_APK_hash_before_launch": "PASS",
+  "signed_install_over": "NOT_YET_RUN",
+  "Fold": "NOT_RUN",
+  "no_extra_shutdown_cycle": "No repeated successful functional cycle solely for a slow final file hash. Essential APK integrity is independently checked by packaging and signed install-over."
+}
