@@ -1,0 +1,98 @@
+{
+  "actual_signed_candidate": "UNKNOWN_PENDING_ORIGINAL397",
+  "application_tests": false,
+  "baseline": {
+    "artifact_id": 13899912993,
+    "name": "Infinity2103483-OriginalSigned-Startup-Internal-QA-43119348510-FOLD-PENDING",
+    "run_id": 43119348510,
+    "sha256": "df8aa2cd1ba52a83d0da60927bbd51e6fbc5de3808d4a9e2279e9eb759f820e7",
+    "size_in_bytes": 328376479,
+    "source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+    "workflow_id": 397702717,
+    "workflow_path": ".github/workflows/infinity-combined-release.yml"
+  },
+  "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "baseline_native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "branch": "work/infinity-core-outcomes-qa-20261112",
+  "candidate": {
+    "artifact_id": null,
+    "name": null,
+    "run_id": null,
+    "sha256": null,
+    "size_in_bytes": null,
+    "source": null,
+    "workflow_id": 397702717,
+    "workflow_path": ".github/workflows/infinity-combined-release.yml"
+  },
+  "candidate_APK_sha256": null,
+  "candidate_native_sha256": null,
+  "candidate_versionCode": 2103484,
+  "enabled": false,
+  "feature": "core-outcomes-signed-install",
+  "host_guards": {
+    "additional_affected_check": "PASS_EXISTING_RESULT_DIRECTORY_PASSED_TO_RETAINED_DISPOSAL",
+    "application_or_device_tests": "NOT_RUN",
+    "artifact_downloads": "NOT_RUN",
+    "preflight_correction": {
+      "application_or_device_tests": "NOT_RUN",
+      "results": {
+        "baseline_sdk_lines_exact_match_and_invalid_or_changed_refusal": "PASS_STATIC_AND_PURE_PARSER",
+        "data_directory_stat_uid_must_equal_pm_uid": "PASS_MOCKED_ADB_OUTPUT_ONLY",
+        "pm_exact_package_uid_with_appId_dump_and_wrong_or_duplicate_uid_refusal": "PASS_MOCKED_ADB_OUTPUT_ONLY",
+        "streamed_member_hash_parity_without_archive_read": "PASS_MOCKED_ZIP_ONLY"
+      },
+      "selected_before_execution": [
+        "streamed_member_hash_parity_without_archive_read",
+        "baseline_sdk_lines_exact_match_and_invalid_or_changed_refusal",
+        "pm_exact_package_uid_with_appId_dump_and_wrong_or_duplicate_uid_refusal",
+        "data_directory_stat_uid_must_equal_pm_uid"
+      ],
+      "status": "PASS_SELECTED_PREFLIGHT_CORRECTION_GUARDS_ONLY"
+    },
+    "results": {
+      "disabled_before_helpers_downloads_or_adb": "PASS_MOCKED",
+      "isolated_manual_routing_prior_jobs_exact": "PASS_STATIC_ROUTING_AND_INLINE_SYNTAX_ONLY",
+      "mocked_installed_apk_native_uid_binding_and_tamper_refusal": "PASS_MOCKED",
+      "mocked_synthetic_byte_and_permission_retention": "PASS_MOCKED",
+      "ordinary_install_commands_no_launch_or_native_writes": "PASS_MOCKED",
+      "valid_frozen_metadata_and_unknown_producer_refusal": "PASS_MOCKED",
+      "whole_zip_and_original_signature_gate_source_contract": "PASS_STATIC_SOURCE_ONLY"
+    },
+    "selected_before_execution": [
+      "disabled_before_helpers_downloads_or_adb",
+      "valid_frozen_metadata_and_unknown_producer_refusal",
+      "whole_zip_and_original_signature_gate_source_contract",
+      "ordinary_install_commands_no_launch_or_native_writes",
+      "mocked_installed_apk_native_uid_binding_and_tamper_refusal",
+      "mocked_synthetic_byte_and_permission_retention",
+      "isolated_manual_routing_prior_jobs_exact"
+    ],
+    "signing": "NOT_RUN",
+    "status": "PASS_SELECTED_STATIC_AND_MOCKED_INSTALL_GUARDS_ONLY"
+  },
+  "install_only": true,
+  "limitations": [
+    "Synthetic sentinel retention only; real userdata NOT_RUN",
+    "Application/native/Core/provider/Close/shutdown NOT_RUN",
+    "Fold/owner-device acceptance NOT_RUN",
+    "CI VM disposal is not application shutdown proof"
+  ],
+  "native_injection": false,
+  "owner_device": false,
+  "prospective_version_reserved": false,
+  "schema": 1,
+  "shutdown_tests": false,
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "daa3bc06bd5c65f629c273a7da207057fe03a28f82c0754673e192a1d594e70f",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py": "0425da7f85c6169fbf37c3076b4a3aa402ecc0792450b6231863f1647c1078df",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/prepare_ci_tooling.sh": "e5c1c0b071a7e2da5ef501b6ee24b393649c755edf72b354137718ac46d1ffa1",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/signed_install.py": "1d831b9d44e5bc9bac7089ce5c0040bca59befbb2f2469919706cddac513a8d6",
+    "repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py": "9b4cf409c35688a77e94849361aff510b6b896871314b32b15cc5844b4e23734"
+  },
+  "synthetic_data_only": true,
+  "preflight_alias_review": {
+    "status": "PASS_SELECTED_MOCKED_CE_ALIAS_AND_PM_UID_GUARDS",
+    "cases": 4,
+    "application_executed": false
+  }
+}
