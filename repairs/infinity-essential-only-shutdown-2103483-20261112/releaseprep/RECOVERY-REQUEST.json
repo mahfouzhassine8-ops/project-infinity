@@ -1,5 +1,5 @@
 {
-  "enabled": false,
+  "enabled": true,
   "kind": "recovery",
   "versionCode": 2103487,
   "generation": 72,
@@ -9,5 +9,18 @@
   "publication": false,
   "accepted_pointer_updated": false,
   "version_reserved": false,
-  "remaining": "Awaiting completed native proof and independently selected Android Close verification before owner preparation"
+  "remaining": "Prepare exact83 higher-version forward recovery; repair relaunch still pending",
+  "source_bindings": {
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/releaseprep/owner_release.py": "039777cd3b00932e6d5a2681d52cd3c89de2114d36b06edfb3ac412aac97f73e",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/releaseprep/OWNER-AUTHORIZATION.json": "02e19ba2e8422ddfb95179d5a029faf5677696e8606231058e0cda90d4b34dbd",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/SCOPE.json": "d4f020ec6759715aaf5a087ce4d09f9e2b51b994de2bca8d7f5c96d3b5242e28",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/BASELINE-SOURCE.json": "72a2733142a8e6ef16363e8f2236f3ecaed11c2f26a1d1398a4613be12f87b77",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/BASE83-NATIVE-SOURCE-MAP.json": "c5b46fd24452b901fadb55568a8605283d6d0b6758b94ea24ccacdcef63f18a5",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistence.h": "c7e7e758a3496c32b82b8948c0b8de00409a492e2f0c98996a6f9b74d6fdda06",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonWriteHooks.h": "755417f20304c2bfe6300feb3813dc7538c264ea8bf7e6d1ddba60e33034b6a1",
+    "repairs/infinity-essential-only-shutdown-2103483-20261112/evidence/REVALIDATED-ACTUAL-CLOSE-43196958708.json": "6a8157d5bdac4a55e7565acf83898bbc8602a165f462d7175168f335a5484f78"
+  },
+  "workflow_sha256": "b7d2f161cbec8d1d5f2a727666a611074ea66f4861cca7c2e81701180bcd0679",
+  "parent_authority_sha256": "0dc88a84b06c400dc0b80cf77ebdbb3667951d68dd0dde46db0922df9fb9cbd0"
 }
