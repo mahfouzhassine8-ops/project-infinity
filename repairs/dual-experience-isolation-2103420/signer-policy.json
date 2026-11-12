@@ -168,9 +168,57 @@
       "workflow_sha256": "f131a2307d5f790d715db90295c2075117c0bac6386b3d4556f312baa7e13ca3",
       "original_key_access": false,
       "review_role": "isolated host or diagnostic QA; no original-key signing"
+    },
+    {
+      "id": 414096338,
+      "path": ".github/workflows/infinity-2103480-shutdown-native-build.yml",
+      "source": "5e26af40222bc521638bd184a2bfb0d5dce337f1",
+      "workflow_sha256": "4708b66f7979670f977ad59dfbe4d78e052a6a1662e0562963a1f14f27fd5e75",
+      "original_key_access": false,
+      "review_role": "source-pinned ARM64 build only; read-only actions/contents; no signing-key expressions"
+    },
+    {
+      "id": 414251549,
+      "path": ".github/workflows/infinity-2103480-shutdown-qa-assembly.yml",
+      "source": "694d46a480e62004952cc6a5b289af0ff995a071",
+      "workflow_sha256": "cfcd13deb128cfcc3d30149ba2f9d550182d7c5f827b0f0e4b15b7a76a233af1",
+      "original_key_access": false,
+      "review_role": "source-pinned unsigned QA assembly plus key-free workflow audit; read-only actions/contents; no key expressions"
+    },
+    {
+      "id": 414031428,
+      "path": ".github/workflows/infinity-core-native-loader-candidate-host.yml",
+      "source": "59efeb8962ff7dbdac5cd1a7766fdba7a42f0df0",
+      "workflow_sha256": "6eb99f1b804c953fe9bb784252e111b70461ee04e8dc4952ef09a576c94072759",
+      "original_key_access": false,
+      "review_role": "source-pinned host-only native compatibility tests; read-only contents; no signing"
+    },
+    {
+      "id": 414737362,
+      "path": ".github/workflows/infinity-functional-startup-evidence.yml",
+      "source": "0b39ed355e59de4da1dd3cb5b8623bab2def9706",
+      "workflow_sha256": "3ac514581e1a7d441d241fab55d2c11437e2eb873099b61d0036cffa03645b03",
+      "original_key_access": false,
+      "review_role": "Authenticated original82 signature/member evidence only; read-only actions/contents; no signing-key expressions"
+    },
+    {
+      "id": 414757668,
+      "path": ".github/workflows/infinity-functional-startup-native.yml",
+      "source": "a7f890b1cdccebca7db6695fa3e6752d501cec9d",
+      "workflow_sha256": "7fbe2db562a0b9ab68c0782ac09e7ccfa58b956b74843037a37ba602ff0cbd07",
+      "original_key_access": false,
+      "review_role": "Exact-source host proof reuse and actual full ARM64 compile/link; read-only actions/contents; no signing-key expressions"
+    },
+    {
+      "id": 415259347,
+      "path": ".github/workflows/infinity-functional-startup-qa-stage.yml",
+      "source": "43dac4a78fb3429ec6d62e7d3f0d2ec208a4e0b9",
+      "workflow_sha256": "b0f8f1862367ff518f41e29a0a8696626cb6f884c17c4be681e19b2a7d7b41b2",
+      "original_key_access": false,
+      "review_role": "Exact authenticated unsigned QA assembly only; source and native archive bindings; read-only actions/contents; no key access"
     }
   ],
-  "audit_workflows": 619,
+  "audit_workflows": 642,
   "retired_original_key_workflows": [
     {
       "id": 370925114,
@@ -2919,7 +2967,13 @@
     410795791,
     410798135,
     410843338,
-    410860075
+    410860075,
+    414031428,
+    414096338,
+    414251549,
+    414737362,
+    414757668,
+    415259347
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",

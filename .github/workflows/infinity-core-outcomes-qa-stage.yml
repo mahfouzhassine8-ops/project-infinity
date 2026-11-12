@@ -1,0 +1,131 @@
+name: Infinity locked83 | key-free diagnostic unsigned QA staging
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: infinity-core-outcomes-keyfree-stage
+  cancel-in-progress: false
+
+jobs:
+  stage-unsigned:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-core-outcomes-qa-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env:
+      GH_TOKEN: ${{ github.token }}
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - name: Refuse absent or disabled request before downloads or assembly
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,re,subprocess
+          from pathlib import Path
+          task=Path('repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep')
+          path=task/'REQUEST.json'
+          assert path.is_file(),'FROZEN_REQUEST_MISSING_NO_STAGING_SELECTED'
+          request=json.loads(path.read_bytes())
+          assert request['enabled'] is True,'FROZEN_REQUEST_DISABLED_NO_STAGING_SELECTED'
+          assert request['operation']=='stage-original83-native-observation-unsigned-QA'
+          assert request['branch']=='work/infinity-core-outcomes-qa-20261112'
+          assert request['signing'] is False and request['registry_mutation'] is False and request['owner_delivery'] is False
+          assert request['version_reserved'] is False and type(request['provisional_versionCode']) is int and request['provisional_versionCode']>2103483
+          head=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
+          assert head==os.environ['GITHUB_SHA']
+          assert not subprocess.check_output(['git','status','--porcelain','--untracked-files=no']).strip()
+          for item in (path,task/'stage.py',task/'BASELINE83.json'):
+            assert item.read_bytes()==subprocess.check_output(['git','show',head+':'+str(item)])
+          authority=json.loads(subprocess.check_output(['git','show','3d9709bb1226a2ffa3a474cf04b3d3842b084611:repairs/dual-experience-isolation-2103420/release-authority.json']))
+          for item,wanted in authority['source_files'].items():
+            assert hashlib.file_digest(Path(item).open('rb'),'sha256').hexdigest()==wanted,'ORIGINAL83_TOOL_CHANGED:'+item
+          def api(route):
+            return json.loads(subprocess.check_output(['gh','api','repos/mahfouzhassine8-ops/project-infinity/'+route],timeout=45))
+          current=api('actions/runs/'+os.environ['GITHUB_RUN_ID'])
+          assert current['head_sha']==head and current['path']=='.github/workflows/infinity-core-outcomes-qa-stage.yml'
+          assert api('git/ref/heads/work/infinity-2103460-nine-corrections-20261106')['object']['sha']=='3d9709bb1226a2ffa3a474cf04b3d3842b084611'
+          base=json.loads((task/'BASELINE83.json').read_bytes())
+          producers={'signed83':base['signed_apk'],'owners83':base['prepared_owners'],'native':request['native_producer'],'android':request['android_producer']}
+          for role,row in producers.items():
+            assert all(type(row[k]) is int and row[k]>0 for k in ('run','workflow_id','id','size_in_bytes'))
+            assert re.fullmatch('[0-9a-f]{40}',row['source']) and re.fullmatch('sha256:[0-9a-f]{64}',row['digest'])
+            if role in ('native','android'):assert row['workflow_id']!=397702717
+            run=api('actions/runs/'+str(row['run']))
+            assert run['status']=='completed' and run['conclusion']=='success' and run['head_sha']==row['source'] and run['workflow_id']==row['workflow_id']
+            artifact=api('actions/artifacts/'+str(row['id']))
+            assert not artifact['expired'] and artifact['workflow_run']['id']==row['run']
+            assert all(artifact[k]==row[k] for k in ('id','name','digest','size_in_bytes'))
+          evidence=dict(status='PASS_FROZEN_REQUEST_AND_PRODUCER_METADATA_ONLY',source=head,request_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),producers=producers,proof_bytes_verified=False,APK_assembled=False,signing=False,registry_mutated=False,owner_delivery=False)
+          Path('CORE-OUTCOMES-STAGE-ADMISSION.json').write_text(json.dumps(evidence,indent=2,sort_keys=True)+'\n')
+          PY
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Authenticate all four whole archives and safely extract fixed input roles
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,stat,subprocess
+          from pathlib import Path,PurePosixPath
+          from zipfile import ZipFile
+          task=Path('repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep')
+          request=task/'REQUEST.json'
+          evidence=json.loads(Path('CORE-OUTCOMES-STAGE-ADMISSION.json').read_text())
+          assert hashlib.sha256(request.read_bytes()).hexdigest()==evidence['request_sha256']
+          root=Path('core-outcomes-stage-inputs');root.mkdir(exist_ok=False)
+          for role,row in evidence['producers'].items():
+            assert role in ('signed83','owners83','native','android')
+            archive=root/(role+'.zip')
+            with archive.open('xb') as output:
+              subprocess.run(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/'+str(row['id'])+'/zip'],stdout=output,check=True,timeout=600)
+            assert archive.stat().st_size==row['size_in_bytes']
+            assert 'sha256:'+hashlib.file_digest(archive.open('rb'),'sha256').hexdigest()==row['digest']
+            target=root/role;target.mkdir()
+            with ZipFile(archive) as source:
+              infos=source.infolist();names=[i.filename for i in infos]
+              assert 0<len(names)<=100000 and len(names)==len(set(names))
+              assert sum(i.file_size for i in infos)<=8*1024**3
+              for info in infos:
+                path=PurePosixPath(info.filename)
+                parts=info.filename.rstrip('/').split('/')
+                assert path.parts and not path.is_absolute() and '\\' not in info.filename and '\x00' not in info.filename
+                assert all(part not in ('','.', '..') for part in parts)
+                kind=stat.S_IFMT(info.external_attr>>16)
+                assert kind in (0,stat.S_IFREG,stat.S_IFDIR) and not (info.flag_bits&1)
+              source.extractall(target)
+            print('Verified fixed input role:',role,'artifact',row['id'])
+          PY
+      - name: Original83 owners plus verified native; exact three-member unsigned preservation
+        run: |
+          python3 repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/stage.py \
+            --request repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json \
+            --baseline core-outcomes-stage-inputs/signed83/Infinity-2103483-Combined-Original-Signer.apk \
+            --components core-outcomes-stage-inputs/owners83/components \
+            --owners-archive core-outcomes-stage-inputs/owners83.zip \
+            --native core-outcomes-stage-inputs/native --native-archive core-outcomes-stage-inputs/native.zip \
+            --android core-outcomes-stage-inputs/android --android-archive core-outcomes-stage-inputs/android.zip \
+            --sdk "$ANDROID_HOME/build-tools/35.0.0" --out core-outcomes-qa-prepared
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Infinity-Core-Outcomes-Unsigned-QA-${{ github.run_id }}-NOT-INSTALLABLE
+          path: core-outcomes-qa-prepared/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Core-Outcomes-Stage-Evidence-${{ github.run_id }}-NOT-ACCEPTANCE
+          path: |
+            CORE-OUTCOMES-STAGE-ADMISSION.json
+            repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json
+            repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/BASELINE83.json
+          if-no-files-found: warn
+          retention-days: 90
