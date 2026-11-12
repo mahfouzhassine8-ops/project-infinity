@@ -54,12 +54,18 @@ jobs:
           assert api('git/ref/heads/work/infinity-2103460-nine-corrections-20261106')['object']['sha']=='3d9709bb1226a2ffa3a474cf04b3d3842b084611'
           base=json.loads((task/'BASELINE83.json').read_bytes())
           producers={'signed83':base['signed_apk'],'owners83':base['prepared_owners'],'native':request['native_producer'],'android':request['android_producer']}
+          auth_path=task/'OWNER-QA-AUTHORIZATION.json'
+          assert hashlib.sha256(auth_path.read_bytes()).hexdigest()==request['owner_qa_authorization_sha256']
+          auth=json.loads(auth_path.read_bytes())
+          assert auth['owner_accepts_controlled_internal_QA'] is True and auth['production_approval'] is False
+          assert auth['failed_emulator_run']==request['android_producer']['run']==43163420602
+          assert auth['native_sha256']==request['native_sha256']
           for role,row in producers.items():
             assert all(type(row[k]) is int and row[k]>0 for k in ('run','workflow_id','id','size_in_bytes'))
             assert re.fullmatch('[0-9a-f]{40}',row['source']) and re.fullmatch('sha256:[0-9a-f]{64}',row['digest'])
             if role in ('native','android'):assert row['workflow_id']!=397702717
             run=api('actions/runs/'+str(row['run']))
-            assert run['status']=='completed' and run['conclusion']=='success' and run['head_sha']==row['source'] and run['workflow_id']==row['workflow_id']
+            assert run['status']=='completed' and run['conclusion']==('failure' if role=='android' else 'success') and run['head_sha']==row['source'] and run['workflow_id']==row['workflow_id']
             artifact=api('actions/artifacts/'+str(row['id']))
             assert not artifact['expired'] and artifact['workflow_run']['id']==row['run']
             assert all(artifact[k]==row[k] for k in ('id','name','digest','size_in_bytes'))
@@ -130,6 +136,7 @@ jobs:
             CORE-OUTCOMES-STAGE-ADMISSION.json
             repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/REQUEST.json
             repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/BASELINE83.json
+            repairs/infinity-core-outcomes-qa-2103483-20261112/releaseprep/OWNER-QA-AUTHORIZATION.json
             core-outcomes-qa-prepared/UNSIGNED-QA-PRESERVATION.json
             core-outcomes-qa-prepared/ORIGINAL83-SIGNATURE.txt
             core-outcomes-qa-prepared/components/catalog.json

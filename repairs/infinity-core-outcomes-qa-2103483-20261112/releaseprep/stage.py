@@ -77,9 +77,10 @@ def tools():
     return SimpleNamespace(cb=cb, inventory=inventory, ref=ref, authority=authority)
 
 
-def producer(row):
+def producer(row, expected='success'):
+    require(expected in ('success', 'failure'), 'EXPLICIT_PRODUCER_CONCLUSION')
     run = api('actions/runs/' + str(row['run']))
-    require(run['status'] == 'completed' and run['conclusion'] == 'success' and run['head_sha'] == row['source'] and
+    require(run['status'] == 'completed' and run['conclusion'] == expected and run['head_sha'] == row['source'] and
             run['workflow_id'] == row['workflow_id'], 'EXACT_SUCCESSFUL_PRODUCER')
     artifact = api('actions/artifacts/' + str(row['id']))
     require(not artifact['expired'] and artifact['workflow_run']['id'] == row['run'] and
@@ -186,14 +187,31 @@ def stage(request, baseline, components, owners_archive, native, native_archive,
             'EXPLICIT_NEW_ENGINE_SOURCE_AND_ORIGINAL83_NATIVE_PROOF_BINDINGS')
     for spec in r['native_proofs'].values():
         receipt(native / spec['file'], spec)
-    producer(r['android_producer'])
+    authorization = HERE / 'OWNER-QA-AUTHORIZATION.json'
+    require(r['owner_qa_authorization_sha256'] == sha(authorization), 'FROZEN_OWNER_QA_AUTHORIZATION')
+    allowed = load(authorization)
+    require(allowed['authorization'] == 'OWNER_EXPLICIT_EXPERIMENTAL_FOLD_QA_WITH_UNRESOLVED_EMULATOR_SIGSEGV' and
+            allowed['owner_accepts_controlled_internal_QA'] is True and allowed['production_approval'] is False and
+            allowed['baseline_APK_sha256'] == APK83 and allowed['native_sha256'] == engine_sha and
+            r['android_producer']['run'] == allowed['failed_emulator_run'] == 43163420602,
+            'ONLY_OWNER_AUTHORIZED_EXACT_EXPERIMENTAL_RISK_CONTRACT')
+    producer(r['android_producer'], expected='failure')
     require('sha256:' + sha(android_archive) == r['android_producer']['digest'] and
             android_archive.stat().st_size == r['android_producer']['size_in_bytes'], 'AUTHENTICATED_ANDROID_EVIDENCE_ARCHIVE')
     with ZipFile(android_archive) as archive:
         t.inventory.validate_names(archive)
         require(member_sha(archive, r['android_proof']['file']) == sha(android / r['android_proof']['file']),
                 'ANDROID_RECEIPT_NOT_FROM_FROZEN_PRODUCER')
-    observed = receipt(android / r['android_proof']['file'], r['android_proof'])
+    failed_path = android / r['android_proof']['file']
+    require(sha(failed_path) == r['android_proof']['sha256'], 'EXACT_FAILED_EMULATOR_RECEIPT_BYTES')
+    observed = load(failed_path)
+    require(observed['status'] == r['android_proof']['status'] == 'BLOCKED_OR_FAILED_PRE_SIGN_DIAGNOSTIC' and
+            'NATIVE_ENGINE_DIED_OR_RESTARTED' in observed.get('error', '') and
+            all(observed.get(k) == v for k, v in r['android_proof']['required_fields'].items()),
+            'PRESERVE_ACTUAL_FAILED_RUNTIME_STATUS_NOT_PASS')
+    with ZipFile(android_archive) as archive:
+        require(member_sha(archive, r['emulator_crash']['file']) == r['emulator_crash']['sha256'], 'AUTHENTIC_CRASH_EVIDENCE')
+        require(b'SIGSEGV' in archive.read(r['emulator_crash']['file']), 'RETAIN_REAL_NATIVE_SIGSEGV')
     require(observed['native_sha256'] == engine_sha and observed['baseline_APK_sha256'] == APK83 and
             observed['native_injection'] is True and observed['APK_modified'] is False and
             observed['before_first_launch'] is True and observed['owner_device'] is False,
@@ -223,7 +241,8 @@ def stage(request, baseline, components, owners_archive, native, native_archive,
     proof = dict(status='PASS_KEY_FREE_UNSIGNED83_NATIVE_OBSERVATION_THREE_MEMBER_PRESERVATION',
         source=source, baseline_version=2103483, baseline_APK_sha256=APK83, authority_source=BASE,
         versionCode=version, version_reserved=False, native_sha256=engine_sha, native_producer=r['native_producer'],
-        Android_native_injection='PASS_SELECTED_SCOPE_ONLY_NOT_APK_INSTALL_ACCEPTANCE',
+        Android_native_injection='OWNER_ACCEPTED_UNRESOLVED_EMULATOR_SIGSEGV_NOT_PASS',
+        owner_qa_authorization_sha256=sha(authorization), unresolved_emulator_SIGSEGV_run=43163420602,
         Android_producer=r['android_producer'], Android_proof_sha256=r['android_proof']['sha256'],
         unsigned_sha256=sha(candidate), changed_members=changes, unchanged_payload_members=retained,
         request_sha256=sha(request), stage_tool_sha256=sha(Path(__file__)), baseline_metadata_sha256=sha(HERE / 'BASELINE83.json'),

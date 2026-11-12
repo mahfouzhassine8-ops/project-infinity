@@ -121,13 +121,14 @@ def toolkit(r):
     return SimpleNamespace(cb=cb, ra=ra, gate=gate, inventory=inventory, base=base)
 
 
-def producer(row, expected_id=None):
+def producer(row, expected_id=None, expected='success'):
+    require(expected in ('success', 'failure'), 'EXPLICIT_PRODUCER_CONCLUSION')
     require(all(type(row[k]) is int and row[k] > 0 for k in ('run', 'workflow_id', 'id', 'size_in_bytes')) and
             re.fullmatch('[0-9a-f]{40}', row['source']) and re.fullmatch('sha256:[0-9a-f]{64}', row['digest']),
             'COMPLETE_FROZEN_PRODUCER_DESCRIPTOR')
     require(expected_id is None or row['workflow_id'] == expected_id, 'EXACT_WORKFLOW_ROLE')
     run = api('actions/runs/' + str(row['run']))
-    require(run['status'] == 'completed' and run['conclusion'] == 'success' and run['head_sha'] == row['source'] and
+    require(run['status'] == 'completed' and run['conclusion'] == expected and run['head_sha'] == row['source'] and
             run['workflow_id'] == row['workflow_id'], 'ACTUAL_SUCCESSFUL_EXACT_PRODUCER')
     artifact = api('actions/artifacts/' + str(row['id']))
     require(not artifact['expired'] and artifact['workflow_run']['id'] == row['run'] and
@@ -158,6 +159,7 @@ def request():
                 (HERE / 'stage.py').relative_to(ROOT).as_posix(), (HERE / 'BASELINE83.json').relative_to(ROOT).as_posix(),
                 (HERE.parent / 'capture_mac_usb.py').relative_to(ROOT).as_posix(),
                 (HERE.parent / 'CAPTURE-MAC-USB.md').relative_to(ROOT).as_posix(),
+                (HERE / 'OWNER-QA-AUTHORIZATION.json').relative_to(ROOT).as_posix(),
                 stage_request.as_posix()}
     require(set(r['source_bindings']) == required and stage_request.parent == HERE.relative_to(ROOT), 'EXACT_TASK_TOOL_AND_STAGE_INPUT_BINDINGS')
     for name, wanted in r['source_bindings'].items():
@@ -168,7 +170,7 @@ def request():
             'FROZEN_COMMITTED_ORIGINAL_QA_REQUEST')
     for key in ('native_producer', 'prepared_producer', 'android_producer'):
         require(r[key]['workflow_id'] != 397702717, 'NATIVE_ANDROID_STAGE_HAVE_NO_ORIGINAL_SIGNER_ROLE')
-        producer(r[key])
+        producer(r[key], expected='failure' if key == 'android_producer' else 'success')
     role_sources = {r[k]['workflow_id']: r[k]['source'] for k in ('native_producer', 'prepared_producer')}
     for row in r['unsigned_workflow_additions']:
         meta = api('actions/workflows/' + str(row['id']))
@@ -212,7 +214,9 @@ def prepared_inputs(r, baseline, t):
             proof['authority_source'] == BASE and proof['versionCode'] == VERSION and proof['version_reserved'] is False and
             proof['native_sha256'] == r['native_sha256'] and proof['native_producer'] == r['native_producer'] and
             proof['Android_producer'] == r['android_producer'] and proof['Android_proof_sha256'] == r['Android_proof_sha256'] and
-            proof['Android_native_injection'] == 'PASS_SELECTED_SCOPE_ONLY_NOT_APK_INSTALL_ACCEPTANCE' and
+            proof['Android_native_injection'] == 'OWNER_ACCEPTED_UNRESOLVED_EMULATOR_SIGSEGV_NOT_PASS' and
+            proof['unresolved_emulator_SIGSEGV_run'] == 43163420602 and
+            proof['owner_qa_authorization_sha256'] == sha(HERE / 'OWNER-QA-AUTHORIZATION.json') and
             proof['Core_path_or_source_patch'] is False and proof['signed'] is False and proof['original_key_used'] is False and
             proof['owner_delivery'] is False and proof['Fold'] == 'NOT_RUN', 'EXACT_ACTUAL_STAGE_AND_ANDROID_INJECTION_PROVENANCE')
     stage_path = HERE / 'stage.py'
@@ -286,7 +290,7 @@ def propose(out, baseline):
         preparation_sha256=sha(PREPARED / 'UNSIGNED-QA-PRESERVATION.json'), baseline_APK_sha256=APK83, native_sha256=r['native_sha256'],
         native_producer=r['native_producer'], Android_producer=r['android_producer'], Android_proof_sha256=r['Android_proof_sha256'],
         immutable_functional_base=2103483, Core_path_or_source_patch=False,
-        Android='PASS_SELECTED_NATIVE_INJECTION_ONLY_NOT_APK_INSTALL_ACCEPTANCE',
+        Android='OWNER_ACCEPTED_UNRESOLVED_EMULATOR_SIGSEGV_NOT_PASS', unresolved_emulator_SIGSEGV_run=43163420602,
         APK_installation='NOT_RUN_REQUIRES_ORIGINAL_SIGNATURE', Fold_cause_established=False, physical_Fold='NOT_RUN',
         engineering_QA_only=True, experimental=True, publication=False, public_release=False, owner_delivery_cleared=False,
         accepted_pointer_updated=False, shutdown_or_Core_outcome_repair='UNPROVEN',
@@ -353,7 +357,7 @@ def post(baseline, signed, sdk):
         source=os.environ['GITHUB_SHA'], signed_apk_sha256=sha(apk), certificate_sha256=CERT, native_sha256=r['native_sha256'],
         baseline_APK_sha256=APK83, changed_members=sorted(MEMBERS), unchanged_payload_members=retained,
         original83_preserved=True, Cobra_changed=False, Core_path_or_source_patch=False,
-        Android='SELECTED_INJECTED_NATIVE_ONLY', actual_APK_installation='NOT_RUN', owner_delivery=False,
+        Android='OWNER_ACCEPTED_UNRESOLVED_EMULATOR_SIGSEGV_NOT_PASS', unresolved_emulator_SIGSEGV_run=43163420602, actual_APK_installation='NOT_RUN', owner_delivery=False,
         shutdown_or_Core_outcome_repair='UNPROVEN', Fold='NOT_RUN', Fold_cause_established=False, public_release=False)
     (signed / 'QA-PRESERVATION.json').write_bytes(t.inventory.canonical(receipt))
     (signed / 'QA-SIGNATURE.txt').write_text(verify)
