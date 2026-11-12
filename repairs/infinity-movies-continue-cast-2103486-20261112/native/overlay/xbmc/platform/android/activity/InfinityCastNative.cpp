@@ -111,6 +111,18 @@ CVariant Snapshot(const std::shared_ptr<CFileItem>& item,
   result["can_pause"] = player->CanPause();
   result["can_seek"] = player->CanSeek();
   result["title"] = item->GetLabel();
+  const auto manifestHeaders = item->GetProperty("inputstream.adaptive.manifest_headers").asString();
+  const auto streamHeaders = item->GetProperty("inputstream.adaptive.stream_headers").asString();
+  const bool headersSupported = manifestHeaders.size() <= 16384 && streamHeaders.size() <= 16384;
+  result["cast_headers_supported"] = headersSupported;
+  if (headersSupported)
+  {
+    result["cast_manifest_headers"] = manifestHeaders;
+    result["cast_stream_headers"] = streamHeaders;
+  }
+  result["cast_drm"] = !item->GetProperty("inputstream.adaptive.license_type").asString().empty() ||
+                       !item->GetProperty("inputstream.adaptive.drm").asString().empty();
+
   if (item->HasVideoInfoTag())
   {
     const auto* tag = item->GetVideoInfoTag();
