@@ -1,0 +1,96 @@
+{
+  "status": "PASS",
+  "cases": [
+    {
+      "case": "copy2",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"copy2\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "essential-metadata",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"essential-metadata\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "metadata-errors",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"metadata-errors\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "missing-load",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"missing-load\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "opaque-load",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"opaque-load\",\"passed\":true,\"sealed\":false}\n",
+      "stderr": ""
+    },
+    {
+      "case": "bypass-load",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"bypass-load\",\"passed\":true,\"sealed\":false}\n",
+      "stderr": ""
+    },
+    {
+      "case": "live-metadata",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"live-metadata\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "close-admission",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"close-admission\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "essential-participant",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"essential-participant\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "active-essential",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"active-essential\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "unknown-write",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"unknown-write\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "classifier",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"classifier\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    },
+    {
+      "case": "failed-load-after-delete",
+      "exit_code": 0,
+      "stdout": "{\"case\":\"failed-load-after-delete\",\"passed\":true,\"sealed\":true}\n",
+      "stderr": ""
+    }
+  ],
+  "Python": [
+    3,
+    11,
+    7
+  ],
+  "Core_executed": false,
+  "Android": false,
+  "Fold": false,
+  "baseline_copy2_control": {
+    "exit_code": 0,
+    "stdout": "{\"case\":\"baseline-copy2\",\"passed\":true,\"sealed\":false}\n",
+    "stderr": ""
+  }
+}
