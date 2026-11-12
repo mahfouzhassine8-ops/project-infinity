@@ -32,7 +32,13 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
             java.lang.reflect.Field source=InfinityCastSession.class.getDeclaredField("source");source.setAccessible(true);
             java.lang.reflect.Field transport=InfinityCastSession.class.getDeclaredField("privateSource");transport.setAccessible(true);
             source.set(cast,new JSONObject());transport.set(cast,InfinityCastSource.parse("https://example.invalid/public.mp4"));
-            java.lang.reflect.Method connect=InfinityCastSession.class.getDeclaredMethod("connectedSession",com.google.android.gms.cast.framework.CastSession.class);
+            // SDK classes are intentionally private/optimized. The production
+            // controller is compiled with them; a separately compiled CI probe
+            // must inspect its actual parameter type, not import an old name.
+            java.lang.reflect.Method connect=null;
+            for(java.lang.reflect.Method method:InfinityCastSession.class.getDeclaredMethods())
+                if(method.getName().equals("connectedSession") && method.getParameterTypes().length==1)connect=method;
+            if(connect==null)throw new NoSuchMethodException("connectedSession");
             connect.setAccessible(true);connect.invoke(cast,new Object[]{null});
             java.lang.reflect.Field started=InfinityCastSession.class.getDeclaredField("transferStarted");started.setAccessible(true);
             explicitSelectionGuard=!started.getBoolean(cast);source.set(cast,null);transport.set(cast,null);

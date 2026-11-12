@@ -2,6 +2,7 @@
 from pathlib import Path
 from zipfile import ZipFile,ZIP_DEFLATED
 import hashlib,json,os,re,subprocess,sys
+from dex_contract import Dex
 HERE=Path(__file__).resolve().parent
 WORK=Path(sys.argv[1]).resolve();APK=Path(sys.argv[2]).resolve()
 SDK=WORK/'tools';COMPONENT=WORK/'component-reuse86';OUT=WORK/'probe';OUT.mkdir(exist_ok=True)
@@ -18,6 +19,14 @@ with ZipFile(jar,'w',ZIP_DEFLATED) as z:
 dex=OUT/'dex';dex.mkdir(exist_ok=True)
 run(['java','-cp',SDK/'d8.jar','com.android.tools.r8.D8','--min-api','21','--lib',SDK/'android.jar',
      '--classpath',COMPONENT/'feature.jar','--output',dex,jar])
+shipped=set()
+for p in (COMPONENT/'dex').glob('*.dex'):shipped.update(Dex(p.read_bytes()).classes)
+probe=[Dex(p.read_bytes()) for p in dex.glob('*.dex')]
+for value in probe:shipped.update(value.classes)
+for value in probe:
+ for name in value.types:
+  if name.startswith('Lcom/google/android/gms/'):
+   assert name in shipped,'CI probe references an SDK name relocated in the actual component: '+name
 manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.castqa" android:versionCode="1" android:versionName="CI-only">
 <uses-sdk android:minSdkVersion="30" android:targetSdkVersion="35"/>
 <uses-permission android:name="android.permission.INTERNET"/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/><uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
