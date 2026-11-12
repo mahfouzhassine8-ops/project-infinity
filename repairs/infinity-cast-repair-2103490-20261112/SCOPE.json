@@ -1,0 +1,59 @@
+{
+  "APK_candidate_allowlist": [
+    "classes6.dex",
+    "AndroidManifest.xml",
+    "assets/experience-component-updates.properties"
+  ],
+  "accepted_pointer_updated": false,
+  "allowed_new_production_sources": [],
+  "baseline_APK_sha256": "63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733",
+  "baseline_signing_source": "d311f22ddd30d3c7313a3f8f009c8f8a8e3325cd",
+  "baseline_source_snapshot": "405d7c268efbfb32f2013e378c9b19aac0756faa",
+  "future_versions_provisional": {
+    "candidate": 2103492,
+    "recovery": 2103493
+  },
+  "native_note": "Reuse unchanged original-signed90 ARM64 engine. Any proven necessary change must stay inside the existing Cast translation unit, be separately frozen before editing, and pass real ARM64 verification.",
+  "native_source_frozen": true,
+  "no_APK_additions_or_removals": true,
+  "owner_acceptance": "ONE_FOLD_AND_VIDEO_RECEIVER_SESSION_AFTER_SIGNING",
+  "production_allowlist": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastAdaptive.java": "aa0b978cf26910ace0919b221a7e03888b36602621cae117fe2b3a808dabce08",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": "fbafd4f04ebf94811bb54aec350052f782dc7f4bca466e7c461f079a120feb96",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "cd5a50b94d2c4d7777ab386e26042a1719f5a19bdc85cdcab624c62fc0d90dc9",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "9a32c8fe574128b75410580a7e2f0a6f7fa78e64a471a7de16bf05313ed7f783",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "bb5e2271daa6460c794bea3a57cce37b2a4451afd8d28186642391703640a276",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java": "5b3f30822ce141ef04fba3b752ed8c707ae0af00e4804dd63bb54a62907fecdc"
+  },
+  "protected": [
+    "Cobra",
+    "all providers/Search",
+    "Movies/Infinity Movies/TV/Infinity TV",
+    "Continue Watching/tracking/resume/Trakt/Watchlists",
+    "Python startup",
+    "shutdown/coordinator/persistence/SQLite/deadlines",
+    "all native code until proven Cast-only need",
+    "all skin/entrypoint locations/unrelated controls",
+    "all settings/schemas/profiles/databases/user data",
+    "original signer"
+  ],
+  "recovery_plan": "Higher-version restore of exact signed2103490 functionality; retain all historical recovery artifacts unmodified",
+  "retained_improvements": [
+    "HLS/DASH/progressive delivery",
+    "authenticated adaptive relay and private credentials",
+    "receiver discovery",
+    "compact Cast UI",
+    "source-bound session/cleanup/native integration",
+    "all working2103490 Movies/Home/TV features"
+  ],
+  "schema": 1,
+  "scope": "CAST_ONLY_REMAINING_TRANSFER_REPAIR_DIRECTLY_FROM_SIGNED2103490",
+  "tests_selected": [
+    "Reproduce evidence-supported Cast media-load/relay/status failure and corrected transition",
+    "Preserve existing adaptive/progressive/authentication coverage; reuse valid unchanged evidence",
+    "Receiver accessibility and owned return/failure/cancel cleanup checks",
+    "Android component/ABI compile and signed in-place installation/recovery when fix proven",
+    "Post-Cast shutdown only via independent selected scenario when executable; no shutdown code edits"
+  ]
+}
