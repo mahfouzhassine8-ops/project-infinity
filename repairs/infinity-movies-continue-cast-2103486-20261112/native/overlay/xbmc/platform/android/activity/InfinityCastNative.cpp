@@ -151,7 +151,7 @@ void ChannelProperty(const std::string& token, bool release)
     if (current == name || current.empty())
     {
       home->SetProperty("Infinity.Cast.Channel", "released:" + name);
-      home->ClearProperty("Infinity.Cast.Connected");
+      home->SetProperty("Infinity.Cast.Connected", "");
     }
   }
   else home->SetProperty("Infinity.Cast.Channel", name);
