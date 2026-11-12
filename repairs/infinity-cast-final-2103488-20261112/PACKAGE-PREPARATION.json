@@ -1,0 +1,89 @@
+{
+  "candidate": {
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "baseline_APK_sha256": "4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "474c3d334ce6444bc1f210a36729b266e963b273f6e1d97dea944cbfbbdea00f",
+        "before": "61f49995207b972ff179348e608997cedb3648c0522482a8df341badaa28759a"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "78859a51467548ff127eb737cfe21d599dd7e7a96a945b0aa4694451e7d7ac53",
+        "before": "8e56ef715c3e3fc8ab1ab1232eb13ff74f4716b0d1887e888626b0f1dc485120"
+      },
+      "classes6.dex": {
+        "after": "d72ee0281b417873c3d982732d11d1d34932e37a5a94fa95c2e73233c3e5b658",
+        "before": "900fba47219e396705aaad15a9bbc35da7f6f7d7236ad0f4de85481768b8636c"
+      },
+      "lib/arm64-v8a/libkodi.so": {
+        "after": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+        "before": "dc9e734655546f02c9a060b50bda1643f189e2756dd159c4f5b14169e6bb6716"
+      }
+    },
+    "kind": "candidate",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103486,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "b5a849ef256f44d7e975627d60a766d2754db7e0",
+    "status": "PASS_EXACT_SIGNED88_CAST_ONLY_MEMBER_VECTOR",
+    "unchanged_payload_members": 7771,
+    "unsigned_sha256": "a490f89668bde952664ed6da56572e98b0e3b429b3d34eb1e834bba57d43aa80",
+    "versionCode": 2103490
+  },
+  "ownership_policy_matches_compiled_component": true,
+  "prepared_producer": {
+    "digest": "sha256:fe6b21e340b276f0464aa651ddf51ebe22756c2ed82f51fde45a22bda2becca0",
+    "id": 13991961867,
+    "name": "Infinity88-CastFinal-Prepared-43323900250-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43323900250,
+    "size_in_bytes": 1314700086,
+    "source": "b5a849ef256f44d7e975627d60a766d2754db7e0",
+    "workflow_id": 397702717
+  },
+  "receipt_artifact": {
+    "digest": "sha256:c0b8859f5503e988d5a2664ab455f745bcde2f9b5d022ffae9f4266375ddb85d",
+    "id": 13991822182
+  },
+  "recovery": {
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "baseline_APK_sha256": "5fa350dd945fcb8f294975be6fd16ee3c4432ffa1519089aa70bbde680fdf834",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "aea0ed0d1a01041137b66acc3ba2c752f501b8e97258327d28bf851b6cb65950",
+        "before": "29418c83d7e1e120d8eb8aaddfcc6c3c2c3b4935727419e8e969367e879c3e09"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "1c24d9d8234b76217a3bb90b5dfedd9c0b40d75aa5c7b4f5ab659edb015dd3f2",
+        "before": "b6eab4da8d3a1149d171566ca2ff5e4710434732ddefaf737c82dc52577b8bb2"
+      }
+    },
+    "kind": "recovery",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103486,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "b5a849ef256f44d7e975627d60a766d2754db7e0",
+    "status": "PASS_EXACT_SIGNED88_CAST_ONLY_MEMBER_VECTOR",
+    "unchanged_payload_members": 7767,
+    "unsigned_sha256": "86746c7ef0858b974a94ae449321bda1ee0875aa07f44139288a468074083979",
+    "versionCode": 2103491
+  },
+  "run": 43323900250,
+  "schema": 1,
+  "status": "PASS_UNSIGNED_COMPLETE_PAIR; NOT_INSTALLABLE"
+}

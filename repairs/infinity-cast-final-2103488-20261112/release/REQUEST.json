@@ -55,6 +55,15 @@
   },
   "owner_acceptance_after_signing": true,
   "parent_authority_sha256": "ae55b8616d6c6283b9b0cbdd8def3351522805433e6bd089b8c234e9157bcbca",
+  "prepared_producer": {
+    "digest": "sha256:fe6b21e340b276f0464aa651ddf51ebe22756c2ed82f51fde45a22bda2becca0",
+    "id": 13991961867,
+    "name": "Infinity88-CastFinal-Prepared-43323900250-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43323900250,
+    "size_in_bytes": 1314700086,
+    "source": "b5a849ef256f44d7e975627d60a766d2754db7e0",
+    "workflow_id": 397702717
+  },
   "recovery": "Higher-version forward recovery restoring protected2103486 functionality via verified original-signed89, including CC84 and skin275 to prevent module downgrade",
   "registry_parent_source": "ab5f3e41721291091e5fe177787156408193c0fa",
   "schema": 1,
@@ -66,6 +75,7 @@
     "repairs/infinity-cast-final-2103488-20261112/ANDROID-CAST-PASS.json": "90ecab715333cf46ca1dfa1d39eacf69b5e05ac18b6caf7b8aa70ac4cbb1d096",
     "repairs/infinity-cast-final-2103488-20261112/ARM64-PASS.json": "31b04088505dc612faac0bbf40b0b851c35abb8f0447f093fc2066160b60398e",
     "repairs/infinity-cast-final-2103488-20261112/HOST-CAST.json": "f8d99d6e8a8132f8760db42720fd9a53dce087978f7043f11bcbc57e231754fc",
+    "repairs/infinity-cast-final-2103488-20261112/PACKAGE-PREPARATION.json": "8fab8c5a802b712c2580788283c16b624958e3730b0931976832a2541680565d",
     "repairs/infinity-cast-final-2103488-20261112/SCOPE.json": "c1aeedfce6022cdc805c528d4a2025af5da943b0d3ad56eb37e5d1c9078cadf1",
     "repairs/infinity-cast-final-2103488-20261112/SOURCE-CHANGES.json": "326222ab93f82d7cef371cb48db572ad64a7150d82b4cfbdaec643f4b5d43b6e",
     "repairs/infinity-cast-final-2103488-20261112/release/gate.py": "63dfef3628de794d8bf7f4a69f79194c7b82a9bdd00d9ac2605e681cbc764557",
