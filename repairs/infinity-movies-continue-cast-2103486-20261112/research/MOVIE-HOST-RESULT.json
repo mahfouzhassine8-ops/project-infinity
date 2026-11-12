@@ -1,0 +1,14 @@
+{
+  "status": "PASS_7_SELECTED_HOST_CASES_NOT_ANDROID_OR_FOLD_ACCEPTANCE",
+  "command": "python test_movie_routes.py /workspace/scratch/movies86-provider-contracts",
+  "baseline_APK": "550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197",
+  "reference66_APK": "d366e4b8aadba8484768cfcc0d362c2fc8e0181d78123ea77e04af4f028a3135",
+  "baseline_negative_control": "Actual signed86 _target discards current verified native movie routes and selects TMDb Helper",
+  "candidate": "Retains exact original current-provider movie route with source/hash and ID checks",
+  "TV_changes": false,
+  "progress_filter_or_threshold_changes": false,
+  "profile_data_read": false,
+  "Android": "NOT_RUN",
+  "Cast": "NOT_IMPLEMENTED_YET",
+  "Fold": "NOT_RUN"
+}

@@ -1,0 +1,569 @@
+# SPDX-License-Identifier: GPL-2.0-or-later
+"""Shared Infinity experience policy. One observer, one existing progress store.
+
+Artwork preloading warms Kodi's texture cache only; it never opens a player or
+asks a provider for streams. Provider routes are remembered only after AV starts.
+"""
+from __future__ import annotations
+import re
+import time
+import hashlib
+import json
+from pathlib import Path
+from contextlib import nullcontext, contextmanager
+from common import persistence_scope
+from urllib.parse import urlsplit, parse_qs
+
+COMMANDS = (
+    ('resume-hub', 'Resume Hub', 'Continue, watched history, Watchlist, Collection and local lists'),
+    ('restore-session', 'Restore session', 'Return to your last browsing position'),
+    ('retry-playback', 'Recover playback', 'Retry the failed source at your saved position'),
+    ('forget-source', 'Forget source preference', 'Use the normal resolver for this title'),
+    ('ambient-home', 'Ambient Home', 'Off, Subtle or Immersive artwork atmosphere'),
+    ('health-center', 'Health Center', 'Open existing diagnostics and recovery'),
+    ('runtime', 'Runtime inspector', 'Display, motion, power and stability'),
+    ('view-normal', 'View: Normal', 'Preserve the original Normal presentation'),
+    ('view-auto', 'View: Adaptive', 'Follow the active display'),
+    ('view-cinema', 'View: Cinema', 'Cinema Home presentation'),
+    ('view-compact', 'View: Compact', 'Compact Home presentation'),
+    ('view-twopane', 'View: Two Pane', 'Two Pane Home presentation'),
+    ('settings', 'Experience settings', 'Motion, artwork, recovery and resume preferences'),
+    ('support-exporter', 'Export diagnostics', 'Use the existing support exporter'),
+    ('create-restore', 'Create restore point', 'Snapshot the existing setup'),
+    ('restore-menu', 'Restore point', 'Choose a saved setup'),
+    ('mark-good', 'Mark known good', 'Save the working setup'),
+    ('restore-good', 'Restore known good', 'Use the existing recovery system'),
+    ('performance', 'Performance mode', 'Use existing performance controls'),
+    ('adaptive-refresh', 'Adaptive refresh', 'Use existing refresh ownership'),
+    ('crash-recovery', 'Crash recovery', 'Review existing guardian suggestions'),
+)
+
+
+def commands(query=''):
+    terms = str(query).casefold().split()
+    return [row for row in COMMANDS if all(t in ' '.join(row).casefold() for t in terms)]
+
+
+def stable_route(route):
+    """Expiring HTTP streams, PVR and opaque builtins are never source memory."""
+    if not isinstance(route, str) or not route or any(c in route for c in '\r\n\x00'):
+        return ''
+    try:
+        parsed = urlsplit(route)
+    except ValueError:
+        return ''
+    if parsed.scheme == 'plugin' and re.fullmatch(r'[\w.-]+', parsed.netloc or ''):
+        return route
+    if parsed.scheme in ('file', 'smb', 'nfs', 'special'):
+        return route
+    if route.startswith('/'):
+        return route
+    return ''
+
+
+# Exact current producer versions observed on the supplied Fold export.
+# Historical Watched Bridge contracts and saved history proofs remain intact.
+CURRENT_SOURCE_CONTRACTS = {'plugin.video.umbrella': {'6.7.94': {'version': '6.7.94', 'scope': 'show_episode', 'files': {'resources/lib/menus/episodes.py': ['52c610758b006d22a5dd9b9284122597afd183405a33a659b8f50c2c78115136', 'c3dd1ea82517b8a7def573ee90c4045cb6fd90baa40dda1c8d58e337cae25f73'], 'resources/lib/modules/control.py': ['3b742abd6915ddd9f6b66bebf29b6aceecd0b78e68e43e273b8937a76cb07dcd'], 'resources/lib/menus/movies.py': ['c1c9de10e6102954aab890fbe6b1a1c41f122da1f136e3440b83310fe41608a5', 'd6a271b7d5a50aae95507dedbbb0e08c215fbda42db500e95ec78d22fb8c8482']}}}, 'plugin.video.pov': {'6.10.20': {'version': '6.10.20', 'scope': 'show_episode', 'files': {'resources/lib/menus/episodes.py': ['ccc479ae765c31199d6342352a5ba463f556279f2da55005ef1f91e99fb531cf'], 'resources/lib/indexers/metadata.py': ['66409de0d892b20e4e8c3b23cc7214727f2f8b40a643c49b228a758db74168be'], 'resources/lib/menus/movies.py': ['2328d24a4090396f3970fa329d48bbff92e86b7fcc5ee14fbaedfc1594263bef'], 'resources/lib/modules/kodi_utils.py': ['26115e6c5af1297fbfad7d1600221b7184c1c86304efea4d65b7697d154c7b0a']}}}}
+
+
+# Native movie entry/dispatch interfaces from the supplied installed exports.
+# No provider source or existing episode contract is modified.
+CURRENT_MOVIE_SOURCE_CONTRACTS = {'plugin.video.umbrella': {'6.8.00': {'version': '6.8.00', 'scope': 'movie', 'files': {'addon.xml': '879343065f8c9a515fa76dfabb8faa7c375047ca9b0ae179cbbaae2f0f771b5e', 'resources/lib/menus/movies.py': 'e9ba284439ec2e126defeebf1b59cbad3a25f3a2fd0e75d004915171f0118291', 'resources/lib/modules/router.py': 'c0cfecb068b0ee80f78e774791cad4205cdb269987888f858d4710627a1a51ea', 'umbrella.py': '8875307040fd671afae5d460085730419dff2b1f84857394ddee742e18daa980'}}}, 'plugin.video.pov': {'6.11.02': {'version': '6.11.02', 'scope': 'movie', 'files': {'addon.xml': 'd1183b5c1fbdf9aa692048a54e66b89bba4bfaa40d78aa615d00351cdf8ebf05', 'resources/lib/caches/__init__.py': 'f3448d8392d0d587c561d2d3444e6c97474b77c3d30a915a0da247e8d4364c2b', 'resources/lib/caches/meta_cache.py': '0cbb93769c9867a61d0faf31140510c19f3f8bbe6c1c0f312bd7cfd9e862de46', 'resources/lib/indexers/metadata.py': '66409de0d892b20e4e8c3b23cc7214727f2f8b40a643c49b228a758db74168be', 'resources/lib/indexers/tmdb_api.py': '26a844d69b4e76c55762ca091b098ee9ec3abce0f74f76fa49e5351f963b1303', 'resources/lib/menus/episodes.py': '407bc518143920f903df884b96ca661784e8d9840962f2109f1f68778a323911', 'resources/lib/menus/movies.py': '2328d24a4090396f3970fa329d48bbff92e86b7fcc5ee14fbaedfc1594263bef', 'resources/lib/menus/seasons.py': '1a29b118399825708302d090ff8d569ce831774e5fa23a26082a52352d9aa4a1', 'resources/lib/menus/tvshows.py': 'b13b2fbfb4f48def0ef81c2ef4dede92a11f04c85ff54c101dd4286e94639680', 'resources/lib/modules/entry.py': '0814bc3b11b377ce96ce3373936a4fd40fb683e5330daa25fc8a17f63c732b6f', 'resources/lib/modules/kodi_utils.py': 'a5d35a7c01502a09af379fe729e15a29aced3053c23e1a513cfa4a55bfffc238', 'resources/lib/modules/player.py': '5051f95b9989c5d1608e84c5562edc6795a7bef8e5cf9d14386e79471a1d2f9c', 'resources/lib/modules/sources.py': '530c6446e25c87088e4aab72526824513b14c1e9f5af575cc6e5d6f1e0e56f89', 'resources/lib/router.py': '9bab400e60cfcb7a3923f9584c5348efa068fc361c3ee5e7d97101b65dbb3534'}}}}
+_movie_source_cache = {}
+
+
+def _render_source_stamp(root, bridge, names):
+    """A rendering hint only; selected actions always verify raw source again."""
+    import stat
+    paths = [bridge / 'PROVIDER-CONTRACTS.json', root / 'addon.xml']
+    paths.extend(root / name for name in sorted(names))
+    result = [str(root), str(bridge)]
+    for path in paths:
+        value = path.lstat()
+        if not stat.S_ISREG(value.st_mode) or path.resolve() != path.absolute():
+            return None
+        result.append((str(path), value.st_dev, value.st_ino, value.st_size,
+                       value.st_mtime_ns, value.st_ctime_ns))
+    return tuple(result)
+
+
+def _source_contract(provider, render_cache=None, media=None):
+    """Reuse the existing Watched Bridge producer contract; never trust a name."""
+    import xbmcaddon
+    import xbmcvfs
+    import xml.etree.ElementTree as ET
+    try:
+        bridge = Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.infinity.watchedbridge').getAddonInfo('path')))
+        raw = (bridge / 'PROVIDER-CONTRACTS.json').read_bytes()
+        if hashlib.sha256(raw).hexdigest() != 'c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e':
+            return None
+        contract = json.loads(raw).get(provider)
+        if not contract:
+            return None
+        root = Path(xbmcvfs.translatePath(xbmcaddon.Addon(provider).getAddonInfo('path'))).resolve()
+        manifest = ET.parse(root / 'addon.xml').getroot()
+        if manifest.get('id') != provider:
+            return None
+        if manifest.get('version') != contract['version']:
+            contract = CURRENT_SOURCE_CONTRACTS.get(provider, {}).get(manifest.get('version'))
+            if not contract and media == 'movie':
+                contract = CURRENT_MOVIE_SOURCE_CONTRACTS.get(provider, {}).get(manifest.get('version'))
+            if not contract:
+                return None
+        stamp = _render_source_stamp(root, bridge, contract['files']) if render_cache is not None else None
+        cached = render_cache.get(provider) if stamp is not None else None
+        if cached is not None and cached[0] == stamp and cached[1] == contract:
+            return contract
+        if render_cache is not None:
+            render_cache.pop(provider, None)
+        for name, digest in contract['files'].items():
+            path = (root / name).resolve()
+            if not path.is_relative_to(root) or path.stat().st_size > 1024 * 1024 or hashlib.sha256(path.read_bytes()).hexdigest() not in (digest if isinstance(digest, (list, tuple)) else (digest,)):
+                return None
+        if stamp is not None:
+            if _render_source_stamp(root, bridge, contract['files']) != stamp:
+                return None
+            # Only two reviewed source-memory providers can reach here.
+            if len(render_cache) < 2:
+                render_cache[provider] = (stamp, contract)
+        return contract
+    except (OSError, ValueError, RuntimeError, ET.ParseError):
+        return None
+
+
+def source_identity(route, media, ids, season=-1, episode=-1, verify=None):
+    """Bind an actual resolver invocation to typed IDs and exact episode numbers."""
+    import resume_hub as hub
+    if not isinstance(route, str) or len(route.encode('utf-8')) > 65536 or any(ord(c) < 32 for c in route):
+        return None
+    try:
+        parsed = urlsplit(route)
+        if parsed.scheme != 'plugin' or parsed.path not in ('', '/') or parsed.netloc not in ('plugin.video.umbrella', 'plugin.video.pov'):
+            return None
+        contract = (verify or _source_contract)(parsed.netloc)
+        if not contract and media == 'movie':
+            # Movie-only current interfaces, checked against the installed
+            # original producer source. TV/episode contracts stay unchanged.
+            contract = _source_contract(parsed.netloc, _movie_source_cache, media='movie')
+        if not contract:
+            return None
+        query = parse_qs(parsed.query, keep_blank_values=True)
+        if any(len(v) != 1 for v in query.values()):
+            return None
+        if parsed.netloc == 'plugin.video.pov':
+            if query.get('mode') != ['play_media'] or query.get('mediatype') != [('movie' if media == 'movie' else 'episode')]:
+                return None
+            route_ids = hub.verified_ids({k: query[k + '_id'][0] for k in ('imdb', 'tmdb', 'tvdb') if k + '_id' in query})
+        else:
+            if query.get('action') not in (['play'], ['play_Item']):
+                return None
+            route_ids = hub.verified_ids({k: query[k][0] for k in ('imdb', 'tmdb', 'tvdb') if k in query})
+        actual = hub.verified_ids(ids)
+        common = set(route_ids) & set(actual)
+        if not common or any(route_ids[k] != actual[k] for k in common):
+            return None
+        if media == 'movie':
+            if 'season' in query or 'episode' in query:
+                return None
+            return hub.media_identity('movie', actual)
+        if media != 'tv' or contract.get('scope') != 'show_episode':
+            return None
+        coordinates = tuple(hub.episode_number(query.get(k, [''])[0]) for k in ('season', 'episode'))
+        if min(coordinates) < 0 or coordinates != (hub.episode_number(season), hub.episode_number(episode)):
+            return None
+        return hub.media_identity('tv', {}, season, episode, actual)
+    except (ValueError, TypeError, KeyError):
+        return None
+
+
+def verified_source(entry, route, verify=None):
+    import resume_hub as hub
+    if not isinstance(route, str):
+        return ''
+    if not route.startswith('plugin://'):
+        return stable_route(route)
+    # Existing source-memory contracts for other providers are outside this
+    # corrective scope. Their original validated-route behavior is preserved.
+    try:
+        if urlsplit(route).netloc not in ('plugin.video.umbrella', 'plugin.video.pov'):
+            return stable_route(route)
+    except ValueError:
+        return ''
+    identity = hub.entry_identity(entry)
+    if not identity:
+        return ''
+    if identity.get('kind') in ('tvshow', 'season'):
+        # Existing Watchlist/Collection directory navigation is not expired
+        # movie/episode playback recovery. Preserve its original saved route.
+        return stable_route(route)
+    proof = source_identity(route, entry.get('media'), identity['ids'], entry.get('season'), entry.get('episode'), verify)
+    return route if hub.same_identity(identity, proof) else ''
+
+
+def browsing_route(route):
+    if not isinstance(route, str) or any(c in route for c in '\r\n\x00"'):
+        return ''
+    try:
+        return stable_route(route) or (route if urlsplit(route).scheme in ('videodb', 'musicdb', 'sources', 'library') else '')
+    except ValueError:
+        return ''
+
+
+def number(value, default=0.0):
+    try:
+        n = float(value)
+        return n if n >= 0 and n < 1e12 else default
+    except (ValueError, TypeError, OverflowError):
+        return default
+
+
+def artwork_tier(free_mb, width, playing=False, constrained=False):
+    # Unknown RAM is conservative, never treated as a measurement of abundance.
+    if playing or constrained or 0 < number(free_mb) < 650:
+        return 'safe'
+    if number(free_mb) >= 1800 and number(width) >= 1600:
+        return 'high'
+    return 'standard'
+
+
+def memory_mb(value):
+    match = re.match(r'^\s*([\d.]+)\s*(GB|MB|KB)?', str(value), re.I)
+    if not match:
+        return 0.0
+    unit = (match[2] or 'MB').upper()
+    return number(match[1]) * {'GB': 1024, 'MB': 1, 'KB': 1 / 1024}[unit]
+
+
+def artwork(url, tier='standard', fanart=False):
+    if not isinstance(url, str):
+        return ''
+    # Only TMDb's documented size routes. Tokens, Kodi image:// wrappers, local
+    # paths, provider headers and unrelated artwork servers pass through intact.
+    size = {'safe': ('w342', 'w780'), 'standard': ('w500', 'w1280'),
+            'high': ('w780', 'w1280')}.get(tier, ('w500', 'w1280'))[bool(fanart)]
+    return re.sub(r'^(https://image\.tmdb\.org/t/p/)(?:original|w\d+)(/[^?|]+)$',
+                  lambda m: m[1] + size + m[2], url)
+
+
+def health(ui, guardian, watchdog):
+    if ui in ('problem', 'unresolved') or watchdog == 'safe-mode':
+        return 'attention', 'FFFF665F', 'Health needs attention'
+    if guardian == 'suspects' or watchdog == 'warning' or ui in ('deferred', 'restored'):
+        return 'review', 'FFFFBF60', 'Health review available'
+    if ui == 'healthy' and guardian in ('clear', 'disabled') and watchdog == 'clear':
+        return 'ready', 'FF4ADDCB', 'Health checks ready'
+    return 'unknown', 'FF91A4BC', 'Health status pending'
+
+
+class ExperienceController:
+    def __init__(self, profile, player, api):
+        self.profile, self.player, self.api = profile, player, api
+        self.xbmc, self.gui = api['xbmc'], api['gui']
+        self.home = self.gui.Window(10000)
+        self.last_tick = self.last_save = 0.0
+        self.highlight = None
+        self.highlight_at = 0.0
+        self.origin = None
+        self.recovery = None
+        self.retry_count = 0
+        self.retry_key = ''
+        self.seek_pending = None
+        self.session = api['read'](profile / 'session.json', {})
+        self.boot_restore = False
+        self.focus_pending = None
+        self.recovery_notice = False
+
+    @contextmanager
+    def progress_lock(self):
+        with (self.api.get('progress_lock') or nullcontext()):
+            with persistence_scope():
+                yield
+
+    def save_source(self, key, route):
+        with self.progress_lock():
+            data = self.api['load_continue'](self.profile)
+            sources = data.setdefault('sources', {})
+            sources[key] = {'route': route, 'updated': int(time.time()), 'failures': 0}
+            data['sources'] = dict(sorted(sources.items(),
+                key=lambda pair: number(pair[1].get('updated')), reverse=True)[:100])
+            self.api['save_continue'](self.profile, data)
+
+    def remove_progress(self, key, collection):
+        with self.progress_lock():
+            data = self.api['load_continue'](self.profile)
+            data.get(collection, {}).pop(key, None)
+            self.api['save_continue'](self.profile, data)
+
+    def prop(self, key):
+        return self.home.getProperty('Infinity.' + key)
+
+    def publish(self, key, value):
+        self.api['set']('Infinity.' + key, value)
+
+    def label(self, key):
+        return str(self.xbmc.getInfoLabel(key) or '')
+
+    def clear_art(self):
+        for name in ('AmbientHome.Art', 'AmbientHome.SubmittedMode', 'AmbientHome.RenderInputReady', 'Preload.One', 'Preload.Two'):
+            self.publish(name, '')
+
+    def on_started(self):
+        item = self.player.cw_item
+        if not item:
+            return
+        if self.xbmc.getCondVisibility('Pvr.IsPlayingTV | Pvr.IsPlayingRadio'):
+            return
+        if self.retry_key != item['key']:
+            self.retry_count = 0
+        self.retry_key = item['key']
+        # The actual resolved CFileItem supplies this route. Home focus, title
+        # similarity and elapsed time cannot prove a movie or episode identity.
+        route = verified_source(item, item.get('stable_source') or item.get('source', ''))
+        # Retain the original source-memory fallback for unrelated providers.
+        # Reviewed Umbrella/POV routes require the native capture above.
+        if not item.get('stable_source') and self.origin and time.monotonic() - self.origin['at'] < 20:
+            origin_route = self.origin['route']
+            origin_host = urlsplit(origin_route).netloc if origin_route else ''
+            if origin_host not in ('plugin.video.umbrella', 'plugin.video.pov'):
+                title = item.get('showtitle') or item.get('title') or ''
+                matched = title.casefold() == self.origin['title'].casefold()
+                if matched and item.get('media') == 'tv':
+                    matched = (str(item.get('season')) == self.origin['season'] and
+                               str(item.get('episode')) == self.origin['episode'])
+                if matched:
+                    route = origin_route or route
+        if route and self.api['bool']('source_memory_enabled', True):
+            self.save_source(item['key'], route)
+            item['stable_source'] = route
+            self.publish('SourceMemory.Status', 'remembered')
+        if self.seek_pending:
+            if self.seek_pending['key'] == item['key']:
+                self.seek_pending['ready'] = True
+            else:
+                self.seek_pending = None
+        self.publish('Recovery.Status', 'playing')
+        self.publish('Recovery.Available', 'false')
+        self.recovery = None
+        self.recovery_notice = False
+
+    def on_error(self):
+        # Callback only arms recovery; it never runs a dialog on Kodi's player
+        # callback thread and never changes a healthy/paused/live player.
+        item = dict(self.player.cw_item or {})
+        if self.xbmc.getCondVisibility('Pvr.IsPlayingTV | Pvr.IsPlayingRadio'):
+            self.publish('Recovery.Status', 'unavailable')
+            return
+        if not item or not item.get('key'):
+            self.publish('Recovery.Status', 'unavailable')
+            return
+        self.seek_pending = None
+        with self.progress_lock():
+            data = self.api['load_continue'](self.profile)
+            saved = data.get('items', {}).get(item['key'], {})
+            source = data.get('sources', {}).get(item['key'], {})
+            if source:
+                source['failures'] = min(2, int(number(source.get('failures'))) + 1)
+                self.api['save_continue'](self.profile, data)
+        route = verified_source(item, source.get('route') or item.get('stable_source') or item.get('source', ''))
+        if not route or item.get('media') not in ('movie', 'tv'):
+            self.publish('Recovery.Status', 'unavailable')
+            return
+        if self.retry_key != item['key']:
+            self.retry_count = 0
+        self.retry_key = item['key']
+        self.recovery = {'key': item['key'], 'route': route,
+                         'position': number(saved.get('position')), 'at': time.monotonic()}
+        self.publish('Recovery.Status', 'available' if self.retry_count < 2 else 'exhausted')
+        self.publish('Recovery.Available', 'true' if self.retry_count < 2 else 'false')
+        if self.retry_count < 2 and self.api['str']('playback_recovery', 'prompt') == 'prompt':
+            self.recovery_notice = True
+
+    def retry(self):
+        if not self.recovery or self.retry_count >= 2 or self.player.isPlaying():
+            return False
+        if time.monotonic() - self.recovery['at'] > 300:
+            self.recovery = None
+            self.publish('Recovery.Available', 'false')
+            return False
+        record = self.recovery
+        self.retry_count += 1
+        self.publish('Recovery.Status', 'retrying')
+        self.publish('Recovery.Available', 'false')
+        self.seek_pending = dict(record, ready=False, started=time.monotonic())
+        result = self.api['rpc']('Player.Open', {'item': {'file': record['route']}})
+        if 'error' in result:
+            self.seek_pending = None
+            self.publish('Recovery.Status', 'failed')
+            self.publish('Recovery.Available', 'true' if self.retry_count < 2 else 'false')
+            return False
+        return True
+
+    def capture_session(self):
+        window = self.gui.getCurrentWindowId()
+        if window not in (10000, 10025, 10500, 10002, 10001) or self.gui.getCurrentWindowDialogId() != 9999:
+            return
+        try:
+            focus = self.gui.Window(window).getFocusId()
+        except Exception:
+            focus = 0
+        record = {'schema': 1, 'updated': int(time.time()), 'window': window,
+                  'focus': max(0, int(focus)), 'position': int(number(self.label('Container(%d).CurrentItem' % focus))),
+                  'path': browsing_route(self.label('Container.FolderPath')),
+                  'view': self.label('Skin.String(Infinity.VisualMode)'),
+                  'label': self.label('ListItem.Label')}
+        self.api['atomic'](self.profile / 'session.json', record)
+        self.session = record
+        self.publish('Session.Status', 'saved')
+
+    def restore_session(self, manual=False):
+        if self.player.isPlaying() or not self.api['bool']('session_restore_enabled', True):
+            return False
+        saved = self.session
+        names = {10000: 'home', 10025: 'videos', 10500: 'music', 10002: 'pictures', 10001: 'programs'}
+        win = saved.get('window')
+        if win not in names or time.time() - number(saved.get('updated')) > 604800:
+            self.publish('Session.Status', 'unavailable')
+            return False
+        path = browsing_route(saved.get('path', ''))
+        if win != 10000 and not path:
+            self.publish('Session.Status', 'unavailable')
+            return False
+        params = {'window': names[win]}
+        if path:
+            params['parameters'] = [path]
+        result = self.api['rpc']('GUI.ActivateWindow', params)
+        if 'error' in result:
+            self.publish('Session.Status', 'unavailable')
+            return False
+        if manual:
+            view = {'normal': 'normal', 'follow': 'auto', 'adaptive': 'auto',
+                    'cinema': 'cinema', 'compact': 'compact', 'twopane': 'twopane'}.get(saved.get('view'))
+            if view:
+                self.xbmc.executebuiltin('RunScript(script.infinity.commandcenter,view-mode,%s)' % view)
+        self.focus_pending = dict(saved, due=time.monotonic() + 1.5, expires=time.monotonic() + 12)
+        self.publish('Session.Status', 'restoring')
+        return True
+
+    def background_tick(self, now):
+        self.clear_art()
+        # Completing an already requested resume seek remains essential work.
+        self.continue_pending_seek(now)
+
+    def continue_pending_seek(self, now):
+        if self.seek_pending:
+            pending = self.seek_pending
+            if now - pending['started'] > 30:
+                self.seek_pending = None
+                self.publish('Recovery.Status', 'failed')
+            elif pending.get('ready') and self.player.isPlayingVideo():
+                try:
+                    total = self.player.getTotalTime()
+                    if total > 0:
+                        if 0 < pending['position'] < total * .95:
+                            self.player.seekTime(pending['position'])
+                        self.seek_pending = None
+                except Exception:
+                    pass
+
+    def tick(self, now):
+        if now - self.last_tick < 0.4:
+            return
+        self.last_tick = now
+        if self.recovery_notice:
+            self.recovery_notice = False
+            self.gui.Dialog().notification('Infinity playback recovery',
+                'Retry is available in the Infinity Command Palette.', self.gui.NOTIFICATION_INFO, 5000)
+        playing = self.player.isPlaying()
+        mode = self.prop('MotionModeEffective')
+        tier = artwork_tier(memory_mb(self.label('System.Memory(free)')), self.label('System.ScreenWidth'),
+                            playing, mode in ('off', 'reduced') or self.prop('RefreshThermalLimited') == 'true')
+        self.publish('Artwork.Quality', tier)
+        state, color, text = health(self.prop('UIHealth.Status'), self.prop('Guardian.Status'),
+                                   self.prop('StartupWatchdog.Status'))
+        self.publish('HealthOrb.State', state)
+        self.publish('HealthOrb.Color', color)
+        self.publish('HealthOrb.Label', text)
+        ambient = self.api['str']('ambient_home', 'subtle')
+        if ambient not in ('off', 'subtle', 'immersive'):
+            ambient = 'subtle'
+        self.publish('AmbientHome.Mode', ambient)
+        ready = self.prop('BootStage') == 'ready'
+        window = self.gui.getCurrentWindowId()
+        if playing or not ready or window != 10000:
+            self.clear_art()
+        else:
+            try:
+                focus = self.gui.Window(window).getFocusId()
+            except Exception:
+                focus = 0
+            route = self.label('ListItem.FileNameAndPath')
+            title = self.label('ListItem.TVShowTitle') or self.label('ListItem.Title') or self.label('ListItem.Label')
+            art = self.label('ListItem.Art(fanart)')
+            section = self.label('Container(9000).ListItem.Property(section)')
+            panels = {'movies': (8101, 8801), 'tvshows': (8102, 8802)}
+            if not art:
+                for panel in panels.get(section, ()):
+                    if self.xbmc.getCondVisibility('Control.IsVisible(%d)' % panel):
+                        art = self.label('Container(%d).ListItem.Art(fanart)' % panel)
+                        if not art:
+                            art = self.label('Container(%d).ListItem.Art(poster)' % panel)
+                        if art:
+                            break
+            sig = (focus, route, title, art, tier, ambient)
+            if sig != self.highlight:
+                self.highlight = sig
+                self.highlight_at = now
+                self.origin = {'route': stable_route(route), 'title': title, 'at': now,
+                               'season': self.label('ListItem.Season'), 'episode': self.label('ListItem.Episode')}
+            elif now - self.highlight_at >= 0.45:
+                submitted = artwork(sig[3], tier, True) if ambient != 'off' else ''
+                self.publish('AmbientHome.Art', submitted)
+                self.publish('AmbientHome.SubmittedMode', ambient if submitted else 'off')
+                self.publish('AmbientHome.RenderInputReady', 'true' if submitted else 'false')
+                enabled = self.api['bool']('highlight_preload_enabled', True)
+                for offset, name in ((1, 'One'), (2, 'Two')):
+                    value = self.label('Container(%d).ListItem(%d).Art(poster)' % (focus, offset))
+                    # Keep at most two textures, one under pressure. No wrapping
+                    # duplicates, no bulk catalogue or video prefetch.
+                    self.publish('Preload.' + name, artwork(value, tier) if enabled and (offset == 1 or tier != 'safe') else '')
+        command = self.prop('Experience.Command')
+        if command:
+            self.home.clearProperty('Infinity.Experience.Command')
+            if command == 'retry-playback':
+                self.retry()
+            elif command == 'restore-session':
+                self.restore_session(manual=True)
+            elif command == 'forget-source' and self.retry_key:
+                self.remove_progress(self.retry_key, 'sources')
+                self.publish('SourceMemory.Status', 'cleared')
+            elif command.startswith('remove:') and re.fullmatch(r'remove:[a-f0-9]{64}', command):
+                self.remove_progress(command[7:], 'items')
+        if self.recovery and not playing and self.api['str']('playback_recovery', 'prompt') == 'auto':
+            if now - self.recovery['at'] >= 2 and self.retry_count == 0:
+                self.retry()
+        self.continue_pending_seek(now)
+        if ready and not self.boot_restore:
+            self.boot_restore = True
+            if window == 10000 and not playing:
+                self.restore_session()
+        if self.focus_pending:
+            saved = self.focus_pending
+            if now > saved['expires'] or playing:
+                self.focus_pending = None
+            elif now >= saved['due'] and window == saved['window']:
+                if window == 10000 or self.label('Container.FolderPath') == saved.get('path'):
+                    focus = int(number(saved.get('focus')))
+                    pos = max(0, int(number(saved.get('position'))) - 1)
+                    if focus:
+                        self.xbmc.executebuiltin('Control.SetFocus(%d,%d,absolute)' % (focus, pos))
+                    self.focus_pending = None
+                    self.publish('Session.Status', 'restored')
+        if ready and self.boot_restore and not self.focus_pending and not playing and now - self.last_save > 12:
+            self.capture_session()
+            self.last_save = now
+
+    def shutdown(self):
+        # Never overwrite a browsing snapshot with the full-screen player.
+        if self.boot_restore and not self.player.isPlaying():
+            self.capture_session()
+        self.clear_art()
