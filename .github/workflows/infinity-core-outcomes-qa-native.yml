@@ -1,0 +1,157 @@
+name: Infinity Essential-only repair - scoped host and ARM64
+on:
+  push:
+    branches: [work/infinity-essential-only-shutdown-2103483-20261112]
+    paths:
+      - .github/workflows/infinity-core-outcomes-qa-native.yml
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/native/**
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/test_native*.py
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/BASE*.json
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/SCOPE.json
+  workflow_dispatch:
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity-essential-only-native, cancel-in-progress: false}
+jobs:
+  selected-host:
+    if: github.ref == 'refs/heads/work/infinity-essential-only-shutdown-2103483-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Selected actual native metadata and essential-write safety cases
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/test_native.py --out HOST-ESSENTIAL-ONLY.json
+      - name: Actual existing native engine identity during final save and sealed phases
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/test_native_identity.py --out HOST-ESSENTIAL-IDENTITY.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Essential-Only-Host-${{ github.run_id }}
+          path: |
+            HOST-ESSENTIAL-ONLY.json
+            HOST-ESSENTIAL-IDENTITY.json
+          if-no-files-found: error
+          retention-days: 90
+  arm64:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-essential-only-shutdown-2103483-20261112'
+    needs: selected-host
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      NDK_VER: '21.4.7075529'
+      DEPENDS: '${{ github.workspace }}/android-tools/xbmc-depends'
+      TARBALLS: '${{ github.workspace }}/android-tools/xbmc-tarballs'
+      BUILD_DIR: '${{ github.workspace }}/kodi-build'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595626273', run-id: '42425522122', merge-multiple: true, github-token: '${{ github.token }}', path: exact464}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
+      - name: Exact83 source restoration and scoped shutdown overlay
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py prepare
+      - name: Retained dependency tooling
+        run: bash repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh
+      - uses: actions/cache@v4
+        with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
+      - name: Retained NDK and dependencies
+        run: |
+          bash repairs/android-checkpoint-shutdown/install_ndk.sh
+          python repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py dependencies
+      - name: Actual full ARM64 compilation and ABI verification
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py compile
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity-Essential-Only-ARM64-${{ github.run_id }}-NO-INSTALLER
+          path: |
+            essential-only-native/libkodi.so
+            essential-only-native/*.json
+            essential-only-native/*.txt
+          if-no-files-found: error
+          retention-days: 90
+
+  movies-cast-native:
+    name: Accepted86 Cast-only native commands, full ARM64 and preservation; no application or shutdown tests
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/infinity-movies-continue-cast-2103486-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      KODI_BUILD_DIR: '${{ github.workspace }}/kodi-build'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Selected actual Cast native unit with mocked player and message backends only
+        run: |
+          t=repairs/infinity-movies-continue-cast-2103486-20261112/native/tests
+          c++ -std=c++17 -pthread -I "$t/stubs" -I "$t" "$t/test_cast_native.cpp" -o /tmp/cast-native-host
+          /tmp/cast-native-host
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595626273', run-id: '42425522122', merge-multiple: true, github-token: '${{ github.token }}', path: exact464}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13935631408', run-id: '43200317103', merge-multiple: true, github-token: '${{ github.token }}', path: signed86}
+      - name: Restore exact accepted86 native source and append only the isolated Cast source
+        run: python repairs/infinity-movies-continue-cast-2103486-20261112/build_cast_native.py prepare
+      - name: Retained official Ubuntu dependency tooling
+        run: bash repairs/infinity-movies-continue-cast-2103486-20261112/prepare_ci_tooling.sh
+      - uses: actions/cache@v4
+        with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
+      - name: Frozen verified NDK and dependency build
+        run: |
+          bash cast-native-frozen-tools/repairs/android-checkpoint-shutdown/install_ndk.sh
+          python repairs/infinity-movies-continue-cast-2103486-20261112/build_cast_native.py dependencies
+      - name: Real complete ARM64 compilation/link and exact86 ABI/source preservation
+        run: python repairs/infinity-movies-continue-cast-2103486-20261112/build_cast_native.py compile
+      - uses: actions/upload-artifact@v4
+        if: success()
+        with:
+          name: Infinity86-Cast-Native-ARM64-${{ github.run_id }}-NO-INSTALLER
+          path: |
+            cast-native-output/libkodi.so
+            cast-native-output/CAST-ARM64.json
+            cast-native-output/CAST-SOURCE-PRESERVATION.json
+            cast-native-output/NATIVE-SOURCE-MAP.json
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 90
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity86-Cast-Native-Evidence-${{ github.run_id }}-NO-INSTALLER
+          path: |
+            cast-native-output/*.json
+            cast-native-output/*.log
+          if-no-files-found: warn
+          retention-days: 90

@@ -23,7 +23,8 @@
     "host": "test_movie_routes: actual signed86 validator and target, existing installed-source hashes, exact route/identity, tamper/version refusal, TV negative controls, no progress on saving; native Movie actual-item fallback: current file/type/tag snapshots, exact URI IDs, race/contradiction refusal, no GUI reads/library ID claims",
     "Android": "NOT_SELECTED_YET",
     "shutdown": "Only after corrected movie paths; independent workflow; no shutdown source changes",
-    "Cast": "Dependency compatibility and supported ownership boundary; no receiver PASS without actual execution"
+    "Cast": "Dependency compatibility and supported ownership boundary; no receiver PASS without actual execution",
+    "native": "Cast-only queue/cancellation/source-occurrence/admission unit checks, then real full ARM64 engine compilation/link and exact baseline86 native-source/ABI preservation; no shutdown or owner tests"
   },
   "movie_production_file": "script.infinity.commandcenter/experience.py",
   "additional_changes": "Must be necessary for the three approved work items; freeze exact list before integration/build",
@@ -32,5 +33,11 @@
   "movie_production_files": [
     "script.infinity.commandcenter/experience.py",
     "script.infinity.commandcenter/service.py: movie actual-item fallback only"
-  ]
+  ],
+  "native_Cast_only_changes": [
+    "xbmc/platform/android/activity/InfinityCastNative.cpp (new)",
+    "xbmc/platform/android/activity/CMakeLists.txt (one source-list addition)"
+  ],
+  "native_protected_changes": false,
+  "native_reference_source": "9ce852ebb044a82853ef93af24e34a07ed96daff"
 }
