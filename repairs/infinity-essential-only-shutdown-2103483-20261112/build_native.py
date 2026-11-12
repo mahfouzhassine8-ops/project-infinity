@@ -40,7 +40,7 @@ def scope():
  assert os.environ['GITHUB_REF']=='refs/heads/'+BRANCH
  assert subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()==os.environ['GITHUB_SHA']
  policy='repairs/dual-experience-isolation-2103420/signer-policy.json'
- allowed={'.github/workflows/infinity-core-outcomes-qa-native.yml','.github/workflows/infinity-core-outcomes-qa-stage.yml','.github/workflows/infinity-saved-navigation-android.yml',policy}
+ allowed={'.github/workflows/infinity-shutdown-verification.yml','.github/workflows/infinity-core-outcomes-qa-native.yml','.github/workflows/infinity-core-outcomes-qa-stage.yml','.github/workflows/infinity-saved-navigation-android.yml',policy}
  changed=subprocess.check_output(['git','diff','--name-only',BASE,'HEAD'],text=True).splitlines()
  assert all(n in allowed or n.startswith('repairs/infinity-essential-only-shutdown-2103483-20261112/') for n in changed),changed
  assert (ROOT/policy).read_bytes()==subprocess.check_output(['git','show','3d9709bb1226a2ffa3a474cf04b3d3842b084611:'+policy]),'Exact original83 authority policy snapshot required'

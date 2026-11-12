@@ -6,7 +6,7 @@ on:
       - .github/workflows/infinity-core-outcomes-qa-native.yml
       - repairs/infinity-essential-only-shutdown-2103483-20261112/native/**
       - repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py
-      - repairs/infinity-essential-only-shutdown-2103483-20261112/test_native.py
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/test_native*.py
       - repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh
       - repairs/infinity-essential-only-shutdown-2103483-20261112/BASE*.json
       - repairs/infinity-essential-only-shutdown-2103483-20261112/SCOPE.json
@@ -25,11 +25,15 @@ jobs:
         with: {python-version: '3.11.7'}
       - name: Selected actual native metadata and essential-write safety cases
         run: python repairs/infinity-essential-only-shutdown-2103483-20261112/test_native.py --out HOST-ESSENTIAL-ONLY.json
+      - name: Actual existing native engine identity during final save and sealed phases
+        run: python repairs/infinity-essential-only-shutdown-2103483-20261112/test_native_identity.py --out HOST-ESSENTIAL-IDENTITY.json
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: Infinity-Essential-Only-Host-${{ github.run_id }}
-          path: HOST-ESSENTIAL-ONLY.json
+          path: |
+            HOST-ESSENTIAL-ONLY.json
+            HOST-ESSENTIAL-IDENTITY.json
           if-no-files-found: error
           retention-days: 90
   arm64:

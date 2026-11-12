@@ -868,6 +868,17 @@ inline PyObject* CheckedDlopen(PyObject* self,PyObject* args,PyObject* kwargs)
   // PyDLL(None) only references the already-running process, as in Audit().
   if(PyTuple_GET_SIZE(args)>0 && PyTuple_GET_ITEM(args,0)==Py_None)
     return PyObject_Call(context->originalDlopen,args,kwargs);
+  // Preserve Audit's existing exact, already-loaded Command Center identity
+  // lookup in EVERY phase, including final-save/sealed observer callbacks.
+  // This reuses its native RTLD_NOLOAD/address proof, not a filename exemption.
+  // The original native audit repeats the same proof on converted arguments.
+  if(PyTuple_GET_SIZE(args)>0 && PyUnicode_CheckExact(PyTuple_GET_ITEM(args,0))) {
+    auto* lookup=PyTuple_Pack(1,PyTuple_GET_ITEM(args,0));
+    if(!lookup)return nullptr;
+    const bool readonly=ApprovedInfinityModuleIdentityLookup("ctypes.dlopen",lookup);
+    Py_DECREF(lookup);
+    if(readonly)return PyObject_Call(context->originalDlopen,args,kwargs);
+  }
   // A loader attempt is a coordination obligation, not evidence that every
   // previously removed filesystem name was recreated. Actual I/O retains its
   // own leases; an unverified successful image retains the opaque blocker.
