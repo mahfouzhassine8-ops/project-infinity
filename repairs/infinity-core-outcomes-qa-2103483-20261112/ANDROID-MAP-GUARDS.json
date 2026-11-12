@@ -1,0 +1,15 @@
+{
+  "status": "PASS_SELECTED_PURE_HOST_DIAGNOSTIC_MAP_GUARDS",
+  "cases": [
+    "Incomplete snapshot remains NOT_VERIFIED; observed failure remains mandatory",
+    "Any observed mapping across invokers rejects",
+    "Code mismatch still rejects",
+    "Actual successful load rejects",
+    "No acceptance without actual correlated load error"
+  ],
+  "helper_sha256": "0425da7f85c6169fbf37c3076b4a3aa402ecc0792450b6231863f1647c1078df",
+  "Android_executed": false,
+  "native_executed": false,
+  "shutdown_safety_changed": false,
+  "independent_review": "Astra permits explicit visibility limitation only; no worker/drain absence claim"
+}

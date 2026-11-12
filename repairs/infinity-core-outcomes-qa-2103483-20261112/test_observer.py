@@ -10,6 +10,7 @@ from contextlib import contextmanager
 import hashlib
 import importlib.util
 import json
+import marshal
 import os
 from pathlib import Path
 import shutil
@@ -47,6 +48,41 @@ def health(lib):
     result = lib.is_core_service_running()
     return result
 '''
+
+
+def run_capi_file(path, namespace=None, before_body=None):
+    """Use the actual embedding file API; optionally abort at module entry."""
+    namespace = {} if namespace is None else namespace
+    libc = ctypes.CDLL(None)
+    libc.fopen.argtypes, libc.fopen.restype = [ctypes.c_char_p, ctypes.c_char_p], ctypes.c_void_p
+    libc.fclose.argtypes, libc.fclose.restype = [ctypes.c_void_p], ctypes.c_int
+    run = ctypes.pythonapi.PyRun_FileExFlags
+    run.argtypes = [ctypes.c_void_p, ctypes.c_char_p, ctypes.c_int, ctypes.py_object,
+                    ctypes.py_object, ctypes.c_int, ctypes.c_void_p]
+    run.restype = ctypes.py_object
+    stream = libc.fopen(os.fsencode(path), b'rb')
+    if not stream:
+        raise OSError('Cannot open selected C API fixture')
+    previous = sys.gettrace()
+    class BeforeFirstBody(BaseException):
+        pass
+    def sentinel(frame, event, arg):
+        if frame.f_code.co_filename == str(path) and event == 'call':
+            before_body(frame, event, arg)
+            raise BeforeFirstBody()
+        return sentinel
+    try:
+        if before_body is not None:
+            sys.settrace(sentinel)
+        try:
+            run(stream, os.fsencode(path), 257, namespace, namespace, 0, None)
+        except BeforeFirstBody:
+            pass
+    finally:
+        if before_body is not None:
+            sys.settrace(previous)
+        libc.fclose(stream)
+    return namespace
 
 
 class ObserverContract(unittest.TestCase):
@@ -348,6 +384,101 @@ class ObserverContract(unittest.TestCase):
         self.assertEqual(path.read_bytes(), original)
         self.assertEqual(self.events('native_call.before'), [])
         self.assert_diagnostic_only()
+
+    def test_capi_exact_core_entry_matches_all_immutable_fields_before_body(self):
+        path = Path(os.environ.get('INFINITY_COREQA_SERVICE_SOURCE', '/tmp/infinity-core-service-reference.py'))
+        raw = path.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), observer.CORE_SOURCE)
+        reference = compile(raw, str(path), 'exec', dont_inherit=True)
+        # Reproduce the original fingerprint's reference context for proof.
+        def previous_collect(code):
+            return marshal.dumps(code)
+        previous_bytes = previous_collect(reference)
+        observed = []
+        with self.observing(source=path, digest=observer.CORE_SOURCE, actor='core_service') as state:
+            def before_body(frame, event, arg):
+                state.trace(frame, event, arg)
+                observed.append((marshal.dumps(frame.f_code), frame.f_code))
+            namespace = run_capi_file(path, before_body=before_body)
+        self.assertEqual(set(namespace), {'__builtins__'}, 'Actual Core body must never execute')
+        self.assertEqual(len(observed), 1)
+        actual = observed[0][1]
+        fields = ('co_argcount', 'co_posonlyargcount', 'co_kwonlyargcount', 'co_nlocals',
+                  'co_stacksize', 'co_flags', 'co_code', 'co_names', 'co_varnames',
+                  'co_freevars', 'co_cellvars', 'co_filename', 'co_name', 'co_qualname',
+                  'co_firstlineno', 'co_linetable', 'co_exceptiontable', 'co_lnotab')
+        def same_fields(a, b):
+            for name in fields: self.assertEqual(getattr(a, name), getattr(b, name), name)
+            self.assertEqual(len(a.co_consts), len(b.co_consts))
+            for left, right in zip(a.co_consts, b.co_consts):
+                self.assertIs(type(left), type(right))
+                if type(left) is types.CodeType: same_fields(left, right)
+                else: self.assertEqual(left, right)
+        same_fields(reference, actual)
+        self.assertEqual(observer._code_fingerprint(reference), observer._code_fingerprint(actual))
+        self.assertEqual(self.events('coverage.code_mismatch'), [])
+        self.assertEqual(self.events('native_call.before'), [])
+        self.assertEqual(path.read_bytes(), raw)
+        # Marshal equality is intentionally not an acceptance requirement: its
+        # reference flag can depend on which objects the embedding caller owns.
+        # Neither its byte values nor its serialized length is a stable code
+        # identity contract; the full immutable-field comparison above is.
+
+    def test_capi_neutral_fixture_is_observed_and_modified_code_fails_closed(self):
+        native = types.SimpleNamespace(start_core_service=lambda port: 31)
+        with self.observing():
+            namespace = run_capi_file(self.source)
+            self.assertEqual(namespace['start_engine'](native), 31)
+            self.assertEqual(self.events('coverage.code_mismatch'), [])
+            self.assertEqual(self.events('native_call.progressed')[-1]['result'], 31)
+            self.source.write_text(FIXTURE.replace('8191', '8192'))
+            changed = run_capi_file(self.source)
+            before = len(self.events('native_call.progressed'))
+            self.assertEqual(changed['start_engine'](native), 31)
+            self.assertEqual(len(self.events('native_call.progressed')), before)
+            self.assertTrue(self.events('coverage.code_mismatch'))
+
+    def test_immutable_fingerprint_covers_fields_typed_constants_and_sharing(self):
+        module = compile('def sample(x, y=1, *, z=2):\n try:\n  return x+y+z\n except Exception:\n  return None\n',
+                         str(self.source), 'exec', dont_inherit=True)
+        code = next(v for v in module.co_consts if type(v) is types.CodeType)
+        original = observer._code_fingerprint(code)
+        changes = [dict(co_argcount=1), dict(co_posonlyargcount=1), dict(co_kwonlyargcount=0),
+                   dict(co_varnames=code.co_varnames + ('extra',), co_nlocals=code.co_nlocals + 1),
+                   dict(co_stacksize=code.co_stacksize + 1), dict(co_flags=code.co_flags ^ 0x10),
+                   dict(co_code=code.co_code + b'\x09\x00'), dict(co_consts=code.co_consts + ('extra',)),
+                   dict(co_names=code.co_names + ('extra',)),
+                   dict(co_varnames=('renamed',) + code.co_varnames[1:]),
+                   dict(co_freevars=('captured',)), dict(co_cellvars=('cell',)),
+                   dict(co_filename=str(self.source) + '.other'), dict(co_name='other'),
+                   dict(co_qualname='foreign.sample'), dict(co_firstlineno=code.co_firstlineno + 1),
+                   dict(co_linetable=b''), dict(co_exceptiontable=b'')]
+        for change in changes:
+            with self.subTest(fields=tuple(change)):
+                self.assertNotEqual(observer._code_fingerprint(code.replace(**change)), original)
+        for left, right in [(True, 1), (0.0, -0.0), (complex(0.0, 0.0), complex(-0.0, 0.0))]:
+            self.assertNotEqual(observer._code_fingerprint(code.replace(co_consts=(left,))),
+                                observer._code_fingerprint(code.replace(co_consts=(right,))))
+        shared = tuple(['not-interned-' + str(os.getpid()), 1])
+        separate = tuple(list(shared))
+        self.assertIsNot(shared, separate)
+        a = code.replace(co_consts=(shared, shared, frozenset(('a', 7)), Ellipsis, b'bytes', 10**200))
+        b = code.replace(co_consts=(shared, separate, frozenset((7, 'a')), Ellipsis, b'bytes', 10**200))
+        self.assertEqual(observer._code_fingerprint(a), observer._code_fingerprint(b))
+        with self.assertRaises(TypeError): observer._code_fingerprint(code.replace(co_consts=(object(),)))
+
+    def test_verification_cache_does_not_reuse_equal_code_with_changed_qualname(self):
+        namespace = self.fixture_functions()
+        function = namespace['start_engine']
+        changed = types.FunctionType(function.__code__.replace(co_qualname='foreign.start_engine'), namespace)
+        self.assertEqual(function.__code__, changed.__code__, 'Exercise CodeType equality cache hazard')
+        native = types.SimpleNamespace(start_core_service=lambda port: 71)
+        with self.observing():
+            self.assertEqual(function(native), 71)
+            count = len(self.events('native_call.progressed'))
+            self.assertEqual(changed(native), 71)
+            self.assertEqual(len(self.events('native_call.progressed')), count)
+            self.assertTrue(self.events('coverage.code_mismatch'))
 
 
 if __name__ == '__main__':

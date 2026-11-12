@@ -1,7 +1,7 @@
 {
   "schema": 1,
-  "enabled": true,
-  "application_tests": true,
+  "enabled": false,
+  "application_tests": false,
   "feature": "core-outcomes-native-qa",
   "branch": "work/infinity-core-outcomes-qa-20261112",
   "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
@@ -91,5 +91,5 @@
     "Owner data/device",
     "APK installation acceptance"
   ],
-  "blocker": null
+  "blocker": "Actual Android run43154927627 coverage.code_mismatch; await corrected full-field code verification, new ARM64 and Android evidence"
 }

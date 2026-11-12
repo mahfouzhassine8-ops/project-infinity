@@ -279,6 +279,8 @@ def events(path, pid):
 
 def reject_success(rows):
     require(not any(r['data'].get('event') == 'core.load.returned' or
+            (r['data'].get('event') == 'core.maps' and
+             (r['data'].get('map_entries', 0) > 0 or r['data'].get('executable_mapping') is True)) or
             (r['data'].get('event', '').startswith('native_call.') and
              r['data'].get('symbol') == 'start_core_service') for r in rows),
             'UNEXPECTED_CORE_SUCCESS_OR_REAL_NATIVE_START_ABORT_REMAINING_DIAGNOSTIC')
@@ -321,11 +323,22 @@ def outcome(rows):
                                  r.get('moment') == 'load_error'), None)
                     if maps is None:
                         continue
-                    require(maps.get('complete') is True and maps.get('map_entries') == 0 and
-                            maps.get('executable_mapping') is False, 'OWN_PROCESS_CORE_MAPS_MUST_BE_COMPLETE_AND_EMPTY')
+                    require(type(maps.get('complete')) is bool and maps.get('map_entries') == 0 and
+                            maps.get('executable_mapping') is False and maps.get('chunk_limit') == 4096 and
+                            type(maps.get('buffer_chunks_scanned')) is int and
+                            0 <= maps['buffer_chunks_scanned'] <= 4096 and
+                            all(type(maps.get(key)) is bool for key in
+                                ('limit_reached', 'line_truncated', 'open_succeeded', 'read_failed')),
+                            'BOUNDED_EXPLICIT_OWN_PROCESS_MAP_OBSERVATION_REQUIRED')
+                    unavailable = (not maps['open_succeeded'] or maps['limit_reached'] or
+                                   maps['line_truncated'] or maps['read_failed'])
+                    require(maps['complete'] is not unavailable, 'INCONSISTENT_MAP_VISIBILITY')
                     return dict(status='PASS_OBSERVED_ORIGINAL_CORE_NAMESPACE_FAILURE_NOT_CORE_SUCCESS',
                                 invoker=invoker, coverage=first, operations=paired,
-                                load_begin=begin, load_error=failed, own_process_maps=maps)
+                                load_begin=begin, load_error=failed, own_process_maps=maps,
+                                own_process_maps_visibility=('COMPLETE_BOUNDED_SNAPSHOT_NOT_WORKER_PROOF'
+                                    if maps['complete'] else 'NOT_VERIFIED_INCOMPLETE_SNAPSHOT'),
+                                native_worker_absence='NOT_ESTABLISHED', native_drain='UNVERIFIED')
     return None
 
 

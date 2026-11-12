@@ -46,7 +46,7 @@ jobs:
           assert sys.version_info[:3]==(3,11,7)
           suite=unittest.defaultTestLoader.discover('repairs/infinity-core-outcomes-qa-2103483-20261112',pattern='test_observer.py')
           result=unittest.TextTestRunner(verbosity=2).run(suite)
-          proof=dict(status='PASS_SELECTED_PYTHON_OUTCOME_HOST' if result.wasSuccessful() and result.testsRun==14 and not result.skipped else 'FAIL_SELECTED_HOST',testsRun=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),Python=list(sys.version_info[:3]),Core_executed=False,Android=False)
+          proof=dict(status='PASS_SELECTED_PYTHON_OUTCOME_HOST' if result.wasSuccessful() and result.testsRun==18 and not result.skipped else 'FAIL_SELECTED_HOST',testsRun=result.testsRun,failures=len(result.failures),errors=len(result.errors),skipped=len(result.skipped),Python=list(sys.version_info[:3]),Core_executed=False,Android=False)
           Path('HOST-CORE-OUTCOMES.json').write_text(json.dumps(proof,indent=2)+'\n')
           assert proof['status']=='PASS_SELECTED_PYTHON_OUTCOME_HOST'
           PY

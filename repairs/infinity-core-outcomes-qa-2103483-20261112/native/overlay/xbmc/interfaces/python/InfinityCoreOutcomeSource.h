@@ -3,7 +3,7 @@ inline constexpr const char* INFINITY_CORE_OUTCOME_SOURCE=R"coreoutcome("""Core-
 import ast
 import hashlib
 import json
-import marshal
+import struct
 import os
 import shutil
 import stat
@@ -16,6 +16,51 @@ import _ctypes
 
 CORE_SOURCE = '2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3'
 CORE_LIBRARY = 'libadulthideout_core.so'
+
+
+def _code_fingerprint(code):
+    """Hash immutable code values, independent of marshal's reference flags."""
+    def framed(raw):
+        return struct.pack('>Q', len(raw)) + raw
+
+    def encode(value):
+        kind = type(value)
+        if kind is types.CodeType:
+            fields = ('co_argcount', 'co_posonlyargcount', 'co_kwonlyargcount',
+                      'co_nlocals', 'co_stacksize', 'co_flags', 'co_code', 'co_consts',
+                      'co_names', 'co_varnames', 'co_freevars', 'co_cellvars',
+                      'co_filename', 'co_name', 'co_qualname', 'co_firstlineno',
+                      'co_linetable', 'co_exceptiontable', 'co_lnotab')
+            return b'C' + encode(tuple((name, getattr(value, name)) for name in fields))
+        if value is None:
+            return b'N'
+        if value is Ellipsis:
+            return b'E'
+        if kind is bool:
+            return b'B' + bytes((value,))
+        if kind is int:
+            magnitude = abs(value)
+            return b'I' + bytes((value < 0,)) + framed(
+                magnitude.to_bytes((magnitude.bit_length() + 7) // 8, 'big'))
+        if kind is float:
+            return b'R' + struct.pack('>d', value)
+        if kind is complex:
+            return b'J' + struct.pack('>dd', value.real, value.imag)
+        if kind is str:
+            return b'S' + framed(value.encode('utf-8', errors='surrogatepass'))
+        if kind is bytes:
+            return b'Y' + framed(value)
+        if kind in (tuple, frozenset):
+            children = [encode(child) for child in value]
+            if kind is frozenset:
+                children.sort()
+            return (b'T' if kind is tuple else b'F') + struct.pack('>Q', len(children)) + b''.join(
+                framed(child) for child in children)
+        raise TypeError('Unsupported immutable code constant type')
+
+    if type(code) is not types.CodeType:
+        raise TypeError('Expected an immutable code object')
+    return hashlib.sha256(encode(code)).digest()
 
 
 class State:
@@ -52,7 +97,7 @@ class State:
             return
         compiled = compile(raw, source_path, 'exec', dont_inherit=True)
         def collect(code):
-            self.codes.add(hashlib.sha256(marshal.dumps(code)).digest())
+            self.codes.add(_code_fingerprint(code))
             for child in code.co_consts:
                 if type(child) is types.CodeType:
                     collect(child)
@@ -250,9 +295,12 @@ class State:
         try:
             if frame.f_code.co_filename != self.source:
                 return None
-            if frame.f_code not in self.checked_codes:
-                self.checked_codes[frame.f_code] = hashlib.sha256(marshal.dumps(frame.f_code)).digest() in self.codes
-            if not self.checked_codes[frame.f_code]:
+            identity = id(frame.f_code)
+            checked = self.checked_codes.get(identity)
+            if checked is None or checked[0] is not frame.f_code:
+                checked = (frame.f_code, _code_fingerprint(frame.f_code) in self.codes)
+                self.checked_codes[identity] = checked
+            if not checked[1]:
                 self.record('coverage.code_mismatch')
                 return None
             key = id(frame)

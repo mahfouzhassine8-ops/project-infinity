@@ -1,0 +1,26 @@
+{
+  "status": "PROVED_MARSHAL_REFERENCE_FLAG_MISMATCH_LOCAL_ONLY",
+  "python": "3.12.14",
+  "source_sha256": "2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3",
+  "api": "PyRun_FileExFlags(FILE,path,257,globals,globals,0,NULL)",
+  "abort": "trace call event before exact Core module first statement",
+  "namespace_keys_after": [
+    "__builtins__"
+  ],
+  "core_body_executed": false,
+  "immutable_code_field_differences": [],
+  "marshal_lengths": [
+    33397,
+    33397
+  ],
+  "first_difference_offset": 546,
+  "expected_tag": "0x7a TYPE_SHORT_ASCII",
+  "live_frame_tag": "0xfa TYPE_SHORT_ASCII|FLAG_REF",
+  "same_values_after_retaining_code_objects": true,
+  "canonical_fingerprint_CAPI_match": "PASS",
+  "modifiedcode_failclosed": "PASS",
+  "qualname_cache_alias_failclosed": "PASS",
+  "existing14": "PASS local3.12.14",
+  "new4": "PASS local3.12.14",
+  "pinned3_11_7": "PENDING_CI"
+}

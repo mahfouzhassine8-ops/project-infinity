@@ -56,24 +56,37 @@ inline void Log(int id,const char* json) noexcept {
 inline void Maps(int id,const char* moment) noexcept {
   const int saved=errno;
   if(!Active() || records.load(std::memory_order_relaxed)>=8192){errno=saved;return;}
+  errno=0;
   FILE* stream=std::fopen("/proc/self/maps","r");
-  unsigned count=0,rows=0;bool executable=false,complete=stream!=nullptr;
+  const int openError=stream?0:errno;
+  const bool opened=stream!=nullptr;
+  unsigned count=0,chunks=0;int readError=0;
+  bool executable=false,complete=stream!=nullptr,truncated=false,capped=false,readFailed=false;
   char text[4096]{};
   if(stream) {
-    while(std::fgets(text,sizeof(text),stream)) {
-      if(++rows>4096){complete=false;break;}
-      if(!std::strchr(text,'\n'))complete=false;
+    // Count bounded fgets buffer records, not presumed physical map lines.
+    // One additional read detects cap exhaustion; its contents are discarded.
+    while(true) {
+      errno=0;
+      if(!std::fgets(text,sizeof(text),stream)) {
+        const int observed=errno;
+        if(std::ferror(stream)){readFailed=true;readError=observed;complete=false;}
+        break;
+      }
+      if(chunks>=4096){capped=true;complete=false;break;}
+      ++chunks;
+      if(!std::strchr(text,'\n')){truncated=true;complete=false;}
       if(std::strstr(text,"libadulthideout_core.so")) {
         ++count;char permissions[5]{};
         if(std::sscanf(text,"%*s %4s",permissions)==1 && permissions[2]=='x')executable=true;
       }
     }
-    if(std::ferror(stream))complete=false;
     std::fclose(stream);
   }
-  char json[360]{};
-  std::snprintf(json,sizeof(json),"{\"v\":1,\"event\":\"core.maps\",\"moment\":\"%s\",\"map_entries\":%u,\"executable_mapping\":%s,\"complete\":%s,\"completion_proof\":false}",
-                moment,count,executable?"true":"false",complete?"true":"false");
+  char json[700]{};
+  std::snprintf(json,sizeof(json),"{\"v\":1,\"event\":\"core.maps\",\"moment\":\"%s\",\"map_entries\":%u,\"executable_mapping\":%s,\"complete\":%s,\"buffer_chunks_scanned\":%u,\"chunk_limit\":4096,\"limit_reached\":%s,\"line_truncated\":%s,\"open_succeeded\":%s,\"open_errno\":%d,\"read_failed\":%s,\"read_errno\":%d,\"completion_proof\":false}",
+                moment,count,executable?"true":"false",complete?"true":"false",chunks,
+                capped?"true":"false",truncated?"true":"false",opened?"true":"false",openError,readFailed?"true":"false",readError);
   Log(id,json);errno=saved;
 }
 inline int SelfId(PyObject* self) noexcept {
