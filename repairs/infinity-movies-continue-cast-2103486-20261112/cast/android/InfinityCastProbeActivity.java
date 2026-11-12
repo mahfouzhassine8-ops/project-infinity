@@ -9,6 +9,10 @@ import org.json.JSONObject;
 
 /** CI-only separate-package probe. Never included in the combined installer. */
 public final class InfinityCastProbeActivity extends Activity implements InfinityCastSession.View {
+    private static final java.util.concurrent.atomic.AtomicBoolean admitted=new java.util.concurrent.atomic.AtomicBoolean();
+    private static final java.util.concurrent.atomic.AtomicInteger recreations=new java.util.concurrent.atomic.AtomicInteger();
+    private static volatile int baselineResource;
+    private static volatile boolean recreatedResourceMismatch;
     private final Handler ui=new Handler(Looper.getMainLooper());
     private long deadline;
     private int pulses;
@@ -22,7 +26,17 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
     private int cleanupCycles;
     @Override public void onCreate(Bundle saved) {
         super.onCreate(saved);
+        // ResourcesLoader/SDK installation can recreate this disposable Activity.
+        // Its first process-owned probe keeps running on the same main Looper;
+        // starting another transport probe would race the intentional one-relay
+        // ownership guard. Do not re-run the pre-install assertion after install.
+        if(!admitted.compareAndSet(false,true)) {
+            recreations.incrementAndGet();
+            if(getResources().getIdentifier("tag_accessibility_pane_title","id","com.projectinfinity.kodi")!=baselineResource)recreatedResourceMismatch=true;
+            return;
+        }
         oldResource=getResources().getIdentifier("tag_accessibility_pane_title","id","com.projectinfinity.kodi");
+        baselineResource=oldResource;
         if(oldResource==0){result(false,"baseline_resource_missing");return;}
         if(getResources().getIdentifier("cast_device_chooser_title","string","com.projectinfinity.cast.resources")!=0){
             result(false,"Cast_resource_loaded_before_request");return;}
@@ -57,6 +71,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
     }
     private void pulse() {
         if(finished)return;pulses++;
+        if(recreatedResourceMismatch){result(false,"recreated_Activity_original_resource_changed");return;}
         try {
             java.lang.reflect.Field field=InfinityCastSession.class.getDeclaredField("initialized");field.setAccessible(true);
             if(field.getBoolean(cast)) {
@@ -111,6 +126,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
             boolean idleCallbacksReleased=cast==null || (!(Boolean)field("listening") && !(Boolean)field("discovering"));
             if(passed && !idleCallbacksReleased){passed=false;reason="idle_Cast_callbacks_not_released";}
             JSONObject value=new JSONObject().put("schema",1).put("pass",passed).put("reason",reason).put("idle_callback_released",idleCallbacksReleased)
+                .put("activity_recreations",recreations.get()).put("one_transport_probe_per_process",true)
                 .put("main_thread_pulses",pulses).put("API",android.os.Build.VERSION.SDK_INT)
                 .put("original_resource_id",oldResource).put("Activity_original_after",activityResourceAfter)
                 .put("Application_original_after",applicationResourceAfter).put("Application_Cast_id",applicationCastResource)
