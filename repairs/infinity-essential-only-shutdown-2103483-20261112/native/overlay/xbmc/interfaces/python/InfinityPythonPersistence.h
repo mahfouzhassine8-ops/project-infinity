@@ -21,7 +21,7 @@ namespace InfinityPythonPersistence
 {
 struct IoContract { PyObject* type{nullptr}; PyObject* methods[4]{}; };
 struct CleanIoReceipt { PyObject* weak{nullptr}; int fd{-1}; dev_t device{}; ino_t inode{}; mode_t mode{}; int flags{-1}; };
-struct NativeLoadAttempt { bool unclassified{false}; std::string target; };
+struct NativeLoadAttempt { bool unclassified{false}, ambiguous{false}; std::string target; };
 struct Context
 {
   int id{-1};
@@ -813,8 +813,9 @@ inline int Audit(const char* event,PyObject* args,void*)
       if(std::strcmp(event,"ctypes.dlopen")==0 && loads!=context->nativeLoads.end() && !loads->second.empty()) {
         // The trusted delegate, not Python-supplied success data, resolves
         // this admission against the original native loader's actual result.
-        loads->second.back()->unclassified=true;
-        loads->second.back()->target=count?Path(at(0)):std::string{};
+        auto& attempt=*loads->second.back();
+        if(attempt.unclassified)attempt.ambiguous=true;
+        else {attempt.unclassified=true;attempt.target=count?Path(at(0)):std::string{};}
       } else
         InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
                                         NativeLookupEvidence(event,args));
@@ -879,6 +880,15 @@ inline PyObject* CheckedDlopen(PyObject* self,PyObject* args,PyObject* kwargs)
     Py_DECREF(lookup);
     if(readonly)return PyObject_Call(context->originalDlopen,args,kwargs);
   }
+  // Argument conversion for a user-defined mode/name can itself execute
+  // another cached native loader or raise a fabricated loader-like error.
+  // Preserve the ORIGINAL strict audit path for all such calls. Only exact
+  // primitive arguments can enter terminal-outcome accounting.
+  const auto argc=PyTuple_GET_SIZE(args);
+  const bool ordinary=(argc==1 || argc==2) && (!kwargs || PyDict_Size(kwargs)==0) &&
+      (PyUnicode_CheckExact(PyTuple_GET_ITEM(args,0)) || PyBytes_CheckExact(PyTuple_GET_ITEM(args,0))) &&
+      (argc==1 || PyLong_CheckExact(PyTuple_GET_ITEM(args,1)));
+  if(!ordinary)return PyObject_Call(context->originalDlopen,args,kwargs);
   // A loader attempt is a coordination obligation, not evidence that every
   // previously removed filesystem name was recreated. Actual I/O retains its
   // own leases; an unverified successful image retains the opaque blocker.
@@ -894,7 +904,7 @@ inline PyObject* CheckedDlopen(PyObject* self,PyObject* args,PyObject* kwargs)
   context->nativeLoads[thread].pop_back();
   if(context->nativeLoads[thread].empty())context->nativeLoads.erase(thread);
   InfinityScriptPersistence::EndProtectedOperation(token);
-  if(attempt.unclassified && (result || !LoadRejectedBeforeExecution(attempt.target,error)))
+  if(attempt.unclassified && (result || attempt.ambiguous || !LoadRejectedBeforeExecution(attempt.target,error)))
     InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
         result?"event=ctypes.dlopen;outcome=loaded;native_drain=unverified":
                "event=ctypes.dlopen;outcome=error;native_execution_not_excluded");
