@@ -1,0 +1,20 @@
+{
+  "baseline": "2103483",
+  "installed_diagnostic": "2103484",
+  "purpose": "Functional Essential-only shutdown repair",
+  "Core_path_changed": false,
+  "Cobra_changes": false,
+  "production_changes": [
+    "Native CPython metadata operation leases and terminal native-load accounting only"
+  ],
+  "selected_checks": [
+    "Native host: actual copy2 metadata successes/errors and leases",
+    "Native host: optional failed loader attempt versus loaded unverified capability",
+    "Native host: active essential/unknown writes, aliases and sealed admission remain blocking",
+    "Full ARM64 compilation/link and baseline ABI",
+    "Independent Android same-profile normal shutdown, process death and relaunch with retained sentinels",
+    "Original signer, exact83 APK payload preservation and install-over compatibility"
+  ],
+  "unselected_tests": "NOT_RUN",
+  "authorization": "Owner Essential-only repair directive; shutdown scenario explicitly selected"
+}

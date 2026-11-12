@@ -1,0 +1,1193 @@
+#pragma once
+// Python.h is included by the invoker before this header.
+#include "InfinityPythonPersistenceSource.h"
+#include "InfinityReadonlyPlatformCommand.h"
+#include "platform/android/activity/InfinityScriptPersistence.h"
+#include "platform/android/activity/InfinityProtectedWrites.h"
+#include "dbwrappers/InfinitySQLiteVFS.h"
+#if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
+#include "filesystem/SpecialProtocol.h"
+#endif
+#include <cstdlib>
+#include <cstring>
+#include <frameobject.h>
+#include <map>
+#include <mutex>
+#include <string>
+#include <sys/statvfs.h>
+
+namespace InfinityPythonWriteHooks { inline PyObject* ActualDescriptor(PyObject* object,unsigned depth); inline bool VerifiedCleanIo(PyObject* object); }
+namespace InfinityPythonPersistence
+{
+struct IoContract { PyObject* type{nullptr}; PyObject* methods[4]{}; };
+struct CleanIoReceipt { PyObject* weak{nullptr}; int fd{-1}; dev_t device{}; ino_t inode{}; mode_t mode{}; int flags{-1}; };
+struct Context
+{
+  int id{-1};
+  PyObject* globals{nullptr};
+  PyObject* observer{nullptr};
+  PyObject* connectionType{nullptr};
+  PyObject* rawType{nullptr};
+  PyObject* rawWrite{nullptr};
+  PyObject* vfsType{nullptr};
+  PyObject* vfsWrite{nullptr};
+  PyObject* admissionError{nullptr};
+  std::vector<IoContract> ioContracts;
+  std::map<PyObject*,CleanIoReceipt> cleanIo;
+  std::string initializationStage;
+  uint64_t interpreterIdentity{0};
+  bool retiring{false};
+  bool finalized{false};
+  bool preservePending{false};
+  bool waitingWorkers{false};
+  std::map<PyThreadState*,unsigned> checkedOpens;
+  std::map<PyThreadState*,unsigned> readonlyChildren;
+  std::map<PyThreadState*,std::string> sqliteTargets;
+  std::map<uint64_t, int> protectedOperations;
+  std::map<PyThreadState*, unsigned> nativeProtectionDepth;
+  std::map<PyThreadState*, unsigned> nativeExtensionDepth;
+};
+inline std::map<PyInterpreterState*,Context*>& Contexts()
+{static auto* contexts=new std::map<PyInterpreterState*,Context*>;return *contexts;}
+inline void InitializationStage(Context* context,const char* stage)
+{
+  context->initializationStage=stage;
+  InfinityScriptPersistence::InitializationProgress(context->id,stage,context->interpreterIdentity);
+}
+inline void ReportInitializationStage(Context* context,const char* stage) noexcept
+{
+  // Auxiliary progress must not change Python errors, errno, write ownership,
+  // observer admission or the outcome of the operation being diagnosed.
+  const int nativeError=errno;
+  try { InitializationStage(context,stage); } catch(...) { /* Diagnostic only. */ }
+  errno=nativeError;
+}
+inline PyObject* ReportPythonInitializationStage(PyObject* capsule,PyObject* value)
+{
+  const int nativeError=errno;
+  if(PyCapsule_IsValid(capsule,"Infinity.Persistence.Observer") &&
+      PyUnicode_CheckExact(value) && PyUnicode_IS_COMPACT_ASCII(value))
+  {
+    auto* context=static_cast<Context*>(PyCapsule_GetPointer(capsule,"Infinity.Persistence.Observer"));
+    auto* thread=PyThreadState_Get();
+    const auto found=Contexts().find(thread->interp);
+    const auto length=PyUnicode_GET_LENGTH(value);
+    const char* stage=reinterpret_cast<const char*>(PyUnicode_1BYTE_DATA(value));
+    bool valid=length>7 && length<128 && std::strncmp(stage,"python.",7)==0;
+    for(Py_ssize_t i=0;valid && i<length;++i)
+      valid=(stage[i]>='a' && stage[i]<='z') || (stage[i]>='A' && stage[i]<='Z') ||
+          (stage[i]>='0' && stage[i]<='9') || stage[i]=='.' || stage[i]=='_';
+    if(valid && found!=Contexts().end() && found->second==context)
+      ReportInitializationStage(context,stage);
+  }
+  errno=nativeError;
+  Py_RETURN_NONE;
+}
+inline void InitializationFailed(int id,const std::string& reason,const std::string& stage,
+                                 PyObject* globals=nullptr)
+{
+  // Capture the FIRST error before another import or attribute lookup can
+  // replace it. No Python modules are imported to format this receipt, and the
+  // original exception (including its traceback) remains pending for Kodi.
+  const int nativeError=errno;
+  InfinityScriptPersistence::InitializationProgress(id,("failed:"+stage).c_str());
+  PyObject *type=nullptr,*value=nullptr,*trace=nullptr;
+  PyErr_Fetch(&type,&value,&trace);
+  auto* thread=PyThreadState_Get();
+  const auto interpreterId=thread?PyInterpreterState_GetID(thread->interp):-1;
+  PyErr_Clear(); // Preserve the original error even if identity inspection fails.
+  std::string detail="stage="+stage+"; invoker_id="+std::to_string(id)+
+      "; interpreter_id="+std::to_string(interpreterId);
+  const auto appendText=[&](PyObject* text,std::size_t limit=768) {
+    if(text && PyUnicode_Check(text)) {
+      const char* bytes=PyUnicode_AsUTF8(text);
+      if(bytes)detail.append(bytes, std::min<std::size_t>(std::strlen(bytes),limit));
+    }
+    PyErr_Clear();
+  };
+  if(globals) {
+    auto* step=PyDict_GetItemString(globals,"_INFINITY_INITIALIZATION_STAGE");
+    if(step && PyUnicode_Check(step)) { detail+="; python_stage=";appendText(step); }
+  }
+  detail+="; exception=";
+  detail+=type && PyType_Check(type) ? reinterpret_cast<PyTypeObject*>(type)->tp_name : "<none>";
+  if(value) {
+    detail+="; message=";
+    auto* message=PyObject_Str(value);
+    if(message)appendText(message);else {detail+="<unprintable>";PyErr_Clear();}
+    Py_XDECREF(message);
+  }
+  detail+="; native_errno="+std::to_string(nativeError);
+  std::vector<PyTracebackObject*> frames;
+  for(auto* frame=reinterpret_cast<PyTracebackObject*>(trace);frame;frame=frame->tb_next) {
+    if(frames.size()==8)frames.erase(frames.begin());
+    frames.push_back(frame);
+  }
+  // Put the originating frame first, so a long import chain cannot truncate
+  // the actual failing file out of the bounded ledger detail.
+  for(auto item=frames.rbegin();item!=frames.rend() && detail.size()<1700;++item) {
+    auto* frame=*item;
+    auto* code=PyFrame_GetCode(frame->tb_frame);
+    if(code) {
+      detail+="; at=";appendText(code->co_filename,320);
+      const int line=frame->tb_lineno>=0?frame->tb_lineno:PyCode_Addr2Line(code,frame->tb_lasti);
+      detail+=":"+std::to_string(line)+":";appendText(code->co_name,128);
+      Py_DECREF(code);
+    }
+  }
+  InfinityScriptPersistence::Fail(id,reason,detail);
+  PyErr_Clear();
+  PyErr_Restore(type,value,trace);
+  errno=nativeError;
+}
+inline void AdmissionDenied(Context* context,const char* message)
+{ PyErr_SetString(context && context->admissionError ? context->admissionError : PyExc_PermissionError,message); }
+inline std::string Path(PyObject* value)
+{
+  if(PyLong_Check(value)) {
+    const long fd=PyLong_AsLong(value);if(fd<0 || PyErr_Occurred()){PyErr_Clear();return {};}
+    char target[PATH_MAX];const auto name="/proc/self/fd/"+std::to_string(fd);
+    const auto size=::readlink(name.c_str(),target,sizeof(target)-1);
+    if(size<=0)return {};
+    target[size]='\0';
+    struct stat info{};
+    if(::fstat(static_cast<int>(fd),&info)==0 && S_ISREG(info.st_mode) && info.st_nlink==0)
+      return {}; // Anonymous temporary files/memfd have no persistent namespace.
+    // Sockets/pipes/stdout carry no persistent file contents.
+    if(target[0]!='/')return {};
+    return InfinityScriptPersistence::VerifiedDescriptorLink(static_cast<int>(fd),target);
+  }
+  PyObject* filesystem=PyOS_FSPath(value);if(!filesystem){PyErr_Clear();return {};}
+  PyObject* bytes=PyUnicode_Check(filesystem)?PyUnicode_EncodeFSDefault(filesystem):filesystem;
+  if(bytes!=filesystem)Py_DECREF(filesystem);
+  if(!bytes){PyErr_Clear();return {};}
+  std::string result;
+  if(PyBytes_Check(bytes))result.assign(PyBytes_AS_STRING(bytes),static_cast<std::size_t>(PyBytes_GET_SIZE(bytes)));
+  Py_DECREF(bytes);
+#if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  result=CSpecialProtocol::TranslatePath(result);
+#endif
+  return result;
+}
+
+inline std::string PathAt(PyObject* value,PyObject* dirFdObject)
+{
+  const auto path=Path(value);
+  if(path.empty() || path.front()=='/' || !dirFdObject || dirFdObject==Py_None)return path;
+  if(!PyLong_Check(dirFdObject))return {};
+  const long fd=PyLong_AsLong(dirFdObject);
+  if(PyErr_Occurred()){PyErr_Clear();return {};}
+  if(fd==-1)return path;
+  if(fd<0)return {};
+  struct stat info{};
+  if(::fstat(static_cast<int>(fd),&info)!=0 || !S_ISDIR(info.st_mode))return {};
+  const auto root=Path(dirFdObject);
+  if(root.empty() || root.front()!='/')return {};
+  return root+(root.back()=='/'?"":"/")+path;
+}
+
+inline bool PrivateInfinityCachePrefix(const std::string& path)
+{
+  static constexpr char package[]="com.projectinfinity.kodi";
+  if(path.empty() || path[0]!='/' || path.find("//")!=std::string::npos ||
+     path.find("/../")!=std::string::npos || path.find("/./")!=std::string::npos ||
+     (path.size()>=3 && path.compare(path.size()-3,3,"/..")==0) ||
+     (path.size()>=2 && path.compare(path.size()-2,2,"/.")==0))
+    return false;
+  const std::string direct="/data/data/"+std::string(package)+"/cache/";
+  if(path.rfind(direct,0)==0)return true;
+  static constexpr char userRoot[]="/data/user/";
+  if(path.rfind(userRoot,0)!=0)return false;
+  std::size_t position=std::strlen(userRoot),first=position;
+  while(position<path.size() && path[position]>='0' && path[position]<='9')++position;
+  if(position==first || position>=path.size() || path[position]!='/')return false;
+  const std::string suffix="/"+std::string(package)+"/cache/";
+  return path.compare(position,suffix.size(),suffix)==0;
+}
+inline bool ApprovedNonPersistentPythonBytecodeCachePath(const std::string& filename,bool directory=false)
+{
+  if(!PrivateInfinityCachePrefix(filename))return false;
+#if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  const auto slash=filename.rfind('/');
+  if(slash==std::string::npos || slash==0)return false;
+  char resolved[PATH_MAX]{};
+  const std::string parent=filename.substr(0,slash);
+  if(!::realpath(parent.c_str(),resolved))return false;
+  std::string canonical(resolved);canonical.push_back('/');
+  if(!PrivateInfinityCachePrefix(canonical))return false;
+#endif
+  static constexpr char marker[]="/__pycache__";
+  const auto cache=filename.find(marker);
+  if(cache==std::string::npos)return false;
+  const auto after=cache+std::strlen(marker);
+  if(directory)return after==filename.size();
+  if(after>=filename.size() || filename[after]!='/')return false;
+  const std::string leaf=filename.substr(after+1);
+  if(leaf.empty() || leaf.find('/')!=std::string::npos)return false;
+  const auto pyc=leaf.rfind(".pyc");
+  if(pyc==std::string::npos || pyc==0)return false;
+  const auto suffix=pyc+4;
+  if(suffix==leaf.size())return true;
+  if(leaf[suffix]!='.' || suffix+1>=leaf.size())return false;
+  for(std::size_t i=suffix+1;i<leaf.size();++i)
+    if(leaf[i]<'0' || leaf[i]>'9')return false;
+  return true;
+}
+inline void Touch(Context* context,PyObject* path,bool present=true,bool directory=false)
+{
+  if(context->retiring){InfinityScriptPersistence::Fail(context->id,"write_during_interpreter_retirement");return;}
+  const auto value=Path(path);
+  // A null device consumes bytes and has no durable contents or namespace
+  // mutation. Confirm the actual descriptor/device, never a filename alone.
+  struct stat nullInfo{}, targetInfo{};
+  if(value=="/dev/null" && ::lstat("/dev/null",&nullInfo)==0 && S_ISCHR(nullInfo.st_mode)) {
+    bool same=false;
+    if(PyLong_Check(path)) {
+      const long fd=PyLong_AsLong(path);
+      same=fd>=0 && ::fstat(static_cast<int>(fd),&targetInfo)==0 &&
+           S_ISCHR(targetInfo.st_mode) && targetInfo.st_rdev==nullInfo.st_rdev &&
+           targetInfo.st_dev==nullInfo.st_dev && targetInfo.st_ino==nullInfo.st_ino;
+    }
+    if(same)return;
+  }
+  if(ApprovedNonPersistentPythonBytecodeCachePath(value,directory))return;
+  if(value.empty() && PyLong_Check(path)) {
+    struct stat info{};const long fd=PyLong_AsLong(path);
+    if(fd<0 || PyErr_Occurred() || ::fstat(static_cast<int>(fd),&info)!=0 ||
+       (S_ISREG(info.st_mode) && info.st_nlink!=0)) {
+      PyErr_Clear();InfinityScriptPersistence::Fail(context->id,"persistent_descriptor_identity_unconfirmed");
+    }
+    return;
+  }
+  InfinityScriptPersistence::Touch(context->id,value,present,directory);
+}
+inline void TouchResolved(Context* context,const std::string& value,bool present=true,bool directory=false)
+{
+  if(context->retiring){InfinityScriptPersistence::Fail(context->id,"write_during_interpreter_retirement");return;}
+  if(ApprovedNonPersistentPythonBytecodeCachePath(value,directory))return;
+  InfinityScriptPersistence::Touch(context->id,value,present,directory);
+}
+inline bool MissingImmutableExecutablePath(const std::string& path)
+{
+  if (path.empty() || path.find('\0') != std::string::npos || path.find("/../") != std::string::npos ||
+      path.find("/./") != std::string::npos || path.find("//") != std::string::npos) return false;
+  bool systemPath = false;
+  for (const auto* root : {"/system/", "/system_ext/", "/apex/", "/vendor/", "/odm/", "/product/"})
+    if (path.rfind(root,0) == 0) systemPath = true;
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  // Real read-only/noexec kernel filesystem for the absent-executable test.
+  if (path.rfind("/sys/",0) == 0) systemPath = true;
+#endif
+  if (!systemPath) return false;
+  struct stat st{};
+  if (::lstat(path.c_str(),&st) == 0 || errno != ENOENT) return false;
+  auto parent = path.substr(0,path.rfind('/'));
+  while (!parent.empty())
+  {
+    if (::stat(parent.c_str(),&st) == 0)
+    {
+      struct statvfs fs{};
+      return S_ISDIR(st.st_mode) && ::statvfs(parent.c_str(),&fs) == 0 && (fs.f_flag & ST_RDONLY);
+    }
+    if (errno != ENOENT) return false;
+    parent.resize(parent.rfind('/'));
+  }
+  return false;
+}
+inline bool MissingImmutableExecutable(const std::string& executable)
+{
+  if (executable.empty() || executable.find('\0') != std::string::npos) return false;
+  if (executable.front() == '/') return MissingImmutableExecutablePath(executable);
+  if (executable.find('/') != std::string::npos || executable == "." || executable == "..") return false;
+  const char* environment = std::getenv("PATH");
+  if (!environment || !*environment) return false;
+  std::string paths(environment); size_t start = 0;
+  while (true)
+  {
+    const auto end = paths.find(':',start);
+    const auto directory = paths.substr(start,end == std::string::npos ? end : end-start);
+    if (!MissingImmutableExecutablePath(directory+"/"+executable)) return false;
+    if (end == std::string::npos) return true;
+    start = end+1;
+  }
+}
+inline bool ReadonlyCommand(PyObject* executable,PyObject* command)
+{
+  if(!PyUnicode_Check(executable) || (!PyList_Check(command) && !PyTuple_Check(command)))return false;
+  const auto count=PySequence_Size(command);
+  const char* executableText=PyUnicode_AsUTF8(executable);
+  if(!executableText){PyErr_Clear();return false;}
+  const std::string executableRaw(executableText);
+  const auto executableName=executableRaw=="getprop" ? executableRaw : Path(executable);
+
+  // A missing immutable system executable cannot run external writer code.
+  // Every PATH candidate must be absent on an actual read-only system mount;
+  // writable, relative, unknown or existing candidates remain fail-closed.
+  if (count > 0 && MissingImmutableExecutable(executableRaw))
+  {
+    auto* first = PySequence_GetItem(command,0);
+    const bool same = first && PyUnicode_Check(first) && PyObject_RichCompareBool(first,executable,Py_EQ) == 1;
+    Py_XDECREF(first); if (PyErr_Occurred()) PyErr_Clear();
+    if (same) return true;
+  }
+
+  if(executableName=="getprop" || executableName=="/system/bin/getprop") {
+    if(count<1 || count>2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);
+    if(firstName!="getprop" && firstName!="/system/bin/getprop")return false;
+    if(count==1)return true;
+    PyObject* keyObject=PySequence_GetItem(command,1);
+    const char* keyText=keyObject && PyUnicode_Check(keyObject)?PyUnicode_AsUTF8(keyObject):nullptr;
+    const std::string key=keyText?keyText:std::string{};
+    if(!keyText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(keyObject);
+    if(key.empty() || key.size()>128)return false;
+    for(const unsigned char ch:key)
+      if(!((ch>='a'&&ch<='z')||(ch>='A'&&ch<='Z')||(ch>='0'&&ch<='9')||
+           ch=='.'||ch=='_'||ch=='-'))return false;
+    return true;
+  }
+
+  bool unameExecutable=executableRaw=="uname" || executableName=="/system/bin/uname" ||
+      InfinityReadonlyPlatformCommand::VendorUname(executableName.c_str());
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  unameExecutable = unameExecutable || executableName=="/usr/bin/uname" || executableName=="/bin/uname";
+#endif
+  if(unameExecutable) {
+    if(count<1 || count>2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);
+    if(firstName!="uname" && firstName!="/system/bin/uname")return false;
+    if(count==1)return true;
+    PyObject* flagObject=PySequence_GetItem(command,1);
+    const char* flagText=flagObject && PyUnicode_Check(flagObject)?PyUnicode_AsUTF8(flagObject):nullptr;
+    const std::string flag=flagText?flagText:std::string{};
+    if(!flagText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(flagObject);
+    return flag=="-a" || flag=="-m" || flag=="-s" || flag=="-r" ||
+           flag=="-v" || flag=="-n" || flag=="-p" || flag=="-i" || flag=="-o" || flag=="-rs";
+  }
+
+  if(executableName=="/system/bin/ip") {
+    if(count!=2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    PyObject* verbObject=PySequence_GetItem(command,1);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const char* verbText=verbObject && PyUnicode_Check(verbObject)?PyUnicode_AsUTF8(verbObject):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    const std::string verb=verbText?verbText:std::string{};
+    if((!firstText || !verbText) && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);Py_XDECREF(verbObject);
+    return firstName=="/system/bin/ip" &&
+           (verb=="addr" || verb=="address" || verb=="link" || verb=="route" ||
+            verb=="neigh" || verb=="rule");
+  }
+  if(executableName=="/system/bin/ifconfig") {
+    if(count<1 || count>2)return false;
+    PyObject* first=PySequence_GetItem(command,0);
+    const char* firstText=first && PyUnicode_Check(first)?PyUnicode_AsUTF8(first):nullptr;
+    const std::string firstName=firstText?firstText:std::string{};
+    if(!firstText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(first);
+    if(firstName!="/system/bin/ifconfig")return false;
+    if(count==1)return true;
+    PyObject* targetObject=PySequence_GetItem(command,1);
+    Py_ssize_t targetSize=0;
+    const char* targetText=targetObject && PyUnicode_Check(targetObject)?
+        PyUnicode_AsUTF8AndSize(targetObject,&targetSize):nullptr;
+    const bool safe=targetText && targetSize>0 && targetSize<=64 &&
+                    std::memchr(targetText,'\0',static_cast<std::size_t>(targetSize))==nullptr;
+    if(!targetText && PyErr_Occurred())PyErr_Clear();
+    Py_XDECREF(targetObject);
+    return safe;
+  }
+
+  std::vector<std::string> expected;
+  if(executableName=="/system/bin/logcat")
+    expected={"/system/bin/logcat","--uid="+std::to_string(::getuid()),"-b","crash","-d","-t","200","-v","threadtime"};
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  else if(executableName=="/bin/echo")expected={"/bin/echo","infinity-diagnostic-fixture"};
+#endif
+  else return false;
+  if(count!=static_cast<Py_ssize_t>(expected.size()))return false;
+  for(Py_ssize_t i=0;i<count;++i) {
+    PyObject* item=PySequence_GetItem(command,i);
+    const bool matches=item && PyUnicode_Check(item) && Path(item)==expected[i];
+    Py_XDECREF(item);if(!matches)return false;
+  }
+  return true;
+}
+
+inline bool ReadonlyForkEnvironment(PyObject* environment)
+{
+  std::map<std::string,std::string> expected;
+  for (auto** entry=::environ; entry && *entry; ++entry)
+  {
+    const std::string item(*entry); const auto equal=item.find('=');
+    if (equal==std::string::npos) return false;
+    const auto key=item.substr(0,equal);
+#if !defined(INFINITY_SCRIPT_OBSERVER_HOST)
+    if (key.rfind("LD_",0)==0 || key.rfind("DYLD_",0)==0) return false;
+#endif
+    expected[key]=item.substr(equal+1);
+  }
+  if (environment==Py_None) return true;
+  if (!PyList_CheckExact(environment) && !PyTuple_CheckExact(environment)) return false;
+  std::map<std::string,std::string> actual;
+  for (Py_ssize_t i=0;i<PySequence_Fast_GET_SIZE(environment);++i)
+  {
+    auto* value=PySequence_Fast_GET_ITEM(environment,i);
+    if (!PyBytes_CheckExact(value)) return false;
+    const std::string item(PyBytes_AS_STRING(value),PyBytes_GET_SIZE(value));
+    const auto equal=item.find('=');
+    if (equal==std::string::npos || item.find('\0')!=std::string::npos ||
+        !actual.emplace(item.substr(0,equal),item.substr(equal+1)).second) return false;
+  }
+  if (actual==expected) return true;
+  expected["LC_ALL"]="C";
+  return actual==expected;
+}
+
+inline bool ReadonlyForkExec(PyObject* tuple,std::string& detail)
+{
+  // Validate the actual pinned CPython ABI, not a surrounding Python scope.
+  // Cached direct entry, fileno callbacks and PATH/environment changes must
+  // not inherit permission to run a different child or an arbitrary preexec.
+  detail="native_fork_abi";
+  if (!PyTuple_CheckExact(tuple) || PyTuple_GET_SIZE(tuple)!=23) return false;
+  auto at=[&](Py_ssize_t i){return PyTuple_GET_ITEM(tuple,i);};
+  detail="native_child_options_or_environment";
+  if (at(2)!=Py_True || at(4)!=Py_None || at(17)!=Py_None || at(18)!=Py_None ||
+      at(19)!=Py_None || at(21)!=Py_None || !ReadonlyForkEnvironment(at(5))) return false;
+  for (const int i : {6,7,8,9,10,11,12,13,14,15,16,20,22})
+    if (!PyLong_CheckExact(at(i)) && !PyBool_Check(at(i))) return false;
+  detail="native_child_inherited_descriptors";
+  if (!PyTuple_CheckExact(at(3)) || PyTuple_GET_SIZE(at(3))!=1 ||
+      !PyLong_CheckExact(PyTuple_GET_ITEM(at(3),0)) ||
+      PyObject_RichCompareBool(PyTuple_GET_ITEM(at(3),0),at(13),Py_EQ)!=1) return false;
+  detail="native_child_argument_types";
+  if ((!PyList_CheckExact(at(0)) && !PyTuple_CheckExact(at(0))) ||
+      !PyTuple_CheckExact(at(1)) || PyTuple_GET_SIZE(at(1))==0) return false;
+  const auto count=PySequence_Fast_GET_SIZE(at(0));
+  auto* command=PyTuple_New(count); if (!command) return false;
+  bool safe=true;
+  for (Py_ssize_t i=0;i<count;++i)
+  {
+    auto* original=PySequence_Fast_GET_ITEM(at(0),i); PyObject* value=nullptr;
+    if (PyUnicode_CheckExact(original)) {value=original;Py_INCREF(value);}
+    else if (PyBytes_CheckExact(original))
+      value=PyUnicode_DecodeFSDefaultAndSize(PyBytes_AS_STRING(original),PyBytes_GET_SIZE(original));
+    if (!value) {safe=false;break;}
+    PyTuple_SET_ITEM(command,i,value);
+  }
+  for (Py_ssize_t i=0;safe && i<PyTuple_GET_SIZE(at(1));++i)
+  {
+    auto* original=PyTuple_GET_ITEM(at(1),i);
+    if (!PyBytes_CheckExact(original)) {safe=false;break;}
+    const std::string path(PyBytes_AS_STRING(original),PyBytes_GET_SIZE(original));
+    detail="native_child_executable="+path.substr(0,256);
+    if (path.empty() || path.front()!='/' || path.find('\0')!=std::string::npos)
+    {safe=false;break;}
+    auto* executable=PyUnicode_DecodeFSDefaultAndSize(path.data(),path.size());
+    safe=executable && (MissingImmutableExecutablePath(path) || ReadonlyCommand(executable,command));
+    Py_XDECREF(executable);
+  }
+  Py_DECREF(command);
+  if (PyErr_Occurred()) {PyErr_Clear();return false;}
+  if (safe) detail.clear();
+  return safe;
+}
+
+inline std::string ChildProcessEvidence(PyObject* executable,PyObject* command)
+{
+  // Keep diagnostics useful without copying child arguments, URLs, tokens or environment.
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  std::string name="unknown";
+  if(PyUnicode_Check(executable)) {
+    const char* raw=PyUnicode_AsUTF8(executable);
+    if(raw)name=raw;else PyErr_Clear();
+  } else {
+    const auto path=Path(executable);if(!path.empty())name=path;
+  }
+  const auto count=(PyList_Check(command)||PyTuple_Check(command))?PySequence_Size(command):-1;
+  if(PyErr_Occurred())PyErr_Clear();
+  const std::string result="executable="+name.substr(0,256)+";argc="+std::to_string(count);
+  PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
+
+inline std::string NativeLookupEvidence(const char* event,PyObject* args)
+{
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  std::string result="event="+std::string(event?event:"unknown").substr(0,128);
+  const auto count=PyTuple_Check(args)?PyTuple_GET_SIZE(args):0;
+  if(count>0) {
+    PyObject* first=PyTuple_GET_ITEM(args,0);
+    const auto target=Path(first);
+    if(!target.empty())result+=";target="+target.substr(0,512);
+    else if(PyUnicode_Check(first)) {
+      const char* raw=PyUnicode_AsUTF8(first);
+      if(raw)result+=";target="+std::string(raw).substr(0,512);
+      else PyErr_Clear();
+    }
+  }
+  if(count>1) {
+    PyObject* second=PyTuple_GET_ITEM(args,1);
+    if(PyUnicode_Check(second)) {
+      const char* raw=PyUnicode_AsUTF8(second);
+      if(raw)result+=";symbol="+std::string(raw).substr(0,256);
+      else PyErr_Clear();
+    }
+  }
+  PyErr_Clear();
+  PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
+
+inline bool ApprovedBundledPythonExtension(const char* module,const std::string& filename)
+{
+  // Importing a native module is not itself a persistence write. Only the
+  // exact Pillow images shipped by the signed Infinity APK may cross this
+  // gate; all other add-on native extensions remain fail-closed.
+  const char* libraries=std::getenv("KODI_ANDROID_LIBS");
+  if(!module || !libraries || libraries[0]!='/' || filename.empty())return false;
+  std::string root(libraries);
+  while(root.size()>1 && root.back()=='/')root.pop_back();
+  struct Extension{const char* module;const char* library;};
+  static constexpr Extension approved[]={
+    {"PIL._imaging","lib_imaging.so"},
+    {"PIL._imagingft","lib_imagingft.so"},
+    {"PIL._imagingmath","lib_imagingmath.so"},
+    {"PIL._imagingmorph","lib_imagingmorph.so"},
+    {"PIL._imagingtk","lib_imagingtk.so"},
+  };
+  for(const auto& item:approved)
+    if(std::strcmp(module,item.module)==0 && filename==root+"/"+item.library)return true;
+  return false;
+}
+inline std::string NativeExtensionEvidence(const char* module,const std::string& filename)
+{
+  return "module="+std::string(module?module:"unknown").substr(0,256)+
+         ";path="+filename.substr(0,1024);
+}
+
+inline std::string OpenEvidence(PyObject* path,long flags)
+{
+  // Diagnostic inspection must preserve any exception pending in the caller.
+  PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+  PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+  std::string result="path="+Path(path).substr(0,512)+";flags="+std::to_string(flags);
+  auto* frame=PyEval_GetFrame();Py_XINCREF(frame);
+  for(unsigned count=0;frame && count<4;++count) {
+    auto* code=PyFrame_GetCode(frame);
+    PyObject* filename=code?PyObject_GetAttrString(reinterpret_cast<PyObject*>(code),"co_filename"):nullptr;
+    PyObject* name=code?PyObject_GetAttrString(reinterpret_cast<PyObject*>(code),"co_name"):nullptr;
+    const char* file=filename && PyUnicode_Check(filename)?PyUnicode_AsUTF8(filename):nullptr;
+    const char* function=name && PyUnicode_Check(name)?PyUnicode_AsUTF8(name):nullptr;
+    result+=";frame="+std::string(file?file:"unknown").substr(0,160)+":"+
+            std::to_string(PyFrame_GetLineNumber(frame))+":"+
+            std::string(function?function:"unknown").substr(0,80);
+    Py_XDECREF(filename);Py_XDECREF(name);Py_XDECREF(code);
+    auto* back=PyFrame_GetBack(frame);Py_DECREF(frame);frame=back;
+  }
+  Py_XDECREF(frame);PyErr_Clear();PyErr_Restore(errorType,errorValue,errorTrace);
+  return result;
+}
+} // namespace InfinityPythonPersistence
+#include "InfinityPythonCryptoContract.h"
+namespace InfinityPythonPersistence {
+inline int Audit(const char* event,PyObject* args,void*)
+{
+  auto* thread=PyThreadState_Get();if(!thread)return 0;
+  const auto found=Contexts().find(thread->interp);if(found==Contexts().end())return 0;
+  auto* context=found->second;
+  // Observe the outer PyRun_String compile/execute boundary without replacing
+  // its implementation. Subsequent import audits cannot overwrite a Python
+  // helper's more precise live import/install stage.
+  if(std::strcmp(event,"compile")==0 && context->initializationStage=="python.source")
+    ReportInitializationStage(context,"python.source.compile");
+  else if(std::strcmp(event,"exec")==0 && (context->initializationStage=="python.source" ||
+      context->initializationStage=="python.source.compile"))
+    ReportInitializationStage(context,"python.source.execute");
+  const auto count=PyTuple_Check(args)?PyTuple_GET_SIZE(args):0;
+  const auto at=[&](Py_ssize_t n){return n<count?PyTuple_GET_ITEM(args,n):Py_None;};
+  std::vector<std::string> actualTargets;
+  if(std::strcmp(event,"open")==0 && count>=3 && PyLong_Check(at(2)))
+  {
+    const auto flags=PyLong_AsLong(at(2));
+    if(flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))
+      actualTargets.push_back(PyLong_Check(at(0)) ?
+          InfinityScriptPersistence::DescriptorPath(static_cast<int>(PyLong_AsLong(at(0)))) : Path(at(0)));
+  }
+  else if(std::strcmp(event,"os.rename")==0 && count>=2)
+    actualTargets={PathAt(at(0),at(2)),PathAt(at(1),at(3))};
+  else if(std::strcmp(event,"os.remove")==0 || std::strcmp(event,"os.rmdir")==0)
+    actualTargets={PathAt(at(0),at(1))};
+  else if(std::strcmp(event,"os.mkdir")==0) actualTargets={PathAt(at(0),at(2))};
+  else if(std::strcmp(event,"os.truncate")==0)
+    actualTargets={PyLong_Check(at(0)) ?
+        InfinityScriptPersistence::DescriptorPath(static_cast<int>(PyLong_AsLong(at(0)))) : Path(at(0))};
+  if(!actualTargets.empty())
+  {
+    const auto token=InfinityScriptPersistence::protectedWriteToken;
+    if((token && !InfinityScriptPersistence::ProtectActualTargets(token,actualTargets)) ||
+       (!token && InfinityScriptPersistence::RejectOpaqueMutation("unleased_native_write")))
+    { AdmissionDenied(context,"Infinity protected native write target is sealed"); return -1; }
+    if(std::strcmp(event,"os.rename")==0 && actualTargets.size()==2)
+      InfinityScriptPersistence::RememberAlias(actualTargets[0],actualTargets[1]);
+  }
+  const bool descriptorControl = std::strcmp(event,"fcntl.fcntl")==0 ||
+      std::strcmp(event,"fcntl.ioctl")==0 ||
+      std::strcmp(event,"fcntl.lockf")==0 || std::strcmp(event,"os.chdir")==0;
+  // ctypes imports pythonapi via PyDLL(None). This references the already
+  // running process and loads no image or persistent writer. Apply the exact
+  // existing ApprovedNativeLookup classification BEFORE opaque admission;
+  // otherwise Close can prevent its own persistence observers initializing.
+  // Library loads, symbol lookup and function execution keep their own gates.
+  if(std::strcmp(event,"ctypes.dlopen")==0 && count==1 && at(0)==Py_None)return 0;
+  // Exact already-loaded read-only module identity; never a general native-write exemption.
+  const int moduleIdentityLookup=InfinityModuleIdentityLookupDecision(event,args);
+  if(moduleIdentityLookup>0)return 0;
+  if(moduleIdentityLookup<0) {
+    AdmissionDenied(context,"Infinity module identity requires the actual running engine");
+    return -1;
+  }
+  const bool opaque = std::strcmp(event,"os.chmod")==0 || std::strcmp(event,"os.chown")==0 ||
+      std::strcmp(event,"os.utime")==0 || std::strcmp(event,"os.setxattr")==0 ||
+      std::strcmp(event,"os.removexattr")==0 || std::strcmp(event,"os.link")==0 ||
+      std::strcmp(event,"os.symlink")==0 || std::strcmp(event,"mmap.__new__")==0 ||
+      std::strcmp(event,"sqlite3.load_extension")==0 || std::strcmp(event,"sqlite3.enable_load_extension")==0 ||
+      std::strcmp(event,"os.system")==0 || std::strcmp(event,"os.fork")==0 ||
+      std::strcmp(event,"os.posix_spawn")==0 || std::strcmp(event,"os.exec")==0 ||
+      std::strcmp(event,"os.forkpty")==0 || std::strcmp(event,"subprocess.Popen")==0 ||
+      std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
+      std::strcmp(event,"ctypes.dlsym/handle")==0 || std::strcmp(event,"ctypes.call_function")==0 || descriptorControl;
+  if (opaque && InfinityScriptPersistence::RejectOpaqueMutation(event))
+  {
+    AdmissionDenied(context, "Infinity shutdown closed native mutation admission");
+    return -1; // Audit rejection occurs BEFORE the original operation.
+  }
+  if(descriptorControl)
+    InfinityScriptPersistence::Fail(context->id,"unclassified_descriptor_or_working_directory_mutation",event);
+  if(std::strcmp(event,"open")==0 && count>=3) {
+    const auto flags=PyLong_Check(at(2))?PyLong_AsLong(at(2)):0;
+    if((flags&(O_WRONLY|O_RDWR|O_CREAT|O_TRUNC|O_APPEND))!=0) {
+      if(!context->checkedOpens[thread] && !context->nativeProtectionDepth[thread] &&
+         !ApprovedNonPersistentPythonBytecodeCachePath(Path(at(0)),false))
+        InfinityScriptPersistence::Fail(context->id,"file_open_bypassed_checked_buffer_observer",
+                                        OpenEvidence(at(0),flags));
+      // CPython's own atomic bytecode-cache temp writes under Infinity's private
+      // cache are regenerable runtime cache, not user state. Touch() independently
+      // refuses only that exact cache class; every other unchecked writer remains
+      // fail-closed and tracked.
+      if(!context->checkedOpens[thread])Touch(context,at(0));
+    }
+  }
+  else if(std::strcmp(event,"os.rename")==0 && count>=2) {
+    if(count>2 && ((PyLong_Check(at(2)) && PyLong_AsLong(at(2))!=-1) ||
+                   (PyLong_Check(at(3)) && PyLong_AsLong(at(3))!=-1)))
+      InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_rename");
+    const bool sourceBytecode=ApprovedNonPersistentPythonBytecodeCachePath(Path(at(0)),false);
+    const bool targetBytecode=ApprovedNonPersistentPythonBytecodeCachePath(Path(at(1)),false);
+    if(sourceBytecode!=targetBytecode)
+      InfinityScriptPersistence::Fail(context->id,"python_bytecode_cache_boundary_rename");
+    Touch(context,at(0),false);Touch(context,at(1));
+  }
+  else if(std::strcmp(event,"os.remove")==0 || std::strcmp(event,"os.rmdir")==0) {
+    if(count) {
+      const bool directoryRelative=count>1 && PyLong_Check(at(1)) && PyLong_AsLong(at(1))!=-1;
+      if(directoryRelative) {
+        const auto resolved=PathAt(at(0),at(1));
+        if(resolved.empty())
+          InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_deletion");
+        else
+          TouchResolved(context,resolved,false,std::strcmp(event,"os.rmdir")==0);
+      } else {
+        Touch(context,at(0),false,std::strcmp(event,"os.rmdir")==0);
+      }
+    }
+  }
+  else if(std::strcmp(event,"os.mkdir")==0) {
+    if(count>2 && PyLong_Check(at(2)) && PyLong_AsLong(at(2))!=-1)
+      InfinityScriptPersistence::Fail(context->id,"unobserved_directory_relative_directory_creation");
+    if(count)Touch(context,at(0),true,true);
+  }
+  else if(std::strcmp(event,"os.truncate")==0) {if(count)Touch(context,at(0));}
+  else if(std::strcmp(event,"sys.unraisablehook")==0)
+    InfinityScriptPersistence::Fail(context->id,"unraisable_python_cleanup_or_write_failure");
+  else if(std::strcmp(event,"import")==0 && count>=2) {
+    const auto filename=at(1)==Py_None?std::string{}:Path(at(1));
+    const char* module=PyUnicode_Check(at(0))?PyUnicode_AsUTF8(at(0)):nullptr;
+    const bool external = filename.size()>=3 && filename.compare(filename.size()-3,3,".so")==0 &&
+                          filename.find("/lib-dynload/")==std::string::npos;
+    if (external && InfinityScriptPersistence::RejectOpaqueMutation("import_native_extension"))
+    { AdmissionDenied(context,"Infinity shutdown closed native extension admission"); return -1; }
+    if(module && (std::strcmp(module,"_dbm")==0 || std::strcmp(module,"_gdbm")==0))
+      InfinityScriptPersistence::Fail(context->id,"unobserved_dbm_persistence_backend");
+    // An import allowlist alone cannot cover a native encoder's descriptor
+    // writes. Its actual C type methods must be interposed before the native
+    // loader returns the module to Python. A loader bypass remains a blocker.
+    if(ApprovedBundledPythonExtension(module,filename) &&
+       (!module || std::strcmp(module,"PIL._imaging")!=0 || !context->nativeExtensionDepth[thread]))
+      InfinityScriptPersistence::Fail(context->id,"bundled_native_encoder_write_adapter_missing",
+                                      NativeExtensionEvidence(module,filename));
+    if(filename.size()>=3 && filename.compare(filename.size()-3,3,".so")==0 &&
+       filename.find("/lib-dynload/")==std::string::npos &&
+       !ApprovedBundledPythonExtension(module,filename))
+      InfinityScriptPersistence::Fail(context->id,"unclassified_addon_native_extension",
+                                      NativeExtensionEvidence(module,filename));
+  }
+  else if(std::strcmp(event,"os.chmod")==0 || std::strcmp(event,"os.chown")==0 ||
+          std::strcmp(event,"os.utime")==0 || std::strcmp(event,"os.setxattr")==0 ||
+          std::strcmp(event,"os.removexattr")==0 || std::strcmp(event,"os.link")==0 ||
+          std::strcmp(event,"os.symlink")==0 || std::strcmp(event,"mmap.__new__")==0 ||
+          std::strcmp(event,"sqlite3.load_extension")==0 ||
+          std::strcmp(event,"sqlite3.enable_load_extension")==0)
+    InfinityScriptPersistence::Fail(context->id,"unclassified_native_persistence_operation",event);
+  else if(std::strcmp(event,"sqlite3.connect")==0) {
+    context->sqliteTargets[thread]=count?Path(at(0)):std::string{};
+  }
+  else if(std::strcmp(event,"sqlite3.connect/handle")==0) {
+    if(!context->connectionType || count!=1 || PyObject_IsInstance(at(0),context->connectionType)!=1) {
+      const auto target=context->sqliteTargets.find(thread);
+      const std::string detail=target==context->sqliteTargets.end() ? "path=unknown" :
+          "path="+target->second.substr(0,1024);
+      InfinityScriptPersistence::Fail(context->id,"sqlite_connection_bypassed_checked_commit_observer",detail);
+    }
+    context->sqliteTargets.erase(thread);
+  }
+  else if(std::strcmp(event,"subprocess.Popen")==0) {
+    // The embedded observer establishes readonlyChildren only after validating
+    // shell/cwd/fd/executable and the exact allowed environment contract.
+    // Re-check the command natively so a cached/unpatched Popen cannot bypass it.
+    if(!context->readonlyChildren[thread] || count<4 || !ReadonlyCommand(at(0),at(1)))
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                      ChildProcessEvidence(at(0),at(1)));
+  }
+  else if(std::strcmp(event,"os.posix_spawn")==0) {
+    // Unlike fork_exec, posix_spawn's file actions have no installed native
+    // output lease adapter. Do not infer safe destinations from its command.
+    InfinityScriptPersistence::Fail(context->id,"unobserved_posix_spawn_output",
+                                    ChildProcessEvidence(at(0),at(1)));
+  }
+  else if(std::strcmp(event,"ctypes.dlopen")==0 || std::strcmp(event,"ctypes.dlsym")==0 ||
+          std::strcmp(event,"ctypes.dlsym/handle")==0)
+  {
+    PyObject *errorType=nullptr,*errorValue=nullptr,*errorTrace=nullptr;
+    PyErr_Fetch(&errorType,&errorValue,&errorTrace);
+    if(!ApprovedNativeLookup(event,args))
+      InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                      NativeLookupEvidence(event,args));
+    PyErr_Clear();PyErr_Restore(errorType,errorValue,errorTrace);
+  }
+  else if(std::strcmp(event,"os.system")==0 ||
+          std::strcmp(event,"os.fork")==0 || std::strcmp(event,"os.posix_spawn")==0 ||
+          std::strcmp(event,"os.exec")==0 || std::strcmp(event,"os.forkpty")==0 ||
+          std::strcmp(event,"ctypes.call_function")==0)
+    InfinityScriptPersistence::Fail(context->id,"external_or_opaque_writer_requires_explicit_participant",
+                                    "event="+std::string(event).substr(0,128));
+  // An audit observer does not alter original add-on operations or clear their
+  // Python exceptions. Its failure persists in the native owner ledger.
+  return 0;
+}
+inline Context* Capsule(PyObject* self)
+{return static_cast<Context*>(PyCapsule_GetPointer(self,"Infinity.Persistence.Observer"));}
+// Called only inside the existing Infinity interpreter observer. Do not patch
+// Kodi's shared argument converter, VFS implementation or provider modules.
+inline PyObject* CheckedVfsWrite(PyObject* self, PyObject* args)
+{
+  auto* context = Capsule(self);
+  PyObject *handle = nullptr, *value = nullptr;
+  if (!context || !PyArg_ParseTuple(args, "OO", &handle, &value)) return nullptr;
+  const auto found = Contexts().find(PyThreadState_Get()->interp);
+  if (found == Contexts().end() || found->second != context)
+  {
+    PyErr_SetString(PyExc_RuntimeError, "VFS observer interpreter ownership mismatch");
+    return nullptr;
+  }
+
+  // Capture and invoke the same callable. Only the original static Kodi File
+  // type and its original C method can establish the conversion contract.
+  // A Python override, subclass, replacement or unknown extension gets no proof.
+  PyObject* method = PyObject_GetAttrString(handle, "write");
+  bool nativeMethod = method && context->vfsType && context->vfsWrite &&
+      Py_TYPE(handle) == reinterpret_cast<PyTypeObject*>(context->vfsType) &&
+      PyCFunction_Check(method) && PyCFunction_GetSelf(method) == handle;
+  if (nativeMethod)
+  {
+    const auto* definition = reinterpret_cast<PyMethodDescrObject*>(context->vfsWrite)->d_method;
+    nativeMethod = PyCFunction_GetFunction(method) == definition->ml_meth &&
+        PyCFunction_GetFlags(method) == definition->ml_flags;
+  }
+  const bool invalidBuffer = !PyUnicode_Check(value) && !PyBytes_Check(value) &&
+      !PyByteArray_Check(value);
+
+  uint64_t operation = 0, generation = 0;
+  std::string target;
+  {
+    auto& state = InfinityScriptPersistence::Get();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    for (const auto& item : state.protection.operations)
+    {
+      const auto& lease = item.second;
+      if (lease.writer != context->id || lease.thread != std::this_thread::get_id() ||
+          lease.operation != "vfs.write") continue;
+      // Nested/ambiguous leases never establish no-mutation proof.
+      if (operation) { operation = 0; target.clear(); break; }
+      operation = item.first;
+      if (lease.paths.size() == 1) target = lease.paths.front();
+    }
+    generation = state.protection.generation;
+  }
+  PyObject* result = method ? PyObject_CallFunctionObjArgs(method, value, nullptr) : nullptr;
+  Py_XDECREF(method);
+  if (result == Py_True) return result;
+
+  // Preserve exactly the original result, pending exception and errno. Neither
+  // a rejection nor a failed/partial write is a successful save receipt.
+  const int savedErrno = errno;
+  PyObject *type = nullptr, *error = nullptr, *trace = nullptr;
+  PyErr_Fetch(&type, &error, &trace);
+  const bool rejected = !result && type == PyExc_TypeError && nativeMethod &&
+      invalidBuffer && operation != 0;
+  const char* reason = result ? "vfs_write_failed" : "vfs_write_exception";
+  const std::string detail = "value_type=" + std::string(Py_TYPE(value)->tp_name).substr(0, 80) +
+      ";exception=" + (type && PyType_Check(type) ?
+          std::string(reinterpret_cast<PyTypeObject*>(type)->tp_name).substr(0, 80) : "<none>") +
+      ";operation_id=" + std::to_string(operation) +
+      ";checkpoint_generation=" + std::to_string(generation) +
+      ";effect=" + (rejected ? "argument_rejected_before_native_write" : "unverified");
+  bool recorded = false;
+  if (rejected)
+  {
+    auto& state = InfinityScriptPersistence::Get();
+    std::lock_guard<std::mutex> lock(state.mutex);
+    const auto live = state.protection.operations.find(operation);
+    const auto writer = state.writers.find(context->id);
+    if (live != state.protection.operations.end() && writer != state.writers.end() &&
+        live->second.writer == context->id && live->second.thread == std::this_thread::get_id() &&
+        live->second.operation == "vfs.write" && state.protection.generation == generation)
+    {
+      // Direct native evidence; this reason is NOT added to the generic
+      // AdvisoryFailureReason allowlist. Python cannot assert this proof.
+      std::string name;
+      for (const auto& admission : writer->second.admissions)
+      { if (!name.empty()) name += ","; name += admission.first; }
+      InfinityScriptPersistence::AddBlockerLocked(state, context->id, name,
+          reason, detail, false);
+      recorded = true;
+    }
+  }
+  if (!recorded)
+  {
+    const auto verified = InfinityScriptPersistence::VerifiedVfsWriteFailureTarget(
+        context->id, "vfs.write", target);
+    InfinityScriptPersistence::Fail(context->id, reason, detail, verified);
+  }
+  PyErr_Restore(type, error, trace);
+  errno = savedErrno;
+  return result;
+}
+
+inline void CaptureNativeVfsContract(Context* context, PyObject* vfs)
+{
+  if (!vfs || vfs == Py_None) return;
+  PyObject* type = PyObject_GetAttrString(vfs, "File");
+  if (!type) { PyErr_Clear(); return; }
+  if (PyType_Check(type) &&
+      !(reinterpret_cast<PyTypeObject*>(type)->tp_flags & Py_TPFLAGS_HEAPTYPE) &&
+      std::strcmp(reinterpret_cast<PyTypeObject*>(type)->tp_name, "xbmcvfs.File") == 0)
+  {
+    PyObject* method = PyObject_GetAttrString(type, "write");
+    if (method && Py_TYPE(method) == &PyMethodDescr_Type &&
+        PyDescr_TYPE(method) == reinterpret_cast<PyTypeObject*>(type))
+    { context->vfsType = type; context->vfsWrite = method; return; }
+    Py_XDECREF(method);
+    PyErr_Clear();
+  }
+  Py_DECREF(type);
+}
+
+inline PyObject* Error(PyObject* self,PyObject* args)
+{
+  auto* context=Capsule(self);const char* reason=nullptr;const char* detail="";
+  const char* target=nullptr;
+  if(!context || !PyArg_ParseTuple(args,"s|sz",&reason,&detail,&target))return nullptr;
+  std::string verified;
+  if (target && (std::strcmp(reason,"vfs_write_exception")==0 ||
+                 std::strcmp(reason,"vfs_write_failed")==0))
+    verified=InfinityScriptPersistence::VerifiedVfsWriteFailureTarget(
+        context->id,"vfs.write",target);
+  // Bad/forged/absent path or wrong operation leaves the error fatal.
+  // Never send the path itself to the diagnostic Error() detail.
+  InfinityScriptPersistence::Fail(context->id,reason,detail,verified);
+  Py_RETURN_NONE;
+}
+inline PyObject* Mutation(PyObject* self,PyObject* args)
+{
+  auto* context=Capsule(self);PyObject* path=nullptr;const char* kind=nullptr;
+  if(!context || !PyArg_ParseTuple(args,"Os",&path,&kind))return nullptr;
+  if(std::strcmp(kind,"readonly-child-begin")==0) {
+    ++context->readonlyChildren[PyThreadState_Get()];Py_RETURN_NONE;
+  }
+  if(std::strcmp(kind,"readonly-child-end")==0) {
+    auto& depth=context->readonlyChildren[PyThreadState_Get()];
+    if(depth)--depth;else InfinityScriptPersistence::Fail(context->id,"unbalanced_readonly_child_scope");
+    Py_RETURN_NONE;
+  }
+  if(std::strcmp(kind,"checked-open-begin")==0) {
+    ++context->checkedOpens[PyThreadState_Get()];Py_RETURN_NONE;
+  }
+  if(std::strcmp(kind,"checked-open-end")==0) {
+    auto& depth=context->checkedOpens[PyThreadState_Get()];
+    if(depth)--depth;else InfinityScriptPersistence::Fail(context->id,"unbalanced_checked_open_scope");
+    Py_RETURN_NONE;
+  }
+  Touch(context,path,std::strcmp(kind,"delete")!=0,std::strcmp(kind,"directory")==0);
+  if(std::strcmp(kind,"sqlite")==0)InfinityScriptPersistence::SQLiteCompanions(context->id,Path(path));
+  Py_RETURN_NONE;
+}
+inline PyObject* Protect(PyObject* self, PyObject* args)
+{
+  auto* context = Capsule(self);
+  const char* action = nullptr;
+  unsigned long long key = 0;
+  PyObject* targets = nullptr;
+  if (!context || !PyArg_ParseTuple(args, "sKO", &action, &key, &targets)) return nullptr;
+  const std::string operation(action);
+  if (operation == "end")
+  {
+    const auto found = context->protectedOperations.find(key);
+    if (found == context->protectedOperations.end())
+    { PyErr_SetString(PyExc_RuntimeError, "Protected write ownership mismatch"); return nullptr; }
+    InfinityScriptPersistence::EndProtectedOperation(key);
+    InfinityScriptPersistence::protectedWriteOwner = found->second;
+    context->protectedOperations.erase(found);
+    Py_RETURN_NONE;
+  }
+  if (operation == "clean")
+  {
+    // The enclosing operation still owns its pre-close lease. Successful
+    // close has already invalidated fileno(); retiring the buffer needs only
+    // its original identity, never a second lookup of the closed handle.
+    InfinityScriptPersistence::SetProtectedBuffer(context->id, std::to_string(key), {}, false);
+    Py_RETURN_NONE;
+  }
+  PyObject* sequence = PySequence_Fast(targets, "write targets must be a sequence");
+  if (!sequence) return nullptr;
+  std::vector<std::string> paths;
+  for (Py_ssize_t i = 0; i < PySequence_Fast_GET_SIZE(sequence); ++i)
+  {
+    auto* item = PySequence_Fast_GET_ITEM(sequence, i);
+    std::string path;
+    if (PyLong_Check(item))
+    {
+      const long fd = PyLong_AsLong(item);
+      if (PyErr_Occurred()) { Py_DECREF(sequence); return nullptr; }
+      path = InfinityScriptPersistence::DescriptorPath(static_cast<int>(fd));
+    }
+    else if (PyUnicode_Check(item) || PyBytes_Check(item) || PyObject_HasAttrString(item,"__fspath__")) path = Path(item);
+    else
+    {
+      auto* descriptor = InfinityPythonWriteHooks::ActualDescriptor(item,0);
+      if (descriptor)
+      {
+        path = PyLong_Check(descriptor) ?
+            InfinityScriptPersistence::DescriptorPath(static_cast<int>(PyLong_AsLong(descriptor))) : Path(descriptor);
+        Py_DECREF(descriptor);
+      }
+      else if (PyErr_Occurred()) { Py_DECREF(sequence); return nullptr; }
+    }
+    // A proven clean native handle needs no persistent write lease.
+    // New writes from callbacks still encounter the normal barrier.
+    if ((operation=="file.flush" || operation=="file.close" ||
+         operation=="buffer.flush" || operation=="buffer.close" ||
+         operation=="raw.flush" || operation=="raw.close") &&
+        InfinityPythonWriteHooks::VerifiedCleanIo(item))
+      path=InfinityScriptPersistence::NonPersistentTarget();
+    paths.push_back(path);
+  }
+  Py_DECREF(sequence);
+  if (operation == "dirty")
+  {
+    InfinityScriptPersistence::SetProtectedBuffer(context->id, std::to_string(key), paths, true);
+    Py_RETURN_NONE;
+  }
+  const auto token = InfinityScriptPersistence::BeginProtectedOperation(context->id, paths, operation);
+  if (!token)
+  { AdmissionDenied(context, "Infinity protected write admission is closed"); return nullptr; }
+  context->protectedOperations.emplace(token, InfinityScriptPersistence::protectedWriteOwner);
+  InfinityScriptPersistence::protectedWriteOwner = context->id;
+  return PyLong_FromUnsignedLongLong(token);
+}
+} // namespace InfinityPythonPersistence
+#include "InfinityPythonWriteHooks.h"
+namespace InfinityPythonPersistence
+{
+inline Context* Start(int id,PyInterpreterState* interpreter)
+{
+  // This first stamp is deliberately before Pending/SQLite/GIL-dependent
+  // observer setup, so a native wait cannot look like an unspecified failure.
+  InfinityScriptPersistence::InitializationProgress(id,"native.observer.entry",
+      reinterpret_cast<uintptr_t>(interpreter));
+  if(!InfinityScriptPersistence::Pending(id))return nullptr;
+  if(PyErr_Occurred() && Contexts().find(interpreter)==Contexts().end()) {
+    InitializationFailed(id,"checked_python_observer_initialization_failed","native.entry.pending_exception");
+    return nullptr;
+  }
+  InfinityScriptPersistence::InitializationProgress(id,"native.sqlite_vfs.install");
+  if (!InfinitySQLiteVFS::Install())
+  { InitializationFailed(id,"protected_sqlite_vfs_installation_failed","native.sqlite_vfs.install");return nullptr; }
+  InfinityScriptPersistence::InitializationProgress(id,"native.audit.install");
+  static bool installed=false;
+  if(!installed) {
+    if(PySys_AddAuditHook(Audit,nullptr)!=0){InitializationFailed(id,"native_python_audit_hook_unavailable","native.audit.install");return nullptr;}
+    installed=true;
+  }
+  const auto existing=Contexts().find(interpreter);
+  if(existing!=Contexts().end())return existing->second; // Reusable interpreter keeps all admitted writes.
+  auto* context=new Context;context->id=id;
+  context->interpreterIdentity=reinterpret_cast<uintptr_t>(interpreter);
+  Contexts()[interpreter]=context;
+  const auto failed=[&](const char* reason="checked_python_observer_initialization_failed") {
+    InitializationFailed(id,reason,context->initializationStage,context->globals);
+    return context;
+  };
+  InitializationStage(context,"native.admission_exception");
+  context->admissionError=PyErr_NewException("_infinity_native_persistence_observer.WriteAdmissionClosed",PyExc_PermissionError,nullptr);
+  if(!context->admissionError)
+    return failed("native_python_admission_exception_unavailable");
+  InitializationStage(context,"native.hooks.install");
+  if (!InfinityPythonWriteHooks::Install())
+    return failed("native_python_write_protection_unavailable");
+  InitializationStage(context,"python.globals");
+  context->globals=PyDict_New();
+  if(!context->globals)return failed();
+  PyObject* name=PyUnicode_FromString("_infinity_native_persistence_observer");
+  if(!name)return failed();
+  const int named=PyDict_SetItemString(context->globals,"__name__",name);Py_DECREF(name);
+  if(named!=0)return failed();
+  static PyMethodDef progressMethod={"report_initialization_stage",ReportPythonInitializationStage,METH_O,nullptr};
+  PyObject* capsule=PyCapsule_New(context,"Infinity.Persistence.Observer",nullptr);
+  PyObject* progress=capsule?PyCFunction_NewEx(&progressMethod,capsule,nullptr):nullptr;
+  if(!progress || PyDict_SetItemString(context->globals,"_INFINITY_NATIVE_INITIALIZATION_STAGE",progress)!=0)
+  { Py_XDECREF(progress);Py_XDECREF(capsule);return failed(); }
+  Py_DECREF(progress);
+  InitializationStage(context,"python.source");
+  PyObject* result=PyRun_String(INFINITY_PYTHON_PERSISTENCE_SOURCE,Py_file_input,context->globals,context->globals);
+  if(!result) { Py_DECREF(capsule);return failed(); }
+  Py_DECREF(result);
+  static PyMethodDef vfsWriteMethod={"checked_vfs_write",CheckedVfsWrite,METH_VARARGS,nullptr};
+  static PyMethodDef errorMethod={"record_failure",Error,METH_VARARGS,nullptr};
+  static PyMethodDef mutationMethod={"record_mutation",Mutation,METH_VARARGS,nullptr};
+  static PyMethodDef protectionMethod={"protect_mutation",Protect,METH_VARARGS,nullptr};
+  InitializationStage(context,"native.callbacks");
+  PyObject* error=PyCFunction_NewEx(&errorMethod,capsule,nullptr);
+  PyObject* mutation=error?PyCFunction_NewEx(&mutationMethod,capsule,nullptr):nullptr;
+  PyObject* protection=mutation?PyCFunction_NewEx(&protectionMethod,capsule,nullptr):nullptr;
+  PyObject* vfs=nullptr;
+  if(!protection) {
+    failed();
+    Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(capsule);
+    return context;
+  }
+  InitializationStage(context,"python.import.xbmcvfs");
+  vfs=PyImport_ImportModule("xbmcvfs");
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  if(!vfs){PyErr_Clear();vfs=Py_None;Py_INCREF(vfs);}
+#endif
+  bool initializationFailed=false;
+  if(!vfs || PyErr_Occurred()) { failed();initializationFailed=true; }
+  PyObject* klass=initializationFailed?nullptr:PyDict_GetItemString(context->globals,"Observer");
+  PyObject* hostProbe=Py_False;
+#if defined(INFINITY_SCRIPT_OBSERVER_HOST)
+  hostProbe=Py_True;
+#endif
+  if(klass && !PyErr_Occurred() && vfs) {
+    InitializationStage(context,"python.observer.construct");
+    CaptureNativeVfsContract(context, vfs);
+    PyObject* vfsWrite=PyCFunction_NewEx(&vfsWriteMethod,capsule,nullptr);
+    if(vfsWrite) {
+      context->observer=PyObject_CallFunctionObjArgs(klass,error,mutation,vfs,hostProbe,protection,context->admissionError,vfsWrite,nullptr);
+      Py_DECREF(vfsWrite);
+    }
+  }
+  if(!initializationFailed && (!context->observer || PyErr_Occurred())) {
+    if(!klass)InitializationStage(context,"python.observer.class");
+    failed();initializationFailed=true;
+  }
+  Py_XDECREF(vfs);Py_XDECREF(error);Py_XDECREF(mutation);Py_XDECREF(protection);Py_XDECREF(capsule);
+  if(initializationFailed)return context;
+  InitializationStage(context,"python.observer.connection_type");
+  context->connectionType=PyObject_GetAttrString(context->observer,"connection_type");
+  if(!context->connectionType || PyErr_Occurred())return failed();
+  InitializationStage(context,"python.observer.raw_type");
+  context->rawType=PyObject_GetAttrString(context->observer,"raw_type");
+  if(!context->rawType || PyErr_Occurred())return failed();
+  InitializationStage(context,"python.observer.raw_write");
+  context->rawWrite=PyObject_GetAttrString(context->rawType,"write");
+  if(!context->rawWrite || PyErr_Occurred())return failed();
+  if(!InfinityPythonWriteHooks::CaptureIoContracts(context))return failed();
+  InitializationStage(context,"complete");
+  InfinityScriptPersistence::Observed(id);
+  return context;
+}
+inline void Finish(Context* context,PyThreadState* owner,bool checkpointEscalated=false)
+{
+  if(!context)return;
+  context->waitingWorkers=false;
+  for(auto* thread=PyInterpreterState_ThreadHead(owner->interp);thread;thread=PyThreadState_Next(thread))
+    if(thread!=owner){context->waitingWorkers=true;return;}
+  if(context->observer) {
+    // A checkpoint escalation deliberately injects SystemExit to retire stubborn
+    // bytecode. That exact termination exception is not persistence evidence and
+    // must not poison the observer that runs after bytecode has already stopped.
+    // No other exception is consumed here.
+    if(checkpointEscalated && PyErr_ExceptionMatches(PyExc_SystemExit))
+      PyErr_Clear();
+    PyObject* result=PyObject_CallMethod(context->observer,"finish",nullptr);
+    if(!result && checkpointEscalated && PyErr_ExceptionMatches(PyExc_SystemExit)) {
+      PyErr_Clear();
+      result=PyObject_CallMethod(context->observer,"finish",nullptr); // one bounded retry
+    }
+    if(result) {
+      context->finalized=PyObject_IsTrue(result)==1;Py_DECREF(result);
+      if(!context->finalized)context->preservePending=true;
+    }
+    else {
+      InfinityScriptPersistence::Fail(context->id,"checked_python_observer_finalization_failed",
+        checkpointEscalated?"checkpoint_escalated_observer_exception":"");
+      context->preservePending=true;
+    }
+  }
+  if(context->preservePending)return;
+  context->retiring=true;
+  Py_CLEAR(context->observer);Py_CLEAR(context->connectionType);Py_CLEAR(context->globals);
+  Py_CLEAR(context->rawWrite);Py_CLEAR(context->rawType);
+  Py_CLEAR(context->vfsWrite);Py_CLEAR(context->vfsType);
+  for(auto& item:context->cleanIo)Py_XDECREF(item.second.weak);
+  context->cleanIo.clear();
+  for(auto& contract:context->ioContracts) {
+    for(auto* method:contract.methods)Py_XDECREF(method);
+    Py_XDECREF(contract.type);
+  }
+  context->ioContracts.clear();
+  Py_CLEAR(context->admissionError);
+}
+inline void End(Context* context,PyInterpreterState* interpreter)
+{
+  if(!context)return;
+  Contexts().erase(interpreter);
+  if(context->finalized)InfinityScriptPersistence::Retired(context->id);
+  delete context;
+}
+} // namespace InfinityPythonPersistence
