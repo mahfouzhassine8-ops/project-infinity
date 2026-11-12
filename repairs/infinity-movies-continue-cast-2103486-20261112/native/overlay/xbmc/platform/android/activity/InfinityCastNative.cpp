@@ -2,6 +2,10 @@
 // Cast-only conditional handoff. No observer, persistence owner, startup hook,
 // shutdown hook, player replacement, or call from the ordinary playback path.
 #include "FileItem.h"
+#include "guilib/GUIComponent.h"
+#include "guilib/GUIWindow.h"
+#include "guilib/GUIWindowManager.h"
+#include "guilib/WindowIDs.h"
 #include "ServiceBroker.h"
 #include "application/Application.h"
 #include "application/ApplicationComponents.h"
@@ -134,6 +138,25 @@ CVariant Snapshot(const std::shared_ptr<CFileItem>& item,
   return result;
 }
 
+void ChannelProperty(const std::string& token, bool release)
+{
+  auto gui = CServiceBroker::GetGUI();
+  if (!gui) return;
+  auto home = gui->GetWindowManager().GetWindow(WINDOW_HOME);
+  if (!home) return;
+  const std::string name = "infinity-cast-" + std::to_string(getpid()) + "-" + token;
+  if (release)
+  {
+    const auto current = home->GetProperty("Infinity.Cast.Channel").asString();
+    if (current == name || current.empty())
+    {
+      home->SetProperty("Infinity.Cast.Channel", "released:" + name);
+      home->ClearProperty("Infinity.Cast.Connected");
+    }
+  }
+  else home->SetProperty("Infinity.Cast.Channel", name);
+}
+
 CVariant Execute(Slot& slot, const std::string& op, const std::string& token, int64_t position)
 {
   if (op == "release")
@@ -142,6 +165,7 @@ CVariant Execute(Slot& slot, const std::string& op, const std::string& token, in
     std::lock_guard<std::mutex> lock(state.mutex);
     if (!state.token.empty() && state.token != token) return Error("stale_session");
     state.token.clear(); state.item.reset(); state.file.clear(); state.origin.clear();
+    ChannelProperty(token, true);
     CVariant result(CVariant::VariantTypeObject);
     result["status"] = "ok";
     return result;
@@ -188,7 +212,11 @@ CVariant Execute(Slot& slot, const std::string& op, const std::string& token, in
     return Error("source_changed");
   if (Cancelled(slot)) return Error("cancelled");
 
-  if (op == "pause")
+  if (op == "channel")
+  {
+    ChannelProperty(token, false);
+  }
+  else if (op == "pause")
   {
     if (!player->CanPause()) return Error("not_pausable");
     if (!player->IsPaused()) player->Pause();
@@ -273,7 +301,7 @@ Java_com_projectinfinity_kodi_InfinityCastNative_request(JNIEnv* env, jclass, js
   const auto op = ASCII(env, operation, 16);
   const auto key = ASCII(env, token, 32);
   if (!Token(key) || (op != "capture" && op != "snapshot" && op != "pause" &&
-      op != "resume" && op != "seek" && op != "release") || position < 0) return 0;
+      op != "resume" && op != "seek" && op != "release" && op != "channel") || position < 0) return 0;
   auto messenger = CServiceBroker::GetAppMessenger();
   if (!messenger || g_application.IsStopping()) return 0;
   auto& state = Store();

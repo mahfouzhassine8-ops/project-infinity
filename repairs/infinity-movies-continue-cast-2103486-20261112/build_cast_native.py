@@ -37,7 +37,7 @@ def gate():
     changed=subprocess.check_output(['git','diff','--name-only',scope['baseline_source_snapshot'],'HEAD'],cwd=ROOT,text=True).splitlines()
     permitted=set(scope['production_allowlist'])|set(scope['allowed_new_Cast_sources'])
     for name in changed:
-        assert name in permitted or name.startswith('repairs/infinity-cast-final-2103488-20261112/') or name.startswith(str(HERE.relative_to(ROOT))+'/cast/tests/') or name in (
+        assert name in permitted or name.startswith('repairs/infinity-cast-final-2103488-20261112/') or name.startswith(str(HERE.relative_to(ROOT))+'/cast/tests/') or name.startswith(str(HERE.relative_to(ROOT))+'/native/tests/') or name in (
             '.github/workflows/infinity-core-outcomes-qa-native.yml',
             '.github/workflows/infinity-saved-navigation-android.yml',
             str(HERE.relative_to(ROOT))+'/build_cast_native.py',

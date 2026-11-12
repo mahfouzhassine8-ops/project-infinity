@@ -51,7 +51,7 @@ struct CFileItem {
   std::string path="https://media.invalid/public.mp4", origin="provider-movie";
   CVideoInfoTag tag;
   std::string GetDynPath() const { return path; }
-  Property GetProperty(const std::string&) const { return {origin}; }
+  Property GetProperty(const std::string& key) const { return {key=="Infinity.Resume.OriginalProvider"?origin:""}; }
   std::string GetLabel() const { return "Fixture"; }
   bool HasVideoInfoTag() const { return true; }
   const CVideoInfoTag* GetVideoInfoTag() const { return &tag; }
@@ -93,7 +93,19 @@ struct Settings {
 inline Settings settings;
 struct SettingsComponent { Settings* GetSettings() { return &settings; } };
 inline SettingsComponent settingsComponent;
+struct CGUIWindow {
+  std::map<std::string,std::string> fields;
+  Property GetProperty(const std::string& key) { return {fields[key]}; }
+  void SetProperty(const std::string& key,const std::string& value) { fields[key]=value; }
+  void ClearProperty(const std::string& key) {fields.erase(key);}
+};
+constexpr int WINDOW_HOME=10000;
+inline CGUIWindow home;
+struct GUIWindowManager { CGUIWindow* GetWindow(int) {return &home;} };
+struct GUIComponent {GUIWindowManager windows; GUIWindowManager& GetWindowManager(){return windows;}};
+inline GUIComponent gui;
 struct CServiceBroker {
+  static GUIComponent* GetGUI(){return &gui;}
   static Messenger* GetAppMessenger() { return &messenger; }
   static SettingsComponent* GetSettingsComponent() { return &settingsComponent; }
 };

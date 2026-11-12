@@ -18,6 +18,8 @@ int main()
   auto id=begin("pause",token);messenger.Drain();contains(result(id),"stale_session");
   assert(g_application.player->pauses==0);
   id=begin("capture",token);messenger.Drain();contains(result(id),"\"status\":\"ok\"");
+  id=begin("channel",token);messenger.Drain();contains(result(id),"\"status\":\"ok\"");
+  assert(home.GetProperty("Infinity.Cast.Channel").asString().find(token)!=std::string::npos);
   id=begin("pause",token);messenger.Drain();contains(result(id),"\"status\":\"ok\"");
   assert(g_application.player->paused && g_application.player->pauses==1);
 
