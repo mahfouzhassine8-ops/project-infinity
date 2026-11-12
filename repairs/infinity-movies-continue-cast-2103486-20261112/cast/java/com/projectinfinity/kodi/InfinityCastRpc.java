@@ -8,7 +8,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-/** Only theme reads and the authenticated CC channel-registration command.
+/** Read-only theme query; no Python script admission or player mutation.
  * Playback mutations use the cancellable, item-bound native interface instead.
  */
 final class InfinityCastRpc {
@@ -32,14 +32,5 @@ final class InfinityCastRpc {
                 if(reply!=null)ui.post(()->reply.ready(result));
             });
         } catch(RuntimeException full) { if(reply!=null)ui.post(()->reply.ready(null)); }
-    }
-    static void channel(String name,boolean clear) {
-        if(name==null || !name.matches("infinity-cast-[1-9][0-9]*-[a-f0-9]{32}"))return;
-        try {
-            JSONArray args=new JSONArray().put("cast-channel").put(name);
-            if(clear)args.put("clear");
-            send("Addons.ExecuteAddon",new JSONObject().put("addonid","script.infinity.commandcenter")
-                 .put("params",args).put("wait",false),null);
-        } catch(Exception ignored) {}
     }
 }

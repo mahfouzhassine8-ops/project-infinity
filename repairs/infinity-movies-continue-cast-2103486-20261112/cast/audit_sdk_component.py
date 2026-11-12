@@ -4,7 +4,7 @@ from zipfile import ZipFile
 import hashlib,json,re,sys,subprocess
 from dex_contract import Dex,class_contract
 
-BASE='550b67fa095e2f1c702c073433f754ba3db7cc057e42f1d05fe0789ff264f197'
+BASE='4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566'
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 def verify(apk,sdk,out):
@@ -12,7 +12,7 @@ def verify(apk,sdk,out):
  baseline={};original_members={}
  with ZipFile(apk) as z:
   for n in z.namelist():
-   if re.fullmatch(r'classes\d*\.dex',n):
+   if re.fullmatch(r'classes\d*\.dex',n) and n!='classes6.dex':
     data=z.read(n);baseline.update(Dex(data).classes);original_members[n]=hashlib.sha256(data).hexdigest()
  platform={}
  with ZipFile(sdk/'android.jar') as z:

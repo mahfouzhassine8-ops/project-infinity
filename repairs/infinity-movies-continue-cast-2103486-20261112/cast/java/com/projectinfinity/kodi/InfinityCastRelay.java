@@ -45,12 +45,12 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private static final Pattern VARIABLE=Pattern.compile("\\$(Number|Time)(?:%0([1-9][0-9]?)d)?\\$");
     private static InfinityCastRelay active;
     private static final class Resource {
-        final URI uri;final InfinityCastAdaptive.Kind kind;final String hint;
-        Resource(URI uri,InfinityCastAdaptive.Kind kind,String hint){this.uri=uri;this.kind=kind;this.hint=hint;}
+        final URI uri;final InfinityCastAdaptive.Kind kind;final String hint,suffix;
+        Resource(URI uri,InfinityCastAdaptive.Kind kind,String hint){this.uri=uri;this.kind=kind;this.hint=hint;this.suffix=suffix(uri,kind);}
     }
     private static final class Template {
-        final String value;final String[] names;
-        Template(String value,String[] names){this.value=value;this.names=names;}
+        final String value,suffix;final String[] names;
+        Template(String value,String[] names){this.value=value;this.names=names;this.suffix=suffix(URI.create(value),InfinityCastAdaptive.Kind.MEDIA);}
     }
     private final InfinityCastSource source;
     private final InetAddress receiver;
@@ -67,6 +67,9 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private final AtomicInteger jobs=new AtomicInteger(),requests=new AtomicInteger();
     private volatile boolean closed,ownerDone;
     private volatile String mime,lastFailure="";
+    private volatile boolean hlsFmp4,hlsSeparateAudio;
+    String hlsVideoFormat(){return hlsFmp4?"fmp4":null;}
+    String hlsAudioFormat(){return hlsFmp4 && !hlsSeparateAudio?"fmp4":null;}
     private InfinityCastRelay(InetAddress receiver,InetAddress local,InfinityCastSource source) throws IOException {
         this.receiver=receiver;this.source=source;
         path="/"+UUID.randomUUID().toString().replace("-","");root=new Resource(source.uri,InfinityCastAdaptive.Kind.MEDIA,source.hint);
@@ -115,8 +118,15 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         }
         throw new IOException("no_direct_receiver_route");
     }
+    private static String suffix(URI uri,InfinityCastAdaptive.Kind kind) {
+        if(kind==InfinityCastAdaptive.Kind.HLS)return ".m3u8";if(kind==InfinityCastAdaptive.Kind.DASH)return ".mpd";
+        if(kind==InfinityCastAdaptive.Kind.KEY)return ".key";if(kind==InfinityCastAdaptive.Kind.TEXT)return ".txt";
+        String path=uri.getPath()==null?"":uri.getPath().toLowerCase(Locale.ROOT);
+        for(String value:new String[]{".ts",".m4s",".mp4",".m4v",".webm",".vtt",".aac",".mp3"})if(path.endsWith(value))return value;
+        return ".mp4"; // Opaque media endpoint; actual Content-Type still comes from source.
+    }
     private String base(){return "http://"+listener.getInetAddress().getHostAddress()+":"+listener.getLocalPort()+path;}
-    String address(){return base()+"/media";}
+    String address(){return base()+"/media"+("application/vnd.apple.mpegurl".equals(mime)?".m3u8":"application/dash+xml".equals(mime)?".mpd":root.suffix);}
     boolean closed(){return closed;}
     String failure(){return lastFailure;}
     static synchronized boolean busy(){return active!=null;}
@@ -125,6 +135,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         int bp=b.getPort()<0?("https".equalsIgnoreCase(b.getScheme())?443:80):b.getPort();
         return a.getScheme().equalsIgnoreCase(b.getScheme()) && a.getHost().equalsIgnoreCase(b.getHost()) && ap==bp;
     }
+    @Override public boolean owned(String value){return value.startsWith(base()+"/r/") || value.startsWith(base()+"/t/");}
     @Override public synchronized String resource(URI uri,InfinityCastAdaptive.Kind kind) throws IOException {
         String key=kind+":"+uri.toASCIIString(),id=ids.get(key);
         if(id==null) {
@@ -133,7 +144,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             String hint=kind==InfinityCastAdaptive.Kind.HLS?"application/vnd.apple.mpegurl":kind==InfinityCastAdaptive.Kind.DASH?"application/dash+xml":null;
             resources.put(id,new Resource(uri,kind,hint));
         }
-        return base()+"/r/"+id;
+        return base()+"/r/"+id+"/media"+resources.get(id).suffix;
     }
     @Override public synchronized String template(URI base,String value,String representation,String bandwidth) throws IOException {
         if(value.contains("$RepresentationID$") && !representation.matches("[a-zA-Z0-9_.-]{1,128}"))throw new IOException("unsupported_representation_id");
@@ -149,15 +160,23 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(closed || resources.size()+templates.size()>=8192)throw new IOException("manifest_resource_limit");
             id=UUID.randomUUID().toString().replace("-","");ids.put(key,id);templates.put(id,new Template(expanded,names.toArray(new String[0])));
         }
-        StringBuilder local=new StringBuilder(base()+"/t/"+id);for(String name:names)local.append("/$").append(name).append('$');return local.toString();
+        StringBuilder local=new StringBuilder(base()+"/t/"+id);for(String name:names)local.append("/$").append(name).append('$');return local.append("/segment").append(templates.get(id).suffix).toString();
     }
     private Resource resolveRequest(String raw) throws IOException {
-        if(raw.equals(path+"/media"))return root;
+        int question=raw.indexOf('?');
+        if(question>=0) {
+            String query=raw.substring(question+1);
+            if(query.length()>256 || !query.matches("(?:_HLS_(?:msn|part)=[0-9]{1,18}|_HLS_skip=(?:YES|v2))(?:&(?:_HLS_(?:msn|part)=[0-9]{1,18}|_HLS_skip=(?:YES|v2))){0,2}"))return null;
+            Resource plain=resolveRequest(raw.substring(0,question));if(plain==null)return null;
+            if(plain.kind!=InfinityCastAdaptive.Kind.HLS && !(plain==root && "application/vnd.apple.mpegurl".equals(mime)))return null;
+            return new Resource(URI.create(plain.uri.toASCIIString()+(plain.uri.getRawQuery()==null?"?":"&")+query),InfinityCastAdaptive.Kind.HLS,"application/vnd.apple.mpegurl");
+        }
+        if(raw.equals(URI.create(address()).getRawPath()))return root;
         if(!raw.startsWith(path+"/"))return null;
         String rest=raw.substring(path.length()+1);String[] bits=rest.split("/",-1);
-        if(bits.length==2 && bits[0].equals("r") && bits[1].matches("[a-f0-9]{32}"))return resources.get(bits[1]);
+        if(bits.length==3 && bits[0].equals("r") && bits[1].matches("[a-f0-9]{32}")) {Resource r=resources.get(bits[1]);return r!=null && bits[2].equals("media"+r.suffix)?r:null;}
         if(bits.length>=3 && bits[0].equals("t")) {
-            Template template=templates.get(bits[1]);if(template==null || bits.length!=template.names.length+2)return null;
+            Template template=templates.get(bits[1]);if(template==null || bits.length!=template.names.length+3 || !bits[bits.length-1].equals("segment"+template.suffix))return null;
             Map<String,String> values=new java.util.HashMap<>();
             for(int i=0;i<template.names.length;i++){if(!bits[i+2].matches("[0-9]{1,18}"))return null;values.put(template.names[i],bits[i+2]);}
             Matcher m=VARIABLE.matcher(template.value);StringBuffer out=new StringBuffer();
@@ -175,7 +194,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(closed)throw new IOException("transport_closed");
             Request.Builder request=new Request.Builder().url(target.toASCIIString()).method(method,null)
                 .header("Accept-Encoding","identity").header("User-Agent","InfinityCast/1");
-            if(privateHeaders)for(Map.Entry<String,String> header:source.headers.entrySet())request.header(header.getKey(),header.getValue());
+            if(privateHeaders)for(Map.Entry<String,String> header:(resource==root || resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH?source.headers:source.streamHeaders).entrySet())request.header(header.getKey(),header.getValue());
             if(range!=null)request.header("Range",range);
             Call call=upstream.newCall(request.build());calls.add(call);
             if(closed){call.cancel();calls.remove(call);throw new IOException("transport_closed");}
@@ -214,6 +233,19 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(InfinityCastAdaptive.adaptive(type)) {
                 ByteArrayOutputStream all=new ByteArrayOutputStream();all.write(sample);all.write(read(input,InfinityCastAdaptive.LIMIT-used));
                 InfinityCastAdaptive.rewrite(all.toByteArray(),type,response.request().url().uri(),this);
+                if("application/vnd.apple.mpegurl".equals(type)) {
+                    String playlist=new String(all.toByteArray(),StandardCharsets.UTF_8);hlsSeparateAudio=playlist.contains("TYPE=AUDIO");
+                    hlsFmp4=playlist.contains("#EXT-X-MAP:");URI variant=InfinityCastAdaptive.firstVariant(all.toByteArray(),response.request().url().uri());
+                    if(variant!=null) {
+                        Response media=open(new Resource(variant,InfinityCastAdaptive.Kind.HLS,"application/vnd.apple.mpegurl"),"GET",null);
+                        try {
+                            if(media.code()!=200 || media.body()==null)throw new IOException("source_http_"+media.code());
+                            byte[] body=read(media.body().byteStream(),InfinityCastAdaptive.LIMIT);
+                            InfinityCastAdaptive.rewrite(body,type,media.request().url().uri(),this);
+                            hlsFmp4=new String(body,StandardCharsets.UTF_8).contains("#EXT-X-MAP:");
+                        } finally{release(media);}
+                    }
+                }
             }
             return type;
         } finally {release(response);}
@@ -261,7 +293,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
                 String raw=contentType==null?"":contentType.split(";",2)[0].trim().toLowerCase(Locale.ROOT);
                 if(resource==root || raw.contains("html") || raw.contains("xml") || raw.contains("json"))throw new IOException("unsupported_media_response");
                 type=resource.kind==InfinityCastAdaptive.Kind.TEXT?"text/plain":resource.kind==InfinityCastAdaptive.Kind.KEY?"application/octet-stream":
-                    raw.startsWith("video/") || raw.startsWith("audio/")?raw:"application/octet-stream";
+                    raw.startsWith("video/") || raw.startsWith("audio/") || raw.equals("text/vtt")?raw:"application/octet-stream";
             }
             if(resource.kind==InfinityCastAdaptive.Kind.KEY && method.equals("GET")) {
                 byte[] key=read(response.body().byteStream(),16);if(key.length!=16)throw new IOException("unsupported_hls_key");

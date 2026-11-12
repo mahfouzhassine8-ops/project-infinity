@@ -30,10 +30,11 @@ final class InfinityCastAdaptive {
     interface Links {
         String resource(URI uri,Kind kind) throws IOException;
         String template(URI base,String value,String id,String bandwidth) throws IOException;
+        boolean owned(String value);
     }
     static final int LIMIT=2*1024*1024;
     private static final Pattern ATTRIBUTE=Pattern.compile("(?:^|,)([A-Z0-9-]+)=(\"[^\"]*\"|[^,]*)");
-    private static final Pattern URI_ATTRIBUTE=Pattern.compile("(?<=^|,)URI=\"([^\"]*)\"");
+    private static final Pattern URI_ATTRIBUTE=Pattern.compile("(^|,)URI=\"([^\"]*)\"");
     static boolean adaptive(String mime) {return "application/vnd.apple.mpegurl".equals(mime) || "application/dash+xml".equals(mime);}
     static URI resolve(URI base,String value) throws IOException {
         if(value==null || value.isEmpty() || value.length()>65536 || value.contains("{$"))throw new IOException("unsupported_manifest_uri");
@@ -57,6 +58,19 @@ final class InfinityCastAdaptive {
         int colon=line.indexOf(':');Matcher m=ATTRIBUTE.matcher(colon<0?"":line.substring(colon+1));
         while(m.find())if(name.equals(m.group(1))){String v=m.group(2);return v.startsWith("\"")?v.substring(1,v.length()-1):v;}
         return "";
+    }
+    static URI firstVariant(byte[] data,URI base) throws IOException {
+        boolean variant=false;for(String raw:utf8(data).split("\\r?\\n")){String line=raw.trim();if(variant && !line.isEmpty() && !line.startsWith("#"))return resolve(base,line);if(line.startsWith("#EXT-X-STREAM-INF:"))variant=true;}return null;
+    }
+    static void prune(Document document) throws IOException {
+        java.util.ArrayDeque<Node> nodes=new java.util.ArrayDeque<>();java.util.ArrayDeque<Integer> depths=new java.util.ArrayDeque<>();nodes.push(document);depths.push(0);int count=0;
+        while(!nodes.isEmpty()) {
+            Node n=nodes.pop();int depth=depths.pop();if(depth>128 || ++count>40000)throw new IOException("manifest_structure_limit");
+            for(Node child=n.getFirstChild();child!=null;) {Node next=child.getNextSibling();
+                if(child.getNodeType()==Node.COMMENT_NODE || child.getNodeType()==Node.PROCESSING_INSTRUCTION_NODE)n.removeChild(child);
+                else {nodes.push(child);depths.push(depth+1);}child=next;
+            }
+        }
     }
     private static byte[] hls(byte[] data,URI base,Links links) throws IOException {
         String input=utf8(data);if(input.startsWith("\ufeff"))input=input.substring(1);
@@ -84,7 +98,7 @@ final class InfinityCastAdaptive {
                 if(kind==null)throw new IOException("unsupported_hls_uri_attribute");
                 int colon=line.indexOf(':');String prefix=line.substring(0,colon+1),attrs=line.substring(colon+1);
                 Matcher m=URI_ATTRIBUTE.matcher(attrs);StringBuffer next=new StringBuffer();int count=0;
-                while(m.find()){count++;m.appendReplacement(next,Matcher.quoteReplacement("URI=\""+links.resource(resolve(base,m.group(1)),kind)+"\""));}
+                while(m.find()){count++;m.appendReplacement(next,Matcher.quoteReplacement(m.group(1)+"URI=\""+links.resource(resolve(base,m.group(2)),kind)+"\""));}
                 m.appendTail(next);if(count!=1)throw new IOException("invalid_hls_uri_attribute");line=prefix+next;
             }
             if(tag.equals("#EXTINF")){int comma=line.indexOf(',');if(comma>=0)line=line.substring(0,comma+1);}
@@ -108,6 +122,7 @@ final class InfinityCastAdaptive {
         for(int i=0;i<previous.getAttributes().getLength();i++){Node a=previous.getAttributes().item(i);if(!copy.hasAttribute(a.getNodeName()))copy.setAttribute(a.getNodeName(),a.getNodeValue());}
         for(String name:new String[]{"SegmentTimeline","Initialization","RepresentationIndex"})
             if(first(copy,name)==null && first(previous,name)!=null)copy.appendChild(previous.getOwnerDocument().importNode(first(previous,name),true));
+        if(children(copy,"SegmentURL").isEmpty())for(Element segment:children(previous,"SegmentURL"))copy.appendChild(segment.cloneNode(true));
         return copy;
     }
     private static void walk(Element node,URI inherited,Element inheritedTemplate,Element inheritedList,Element inheritedBase,Links links,int[] count) throws IOException {
@@ -146,7 +161,7 @@ final class InfinityCastAdaptive {
             String raw=utf8(input);if(raw.toUpperCase(Locale.ROOT).contains("<!DOCTYPE") || raw.toUpperCase(Locale.ROOT).contains("<!ENTITY"))throw new IOException("external_xml_refused");
             DocumentBuilderFactory factory=DocumentBuilderFactory.newInstance();factory.setNamespaceAware(true);
             factory.setExpandEntityReferences(false);factory.setXIncludeAware(false);
-            Document document=factory.newDocumentBuilder().parse(new ByteArrayInputStream(input));Element root=document.getDocumentElement();
+            Document document=factory.newDocumentBuilder().parse(new ByteArrayInputStream(input));prune(document);Element root=document.getDocumentElement();
             if(!"MPD".equals(root.getLocalName()))throw new IOException("invalid_dash_manifest");
             NodeList all=root.getElementsByTagNameNS("*","*");if(all.getLength()>20000)throw new IOException("manifest_entry_limit");
             for(int i=0;i<all.getLength();i++) {
@@ -160,6 +175,19 @@ final class InfinityCastAdaptive {
                 else if(!scheme.contains("utc:direct:"))throw new IOException("unsupported_dash_clock");
             }
             walk(root,base,null,null,null,links,new int[]{0});
+            List<Element> verify=new ArrayList<>();verify.add(root);NodeList nodes=root.getElementsByTagName("*");
+            for(int i=0;i<nodes.getLength();i++)verify.add((Element)nodes.item(i));
+            for(Element e:verify) {
+                e.removeAttributeNS("http://www.w3.org/2001/XMLSchema-instance","schemaLocation");
+                for(int i=0;i<e.getAttributes().getLength();i++) {
+                    Node a=e.getAttributes().item(i);String value=a.getNodeValue();
+                    if(value.contains("://") && !links.owned(value) &&
+                        !(a.getNodeName().startsWith("xmlns") && Arrays.asList("http://www.w3.org/2001/XMLSchema-instance","http://www.w3.org/1999/xlink","urn:mpeg:dash:schema:mpd:2011").contains(value)) &&
+                        !(a.getNodeName().equals("schemeIdUri") && value.matches("https?://dashif\\.org/[A-Za-z0-9/_.-]+")))throw new IOException("unsupported_private_manifest_field");
+                    if("http://www.w3.org/XML/1998/namespace".equals(a.getNamespaceURI()) && "base".equals(a.getLocalName()))throw new IOException("external_xml_refused");
+                }
+                if(children(e,null).isEmpty() && e.getTextContent().contains("://") && !links.owned(e.getTextContent().trim()))throw new IOException("unsupported_private_manifest_field");
+            }
             TransformerFactory transformers=TransformerFactory.newInstance();
             transformers.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true);
             javax.xml.transform.Transformer transform=transformers.newTransformer();transform.setOutputProperty(OutputKeys.ENCODING,"UTF-8");

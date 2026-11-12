@@ -41,9 +41,9 @@ with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub,ZipFile(AP
  for n in stub.namelist():
   if n!='resources.arsc':out.writestr(n,stub.read(n))
  for n in original.namelist():
-  if re.fullmatch(r'classes\d*\.dex',n) or n=='resources.arsc' or n.startswith('res/'):
+  if (re.fullmatch(r'classes\d*\.dex',n) and n!='classes6.dex') or n=='resources.arsc' or n.startswith('res/'):
    out.writestr(n,original.read(n),compress_type=0 if n=='resources.arsc' else ZIP_DEFLATED)
- next_dex=1+max(int(n[7:-4] or 1) for n in original.namelist() if re.fullmatch(r'classes\d*\.dex',n))
+ next_dex=6 # replace only the already isolated Cast component in this disposable probe
  for p in sorted((COMPONENT/'dex').glob('*.dex'))+sorted(dex.glob('*.dex')):
   out.writestr('classes'+str(next_dex)+'.dex',p.read_bytes());next_dex+=1
  for name in ('resources.apk','RESOURCE-IDENTITY.json'):out.write(COMPONENT/name,'assets/infinity/cast/'+name)

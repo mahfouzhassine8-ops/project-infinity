@@ -40,7 +40,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private WeakReference<View> view=new WeakReference<>(null);
     private final ExecutorService initialization=Executors.newSingleThreadExecutor(r->{
         Thread t=new Thread(r,"InfinityCastInitialization");t.setDaemon(true);return t;});
-    private boolean initializing,initialized,discovering,initializationAttempted;
+    private boolean initializing,initialized,discovering,initializationAttempted,listening;
     private CastContext sdk;
     private MediaRouter router;
     private MediaRouteSelector selector;
@@ -54,7 +54,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private boolean phoneClockReady;
     private boolean handedOff,everPlayed,finished,returning,aborting,transferStarted,ticking,leaving,selecting;
     private boolean phoneWasPaused,mayHavePaused,restoreInFlight;
-    private String receiverName="";
+    private String receiverName="",selectedDeviceId="";
     private boolean cleanupPending;
     private final Runnable ticker=this::tick;
     private long lastPosition,lastDuration,epoch,nextNativePoll,returnDeadline,returnEpoch;
@@ -73,7 +73,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     void attach(View value) {
         view=new WeakReference<>(value);
         if(!initialized && !initializationAttempted)initialize();
-        else if(initialized){discover();if(!cleanupPending && !returning && !selecting && !transferStarted && !handedOff && !phone.busy())capture();}
+        else if(initialized){listen();discover();if(!cleanupPending && !returning && !selecting && !transferStarted && !handedOff && !phone.busy())capture();}
         changed();
     }
     void detach(View value) {
@@ -106,7 +106,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             CastContext.getSharedInstance(context,initialization)
                     .addOnSuccessListener(value->ui.post(()->{
                         sdk=value;initializing=false;initialized=true;
-                        sdk.getSessionManager().addSessionManagerListener(this,CastSession.class);
+                        listen();
                         router=MediaRouter.getInstance(context);
                         selector=new MediaRouteSelector.Builder().addControlCategory(
                             CastMediaControlIntent.categoryForCast(CastMediaControlIntent.DEFAULT_MEDIA_RECEIVER_APPLICATION_ID)).build();
@@ -116,6 +116,8 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         } catch(Exception | LinkageError error) {unavailable("The Cast component could not initialize. Phone playback is unchanged.");}
     }
     private void unavailable(String reason){initializing=false;message=reason;changed();}
+    private void listen(){if(sdk!=null && !listening){sdk.getSessionManager().addSessionManagerListener(this,CastSession.class);listening=true;}}
+    private void unlisten(){if(sdk!=null && listening){sdk.getSessionManager().removeSessionManagerListener(this,CastSession.class);listening=false;}}
     private void discover() {
         if(router==null || selector==null || discovering)return;
         discovering=true;router.addCallback(selector,routes,MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);updateDevices();
@@ -136,7 +138,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         phone.request("capture",token,0,value->{
             if(!expected.equals(token))return;
             if(!ok(value)){unavailable("No supported active video is available. Phone playback is unchanged.");return;}
-            source=value;privateSource=InfinityCastSource.parse(value.optString("file"));mime=null;
+            source=value;privateSource=readSource(value);mime=null;
             if(privateSource==null || !value.optBoolean("can_pause") || !value.optBoolean("can_seek")) {
                 privateSource=null;message="This source does not expose a supported HTTP video transport. Phone playback is unchanged.";
             } else message="Choose a Cast device.";
@@ -160,19 +162,27 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         if(privateSource==null || source==null){final String routeId=devices.get(index).getId();captureThenChoose(routeId);return;}
         aborting=returning=false;selecting=true;everPlayed=finished=false;receiverName=devices.get(index).getName();
         message="Connecting to "+receiverName+"…";InfinityCastDiagnostics.event("session","connecting",0);changed();
-        final long generation=++epoch;
-        devices.get(index).select();
-        if(connected())connectedSession(session);
+        CastDevice chosen=CastDevice.getFromBundle(devices.get(index).getExtras());
+        if(chosen==null || !chosen.hasCapability(CastDevice.CAPABILITY_VIDEO_OUT)){selecting=false;message="That receiver does not support video.";changed();return;}
+        selectedDeviceId=chosen.getDeviceId();
+        final long generation=++epoch;devices.get(index).select();
+        CastSession existing=sdk==null?null:sdk.getSessionManager().getCurrentCastSession();
+        if(existing!=null && existing.isConnected() && existing.getCastDevice()!=null && selectedDeviceId.equals(existing.getCastDevice().getDeviceId()))connectedSession(existing);
         ui.postDelayed(()->{
             if(generation==epoch && !handedOff && !aborting){message="The receiver did not become ready. Phone playback is unchanged.";abortTransfer();}
         },20000);
+    }
+    private InfinityCastSource readSource(JSONObject value) {
+        if(!value.optBoolean("cast_headers_supported",true))return null;
+        return InfinityCastSource.parse(value.optString("file"),value.optString("cast_manifest_headers"),
+            value.optString("cast_stream_headers"),value.optBoolean("cast_drm"));
     }
     private void captureThenChoose(String routeId) {
         token=UUID.randomUUID().toString().replace("-","");final String expected=token;
         phone.request("capture",token,0,value->{
             if(!expected.equals(token) || cleanupPending)return;
             if(!ok(value)){message="No supported active video is available. Phone playback is unchanged.";changed();return;}
-            source=value;privateSource=InfinityCastSource.parse(value.optString("file"));
+            source=value;privateSource=readSource(value);
             if(privateSource==null){message="Unsupported current video transport. Phone playback is unchanged.";changed();return;}
             for(int i=0;i<devices.size();i++)if(routeId.equals(devices.get(i).getId())){choose(i);return;}
             message="That receiver is no longer available.";changed();
@@ -181,6 +191,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private boolean ok(JSONObject value){return value!=null && "ok".equals(value.optString("status"));}
     private void connectedSession(CastSession value) {
         if(!selecting || transferStarted || aborting || source==null || privateSource==null)return;
+        if(value==null || value.getCastDevice()==null || !selectedDeviceId.equals(value.getCastDevice().getDeviceId()))return;
         transferStarted=true;phoneClockReady=false;
         session=value;remote=value.getRemoteMediaClient();
         CastDevice device=value.getCastDevice();
@@ -193,13 +204,13 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         phone.request("snapshot",token,0,current->{
             if(!expected.equals(token) || session!=value)return;
             if(!ok(current)){abortTransfer();return;}
-            source=current;privateSource=InfinityCastSource.parse(current.optString("file"));
+            source=current;privateSource=readSource(current);
             if(aborting || privateSource==null){abortTransfer();return;}
             phoneWasPaused=current.optBoolean("paused");mayHavePaused=false;
             try {
                 if(channel!=null)channel.close();
                 channel=new InfinityCastChannel(token,current.getString("file_sha256"),current.getString("origin_sha256"));
-                publish();InfinityCastRpc.channel(channel.name,false);
+                publish();phone.request("channel",token,0,registered->{if(!ok(registered))InfinityCastDiagnostics.event("observer","registration_unavailable",0);});
                 message="Checking supported media; phone playback continues.";changed();
                 relay=InfinityCastRelay.start(device.getInetAddress(),privateSource,(owner,type,failure)->ui.post(()->{
                     if(!expected.equals(token) || session!=value || !transferStarted || aborting) {owner.close();return;}
@@ -228,6 +239,8 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(metadata)
                 .setCustomData(new JSONObject().put("infinity_transaction",mediaToken));
             if(source.optLong("duration_ms")>0)info.setStreamDuration(source.optLong("duration_ms"));
+            if(owner.hlsVideoFormat()!=null)info.setHlsVideoSegmentFormat(owner.hlsVideoFormat());
+            if(owner.hlsAudioFormat()!=null)info.setHlsSegmentFormat(owner.hlsAudioFormat());
             message="Preparing the receiver; phone playback continues.";changed();
             final String expectedMedia=mediaToken;
             remote.load(new MediaLoadRequestData.Builder().setMediaInfo(info.build()).setAutoplay(false)
@@ -241,10 +254,10 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private void waitForReady(long deadline,String expected) {
         if(!expected.equals(token) || aborting || returning || handedOff)return;
         if(!connected() || !ownsMedia()){if(SystemClock.uptimeMillis()>deadline){abortTransfer();return;}}
-        else if(remote.getPlayerState()==MediaStatus.PLAYER_STATE_PAUSED && channel!=null && channel.acknowledged()) {
+        else if(remote.getPlayerState()==MediaStatus.PLAYER_STATE_PAUSED && !phone.busy()) {
             pausePhone();return;
         }
-        if(SystemClock.uptimeMillis()>deadline){message="The playback observer or receiver is not ready. Phone playback is unchanged.";abortTransfer();return;}
+        if(SystemClock.uptimeMillis()>deadline){message="The TV did not finish preparing this movie. Phone playback is unchanged.";abortTransfer();return;}
         ui.postDelayed(()->waitForReady(deadline,expected),100);
     }
     private void pausePhone() {
@@ -335,7 +348,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             channel.publish(new JSONObject().put("schema",1).put("controller","InfinityCastV1")
                 .put("pid",Process.myPid()).put("session",token).put("at_ms",SystemClock.uptimeMillis())
                 .put("file_sha256",source.getString("file_sha256")).put("origin_sha256",source.getString("origin_sha256"))
-                .put("connected",connected()).put("owned",handedOff)
+                .put("connected",connected()).put("owned",handedOff && channel.acknowledged())
                 .put("media_matches",ownsMedia())
                 .put("ever_played",everPlayed).put("completed",finished)
                 .put("position",lastPosition/1000.0).put("duration",lastDuration/1000.0));
@@ -436,12 +449,12 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         boolean ownedSession=selecting || transferStarted || handedOff;
         if(remote!=null){try{remote.unregisterCallback(mediaEvents);if(stopOwnedMedia && own && connected())remote.stop();}catch(RuntimeException ignored){}}
         if(relay!=null){relay.close();relay=null;}
-        ui.removeCallbacks(ticker);ticking=false;
+        ui.removeCallbacksAndMessages(null);ticking=false;
         // Explicitly release the RAM-only recorder channel on every exit. The
         // ordinary recorder keeps its last real sample; no records are forged.
-        if(channel!=null){InfinityCastRpc.channel(channel.name,true);channel.close();channel=null;}
+        if(channel!=null){channel.close();channel=null;}
         if(sdk!=null && session!=null && ownedSession)try{sdk.getSessionManager().endCurrentSession(false);}catch(RuntimeException ignored){}
-        remote=null;session=null;stopDiscovery();
+        remote=null;session=null;stopDiscovery();unlisten();
         phone.afterIdle(()->releaseNative(expected));
         changed();
     }
@@ -450,7 +463,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         if(mayHavePaused && !phoneClockReady) {
             // A late committed pause must be reconciled before dropping token
             // ownership. Native item binding protects all other playback.
-            phone.request("resume",expected,0,result->{
+            phone.request(!everPlayed && phoneWasPaused?"pause":"resume",expected,0,result->{
                 phoneClockReady=true;releaseNative(expected);
             });return;
         }
@@ -460,7 +473,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             returnDeadline=0;mayHavePaused=restoreInFlight=false;phoneClockReady=false;
             cleanupPending=leaving=aborting=false;privateSource=null;token="";mediaToken="";
             InfinityCastDiagnostics.event("cleanup","session_released",0);
-            if(view.get()!=null)discover();changed();
+            if(view.get()!=null){listen();discover();}changed();
         });
     }
     @Override public void onSessionStarted(CastSession s,String id){connectedSession(s);}

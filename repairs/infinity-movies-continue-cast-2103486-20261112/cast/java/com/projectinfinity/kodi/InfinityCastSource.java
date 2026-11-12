@@ -15,8 +15,9 @@ final class InfinityCastSource {
     final URI uri;
     final Map<String,String> headers;
     final String hint;
+    final Map<String,String> streamHeaders;
     private InfinityCastSource(URI uri,Map<String,String> headers,String hint) {
-        this.uri=uri;this.headers=Collections.unmodifiableMap(headers);this.hint=hint;
+        this.uri=uri;this.headers=Collections.unmodifiableMap(headers);this.streamHeaders=this.headers;this.hint=hint;
     }
     static InfinityCastSource parse(String raw) {
         if(raw==null || raw.isEmpty() || raw.length()>65536)return null;
@@ -37,7 +38,7 @@ final class InfinityCastSource {
                     int equals=field.indexOf('=');if(equals<=0)return null;
                     String name=URLDecoder.decode(field.substring(0,equals),"UTF-8").toLowerCase(Locale.ROOT);
                     String value=URLDecoder.decode(field.substring(equals+1),"UTF-8");
-                    if(!java.util.Arrays.asList("user-agent","referer","origin","cookie","authorization","accept","accept-language").contains(name) ||
+                    if(!(java.util.Arrays.asList("user-agent","referer","origin","cookie","authorization","accept","accept-language").contains(name) || name.matches("x-[a-z0-9-]{1,48}")) ||
                         value.length()>4096 || headers.containsKey(name))return null;
                     for(int i=0;i<value.length();i++)if(value.charAt(i)<32 || value.charAt(i)==127)return null;
                     headers.put(name,value);
@@ -45,6 +46,17 @@ final class InfinityCastSource {
             }
             return new InfinityCastSource(uri,headers,hint);
         } catch(Exception invalid){return null;}
+    }
+    private InfinityCastSource(InfinityCastSource source,Map<String,String> manifest,Map<String,String> stream) {
+        uri=source.uri;hint=source.hint;Map<String,String> root=new LinkedHashMap<>(source.headers);root.putAll(manifest);
+        Map<String,String> media=new LinkedHashMap<>(source.headers);media.putAll(stream.isEmpty()?manifest:stream);
+        headers=Collections.unmodifiableMap(root);streamHeaders=Collections.unmodifiableMap(media);
+    }
+    static InfinityCastSource parse(String raw,String manifest,String stream,boolean drm) {
+        if(drm)return null;InfinityCastSource source=parse(raw);if(source==null)return null;
+        InfinityCastSource root=parse("https://headers.invalid/media.mp4|"+(manifest==null?"":manifest));
+        InfinityCastSource media=parse("https://headers.invalid/media.mp4|"+(stream==null?"":stream));
+        return root==null || media==null?null:new InfinityCastSource(source,root.headers,media.headers);
     }
     static String mime(String contentType,String hint) {
         String type=contentType==null?"":contentType.split(";",2)[0].trim().toLowerCase(Locale.ROOT);
