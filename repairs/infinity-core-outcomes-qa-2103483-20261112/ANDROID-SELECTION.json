@@ -57,10 +57,10 @@
     ]
   },
   "source_bindings": {
-    ".github/workflows/infinity-saved-navigation-android.yml": "daa3bc06bd5c65f629c273a7da207057fe03a28f82c0754673e192a1d594e70f",
+    ".github/workflows/infinity-saved-navigation-android.yml": "016813ed265dbf1eebb8816b29a25b668911fd977cdee4de3109f43d462b3cfc",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/NATIVE-BINDINGS.json": "b0f62e84af2d0d0b609082866dcffcaffb01d8659c364dcff1e111312bbdeff5",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/SCOPE.json": "2a0141e120483194f93edce3daf763eb57ed223596eca1f4432ae273688c46f1",
-    "repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py": "0425da7f85c6169fbf37c3076b4a3aa402ecc0792450b6231863f1647c1078df",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/SCOPE.json": "c6038c4c77e2f1b60b2f8883f77dc5f1e1006a6e4d4c7e116c20bd739fcaf58f",
+    "repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py": "3e6b8055533883805e7b0c66637cbfda135b54c240cac5119fe6f0872e6c455b",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/build_native.py": "c27f767f96aa67afd1c53584602eb352dbeb4c6722e0b2cd661caffcbb7d3081",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/make_overlay.py": "7e8c56e05f454b942222631b5059dd079b6a52819f90400923d1351b806e0a68",
     "repairs/infinity-core-outcomes-qa-2103483-20261112/native/InfinityCoreOutcomeTrace.h": "079b9eade6060ca68e48fc29a8ea376d64b764ca0b47edb999507d36c6f32c73",
@@ -81,7 +81,8 @@
     "Exact original83 install; root VM native injection before first launch; APK hash and file metadata retained",
     "Normal unmodified Core ZIP installation/enabling; original copy/metadata targets and namespace-rejected dlopen",
     "Correlated direct JSON native log events and complete own-process Core maps",
-    "Local Python before/after, actual Health Center control, authenticated local Command Center plugin"
+    "Local Python before/after, actual Health Center control, authenticated local Command Center plugin",
+    "Specific observed SIGSEGV43163420602: matched original83 same-procedure freshVM startup/localPython control only, distinct NOT_DIAGNOSTIC_ACCEPTANCE status"
   ],
   "unselected": [
     "Core successful activation",
@@ -91,5 +92,6 @@
     "Owner data/device",
     "APK installation acceptance"
   ],
-  "blocker": null
+  "blocker": null,
+  "allow_matched_baseline_control": true
 }

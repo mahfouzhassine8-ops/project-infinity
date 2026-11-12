@@ -26,5 +26,6 @@
   "new_phone_diagnostics": false,
   "source_exports_required": false,
   "map_visibility": "Bounded own-process map observation; incomplete visibility is NOT_VERIFIED, never worker absence or native drain. Any observed mapping/start/success load rejects selected failure-path test.",
-  "selected_Mac_capture": "One owner-controlled attempt: direct logcat plus read-only existing external checkpoint receipts and process observations, no app command or write"
+  "selected_Mac_capture": "One owner-controlled attempt: direct logcat plus read-only existing external checkpoint receipts and process observations, no app command or write",
+  "selected_startup_control": "Specific startup SIGSEGV43163420602 only: exact83/f14 vs same e781 engine, separate matched freshVM profiles and same library copy/launch/localPython path; noCore installation incontrol, noClose, distinctnonacceptance result"
 }

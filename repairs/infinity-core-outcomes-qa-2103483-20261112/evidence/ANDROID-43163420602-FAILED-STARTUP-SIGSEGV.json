@@ -1,0 +1,36 @@
+{
+  "APK_install_acceptance": false,
+  "APK_modified": false,
+  "Core_success_activated": false,
+  "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "before_first_launch": true,
+  "cases": [],
+  "environment": {
+    "application_installed": false,
+    "application_started": false,
+    "compatibility_overrides": false,
+    "fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys",
+    "image": "system-images;android-36;google_apis;x86_64",
+    "page_size": 4096,
+    "revision": 7,
+    "sdk": 36,
+    "serial": "emulator-5554",
+    "status": "PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY",
+    "stock_bridge_build_id": "2810e5b44895c4ea0b1ad6882ea73b73",
+    "stock_bridge_sha256": "fbadc774c989534a567e6af8fd16d2c00727b1f1d9cc778bf538d6b59ed9776d"
+  },
+  "error": "Traceback (most recent call last):\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py\", line 525, in run\n    report['startup'] = base.start_once(device, 1, out); checkpoint()\n                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 620, in start_once\n    device.alive()\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-core-outcomes-qa-2103483-20261112/android_probe.py\", line 105, in alive\n    super().alive()\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 320, in alive\n    require(self.pids() == [str(self.pid)], 'NATIVE_ENGINE_DIED_OR_RESTARTED')\n  File \"/home/runner/work/project-infinity/project-infinity/repairs/infinity-tracking-integration-2103469-20261108/qualify_android_baseline.py\", line 54, in require\n    raise RuntimeError(label)\nRuntimeError: NATIVE_ENGINE_DIED_OR_RESTARTED\n",
+  "injection": {
+    "after": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33",
+    "before": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+    "destination": "/data/app/~~EM6l6slA8r7j2vrzpA0ZJg==/com.projectinfinity.kodi-E5my7Z2t4FEh-npvG5CtzQ==/lib/arm64/libkodi.so",
+    "status": "PASS_PRELAUNCH_NATIVE_INJECTION_NOT_APK_INSTALL_ACCEPTANCE"
+  },
+  "native_injection": true,
+  "native_producer_source": "f5b38189201e0401aa62b652e1320c73f50f37e0",
+  "native_sha256": "e78145538fdefc600572c05b025f79c34cc6d807ae0ba3a4bfb573d6f9dabe33",
+  "owner_device": false,
+  "shutdown": "NOT_RUN",
+  "source_commit": "151970a1a7aecdb501c77e921debe6ebc4ca770d",
+  "status": "BLOCKED_OR_FAILED_PRE_SIGN_DIAGNOSTIC"
+}

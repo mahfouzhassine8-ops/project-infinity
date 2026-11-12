@@ -12,6 +12,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shutil
 import socket
 import stat
 import subprocess
@@ -26,6 +27,7 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 BRANCH = 'work/infinity-core-outcomes-qa-20261112'
 FEATURE = 'core-outcomes-native-qa'
+CONTROL_FEATURE = 'core-outcomes-baseline-startup'
 SELECTION = HERE / 'ANDROID-SELECTION.json'
 APK_SHA = '0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236'
 OLD_NATIVE = 'f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c'
@@ -74,7 +76,9 @@ def selected():
     if os.environ.get('GITHUB_ACTIONS') == 'true':
         require(os.environ.get('GITHUB_REPOSITORY') == 'mahfouzhassine8-ops/project-infinity' and
                 os.environ.get('GITHUB_REF') == 'refs/heads/' + BRANCH and
-                os.environ.get('SELECTED_FEATURE') == FEATURE, 'EXACT_MANUAL_CI_ROUTE')
+                (os.environ.get('SELECTED_FEATURE') == FEATURE or
+                 (os.environ.get('SELECTED_FEATURE') == CONTROL_FEATURE and
+                  row.get('allow_matched_baseline_control') is True)), 'EXACT_MANUAL_CI_ROUTE')
         require(re.fullmatch('[0-9a-f]{40}', os.environ.get('SELECTED_SOURCE', '')) and
                 subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() ==
                 os.environ['SELECTED_SOURCE'], 'EXACT_CHECKED_OUT_TEST_SOURCE')
@@ -252,6 +256,12 @@ def stage(inputs, sdk):
             zip.write(Path(proof['publisher']) / name, CORE + '/' + name)
         zip.write(Path(proof['publisher']) / 'libadulthideout_core.so', CORE + '/bin/android-arm64-v8a/libadulthideout_core.so')
         zip.writestr(CORE + '/bin/android-arm64-v8a/version.txt', '1.0.1\n')
+    if os.environ.get('SELECTED_FEATURE') == CONTROL_FEATURE:
+        control = inputs / 'exact83-control-libkodi.so'
+        with ZipFile(apk) as archive, archive.open('lib/arm64-v8a/libkodi.so') as src, control.open('xb') as dst:
+            shutil.copyfileobj(src, dst, 1024 * 1024)
+        require(sha(control) == OLD_NATIVE, 'EXACT_ORIGINAL83_CONTROL_ENGINE')
+        proof['control_native'] = str(control.resolve())
     health = {}
     with ZipFile(apk) as zip:
         for name in ('default.py', 'khc_contracts.py'):
@@ -456,19 +466,194 @@ def discover_native(device, installed, out):
         base.save(out / 'PACKAGE-NATIVE-DISCOVERY.json', evidence)
 
 
+def matching_crash(text, pid, uid):
+    """Strict identity from the Android tombstone, never a log substring."""
+    commands = re.findall(r'^Cmdline:\s*([^\r\n]+)$', text, re.M)
+    identities = re.findall(r'^pid:\s*(\d+),\s*tid:\s*\d+,.*?>>>\s*([^<>\r\n]+?)\s*<<<', text, re.M)
+    users = re.findall(r'^uid:\s*(\d+)\s*$', text, re.M)
+    return (bool(commands and identities and users) and
+            all(command.strip() == base.PACKAGE + ':kodi' for command in commands) and
+            all(int(number) == pid and name.strip() == base.PACKAGE + ':kodi'
+                for number, name in identities) and all(int(number) == uid for number in users))
+
+
+def symbolize_crash(text, library, expected_sha, sdk, destination, deadline):
+    result = dict(status='NOT_RUN_NO_AVAILABLE_LLVM_ADDR2LINE', diagnostic_only=True,
+                  native_sha256=expected_sha)
+    tools = [sdk / 'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-addr2line']
+    available = shutil.which('llvm-addr2line')
+    if available:
+        tools.append(Path(available))
+    tool = next((path for path in tools if path.is_file() and os.access(path, os.X_OK)), None)
+    if tool is None:
+        return result
+    if not library.is_file() or sha(library) != expected_sha:
+        return dict(status='REFUSED_NATIVE_BINARY_IDENTITY_MISMATCH', diagnostic_only=True)
+    frames = []
+    for line in text.splitlines():
+        match = re.match(r'^\s*#(\d+)\s+pc\s+([0-9a-fA-F]{1,16})\s+(\S*libkodi\.so)(?:\s|$)', line)
+        if match and match.group(3) == destination:
+            frames.append(dict(frame=int(match.group(1)), relative_pc='0x' + match.group(2),
+                               module=match.group(3), original_line=line))
+    if not frames:
+        return dict(status='NOT_RUN_NO_FRAMES_FOR_EXACT_INJECTED_KODI_PATH', diagnostic_only=True,
+                    native_sha256=expected_sha)
+    if time.monotonic() >= deadline:
+        return dict(status='NOT_RUN_DIAGNOSTIC_BUDGET_EXHAUSTED', diagnostic_only=True)
+    result.update(tool=str(tool), tool_sha256=sha(tool), frames=frames[:64], frame_limit=64)
+    try:
+        version = subprocess.run([str(tool), '--version'], capture_output=True, text=True,
+                                 timeout=min(2, max(.1, deadline - time.monotonic())))
+        result['tool_version'] = version.stdout[:2048]
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            result['status'] = 'NOT_RUN_DIAGNOSTIC_BUDGET_EXHAUSTED'
+            return result
+        command = [str(tool), '-C', '-f', '-i', '-e', str(library)]
+        command.extend(frame['relative_pc'] for frame in frames[:64])
+        symbols = subprocess.run(command, capture_output=True, text=True, timeout=min(5, remaining))
+        result.update(status='SYMBOLIZATION_COMPLETED' if symbols.returncode == 0 else 'SYMBOLIZER_ERROR',
+                      returncode=symbols.returncode, symbols=symbols.stdout[:262144],
+                      stderr=symbols.stderr[:2048], output_truncated=len(symbols.stdout) > 262144)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        result.update(status='SYMBOLIZER_UNAVAILABLE_OR_TIMEOUT', error=type(error).__name__)
+    return result
+
+
+def collect_failure(device, out, environment, uid, library, expected_sha, sdk, destination):
+    """Failure-only readback on the already-rooted, admitted disposable CI VM.
+
+    No escalation, permission changes, app action, signal, restart or log clear.
+    API36 tombstoned publishes tombstone_NN via linkat only after kCompletedDump
+    (AOSP android-16.0.0_r1 debuggerd/tombstoned/tombstoned.cpp:431–466).
+    """
+    result = dict(status='NOT_RUN_ENVIRONMENT_OR_IDENTITY_NOT_ADMITTED', failure_only=True,
+                  original_failure_unchanged=True, wait_budget_seconds=40,
+                  tombstone_read_limit_bytes=4194304, retained_foreign_crashes=False)
+    if not (os.environ.get('GITHUB_ACTIONS') == 'true' and
+            os.environ.get('GITHUB_REPOSITORY') == 'mahfouzhassine8-ops/project-infinity' and
+            os.environ.get('GITHUB_REF') == 'refs/heads/' + BRANCH and
+            environment.get('status') == 'PASS_STOCK_API36_ENVIRONMENT_INTAKE_ONLY' and
+            environment.get('sdk') == 36 and environment.get('serial') == device.serial and
+            re.fullmatch(r'emulator-\d+', device.serial) and
+            type(device.pid) is int and device.pid > 0 and
+            str(uid).isdigit() and 10000 <= int(uid) < 100000):
+        return result
+    began = time.monotonic(); deadline = began + 40
+    result.update(status='WAITING_FOR_COMPLETED_MATCHING_NATIVE_TOMBSTONE', pid=device.pid, uid=int(uid),
+                  cmdline=base.PACKAGE + ':kodi', candidates=[], captured_at_utc=time.time())
+    names = ['/data/tombstones/tombstone_%02d' % i for i in range(32)]
+    seen = set()
+
+    def command(arguments, limit=4):
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return None
+        try:
+            return subprocess.run([str(device.adb_bin), '-s', device.serial, *arguments],
+                                  capture_output=True, timeout=min(limit, remaining))
+        except (OSError, subprocess.TimeoutExpired) as error:
+            result['last_query_error'] = type(error).__name__
+            return None
+
+    # Capture all Android buffers for this app UID only; debuggerd's completed
+    # text below supplies frames emitted under the system crash-dumper UID.
+    logs = command(['logcat', '-b', 'all', '-d', '--uid=' + str(uid), '-v', 'threadtime', '-t', '4000'], 5)
+    if logs is not None:
+        result['uid_logcat'] = dict(returncode=logs.returncode, bytes=len(logs.stdout),
+            retained_bytes=min(len(logs.stdout), 8 * 1024**2), truncated=len(logs.stdout) > 8 * 1024**2,
+            stderr=logs.stderr.decode(errors='replace')[:2048])
+        if logs.returncode == 0:
+            (out / 'failure-app-uid-logcat.txt').write_bytes(logs.stdout[:8 * 1024**2])
+    else:
+        result['uid_logcat'] = dict(status='UNAVAILABLE_OR_TIMEOUT')
+    while time.monotonic() < deadline:
+        metadata = command(['shell', 'stat', '-c', '%n|%f|%s|%Y|%i', *names])
+        if metadata is None:
+            break
+        error = metadata.stderr.decode(errors='replace')
+        if 'Permission denied' in error or 'Operation not permitted' in error:
+            result['tombstone_access_denied'] = True
+        candidates = []
+        for line in metadata.stdout.decode(errors='replace').splitlines():
+            parts = line.split('|')
+            if len(parts) != 5 or parts[0] not in names or not re.fullmatch(r'[0-9a-fA-F]+', parts[1]) or not all(p.isdigit() for p in parts[2:]):
+                continue
+            path, mode, size, mtime, inode = parts
+            signature = tuple(parts)
+            if signature in seen:
+                continue
+            seen.add(signature)
+            observation = dict(path=path, size=int(size), mtime=int(mtime), inode=int(inode))
+            result['candidates'].append(observation)
+            if not stat.S_ISREG(int(mode, 16)):
+                observation['status'] = 'NON_REGULAR_NOT_READ'
+            elif int(size) == 0:
+                observation['status'] = 'EMPTY_PUBLISHED_FILE'
+            else:
+                candidates.append((parts, observation))
+        # Read only fixed, published text filenames; never .pb, temp files, or
+        # a directory traversal. Foreign contents are inspected then discarded.
+        for parts, observation in sorted(candidates, key=lambda item: int(item[0][3]), reverse=True):
+            content = command(['exec-out', 'head', '-c', '4194304', parts[0]])
+            if content is None:
+                observation['status'] = 'READ_UNAVAILABLE_OR_TIMEOUT'
+                break
+            if content.returncode:
+                observation['status'] = 'READ_FAILED'
+                continue
+            raw = content.stdout
+            if len(raw) != min(int(parts[2]), 4194304) or len(raw) > 4194304:
+                observation['status'] = 'SIZE_CHANGED_OR_TRUNCATED_NOT_RETAINED'
+                continue
+            text = raw.decode('utf-8', errors='replace')
+            if not matching_crash(text, device.pid, int(uid)):
+                observation['status'] = 'FOREIGN_OR_UNMATCHED_IDENTITY_NOT_RETAINED'
+                continue
+            confirm = command(['shell', 'stat', '-c', '%n|%f|%s|%Y|%i', parts[0]])
+            if confirm is None or confirm.returncode or confirm.stdout.decode(errors='replace').strip() != '|'.join(parts):
+                observation['status'] = 'FILE_REPLACED_DURING_READ_NOT_RETAINED'
+                continue
+            target = out / ('failure-own-' + Path(parts[0]).name + '.txt')
+            target.write_bytes(raw)
+            observation.update(status='MATCHED_OWN_COMPLETED_PUBLISHED_TOMBSTONE', local_file=target.name,
+                               sha256=hashlib.sha256(raw).hexdigest(),
+                               full_tombstone_captured=int(parts[2]) <= 4194304,
+                               truncated=int(parts[2]) > 4194304)
+            result.update(status='CAPTURED_MATCHING_COMPLETED_NATIVE_TOMBSTONE_TEXT',
+                          tombstone=observation, publication_completion='API36_TOMBSTONED_KCOMPLETEDDUMP_THEN_LINKAT',
+                          elapsed_seconds=time.monotonic() - began,
+                          backtrace_lines=len(re.findall(r'^\s*#\d+\s+pc\s+', text, re.M)))
+            result['symbolization'] = symbolize_crash(text, library, expected_sha, sdk, destination, deadline)
+            result['elapsed_seconds'] = time.monotonic() - began
+            return result
+        if time.monotonic() < deadline:
+            time.sleep(min(1, max(0, deadline - time.monotonic())))
+    result.update(status='TOMBSTONE_ACCESS_DENIED' if result.get('tombstone_access_denied') else
+                  'TIMED_OUT_NO_COMPLETED_MATCHING_TOMBSTONE', elapsed_seconds=time.monotonic() - began)
+    return result
+
+
 def run(inputs, sdk, out):
+    control = os.environ.get('SELECTED_FEATURE') == CONTROL_FEATURE
     row = selected(); proof = base.load(inputs / 'INTAKE.json')
     require(os.environ.get('GITHUB_ACTIONS') == 'true' and not out.exists(), 'CI_FRESH_OUTPUT_ONLY')
     require(proof['selection_sha256'] == sha(SELECTION) and sha(Path(proof['apk'])) == APK_SHA and
             sha(Path(proof['native'])) == row['native']['native_sha256'], 'EXACT_CURRENT_ADMITTED_INPUTS')
     for key in ('qa', 'core'):
         require(sha(inputs / proof[key]['archive']) == proof[key]['sha256'], 'STAGED_ZIP_UNCHANGED')
+    expected_engine = OLD_NATIVE if control else row['native']['native_sha256']
+    engine_path = Path(proof['control_native'] if control else proof['native'])
+    require(sha(engine_path) == expected_engine, 'EXACT_SELECTED_ENGINE_BYTES')
     out.mkdir(parents=True)
     report = dict(status='RUNNING', native_injection=True, APK_modified=False, before_first_launch=True,
-        owner_device=False, baseline_APK_sha256=APK_SHA, native_sha256=row['native']['native_sha256'],
+        owner_device=False, baseline_APK_sha256=APK_SHA, native_sha256=expected_engine,
+        matched_baseline_control=control, original83_engine=control,
         source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), native_producer_source=proof['native_source'],
         APK_install_acceptance=False, Core_success_activated=False, shutdown='NOT_RUN', cases=[])
     device = reader = None
+    uid = None
+    destination = None
     def checkpoint(): base.save(out / 'ANDROID-CORE-OUTCOMES.json', report)
     try:
         device = Device(out, sdk); report['environment'] = base.environment(device, out)
@@ -483,14 +668,14 @@ def run(inputs, sdk, out):
         destination = discover_native(device, installed, out)
         before = device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip()
         staged = '/data/local/tmp/infinity-core-outcomes-libkodi.so'
-        device.adb('push', proof['native'], staged, timeout=300)
-        require(device.shell('sha256sum', staged).split()[0] == row['native']['native_sha256'], 'PUSHED_ENGINE_SHA')
+        device.adb('push', engine_path, staged, timeout=300)
+        require(device.shell('sha256sum', staged).split()[0] == expected_engine, 'PUSHED_ENGINE_SHA')
         device.shell('cp', staged, destination, timeout=120)
         require(device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip() == before, 'NATIVE_FILE_OWNER_MODE_LABEL_PRESERVED')
-        require(device.shell('sha256sum', destination).split()[0] == row['native']['native_sha256'], 'INJECTED_ENGINE_READBACK')
+        require(device.shell('sha256sum', destination).split()[0] == expected_engine, 'INJECTED_ENGINE_READBACK')
         require(device.shell('sha256sum', installed).split()[0] == APK_SHA and not device.pids(), 'APK_UNCHANGED_BEFORE_FIRST_LAUNCH')
         report['injection'] = dict(status='PASS_PRELAUNCH_NATIVE_INJECTION_NOT_APK_INSTALL_ACCEPTANCE',
-                                   destination=destination, before=OLD_NATIVE, after=row['native']['native_sha256'])
+                                   destination=destination, before=OLD_NATIVE, after=expected_engine)
         device.shell('mkdir', '-p', base.PROFILE, REMOTE, QP)
         settings = out / 'HARNESS_BOOTSTRAP-guisettings.xml'
         settings.write_text('<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting><setting id="general.addonupdates">2</setting><setting id="addons.unknownsources">true</setting><setting id="services.esenabled">true</setting><setting id="services.esallinterfaces">true</setting></settings>')
@@ -518,15 +703,21 @@ def run(inputs, sdk, out):
                 stdout=stream, stderr=error, stdin=subprocess.DEVNULL, close_fds=True, start_new_session=True)
         device.core_reader = reader
         base.save(out / 'STAGING-IDENTITY.json', dict(status='PASS_PRELAUNCH_NATIVE_INJECTION_ONLY_NOT_APK_INSTALL_ACCEPTANCE',
-            native_sha256=row['native']['native_sha256'], baseline_APK_sha256=APK_SHA,
-            native_injection=True, APK_modified=False, before_first_launch=True, owner_device=False,
+            native_sha256=expected_engine, baseline_APK_sha256=APK_SHA,
+            matched_baseline_control=control, native_injection=True, APK_modified=False, before_first_launch=True, owner_device=False,
             source_commit=report['source_commit'], native_producer_source=proof['native_source'],
             installed_native_path=destination, package_preservation_acceptance=False))
         report['startup'] = base.start_once(device, 1, out); checkpoint()
-        require(device.shell('sha256sum', destination).split()[0] == row['native']['native_sha256'], 'RUNTIME_ENGINE_FILE_UNCHANGED')
+        require(device.shell('sha256sum', destination).split()[0] == expected_engine, 'RUNTIME_ENGINE_FILE_UNCHANGED')
         gui.install_zip(device, proof['qa'], dict(remote_zip_directory=REMOTE), out, 'local-observer')
         nonce = uuid.uuid4().hex
         report['cases'].append(invoke(device, proof, out, 'local-python', 1, nonce)); checkpoint()
+        if control:
+            require(not events(device.core_log, device.pid), 'ORIGINAL83_HAS_NO_CORE_DIAGNOSTIC_EVENTS')
+            base.crash_free_alive(device)
+            report['status'] = 'PASS_MATCHED_ORIGINAL83_STARTUP_CONTROL_ONLY_NOT_DIAGNOSTIC_ACCEPTANCE'
+            checkpoint()
+            return
         gui.install_zip(device, proof['core'], dict(remote_zip_directory=REMOTE), out, 'original-core-source')
         report['core_enable'] = enable(device, CORE); checkpoint()
         deadline = time.monotonic() + 60
@@ -566,6 +757,15 @@ def run(inputs, sdk, out):
             except subprocess.TimeoutExpired:
                 os.killpg(reader.pid, signal.SIGKILL); reader.wait(timeout=3)
         if device:
+            if report['status'] not in ('PASS_SELECTED_PRE_SIGN_ANDROID_CORE_OUTCOME_DIAGNOSTIC_ONLY',
+                                       'PASS_MATCHED_ORIGINAL83_STARTUP_CONTROL_ONLY_NOT_DIAGNOSTIC_ACCEPTANCE'):
+                try:
+                    report['failure_diagnostics'] = collect_failure(device, out, report.get('environment', {}),
+                        uid, engine_path, expected_engine, sdk, destination)
+                    base.save(out / 'FAILURE-ONLY-DIAGNOSTICS.json', report['failure_diagnostics'])
+                except Exception as error:
+                    # Collection must never replace the original exception/status.
+                    report['failure_collection_error'] = type(error).__name__ + ': ' + str(error)
             for name in ('kodi.log', 'kodi.old.log'):
                 try: device.adb('pull', base.HOME + '/temp/' + name, out / name, check=False)
                 except Exception: pass

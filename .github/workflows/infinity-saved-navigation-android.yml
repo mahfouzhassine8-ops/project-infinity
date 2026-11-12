@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, startup82-local-python, startup-internal-qa, core-outcomes-native-qa, core-outcomes-signed-install]
+        options: [select-a-feature, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, startup82-local-python, startup-internal-qa, core-outcomes-native-qa, core-outcomes-signed-install, core-outcomes-baseline-startup]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1812,7 +1812,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'core-outcomes-signed-install' && inputs.feature != 'core-outcomes-native-qa' && inputs.feature != 'startup-internal-qa' && inputs.feature != 'startup82-local-python' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
+    if: inputs.feature != 'core-outcomes-baseline-startup' && inputs.feature != 'core-outcomes-signed-install' && inputs.feature != 'core-outcomes-native-qa' && inputs.feature != 'startup-internal-qa' && inputs.feature != 'startup82-local-python' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -2298,12 +2298,12 @@ jobs:
 
   selected-core-outcomes-native-qa:
     name: Original83 APK with isolated VM engine injection; original Core failure outcomes only
-    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'core-outcomes-native-qa' && github.ref == 'refs/heads/work/infinity-core-outcomes-qa-20261112'
+    if: github.event_name == 'workflow_dispatch' && (inputs.feature == 'core-outcomes-native-qa' || inputs.feature == 'core-outcomes-baseline-startup') && github.ref == 'refs/heads/work/infinity-core-outcomes-qa-20261112'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     env:
       GH_TOKEN: '${{ github.token }}'
-      SELECTED_FEATURE: core-outcomes-native-qa
+      SELECTED_FEATURE: ${{ inputs.feature }}
       SELECTED_SOURCE: '${{ inputs.source_ref }}'
       AUTHORIZED_SCOPE: '${{ inputs.authorization }}'
       PYTHONDONTWRITEBYTECODE: '1'
