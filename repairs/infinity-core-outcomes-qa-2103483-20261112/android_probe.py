@@ -32,6 +32,7 @@ OLD_NATIVE = 'f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c'
 CORE = 'service.adulthideout.core'
 CORE_SOURCE = '2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3'
 CORE_BINARY = 'c4a8a8d1e046cab6a42934b8fba31246efb21a002a90beb2bffa555623a383a9'
+PUBLISHER = '6d38cce274bb45e2b658a63dd44a01e94c8ae990'
 QA = 'script.infinity.coreoutcomesqa'
 sys.path.insert(0, str(ROOT / 'repairs/infinity-tracking-integration-2103469-20261108'))
 import qualify_android_baseline as base
@@ -74,6 +75,9 @@ def selected():
         require(os.environ.get('GITHUB_REPOSITORY') == 'mahfouzhassine8-ops/project-infinity' and
                 os.environ.get('GITHUB_REF') == 'refs/heads/' + BRANCH and
                 os.environ.get('SELECTED_FEATURE') == FEATURE, 'EXACT_MANUAL_CI_ROUTE')
+        require(re.fullmatch('[0-9a-f]{40}', os.environ.get('SELECTED_SOURCE', '')) and
+                subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip() ==
+                os.environ['SELECTED_SOURCE'], 'EXACT_CHECKED_OUT_TEST_SOURCE')
     return row
 
 
@@ -99,6 +103,9 @@ class Device(RetainedDevice):
 
     def alive(self):
         super().alive()
+        reader = getattr(self, 'core_reader', None)
+        if reader is not None:
+            require(reader.poll() is None, 'DIRECT_NATIVE_DIAGNOSTIC_READER_STOPPED')
         path = getattr(self, 'core_log', None)
         if path:
             rows = events(path, self.pid)
@@ -161,12 +168,17 @@ def fetch(out):
             proof['baseline83_native_sha256'] == OLD_NATIVE and proof['diagnostic_only'] is True and
             proof['Core_path_correction_activated'] is False and proof['signed'] is False,
             'ACTUAL_COMPLETED_ARM64_SOURCE_ABI_PROOF')
+    protected = ['observer.py', 'native', 'make_overlay.py', 'build_native.py', 'NATIVE-BINDINGS.json']
+    require(not subprocess.check_output(['git', 'diff', '--name-only', row['native']['source'], 'HEAD', '--',
+            *[str(HERE.relative_to(ROOT) / n) for n in protected]], text=True).strip(),
+            'CURRENT_DIAGNOSTIC_SOURCE_DIFFERS_FROM_COMPLETED_NATIVE_PRODUCER')
     with ZipFile(apk) as zip:
         require(hashlib.sha256(zip.read('lib/arm64-v8a/libkodi.so')).hexdigest() == OLD_NATIVE,
                 'ORIGINAL83_NATIVE_PREIMAGE')
         require(not any(n.startswith('assets/addons/' + CORE + '/') for n in zip.namelist()),
                 'CORE_NOT_PACKAGED_IN_BASE83')
     fixture = out / 'publisher'; fixture.mkdir()
+    require(row['publisher']['commit'] == PUBLISHER, 'EXACT_REVIEWED_PUBLISHER_COMMIT')
     for item in row['publisher']['files']:
         require(item['url'].startswith('https://raw.githubusercontent.com/Vashiel/repository.adulthideout/' +
                 row['publisher']['commit'] + '/'), 'PINNED_PUBLISHER_URL')
@@ -278,13 +290,16 @@ def outcome(rows):
         data = first['data']; invoker = first.get('invoker')
         if data.get('event') != 'coverage.begin' or data.get('actor') != 'core_service' or data.get('source_sha') != CORE_SOURCE:
             continue
+        require(type(invoker) is int and invoker >= 0, 'ACTUAL_CORE_INVOKER_ID')
         owned = [r['data'] for r in rows if r.get('invoker') == invoker]
         if not any(r.get('event') == 'coverage.installed' and r.get('actor') == 'core_service' for r in owned):
             continue
         require(not any(r.get('event') in ('coverage.disabled', 'coverage.limit', 'coverage.code_mismatch',
-                    'coverage.trace_error') for r in owned), 'CORE_OBSERVER_COVERAGE_INCOMPLETE')
-        begins = [r for r in owned if r.get('event') == 'operation.begin']
-        terminals = [r for r in owned if r.get('event') in ('operation.return', 'operation.error')]
+                    'coverage.trace_error', 'coverage.trace_unavailable', 'coverage.inspect_failed',
+                    'coverage.record_too_large') for r in owned), 'CORE_OBSERVER_COVERAGE_INCOMPLETE')
+        begins = [r for r in owned if r.get('actor') == 'core_service' and r.get('event') == 'operation.begin']
+        terminals = [r for r in owned if r.get('actor') == 'core_service' and
+                     r.get('event') in ('operation.return', 'operation.error')]
         paired = [dict(begin=b, end=t) for b in begins for t in terminals
                   if b.get('ticket') == t.get('ticket') and b.get('operation') == t.get('operation')]
         if not any(p['begin']['operation'] == 'copy2' for p in paired) or not any(
@@ -339,6 +354,8 @@ def invoke(device, inputs, out, action, sequence, nonce):
         if all(reply.get(k) == request[k] for k in ('pid', 'process_start', 'nonce', 'sequence', 'action')):
             base.save(out / ('case-%d-%s.json' % (sequence, action)), reply)
             require(reply.get('passed') is True, 'ACTUAL_LOCAL_FUNCTIONAL_CASE:' + action)
+            if action == 'local-python':
+                require(reply.get('arithmetic') == 6, 'ACTUAL_LOCAL_PYTHON_RESULT')
             return reply
         time.sleep(.2)
     raise TimeoutError('ACTUAL_OBSERVER_REPLY:' + action)
@@ -354,7 +371,7 @@ def run(inputs, sdk, out):
     out.mkdir(parents=True)
     report = dict(status='RUNNING', native_injection=True, APK_modified=False, before_first_launch=True,
         owner_device=False, baseline_APK_sha256=APK_SHA, native_sha256=row['native']['native_sha256'],
-        source_commit=os.environ['GITHUB_SHA'], native_producer_source=proof['native_source'],
+        source_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip(), native_producer_source=proof['native_source'],
         APK_install_acceptance=False, Core_success_activated=False, shutdown='NOT_RUN', cases=[])
     device = reader = None
     def checkpoint(): base.save(out / 'ANDROID-CORE-OUTCOMES.json', report)
@@ -370,12 +387,14 @@ def run(inputs, sdk, out):
         paths = re.findall(r'^\s*nativeLibraryDir=(/data/app/[A-Za-z0-9_./+=~-]+)', dump, re.M)
         require(len(set(paths)) == 1, 'UNIQUE_PACKAGE_NATIVE_LIBRARY_DIRECTORY')
         destination = paths[0].rstrip('/') + '/libkodi.so'
+        require(device.shell('stat', '-c', '%F', destination).strip() == 'regular file' and
+                device.shell('readlink', '-f', destination).strip() == destination, 'REGULAR_OWNED_NATIVE_FILE_ONLY')
         require(device.shell('sha256sum', destination).split()[0] == OLD_NATIVE, 'EXACT_INSTALLED_ORIGINAL_ENGINE')
         before = device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip()
         staged = '/data/local/tmp/infinity-core-outcomes-libkodi.so'
-        device.adb('push', proof['native'], staged)
+        device.adb('push', proof['native'], staged, timeout=300)
         require(device.shell('sha256sum', staged).split()[0] == row['native']['native_sha256'], 'PUSHED_ENGINE_SHA')
-        device.shell('cp', staged, destination)
+        device.shell('cp', staged, destination, timeout=120)
         require(device.shell('stat', '-c', '%u:%g:%a:%C', destination).strip() == before, 'NATIVE_FILE_OWNER_MODE_LABEL_PRESERVED')
         require(device.shell('sha256sum', destination).split()[0] == row['native']['native_sha256'], 'INJECTED_ENGINE_READBACK')
         require(device.shell('sha256sum', installed).split()[0] == APK_SHA and not device.pids(), 'APK_UNCHANGED_BEFORE_FIRST_LAUNCH')
@@ -405,7 +424,13 @@ def run(inputs, sdk, out):
         with device.core_log.open('wb') as stream, (out / 'logcat.stderr').open('wb') as error:
             reader = subprocess.Popen(['timeout', '--signal=TERM', '--kill-after=2', '1200',
                 str(device.adb_bin), '-s', device.serial, 'logcat', '-v', 'raw', '-s', 'InfinityCoreQA:I', '*:S'],
-                stdout=stream, stderr=error, stdin=subprocess.DEVNULL, close_fds=True)
+                stdout=stream, stderr=error, stdin=subprocess.DEVNULL, close_fds=True, start_new_session=True)
+        device.core_reader = reader
+        base.save(out / 'STAGING-IDENTITY.json', dict(status='PASS_PRELAUNCH_NATIVE_INJECTION_ONLY_NOT_APK_INSTALL_ACCEPTANCE',
+            native_sha256=row['native']['native_sha256'], baseline_APK_sha256=APK_SHA,
+            native_injection=True, APK_modified=False, before_first_launch=True, owner_device=False,
+            source_commit=report['source_commit'], native_producer_source=proof['native_source'],
+            installed_native_path=destination, package_preservation_acceptance=False))
         report['startup'] = base.start_once(device, 1, out); checkpoint()
         require(device.shell('sha256sum', destination).split()[0] == row['native']['native_sha256'], 'RUNTIME_ENGINE_FILE_UNCHANGED')
         gui.install_zip(device, proof['qa'], dict(remote_zip_directory=REMOTE), out, 'local-observer')
@@ -443,9 +468,12 @@ def run(inputs, sdk, out):
     finally:
         # Stop ONLY the host log reader. No application Quit/Close/force-stop.
         if reader:
-            reader.terminate()
+            import signal
+            try: os.killpg(reader.pid, signal.SIGTERM)
+            except ProcessLookupError: pass
             try: reader.wait(timeout=5)
-            except subprocess.TimeoutExpired: reader.kill(); reader.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                os.killpg(reader.pid, signal.SIGKILL); reader.wait(timeout=3)
         if device:
             for name in ('kodi.log', 'kodi.old.log'):
                 try: device.adb('pull', base.HOME + '/temp/' + name, out / name, check=False)

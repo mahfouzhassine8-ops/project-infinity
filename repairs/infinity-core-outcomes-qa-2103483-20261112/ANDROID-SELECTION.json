@@ -1,0 +1,75 @@
+{
+  "schema": 1,
+  "enabled": false,
+  "application_tests": false,
+  "feature": "core-outcomes-native-qa",
+  "branch": "work/infinity-core-outcomes-qa-20261112",
+  "baseline_APK_sha256": "0c597a2976d9667796a4baac18ed9b624960e22399c94c9f62b1a52393d43236",
+  "baseline_native_sha256": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "native_injection": true,
+  "APK_modified": false,
+  "before_first_launch": true,
+  "owner_device": false,
+  "shutdown_tests": false,
+  "Core_path_correction": false,
+  "baseline": {
+    "run_id": 43119348510,
+    "artifact_id": 13899912993,
+    "workflow_id": 397702717,
+    "workflow_path": ".github/workflows/infinity-combined-release.yml",
+    "source": "3d9709bb1226a2ffa3a474cf04b3d3842b084611",
+    "name": null,
+    "sha256": "df8aa2cd1ba52a83d0da60927bbd51e6fbc5de3808d4a9e2279e9eb759f820e7",
+    "size_in_bytes": null
+  },
+  "native": {
+    "run_id": null,
+    "artifact_id": null,
+    "workflow_id": null,
+    "workflow_path": ".github/workflows/infinity-core-outcomes-qa-native.yml",
+    "source": null,
+    "name": null,
+    "sha256": null,
+    "size_in_bytes": null,
+    "native_sha256": null
+  },
+  "publisher": {
+    "commit": "6d38cce274bb45e2b658a63dd44a01e94c8ae990",
+    "files": [
+      {
+        "name": "addon.xml",
+        "url": "https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/addon.xml",
+        "sha256": "36d1fdc578c678aa677bb71b540b9cbcd69303d8ce2bbfe3c9960c48a9a10313",
+        "size": 2844
+      },
+      {
+        "name": "service.py",
+        "url": "https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/service.adulthideout.core/service.py",
+        "sha256": "2e1b79adc352129696ccfa48a3b5b16f85ebf812026fdd26c3e55d67f34b43b3",
+        "size": 26797
+      },
+      {
+        "name": "libadulthideout_core.so",
+        "url": "https://raw.githubusercontent.com/Vashiel/repository.adulthideout/6d38cce274bb45e2b658a63dd44a01e94c8ae990/core-binaries/android-arm64-v8a/libadulthideout_core.so",
+        "sha256": "c4a8a8d1e046cab6a42934b8fba31246efb21a002a90beb2bffa555623a383a9",
+        "size": 3504952
+      }
+    ]
+  },
+  "source_bindings": {},
+  "selected_cases": [
+    "Exact original83 install; root VM native injection before first launch; APK hash and file metadata retained",
+    "Normal unmodified Core ZIP installation/enabling; original copy/metadata targets and namespace-rejected dlopen",
+    "Correlated direct JSON native log events and complete own-process Core maps",
+    "Local Python before/after, actual Health Center control, authenticated local Command Center plugin"
+  ],
+  "unselected": [
+    "Core successful activation",
+    "Core stop/retirement",
+    "Close/shutdown",
+    "Provider/Search/Cobra execution",
+    "Owner data/device",
+    "APK installation acceptance"
+  ],
+  "blocker": "DISABLED until completed native producer/API artifact identity, whole ZIP digest/size, engine SHA, source proof and final harness bindings are reviewed"
+}
