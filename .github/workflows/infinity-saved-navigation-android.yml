@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, movies-cast-sdk, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
+        options: [select-a-feature, movies-cast-sdk, movies-cast-install, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1812,7 +1812,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'movies-cast-sdk' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
+    if: inputs.feature != 'movies-cast-sdk' && inputs.feature != 'movies-cast-install' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -2175,5 +2175,45 @@ jobs:
             cast-sdk-work/component-reuse86/dex/
             cast-sdk-work/component-reuse86/private-resources/
             cast-sdk-work/maven/SDK-DEPENDENCIES.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  movies-cast-install:
+    name: Signed86 to complete QA to forward recovery; PackageManager only, no app launch or shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-install' && github.ref == 'refs/heads/work/infinity-movies-continue-cast-2103486-20261112'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1', SELECTED_SOURCE: '${{ inputs.source_ref }}'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - name: Authenticate original signed pair and exact package/version/certificate before installation
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SELECTED_SOURCE"
+          python repairs/infinity-movies-continue-cast-2103486-20261112/release/verify_install.py prepare
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 6G
+          avd-name: infinity-movies-cast-install-only
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python repairs/infinity-movies-continue-cast-2103486-20261112/release/verify_install.py run
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity86-Movies-Home-Cast-Install-Recovery-${{ github.run_id }}-NO-APK
+          path: movies-cast-install-results/
           if-no-files-found: warn
           retention-days: 90

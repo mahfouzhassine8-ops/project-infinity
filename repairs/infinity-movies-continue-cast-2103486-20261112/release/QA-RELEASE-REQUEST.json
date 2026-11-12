@@ -52,11 +52,21 @@
   "notes": "Complete combined QA; host/ARM64/private Cast Android evidence reused. Physical Movies/Home/Cast/shutdown acceptance after signing, not asserted PASS.",
   "operation": "prepare-exact86-movies-home-cast-QA",
   "owner_acceptance_after_signing": true,
+  "parent_authority_sha256": "24ae05940d4a483838eecdbc53766e91f0bfa82f1b8a6d73896d3049bb202ea9",
+  "prepared_producer": {
+    "digest": "sha256:894fcfcaeae5efb96a1a9d58d256867fc31f00e50de0b0ab23a10e30a535d3b4",
+    "id": 13975947337,
+    "name": "Infinity86-Movies-Home-Cast-Prepared-43288255071-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43288255071,
+    "size_in_bytes": 1315104629,
+    "source": "6f2dc2f8372f1ac5f6ce957d0cd01ec4d68c7f4b",
+    "workflow_id": 397702717
+  },
   "publication": false,
   "registry_parent_source": "87d65d642f9054ddd8390038ade3de72168c1695",
   "schema": 1,
   "source_bindings": {
-    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "3137bcef091174342a584bba91175cbe7ef092d0a0dd460a5ebacc22f6253965",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json": "b9839d43ea39d90604c0aa2bb162ad92b03f31c20d4a797fd0d9313bb71f8b65",
     "repairs/dual-experience-isolation-2103420/release_authority.py": "e2931207755543e78c63faa0562660d8f8f96f299cc2d0b180a2c67b1720ae6e",
     "repairs/infinity-movies-continue-cast-2103486-20261112/SCOPE.json": "531dbf586f76c98177fe8161180f93e3742bba7d0128a7411589c54ed4d672fd",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
@@ -89,7 +99,8 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/release/prepare_modules.py": "b426dcc8bf291af09402cfc8b5595452188addd4e7497a1de8a278eb9c181be7",
     "repairs/infinity-movies-continue-cast-2103486-20261112/release/prepare_release.py": "c0bccc98d1bdd2adfcd3f17163defbb81e7c07854c5ba1109cf4e4aba68ade0b",
     "repairs/infinity-movies-continue-cast-2103486-20261112/release/release_guard.py": "b11b3bd1ef6ee9c489df93600113ab0e4814935ff187bc6afb59575da31df563",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/release/test_release_guard.py": "d3d7b9541ea9388584717d572f943ae8bdc0656129c63c8775eb9754aba4ad00"
+    "repairs/infinity-movies-continue-cast-2103486-20261112/release/test_release_guard.py": "d3d7b9541ea9388584717d572f943ae8bdc0656129c63c8775eb9754aba4ad00",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/release/verify_install.py": "0c14cb94433eb80ade3bb02010ca2e26c199d0186afe35b1ef665a65c3222634"
   },
   "workflow_sha256": "d94bba05f572389b0d3a7e3fba9b70ac0b7ac337de0e9220bdc9d63550354bdc"
 }
