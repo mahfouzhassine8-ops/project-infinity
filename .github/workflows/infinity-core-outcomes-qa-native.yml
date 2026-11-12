@@ -4,7 +4,12 @@ on:
     branches: [work/infinity-essential-only-shutdown-2103483-20261112]
     paths:
       - .github/workflows/infinity-core-outcomes-qa-native.yml
-      - repairs/infinity-essential-only-shutdown-2103483-20261112/**
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/native/**
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/build_native.py
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/test_native.py
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/prepare_ci_tooling.sh
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/BASE*.json
+      - repairs/infinity-essential-only-shutdown-2103483-20261112/SCOPE.json
   workflow_dispatch:
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity-essential-only-native, cancel-in-progress: false}

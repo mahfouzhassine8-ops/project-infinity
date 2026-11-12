@@ -88,11 +88,11 @@ def main():
    rows.append(dict(case=case,exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr));print(case,r.returncode,r.stderr,flush=True)
   result=dict(status='PASS' if all(r['exit_code']==0 for r in rows) else 'FAIL',cases=rows,Python=list(sys.version_info[:3]),Core_executed=False,Android=False,Fold=False)
   baseline_includes=[HERE/'native/baseline/xbmc',HERE/'native/baseline/xbmc/interfaces/python',*includes[2:]]
-  command=['g++','-std=c++17','-Wall','-Wextra','-Werror','-Wno-misleading-indentation','-pthread',*['-I'+str(x) for x in baseline_includes],str(d/'baseline.cpp'),'-L'+sysconfig.get_config_var('LIBDIR'),'-Wl,-rpath,'+sysconfig.get_config_var('LIBDIR'),'-l'+lib,'-l:libsqlite3.so.0','-ldl','-lm','-lcrypto','-Wl,--export-dynamic','-o',str(d/'baseline')]
+  command=['g++','-std=c++17','-Wall','-Wextra','-Werror','-Wno-misleading-indentation','-pthread',*['-I'+str(x) for x in baseline_includes],str(d/'baseline.cpp'),'-L'+sysconfig.get_config_var('LIBDIR'),'-Wl,-rpath,'+sysconfig.get_config_var('LIBDIR'),'-l'+lib,'-l:libsqlite3.so.0','-ldl','-lm','-lcrypto','-Wl,--export-dynamic','-o',str(d/'baseline-bin')]
   (d/'baseline.cpp').write_text(CPP[:CPP.index(' if(mode=="classifier")')]+CPP[CPP.index(' std::cout<<'):])
   subprocess.run(command,check=True)
   root=d/'baseline';root.mkdir();(root/'profile').mkdir();(root/'cache').mkdir()
-  r=subprocess.run([str(d/'baseline'),'baseline-copy2',str(root)],capture_output=True,text=True,timeout=30)
+  r=subprocess.run([str(d/'baseline-bin'),'baseline-copy2',str(root)],capture_output=True,text=True,timeout=30)
   result['baseline_copy2_control']=dict(exit_code=r.returncode,stdout=r.stdout,stderr=r.stderr)
   if r.returncode:result['status']='FAIL'
   a.out.write_text(json.dumps(result,indent=2)+'\n');assert result['status']=='PASS'
