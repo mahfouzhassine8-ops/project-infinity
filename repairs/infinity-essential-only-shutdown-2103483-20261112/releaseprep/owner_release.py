@@ -60,6 +60,7 @@ def verify_signature(p):
  return text
 def engine(r):
  if r['kind']=='recovery':return BASE_NATIVE,None
+ q.producer(r['native_producer'],expected_id=415461484)
  folder=obtain(r['native_producer'],'native');p=folder/'libkodi.so';proof=load(folder/'ESSENTIAL-ONLY-ARM64.json');source=load(folder/'ESSENTIAL-ONLY-SOURCE-PRESERVATION.json')
  require(proof['status']=='PASS_FULL_ARM64_ESSENTIAL_ONLY_LINK_AND_BASELINE_ABI' and proof['source_commit']==r['native_producer']['source'] and proof['native_sha256']==sha(p)==r['native_sha256'] and proof['Core_path_correction_activated'] is False and proof['signed'] is False,'ACTUAL_FROZEN_FULL_ARM64')
  require(source['baseline83_native_sha256']==BASE_NATIVE and source['unchanged83_native_sources']==9409 and len(source['changed'])==3 and source['Cobra_changed'] is False and source['essential_admission_or_durability_waivers'] is False,'EXACT83_THREE_HEADER_SOURCE_BOUNDARY')
@@ -99,6 +100,7 @@ def prepare(kind):
  count=compare(base,apk,r,t);proof=dict(status='PASS_EXACT83_OWNER_PRESERVATION',kind=kind,versionCode=r['versionCode'],source=os.environ['GITHUB_SHA'],baseline_APK_sha256=BASE83,native_sha256=native_sha,unsigned_sha256=sha(apk),unchanged_payload_members=count,Cobra_changed=False,Core_path_or_source_changed=False,original_key_used=False,signed=False)
  (out/'PRESERVATION.json').write_bytes(t.inventory.canonical(proof))
 def prepared(r,t):
+ q.producer(r['prepared_producer'],expected_id=397702717)
  folder=obtain(r['prepared_producer'],'prepared-'+r['kind']);p=folder/('Infinity-'+str(r['versionCode'])+'-UNSIGNED-NOT-INSTALLABLE.apk');proof=load(folder/'PRESERVATION.json')
  require(proof['status']=='PASS_EXACT83_OWNER_PRESERVATION' and proof['source']==r['prepared_producer']['source'] and proof['unsigned_sha256']==sha(p)==r['unsigned_sha256'],'EXACT_PREPARED_APK')
  return folder,p,proof
