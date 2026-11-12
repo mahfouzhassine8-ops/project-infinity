@@ -1,0 +1,24 @@
+{
+  "status": "INHERITED_STARTUP_FAILURE_REUSED_NOT_PASSED",
+  "candidate_run": 43195343018,
+  "candidate_native": "b75747363c83a548d61463c2fd434be909f27c07d4872fa9d9c61642a3757635",
+  "candidate_artifact": {
+    "id": 13933595959,
+    "digest": "sha256:9d595582afaeac5b99aa3ba3bb199756491fd07e8cd95eaf8febdc51848d1db3"
+  },
+  "baseline_run": 43166899782,
+  "baseline_native": "f14ff78865158337eb6fd19dfe549912d57f2a6a912e5b3440ed28880ee0cb0c",
+  "baseline_artifact": {
+    "id": 13920418316,
+    "digest": "sha256:dba9a61b1102fdc75da8693211fda04a61bdc7865fb22c5e52c017e4657da3f6"
+  },
+  "signal": "SIGSEGV / SEGV_MAPERR",
+  "same_frame": "talloc_lib_init+32",
+  "stage": "Android ARM64 guest shared-library constructors, before Python or selected Close",
+  "environment": "stock API36 x86_64 with ARM64 native bridge",
+  "cause": "NOT_ESTABLISHED; unchanged baseline has same failure",
+  "failure_suppressed": false,
+  "shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "next_action": "One fresh execution attempt with unchanged b757 engine and corrected first-party fixture; no native rebuild or constructor patch"
+}
