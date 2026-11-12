@@ -103,6 +103,17 @@ def run(inputs,sdk,out):
   private='/data/user/0/'+base.PACKAGE;control=base.PROFILE+'/addon_data/script.infinity.commandcenter/.android-checkpoint'
   owner=read_json(device,private+'/files/infinity-kodi-process.json');require(owner.get('phase')=='RUNNING' and owner.get('pid')==device.pid,'REAL_PROCESS_OWNER')
   report['before_owner']=owner
+  # Reuse the existing shutdown transport's readiness contract. Home/JSON-RPC
+  # alone does not establish first-party save participants are initialized.
+  deadline=time.monotonic()+120
+  while time.monotonic()<deadline:
+   active=read_json(device,control+'/active.json');engine=read_json(device,control+'/engine.json');compat=read_json(device,control+'/compat-active.json');participant=read_json(device,control+'/participant.json')
+   if (active.get('owner')==engine.get('owner')==compat.get('owner')==owner['owner'] and
+       active.get('pid')==engine.get('pid')==compat.get('pid')==owner['pid'] and
+       active.get('status')=='ACTIVE' and participant):break
+   device.alive();time.sleep(.25)
+  else:raise RuntimeError('ESSENTIAL_PARTICIPANTS_NOT_READY_NO_CLOSE_ATTEMPTED')
+  report['essential_participants_ready']=dict(active=active,engine=engine,compat=compat,participant=participant)
   require(device.rpc('Favourites.AddFavourite',dict(title=FAVOURITE,type='window',window='home'))=='OK','NATIVE_PRESERVATION_RECORD')
   reply_path=prior.QP+'/reply.json';retained=device.shell('sha256sum',reply_path).split()[0]
   report['shutdown']='REQUESTED_NORMAL_CLOSE';save()
