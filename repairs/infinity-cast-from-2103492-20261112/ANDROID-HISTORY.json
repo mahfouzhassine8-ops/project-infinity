@@ -13,5 +13,16 @@
   ],
   "test_correction": "Verify five actual Android observer retirements plus refusal/retained ownership. Successful native release remains NOT_TESTED by the separate component; covered by deterministic controller/native backend contract only. No source fix made to bypass refusal.",
   "production_Java_changed_for_retry": false,
-  "root_cause_of_physical_Cast_failure": "NOT_PROVEN"
+  "root_cause_of_physical_Cast_failure": "NOT_PROVEN",
+  "second_failed_run": {
+    "run": 43344651096,
+    "source": "d3c874bf8a4c7f98b4c423dc14e0303f4065f965",
+    "artifact": 14001042580,
+    "artifact_sha256": "f0e65dab10df0d29d38fcf12fd0ba38c6819cf24336dafb8f03a7c1ea6f08947",
+    "HTTP": "PASS",
+    "actual_clock_retirement": "FAIL after two completed cycles; third worker had no retirement event within3sec after listener close",
+    "native_release_refusal": "Correctly retained in all three attempts",
+    "targeted_production_correction": "Owned LocalServerSocket shutdown before close; no global socket or native engine change",
+    "host_evidence_reuse": "Session, Source, Relay, Diagnostics unchanged; host tests use deterministic Channel backend. Affected actual Channel is verified by Android."
+  }
 }

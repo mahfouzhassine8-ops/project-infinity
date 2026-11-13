@@ -4,6 +4,8 @@ import android.net.Credentials;
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
 import android.os.Process;
+import android.system.Os;
+import android.system.OsConstants;
 import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
@@ -15,6 +17,7 @@ import java.nio.charset.StandardCharsets;
 final class InfinityCastChannel implements AutoCloseable {
     final String name,token,fileHash,originHash;
     private final LocalServerSocket server;
+    private final Object listenerLock=new Object();
     private volatile boolean closed;
     private boolean retired;
     private Runnable retirementCallback;
@@ -78,6 +81,12 @@ final class InfinityCastChannel implements AutoCloseable {
         LocalSocket socket;
         synchronized(this){closed=true;socket=current;}
         try { if(socket!=null)socket.close(); } catch(Exception ignored) {}
-        try { server.close(); } catch(Exception ignored) {}
+        // close(fd) alone need not wake an accept already executing in Linux.
+        // Shut down this owned listener before closing it. Serialize repeated
+        // closes so a stale descriptor can never target a recycled socket.
+        synchronized(listenerLock) {
+            try { if(server.getFileDescriptor().valid())Os.shutdown(server.getFileDescriptor(),OsConstants.SHUT_RDWR); } catch(Exception ignored) {}
+            try { server.close(); } catch(Exception ignored) {}
+        }
     }
 }
