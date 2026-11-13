@@ -1,0 +1,63 @@
+{
+  "TV_receiver": "NOT_TESTED",
+  "accepted_pointer_updated": false,
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "owner_acceptance": "PENDING",
+  "post_Cast_Kodi_shutdown": "NOT_TESTED",
+  "preservation": {
+    "APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [
+      "lib/arm64-v8a/libinfinitycastremux.so"
+    ],
+    "all_original_native_libraries_unchanged": true,
+    "baseline_APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "6a2fbf016782df2120ecd85fdfe0e27357d2fd8c47e4bbdb8177f5e911034a05",
+        "before": "1054836535e4cbdaf986a28b040c4fe9ff9f1634fa01c70cbd74aea72d80a4dd"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "88112fe113fe78668b26e0b925cf488ed2eaed955381964502ae4ab37ef31270",
+        "before": "5a281c520fb8cede8bb9dd2cef9c54a6125bcf90d3356a81d4233df597b80cff"
+      },
+      "classes6.dex": {
+        "after": "5f2bf19c979904856c0300ae819bf584599255b12623b309c2f984c0cc0f2944",
+        "before": "1cb133100ac9261895ffd270564eac8212d8c8b243b7f0e5051f77f3256e09ba"
+      },
+      "lib/arm64-v8a/libinfinitycastremux.so": {
+        "after": "0ccc74b32ea15bd95452bb1bf3f75895ecf6b45a40113eb05e4185cdc5575af5",
+        "before": null
+      }
+    },
+    "kind": "candidate",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103494,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "cf85829c860f96f0ca2e38d2c4ba485ae6ca32d6",
+    "status": "PASS_EXACT_SIGNED94_CAST_MKV_MEMBER_VECTOR",
+    "unchanged_payload_members": 7772,
+    "versionCode": 2103496
+  },
+  "producer": {
+    "APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+    "digest": "sha256:bbd8d526976ce54610c7f9f587a42b5d801f48f85da93a7f7465e733ea0e4dfb",
+    "id": 14010547149,
+    "name": "Infinity94-MKV-OriginalSigned-43366259258-QA-Fold-Pending",
+    "run": 43366259258,
+    "size_in_bytes": 347903186,
+    "source": "cf85829c860f96f0ca2e38d2c4ba485ae6ca32d6",
+    "workflow_id": 397702717
+  },
+  "schema": 1,
+  "v1_v2_v3": true,
+  "versionCode": 2103496
+}
