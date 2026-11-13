@@ -1,0 +1,20 @@
+{
+  "Android_MediaExtractor_relative_us": 82000,
+  "acceptance_weakened": false,
+  "cause": "AOSP MPEG4Extractor fragmentedRead initializes mCurrentTime to zero per track and uses compositionOffset without applying tfdt; MediaExtractor sampleTime is not the absolute fMP4 packet clock.",
+  "correction": "Keep native/source production unchanged. Keep actual Android track/sample proof; replace invalid extractor-time comparison with strict every-packet source PTS/hash check on actual Android output. Keep <2ms tolerance and require real Android HLS play/seek/cancellation.",
+  "failure_run": 43363103587,
+  "production_defect_proven": false,
+  "real_Android_remux_FFprobe_relative_us": 0,
+  "real_output_first_audio_PTS": 10.0,
+  "real_output_first_video_PTS": 10.0,
+  "real_video_decode_timestamp": 9.918,
+  "source_lines": [
+    6896,
+    6908,
+    6952,
+    6962
+  ],
+  "source_reference": "https://android.googlesource.com/platform/frameworks/av/+/refs/tags/android-16.0.0_r1/media/module/extractors/mp4/MPEG4Extractor.cpp",
+  "source_relative_us": 0
+}

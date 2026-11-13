@@ -2286,6 +2286,7 @@ jobs:
           set -euo pipefail
           task=repairs/infinity-movies-continue-cast-2103486-20261112
           test -n "$CAST_AUTHORIZATION"
+          command -v ffprobe || (sudo apt-get update -qq && sudo apt-get install -y ffmpeg)
           mkdir -p cast-sdk-work/tools
           ln -s "$ANDROID_HOME/platforms/android-34/android.jar" cast-sdk-work/tools/android.jar
           ln -s "$ANDROID_HOME/build-tools/35.0.0/aapt2" cast-sdk-work/tools/aapt2
