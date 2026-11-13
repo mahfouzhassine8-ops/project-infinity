@@ -1,0 +1,51 @@
+{
+  "Android_component_run": 43345587052,
+  "Cobra_changes": false,
+  "accepted_baseline_promoted": false,
+  "baseline": {
+    "APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+    "versionCode": 2103492
+  },
+  "candidate": {
+    "APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+    "artifact": 14001304481,
+    "run": 43347320164,
+    "source": "a8d732beec1272bd526741e2eb7dc009e2190c0b",
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43347320164/artifacts/14001304481",
+    "versionCode": 2103494
+  },
+  "candidate_payload_changes": [
+    "classes6.dex",
+    "AndroidManifest.xml versionCode",
+    "assets/experience-component-updates.properties version label"
+  ],
+  "candidate_unchanged_payload_members": 7772,
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "install_and_recovery_run": 43349020579,
+  "known_persistence_blocker": "Supplied2103492 diagnostic has unresolved TMDbHelper ItemQueries.db proof; not modified or declared fixed; Cast causation unproven",
+  "native_ARM64": "UNCHANGED_EXACT2103492; reuse full compile/link43314732573",
+  "physical_Fold_TV_and_post_Cast_shutdown": "PENDING_ONE_OWNER_SESSION",
+  "physical_receiver_cause": "NOT_ESTABLISHED; verified Cast source defects repaired and bounded safe reporting added",
+  "production_files_changed": 5,
+  "providers_Search_Movies_tracking_skin_changes": false,
+  "recovery": {
+    "APK_sha256": "a92df7057d9937fb0d2c5aa56753e69ee66e7bcf9bdd3622975dc23c2370ed4d",
+    "artifact": 14002702684,
+    "functional_restore": "EXACT_SIGNED2103492",
+    "run": 43348342010,
+    "source": "828b3fde39351de19504d273afccbf02994e49fe",
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43348342010/artifacts/14002702684",
+    "versionCode": 2103495
+  },
+  "recovery_unchanged_payload_members": 7773,
+  "schema": 1,
+  "shutdown_changes": false,
+  "signature_metadata_regenerated": [
+    "META-INF/MANIFEST.MF",
+    "META-INF/INFINITY.SF",
+    "META-INF/INFINITY.RSA",
+    "APK v2/v3 signing blocks"
+  ],
+  "status": "ENGINEERING_QA_PAIR_SIGNED_PRESERVED_AND_INSTALL_VERIFIED; OWNER_ACCEPTANCE_PENDING",
+  "successful_live_Kodi_JNI_handback": "NOT_PHYSICALLY_VERIFIED"
+}

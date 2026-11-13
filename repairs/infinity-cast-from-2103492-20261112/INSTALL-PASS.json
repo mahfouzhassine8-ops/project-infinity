@@ -1,0 +1,58 @@
+{
+  "actual_Android_install": {
+    "Fold_acceptance": "NOT_RUN",
+    "application_launch": false,
+    "application_startup": "NOT_SELECTED",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "data_preservation": "PackageManager retained UID, dataDir and firstInstallTime. No owner profile/database opened or modified.",
+    "data_reset": false,
+    "emulator_abis": "x86_64,arm64-v8a",
+    "forced_downgrade": false,
+    "playback": "OWNER_QA_AFTER_SIGNING",
+    "schema": 1,
+    "shutdown": "OWNER_QA_AFTER_SIGNING",
+    "source": "29bcec3c0b5d11c0fe137f1ae4f603936ca6fd98",
+    "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+    "steps": [
+      {
+        "APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+        "kind": "baseline",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-13 02:04:38",
+          "uid": "10216",
+          "versionCode": 2103492
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+        "kind": "candidate",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-13 02:04:38",
+          "uid": "10216",
+          "versionCode": 2103494
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "a92df7057d9937fb0d2c5aa56753e69ee66e7bcf9bdd3622975dc23c2370ed4d",
+        "kind": "recovery",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-13 02:04:38",
+          "uid": "10216",
+          "versionCode": 2103495
+        },
+        "status": "PASS"
+      }
+    ],
+    "uninstall": false
+  },
+  "artifact": 14003016897,
+  "artifact_sha256": "40796f320f5a0f402276b13d29f0a3da04e00af15cc59aae1d005165855971e0",
+  "run": 43349020579,
+  "schema": 1,
+  "source": "29bcec3c0b5d11c0fe137f1ae4f603936ca6fd98"
+}
