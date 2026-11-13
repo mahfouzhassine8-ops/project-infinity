@@ -4,7 +4,7 @@
     "recovery": 2103495
   },
   "accepted_pointer_updated": false,
-  "active_kind": "candidate",
+  "active_kind": "recovery",
   "baseline_APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
   "inputs": {
     "baseline": {
@@ -36,7 +36,7 @@
     }
   },
   "owner_acceptance_after_signing": true,
-  "parent_authority_sha256": "67fa28feb35571c4ea0dfb8c70cb5a7ad237068719a4cf045cb886de2a3d4e11",
+  "parent_authority_sha256": "04cf904e93b90de72f3dad121f936078253704d4537e356092c19162c53bc279",
   "prepared_producer": {
     "digest": "sha256:d13aaeba86d5e0021ab3b105e9f806fc99de21631994ce4172ac84c76daf4db3",
     "id": 14002266312,
@@ -47,7 +47,7 @@
     "workflow_id": 397702717
   },
   "recovery": "Higher-version exact signed2103492 functional restore; historical86/88/90/91/92/93 artifacts unchanged",
-  "registry_parent_source": "68b62b96ebebadea2b922fe2ce72dab5854d11ea",
+  "registry_parent_source": "a8d732beec1272bd526741e2eb7dc009e2190c0b",
   "schema": 1,
   "source_bindings": {
     ".github/workflows/infinity-saved-navigation-android.yml": "d74f9f50edeb085c596c880ca773021f771581709d34da2e251f45e82ebe0e48",
@@ -59,6 +59,7 @@
     "repairs/infinity-cast-from-2103492-20261112/HOST-CORRECTIONS.json": "8be684eecd8997c1491480bfa33c7da51966d66a060708487e9b0ddcd54faae1",
     "repairs/infinity-cast-from-2103492-20261112/PREPARATION-PASS.json": "33f9ebd6b919dbafc39f7d49e0ffdd2eb7f1ca531a0a803a50039b2a2e3f9aa3",
     "repairs/infinity-cast-from-2103492-20261112/SCOPE.json": "f4ed9b29192494def6bb94059ca8f543e920d9f7cfbacd702774b60b1b71ec89",
+    "repairs/infinity-cast-from-2103492-20261112/SIGNED-CANDIDATE-PASS.json": "bfc84d24ecdca6d7e13eebcf5e0996905c4875a5a3e63434c96e6de5860db72a",
     "repairs/infinity-cast-from-2103492-20261112/SOURCE-REVIEW.json": "aa09de03c38accc4048703f080ef73ac8c13cc1ee4fabbd3c0bfa3427af785c1",
     "repairs/infinity-cast-from-2103492-20261112/release/gate.py": "c6e2238c4bcf51ea6f30de1663f1230693bdd456fa95976ce1f17dc37120d87f",
     "repairs/infinity-cast-from-2103492-20261112/release/verify_install.py": "bce3f538a8091360f0b87af96c21788f7cf94ad44a6bd83f438d7dfb3dc26ff3",
