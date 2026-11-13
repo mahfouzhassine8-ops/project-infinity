@@ -1,0 +1,38 @@
+{
+  "application_startup": false,
+  "inputs": {
+    "baseline": {
+      "APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+      "digest": "sha256:dfdc2c044483fbbc6d08960fbce2e4e7ed40dbb5352e1bf514c8a79a2d271fd0",
+      "id": 13997164302,
+      "name": "Infinity90-CastRepair-OriginalSigned-43337938186-QA-Fold-Pending",
+      "run": 43337938186,
+      "size_in_bytes": 347815575,
+      "source": "c5c82e47ed776b10326f6837c121f77e26628bb2",
+      "workflow_id": 397702717
+    },
+    "candidate": {
+      "APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+      "digest": "sha256:41ff5a1e66e67d34a646a7b0ba8c4d847ccabc0efbcde10fd8a10c97aacdeed8",
+      "id": 14001304481,
+      "name": "Infinity92-CastRepair-OriginalSigned-43347320164-QA-Fold-Pending",
+      "run": 43347320164,
+      "size_in_bytes": 347817487,
+      "source": "a8d732beec1272bd526741e2eb7dc009e2190c0b",
+      "workflow_id": 397702717
+    },
+    "recovery": {
+      "APK_sha256": "a92df7057d9937fb0d2c5aa56753e69ee66e7bcf9bdd3622975dc23c2370ed4d",
+      "digest": "sha256:777f4db1f6f1caf6824bd4195656acd49900916b43c3c41fa4b4bd10bdc7a0f5",
+      "id": 14002702684,
+      "name": "Infinity92-CastRepair-OriginalSigned-43348342010-QA-Fold-Pending",
+      "run": 43348342010,
+      "size_in_bytes": 347815365,
+      "source": "828b3fde39351de19504d273afccbf02994e49fe",
+      "workflow_id": 397702717
+    }
+  },
+  "owner_acceptance": "AFTER_SELECTED_SIGNED_INSTALL_CHECK; ONE_FOLD_SESSION",
+  "schema": 1,
+  "shutdown": false
+}
