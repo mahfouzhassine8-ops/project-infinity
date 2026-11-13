@@ -7,7 +7,7 @@ try:exec(compile(prior.read_text(),str(prior),'exec'),{'__file__':str(prior),'__
 except BaseException as failure:error=failure
 out=Path(sys.argv[1]);target=out/'mkv-remux.mp4'
 subprocess.run(['adb','pull','/sdcard/Android/data/com.projectinfinity.castqa/files/mkv-remux.mp4',str(target)],check=False)
-report_path=out/'ANDROID-CAST-COMPONENT.json';report=json.loads(report_path.read_text())
+report_path=out/'ANDROID-CAST-COMPONENT.json';report=json.loads(report_path.read_text());report['scope']='Actual original94 ARM64 FFmpeg via Cast JNI, private authenticated relay, every output packet timing/quality, compatible Android HLS playback/seek and cancellation. Separate CI package only.'
 try:
  def probe(p):return json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-show_streams','-show_packets','-show_data_hash','sha256','-of','json',str(p)]))
  source=probe(ROOT/'cast-sdk-work/mkv/h264-aac.mkv');actual=probe(target);evidence={}
