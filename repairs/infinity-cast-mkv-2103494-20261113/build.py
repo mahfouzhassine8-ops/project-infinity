@@ -37,7 +37,8 @@ def native():
  src=sources();headers=WORK/'arm64-headers';headers.mkdir(exist_ok=True)
  run([src/'configure','--disable-all','--enable-avutil','--enable-avcodec','--enable-avformat','--disable-programs','--disable-doc','--disable-autodetect','--enable-cross-compile','--target-os=android','--arch=aarch64','--cc='+str(cc),'--cxx='+str(cpp),'--disable-x86asm'],cwd=headers)
  out=WORK/'native';out.mkdir(exist_ok=True);library=out/'libinfinitycastremux.so'
- run([cpp,'-std=c++17','-O2','-fPIC','-shared','-fvisibility=hidden','-Wall','-Wextra','-Wno-deprecated-declarations','-I'+str(src),'-I'+str(headers),HERE/'native/InfinityCastRemux.cpp','-ldl','-Wl,--no-undefined','-Wl,-z,max-page-size=16384','-o',library])
+ version=WORK/'exports.map';version.write_text('{ global: Java_com_projectinfinity_kodi_InfinityCastRemuxNative_*; local: *; };\n')
+ run([cpp,'-std=c++17','-O2','-fPIC','-shared','-fvisibility=hidden','-Wall','-Wextra','-Wno-deprecated-declarations','-I'+str(src),'-I'+str(headers),HERE/'native/InfinityCastRemux.cpp','-ldl','-Wl,--no-undefined','-Wl,--version-script='+str(version),'-Wl,-z,max-page-size=16384','-o',library])
  elf=subprocess.check_output([tool/'llvm-readelf','-h','-d','--dyn-syms','--wide',library],text=True)
  assert 'AArch64' in elf and 'ELF64' in elf
  deps=set(re.findall(r'Shared library: \[([^\]]+)\]',elf));assert deps<={'libc.so','libm.so','libdl.so','libc++_shared.so'}

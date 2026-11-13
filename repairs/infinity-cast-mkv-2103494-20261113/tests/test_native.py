@@ -23,6 +23,7 @@ for kind in ['video','audio']:
  ap=[x for x in a['packets'] if x['stream_index']==ai];bp=[x for x in b['packets'] if x['stream_index']==bi]
  check([x['data_hash'] for x in ap]==[x['data_hash'] for x in bp],kind+' encoded packet bytes and order preserved, zero transcoding')
  delta=[abs(float(x['pts_time'])-float(y['pts_time'])) for x,y in zip(ap,bp)]
+ print(json.dumps({'track':kind,'source_first':[{k:x.get(k) for k in ['pts_time','dts_time','duration_time']} for x in ap[:5]],'output_first':[{k:x.get(k) for k in ['pts_time','dts_time','duration_time']} for x in bp[:5]],'max_pts_delta':max(delta)}),flush=True)
  check(max(delta)<0.002,kind+' original presentation timestamps preserved within source tick')
 original=run(['ffmpeg','-v','error','-i',base,'-map','0:v:0','-f','framemd5','-']).stdout
 copied=run(['ffmpeg','-v','error','-i',playlist,'-map','0:v:0','-f','framemd5','-']).stdout
