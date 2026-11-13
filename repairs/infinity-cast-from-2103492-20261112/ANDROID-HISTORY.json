@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "failed_run": 43343745234,
+  "source": "c0190ad1465c174ba11d64567cd4a2aad502fbe5",
+  "artifact": 14000248263,
+  "artifact_sha256": "98df01c6ae7f796d91abf2e18601da6073113a88e7a45d000b95081f5a0ea21f",
+  "actual_HTTP": "PASS progressive/ranges/private headers/two-origin redirect/HLS/DASH/retirement callback",
+  "failed_assertion": "cleanup expected native release success in a separate package with no live Kodi JNI engine",
+  "actual_outcomes": [
+    "observer retired",
+    "native release refused",
+    "corrected controller retained ownership"
+  ],
+  "test_correction": "Verify five actual Android observer retirements plus refusal/retained ownership. Successful native release remains NOT_TESTED by the separate component; covered by deterministic controller/native backend contract only. No source fix made to bypass refusal.",
+  "production_Java_changed_for_retry": false,
+  "root_cause_of_physical_Cast_failure": "NOT_PROVEN"
+}

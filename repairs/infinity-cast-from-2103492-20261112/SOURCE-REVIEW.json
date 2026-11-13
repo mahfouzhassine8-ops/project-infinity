@@ -1,0 +1,40 @@
+{
+  "baseline_APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+  "development_base_versionCode": 2103492,
+  "native_rebuilt": false,
+  "native_reuse": "Exact signed2103492 libkodi.so; existing compiled/linked ARM64 Cast engine unchanged",
+  "outside_Cast_changes": false,
+  "physical_receiver": "NOT_TESTED",
+  "production_changes": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastChannel.java": {
+      "after_sha256": "0c5fec46c2283fc9db186f6dc74531af55d668ee49e1fcefb5d022b06fb4b5f4",
+      "before_sha256": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+      "justification": "Observe clock-worker retirement and close an accepted socket safely if closure races acceptance; no native recorder/tracking change."
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": {
+      "after_sha256": "dd5788233cf23ca6db90eeeaf293d18ccb3a32ea5a539963b843cf08b92eaa15",
+      "before_sha256": "fbafd4f04ebf94811bb54aec350052f782dc7f4bca466e7c461f079a120feb96",
+      "justification": "Bounded RAM-only safe event summary; never accept raw URL, title, headers, credentials or exception text."
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": {
+      "after_sha256": "f4c7ae25010820b07704bdb9f9597500dc6f3b1384de96d79122f0451f1f0edc",
+      "before_sha256": "cd5a50b94d2c4d7777ab386e26042a1719f5a19bdc85cdcab624c62fc0d90dc9",
+      "justification": "Cast Details toggle exposes the safe transfer outcome summary within existing Cast controls; no changes to other interfaces."
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": {
+      "after_sha256": "e8144934ab4a442a9ef517e30f2806837282b5d3d629234780568928fee4c1cd",
+      "before_sha256": "3540019ffa701206e1fc7883a716bb05a7c80a9a353062ae70251738e683fa3b",
+      "justification": "Preserve public User-Agent/Accept/Accept-Language across redirect/CDN boundaries; retain strict credential origin isolation. Observe actual job retirement and report bounded outcome codes/body delivery counts."
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": {
+      "after_sha256": "b7f391b8105f7fec29370673b21c643cbdb6c6701db72d16d53a4db8d9c7d8f4",
+      "before_sha256": "bc3b195c9dbe54b94d85971f3e7f486d9739443f60192cd7b7281b83b4467863",
+      "justification": "Do not claim cleanup complete until actual relay/channel retirement and native release succeed. Preserve token on release refusal; permit explicit Disconnect retry. Retain all92 phase deadlines and source binding."
+    }
+  },
+  "release_pending": "Actual Android component, exact signed APK member comparison, original signer, in-place install and recovery",
+  "schema": 1,
+  "shutdown_causation": "NOT_PROVEN",
+  "shutdown_changes": false,
+  "status": "PASS_SOURCE_ONLY_CAST_CORRECTION_REVIEW"
+}

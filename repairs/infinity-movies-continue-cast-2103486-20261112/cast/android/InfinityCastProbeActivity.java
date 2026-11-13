@@ -107,17 +107,34 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
     private Object field(String name) throws Exception {java.lang.reflect.Field f=InfinityCastSession.class.getDeclaredField(name);f.setAccessible(true);return f.get(cast);}
     private void cleanupCycle() {
         try {
+            // This separate CI package has no live Kodi JNI engine. Refusal is
+            // required, not successful native release. Use separate controllers
+            // so no test discards or fabricates a production native outcome.
+            java.lang.reflect.Constructor<InfinityCastSession> constructor=InfinityCastSession.class.getDeclaredConstructor(android.content.Context.class);
+            constructor.setAccessible(true);final InfinityCastSession probe=constructor.newInstance(getApplicationContext());
             String token=java.util.UUID.randomUUID().toString().replace("-","");
-            field("token",token);field("source",new JSONObject());field("selecting",true);field("transferStarted",true);
-            field("channel",new InfinityCastChannel(token,new String(new char[64]).replace('\0','a'),new String(new char[64]).replace('\0','b')));
-            cast.returnToPhone();
-            ui.postDelayed(()->{
-                try {
-                    if(field("channel")!=null || field("relay")!=null || !"".equals(field("token")) || (Boolean)field("cleanupPending") || cast.phone.busy() || !(Boolean)field("nativeReleased") || !(Boolean)field("relayRetired") || !(Boolean)field("channelRetired"))throw new IllegalStateException("owned cleanup incomplete");
-                    if(++cleanupCycles<5)cleanupCycle();else cleanupPassed=true;
-                } catch(Exception | LinkageError failure){result(false,"failed_transfer_cleanup_"+failure.getClass().getSimpleName());}
-            },150);
+            java.lang.reflect.Field owner=InfinityCastSession.class.getDeclaredField("token");owner.setAccessible(true);owner.set(probe,token);
+            for(String name:new String[]{"selecting","transferStarted"}){java.lang.reflect.Field f=InfinityCastSession.class.getDeclaredField(name);f.setAccessible(true);f.set(probe,true);}
+            java.lang.reflect.Field source=InfinityCastSession.class.getDeclaredField("source");source.setAccessible(true);source.set(probe,new JSONObject());
+            java.lang.reflect.Field channel=InfinityCastSession.class.getDeclaredField("channel");channel.setAccessible(true);channel.set(probe,new InfinityCastChannel(token,new String(new char[64]).replace('\0','a'),new String(new char[64]).replace('\0','b')));
+            probe.returnToPhone();final long deadline=SystemClock.uptimeMillis()+3000;
+            checkCleanup(probe,token,deadline);
         } catch(Exception | LinkageError failure){result(false,"cleanup_setup_"+failure.getClass().getSimpleName());}
+    }
+    private Object field(InfinityCastSession probe,String name) throws Exception {java.lang.reflect.Field f=InfinityCastSession.class.getDeclaredField(name);f.setAccessible(true);return f.get(probe);}
+    private void checkCleanup(InfinityCastSession probe,String token,long deadline) {
+        ui.postDelayed(()->{
+            try {
+                if(probe.phone.busy() || !(Boolean)field(probe,"channelRetired")){
+                    if(SystemClock.uptimeMillis()<deadline){checkCleanup(probe,token,deadline);return;}
+                    throw new IllegalStateException("actual observer retirement timeout");
+                }
+                if(field(probe,"channel")!=null || field(probe,"relay")!=null || !token.equals(field(probe,"token")) ||
+                    !(Boolean)field(probe,"cleanupPending") || (Boolean)field(probe,"nativeReleased") || !(Boolean)field(probe,"relayRetired") ||
+                    !probe.message.contains("not confirmed"))throw new IllegalStateException("native refusal must retain ownership truthfully");
+                if(++cleanupCycles<5)cleanupCycle();else cleanupPassed=true;
+            } catch(Exception | LinkageError failure){result(false,"failed_transfer_cleanup_"+failure.getClass().getSimpleName());}
+        },25);
     }
     private void result(boolean passed,String reason) {
         if(finished)return;finished=true;
@@ -133,7 +150,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
                 .put("Activity_Cast_id",activityCastResource)
                 .put("relay",relayResult==null?JSONObject.NULL:relayResult)
                 .put("explicit_receiver_selection_required",explicitSelectionGuard).put("private_HTTP_resource_readable",privateResource)
-                .put("ownership_completion_confirmed",cleanupPassed).put("failed_transfer_cleanup_cycles",cleanupCycles).put("failed_transfer_cleanup",cleanupPassed)
+                .put("native_release_unavailable_retains_ownership",cleanupPassed).put("actual_clock_workers_retired",cleanupPassed).put("successful_Kodi_JNI_release","NOT_TESTED_SEPARATE_PACKAGE").put("failed_transfer_cleanup_cycles",cleanupCycles).put("failed_transfer_cleanup",cleanupPassed)
                 .put("full_Infinity_playback","NOT_TESTED").put("receiver_transfer","NOT_TESTED")
                 .put("shutdown","NOT_SELECTED").put("owner_APK",false);
             android.util.Log.i("InfinityCastProbe",value.toString());
