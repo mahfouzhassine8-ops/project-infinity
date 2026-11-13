@@ -3,7 +3,7 @@ from pathlib import Path
 from zipfile import ZipFile
 import os,subprocess,sys,json
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1];CAST=ROOT/'repairs/infinity-movies-continue-cast-2103486-20261112/cast'
-work=Path(sys.argv[1]).resolve();apk=Path(sys.argv[2]).resolve()
+work=Path(sys.argv[1]).resolve();apk=Path(sys.argv[2]).resolve();sys.path.insert(0,str(CAST))
 # Reuse original immutable packaging logic with only a different test Activity.
 source=(CAST/'build_probe.py').read_text().replace("(HERE/'android').glob('*.java')",'Path('+repr(str(HERE/'tests/android'))+").glob('*.java')")
 source=source.replace('<application android:label="Cast Component CI"','<application android:extractNativeLibs="true" android:label="Cast MKV Component CI"')

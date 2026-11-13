@@ -2179,8 +2179,8 @@ jobs:
           retention-days: 90
 
   movies-cast-install:
-    name: Signed92 to Cast repair94 to exact92 forward95; PackageManager only, no app launch or shutdown
-    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-install' && github.ref == 'refs/heads/work/infinity-cast-from-2103492-20261112'
+    name: Signed94 to MKV96 to exact94 forward97; PackageManager only, no app launch or shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-install' && github.ref == 'refs/heads/work/infinity-cast-mkv-from-2103494-20261113'
     runs-on: ubuntu-22.04
     timeout-minutes: 45
     env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1', SELECTED_SOURCE: '${{ inputs.source_ref }}'}
@@ -2197,7 +2197,7 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$SELECTED_SOURCE"
-          python repairs/infinity-cast-from-2103492-20261112/release/verify_install.py prepare
+          python repairs/infinity-cast-mkv-2103494-20261113/release/verify_install.py prepare
           sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
         with:
@@ -2209,11 +2209,11 @@ jobs:
           avd-name: infinity-movies-cast-install-only
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python repairs/infinity-cast-from-2103492-20261112/release/verify_install.py run
+          script: python repairs/infinity-cast-mkv-2103494-20261113/release/verify_install.py run
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity92-CastRepair-Install-Recovery-${{ github.run_id }}-NO-APK
+          name: Infinity94-MKV-Install-Recovery-${{ github.run_id }}-NO-APK
           path: cast-final-install-results/
           if-no-files-found: warn
           retention-days: 90
