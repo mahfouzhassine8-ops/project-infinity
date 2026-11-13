@@ -1,0 +1,93 @@
+{
+  "accepted_pointer_updated": false,
+  "candidate": {
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [
+      "lib/arm64-v8a/libinfinitycastremux.so"
+    ],
+    "all_original_native_libraries_unchanged": true,
+    "baseline_APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "6a2fbf016782df2120ecd85fdfe0e27357d2fd8c47e4bbdb8177f5e911034a05",
+        "before": "1054836535e4cbdaf986a28b040c4fe9ff9f1634fa01c70cbd74aea72d80a4dd"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "88112fe113fe78668b26e0b925cf488ed2eaed955381964502ae4ab37ef31270",
+        "before": "5a281c520fb8cede8bb9dd2cef9c54a6125bcf90d3356a81d4233df597b80cff"
+      },
+      "classes6.dex": {
+        "after": "5f2bf19c979904856c0300ae819bf584599255b12623b309c2f984c0cc0f2944",
+        "before": "1cb133100ac9261895ffd270564eac8212d8c8b243b7f0e5051f77f3256e09ba"
+      },
+      "lib/arm64-v8a/libinfinitycastremux.so": {
+        "after": "0ccc74b32ea15bd95452bb1bf3f75895ecf6b45a40113eb05e4185cdc5575af5",
+        "before": null
+      }
+    },
+    "kind": "candidate",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103494,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "9298cda8b0969d9932c81d3adae80915653d1b71",
+    "status": "PASS_EXACT_SIGNED94_CAST_MKV_MEMBER_VECTOR",
+    "unchanged_payload_members": 7772,
+    "unsigned_sha256": "5626ea0ad6f455533a2a64259774da4c3de220c2cd259013d63f1dcf16194700",
+    "versionCode": 2103496
+  },
+  "other_ownership_assignments_changed": false,
+  "ownership_additions": {
+    "InfinityCastRemux": "INFINITY",
+    "InfinityCastRemuxNative": "INFINITY"
+  },
+  "producer": {
+    "digest": "sha256:e3d7ce71a9cfc0471c37a8addc90eb7a08066fee61050a746434675b715eb209",
+    "id": 14009573772,
+    "name": "Infinity94-MKV-Prepared-43365336147-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43365336147,
+    "size_in_bytes": 1317657547,
+    "source": "9298cda8b0969d9932c81d3adae80915653d1b71",
+    "workflow_id": 397702717
+  },
+  "recovery": {
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "all_original_native_libraries_unchanged": true,
+    "baseline_APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "2e5f90713787554d0322aa3935696427b9e2bc2489c480776500a33e550d0784",
+        "before": "1054836535e4cbdaf986a28b040c4fe9ff9f1634fa01c70cbd74aea72d80a4dd"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "8ce95ebf8d1c9b99a18313ec921f777b0fc65933a8bb55476dab0c75a849502c",
+        "before": "5a281c520fb8cede8bb9dd2cef9c54a6125bcf90d3356a81d4233df597b80cff"
+      }
+    },
+    "kind": "recovery",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103494,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "9298cda8b0969d9932c81d3adae80915653d1b71",
+    "status": "PASS_EXACT_SIGNED94_CAST_MKV_MEMBER_VECTOR",
+    "unchanged_payload_members": 7773,
+    "unsigned_sha256": "f1ee271747335efacd407818fdb6ddd566d0e787ad814d5b770af2f35bee6b45",
+    "versionCode": 2103497
+  },
+  "schema": 1,
+  "signing": "NOT_YET_RUN"
+}
