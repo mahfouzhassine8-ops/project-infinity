@@ -56,7 +56,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private boolean handedOff,everPlayed,finished,returning,aborting,transferStarted,ticking,leaving,selecting;
     private boolean phoneWasPaused,mayHavePaused,restoreInFlight;
     private String receiverName="",selectedDeviceId="";
-    private boolean cleanupPending;
+    private boolean cleanupPending,relayRetired,channelRetired,nativeReleased,nativeReleaseInFlight;
     private long stageSerial;
     private String stageName="idle",lastFailure="";
     private int lastPlayerState=-1,lastIdleReason=-1;
@@ -182,7 +182,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     void choose(int index) {
         if(cleanupPending || selecting || transferStarted || handedOff || index<0 || index>=devices.size() || phone.busy())return;
         if(privateSource==null || source==null){final String routeId=devices.get(index).getId();captureThenChoose(routeId);return;}
-        lastFailure="";lastPlayerState=lastIdleReason=-1;
+        InfinityCastDiagnostics.begin();lastFailure="";lastPlayerState=lastIdleReason=-1;
         aborting=returning=false;selecting=true;everPlayed=finished=false;receiverName=devices.get(index).getName();
         message="Connecting to "+receiverName+"…";InfinityCastDiagnostics.event("session","connecting",0);changed();
         CastDevice chosen=CastDevice.getFromBundle(devices.get(index).getExtras());
@@ -408,6 +408,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     }
     void returnToPhone(){
         InfinityCastDiagnostics.event("owner_action","return_requested",0);
+        if(cleanupPending){final String expected=token;phone.afterIdle(()->releaseNative(expected));return;}
         ++stageSerial;
         if(returning)return;
         if(!handedOff && !mayHavePaused){abortTransfer();return;}
@@ -480,33 +481,49 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         final String expected=token;boolean own=ownsMedia();
         boolean ownedSession=selecting || transferStarted || handedOff;
         if(remote!=null){try{remote.unregisterCallback(mediaEvents);if(stopOwnedMedia && own && connected())remote.stop();}catch(RuntimeException ignored){}}
-        if(relay!=null){relay.close();relay=null;}
+        final InfinityCastRelay retiringRelay=relay;relay=null;relayRetired=retiringRelay==null;
+        final InfinityCastChannel retiringChannel=channel;channel=null;channelRetired=retiringChannel==null;
+        nativeReleased=nativeReleaseInFlight=false;
         ui.removeCallbacksAndMessages(null);ticking=false;
+        if(retiringRelay!=null)retiringRelay.closeWhenRetired(()->ui.post(()->{if(expected.equals(token)){relayRetired=true;finishCleanup(expected);}}));
         // Explicitly release the RAM-only recorder channel on every exit. The
         // ordinary recorder keeps its last real sample; no records are forged.
-        if(channel!=null){channel.close();channel=null;}
+        if(retiringChannel!=null)retiringChannel.closeWhenRetired(()->ui.post(()->{if(expected.equals(token)){channelRetired=true;finishCleanup(expected);}}));
         if(sdk!=null && session!=null && ownedSession)try{sdk.getSessionManager().endCurrentSession(false);}catch(RuntimeException ignored){}
         remote=null;session=null;stopDiscovery();unlisten();
         phone.afterIdle(()->releaseNative(expected));
+        ui.postDelayed(()->{if(cleanupPending && expected.equals(token)){
+            InfinityCastDiagnostics.event("cleanup","completion_pending",0);
+            message="Cast cleanup is not confirmed. Phone controls remain available; Disconnect can retry ownership release.";changed();
+        }},10000);
         changed();
     }
     private void releaseNative(String expected) {
-        if(!cleanupPending || !expected.equals(token))return;
+        if(!cleanupPending || !expected.equals(token) || nativeReleased || nativeReleaseInFlight)return;
+        nativeReleaseInFlight=true;
         if(mayHavePaused && !phoneClockReady) {
             // A late committed pause must be reconciled before dropping token
             // ownership. Native item binding protects all other playback.
             phone.request(!everPlayed && phoneWasPaused?"pause":"resume",expected,0,result->{
-                phoneClockReady=true;releaseNative(expected);
+                phoneClockReady=true;nativeReleaseInFlight=false;releaseNative(expected);
             });return;
         }
         phone.request("release",expected,0,result->{
-            InfinityCastDiagnostics.event("cleanup",ok(result)?"native_released":"native_release_refused",0);
-            handedOff=everPlayed=finished=returning=transferStarted=selecting=false;
-            returnDeadline=0;mayHavePaused=restoreInFlight=false;phoneClockReady=false;
-            cleanupPending=leaving=aborting=false;privateSource=null;token="";mediaToken="";
-            InfinityCastDiagnostics.event("cleanup","session_released",0);
-            if(view.get()!=null){listen();discover();}changed();
+            nativeReleaseInFlight=false;
+            if(!cleanupPending || !expected.equals(token))return;
+            nativeReleased=ok(result);
+            InfinityCastDiagnostics.event("cleanup",nativeReleased?"native_released":"native_release_refused",0);
+            if(!nativeReleased){message="Cast ownership release was not confirmed. Phone controls remain available; use Disconnect to retry.";changed();return;}
+            finishCleanup(expected);
         });
+    }
+    private void finishCleanup(String expected) {
+        if(!cleanupPending || !expected.equals(token) || !nativeReleased || !relayRetired || !channelRetired)return;
+        handedOff=everPlayed=finished=returning=transferStarted=selecting=false;
+        returnDeadline=0;mayHavePaused=restoreInFlight=false;phoneClockReady=false;
+        cleanupPending=leaving=aborting=false;privateSource=null;token="";mediaToken="";
+        InfinityCastDiagnostics.event("cleanup","session_released",0);
+        if(view.get()!=null){listen();discover();}changed();
     }
     @Override public void onSessionStarted(CastSession s,String id){connectedSession(s);}
     @Override public void onSessionResumed(CastSession s,boolean suspended){if(!handedOff)connectedSession(s);}
@@ -514,7 +531,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     @Override public void onSessionResumeFailed(CastSession s,int error){onSessionStartFailed(s,error);}
     @Override public void onSessionEnded(CastSession s,int error){
         if(leaving || s!=session)return;InfinityCastDiagnostics.event("session","ended",error);
-        if(relay!=null){relay.close();relay=null;}
+        if(relay!=null)relay.close();
         if(handedOff || mayHavePaused){message="TV disconnected. Returning to phone playback…";returning=false;restorePhone(everPlayed);}
         else abortTransfer();
     }

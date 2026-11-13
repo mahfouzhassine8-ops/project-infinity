@@ -4,7 +4,7 @@ from zipfile import ZipFile
 import hashlib,json,re,sys,subprocess
 from dex_contract import Dex,class_contract
 
-BASE='63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733'
+BASE='3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827'
 def sha(path):
  with Path(path).open('rb') as stream:return hashlib.file_digest(stream,'sha256').hexdigest()
 def verify(apk,sdk,out):

@@ -16,6 +16,8 @@ final class InfinityCastChannel implements AutoCloseable {
     final String name,token,fileHash,originHash;
     private final LocalServerSocket server;
     private volatile boolean closed;
+    private boolean retired;
+    private Runnable retirementCallback;
     private volatile LocalSocket current;
     private volatile byte[] state="{}\n".getBytes(StandardCharsets.UTF_8);
     private volatile String occurrence="";
@@ -36,12 +38,12 @@ final class InfinityCastChannel implements AutoCloseable {
     }
     boolean acknowledged() { return !occurrence.isEmpty(); }
     private void serve() {
-        while(!closed) {
+        try { while(!closed) {
             LocalSocket accepted;
             try { accepted=server.accept(); }
             catch(Exception listenerFailure) { close();break; }
             try(LocalSocket socket=accepted) {
-                current=socket;
+                synchronized(this){if(closed)continue;current=socket;}
                 Credentials peer=socket.getPeerCredentials();
                 if(peer.getUid()!=Process.myUid() || peer.getPid()!=Process.myPid())continue;
                 socket.setSoTimeout(300);
@@ -59,12 +61,23 @@ final class InfinityCastChannel implements AutoCloseable {
             } catch(Exception ignored) {
                 // Deadline, EOF and a closing listener are normal. No retry
                 // thread or sensitive exception/stream logging is created.
-            } finally { current=null; }
+            } finally { synchronized(this){current=null;} }
+        }} finally {
+            close();Runnable completed;
+            synchronized(this){retired=true;completed=retirementCallback;retirementCallback=null;}
+            InfinityCastDiagnostics.event("observer","retired",0);
+            if(completed!=null)completed.run();
         }
     }
+    void closeWhenRetired(Runnable completed) {
+        boolean ready;
+        synchronized(this){ready=retired;if(!ready)retirementCallback=completed;}
+        close();if(ready)completed.run();
+    }
     @Override public void close() {
-        closed=true;
-        try { if(current!=null)current.close(); } catch(Exception ignored) {}
+        LocalSocket socket;
+        synchronized(this){closed=true;socket=current;}
+        try { if(socket!=null)socket.close(); } catch(Exception ignored) {}
         try { server.close(); } catch(Exception ignored) {}
     }
 }

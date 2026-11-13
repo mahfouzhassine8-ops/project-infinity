@@ -113,7 +113,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
             cast.returnToPhone();
             ui.postDelayed(()->{
                 try {
-                    if(field("channel")!=null || field("relay")!=null || !"".equals(field("token")) || (Boolean)field("cleanupPending") || cast.phone.busy())throw new IllegalStateException("owned cleanup incomplete");
+                    if(field("channel")!=null || field("relay")!=null || !"".equals(field("token")) || (Boolean)field("cleanupPending") || cast.phone.busy() || !(Boolean)field("nativeReleased") || !(Boolean)field("relayRetired") || !(Boolean)field("channelRetired"))throw new IllegalStateException("owned cleanup incomplete");
                     if(++cleanupCycles<5)cleanupCycle();else cleanupPassed=true;
                 } catch(Exception | LinkageError failure){result(false,"failed_transfer_cleanup_"+failure.getClass().getSimpleName());}
             },150);
@@ -133,7 +133,7 @@ public final class InfinityCastProbeActivity extends Activity implements Infinit
                 .put("Activity_Cast_id",activityCastResource)
                 .put("relay",relayResult==null?JSONObject.NULL:relayResult)
                 .put("explicit_receiver_selection_required",explicitSelectionGuard).put("private_HTTP_resource_readable",privateResource)
-                .put("failed_transfer_cleanup_cycles",cleanupCycles).put("failed_transfer_cleanup",cleanupPassed)
+                .put("ownership_completion_confirmed",cleanupPassed).put("failed_transfer_cleanup_cycles",cleanupCycles).put("failed_transfer_cleanup",cleanupPassed)
                 .put("full_Infinity_playback","NOT_TESTED").put("receiver_transfer","NOT_TESTED")
                 .put("shutdown","NOT_SELECTED").put("owner_APK",false);
             android.util.Log.i("InfinityCastProbe",value.toString());

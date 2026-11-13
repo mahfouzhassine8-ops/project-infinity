@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "evidence_sha256": "abac954dba12ee9325c24ce5e7b729921463161e5f2644e93cd2bae56b3f7500",
+  "evidence_bytes": 913721,
+  "raw_published": false,
+  "APK_versionCode": 2103492,
+  "checkpoint": {
+    "duration_ms": 25227,
+    "phase": "CHECKPOINT_FAILED",
+    "reason": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+    "active_native_writers": 0,
+    "reported_owner_blockers": 11,
+    "essential_writes_durable": false,
+    "safe_termination_authorized": false
+  },
+  "confirmed_persistence_blockers": [
+    "TMDb Helper service: SQLite collected with pending transaction",
+    "TMDb Helper service: pending transaction at retirement",
+    "ItemQueries.db: pending protected SQLite write transaction"
+  ],
+  "optional_pending_entry": "unidentified:infinity_native_ambient.py",
+  "playback_owner": "COMMITTED",
+  "Command_Center_owner": "COMMITTED",
+  "compat_owner": "COMMITTED",
+  "limitations": [
+    "No Cast receiver/media-load/relay outcome trace in supplied ZIP",
+    "Both 8 MiB native traces explicitly truncated",
+    "Eleven deadline owner rows are not eleven proved active native writers",
+    "native-cleanup receipt belongs to an older PID/time; not current process-death proof",
+    "kodi-process-state live=false is not OS process-death confirmation",
+    "Cast causation of the TMDb transaction is not established"
+  ],
+  "shutdown_source_changes": false,
+  "TMDb_Helper_changes": false,
+  "root_cause_of_receiver_return_home": "NOT_ESTABLISHED_FROM_PHYSICAL_EVENT_EVIDENCE"
+}

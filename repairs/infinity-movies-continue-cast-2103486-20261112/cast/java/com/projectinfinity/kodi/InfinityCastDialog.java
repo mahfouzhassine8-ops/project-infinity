@@ -28,8 +28,8 @@ public final class InfinityCastDialog extends Dialog implements InfinityCastSess
     private final InfinityCastSession cast;
     private final LinearLayout body,devices,transport;
     private final ScrollView receiverScroll;
-    private final TextView heading,title,status,time,receiver;
-    private final Button toggle,back,close;
+    private final TextView heading,title,status,time,receiver,details;
+    private final Button toggle,back,close,diagnostics;
     private final SeekBar progress;
     private boolean light,dragging;
     private String deviceSignature="";
@@ -61,7 +61,10 @@ public final class InfinityCastDialog extends Dialog implements InfinityCastSess
         time=text("",13,false);transport.addView(time);progress=new SeekBar(activity);progress.setMax(10000);
         progress.setContentDescription("Playback position");transport.addView(progress,new LinearLayout.LayoutParams(-1,dp(40)));
         toggle=button("Pause",v->cast.toggle());transport.addView(toggle);body.addView(transport);
-        back=button("Return to Phone / Disconnect",v->cast.returnToPhone());close=button("Close Controls",v->dismiss());body.addView(back);body.addView(close);
+        back=button("Return to Phone / Disconnect",v->cast.returnToPhone());close=button("Close Controls",v->dismiss());body.addView(back);
+        details=text("",12,false);details.setTextIsSelectable(true);details.setVisibility(View.GONE);
+        diagnostics=button("Cast Details",v->{details.setText(InfinityCastDiagnostics.summary());details.setVisibility(details.getVisibility()==View.VISIBLE?View.GONE:View.VISIBLE);});
+        body.addView(diagnostics);body.addView(details);body.addView(close);
         progress.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
             public void onStartTrackingTouch(SeekBar seek){dragging=true;}
             public void onProgressChanged(SeekBar seek,int value,boolean user){if(user && cast.duration()>0)time.setText("Playback position  "+clock(Math.round(cast.duration()*value/10000.0))+" / "+clock(cast.duration()));}
@@ -99,13 +102,14 @@ public final class InfinityCastDialog extends Dialog implements InfinityCastSess
     private void applyColors() {
         int foreground=light?Color.rgb(15,25,31):Color.rgb(235,243,248);
         GradientDrawable background=new GradientDrawable();background.setColor(light?Color.rgb(245,249,252):Color.rgb(10,17,23));background.setCornerRadius(dp(16));background.setStroke(dp(1),cyan);body.setBackground(background);
-        for(TextView view:new TextView[]{heading,title,status,time,receiver})view.setTextColor(foreground);heading.setTextColor(cyan);receiver.setTextColor(cyan);
-        for(Button button:new Button[]{toggle,back,close}){button.setTextColor(foreground);button.setBackgroundTintList(ColorStateList.valueOf(light?Color.rgb(225,235,241):Color.rgb(26,40,50)));}
+        for(TextView view:new TextView[]{heading,title,status,time,receiver,details})view.setTextColor(foreground);heading.setTextColor(cyan);receiver.setTextColor(cyan);
+        for(Button button:new Button[]{toggle,back,close,diagnostics}){button.setTextColor(foreground);button.setBackgroundTintList(ColorStateList.valueOf(light?Color.rgb(225,235,241):Color.rgb(26,40,50)));}
         progress.setProgressTintList(ColorStateList.valueOf(cyan));progress.setThumbTintList(ColorStateList.valueOf(cyan));deviceSignature="";changed();
     }
     private static String clock(long ms){long s=Math.max(0,ms/1000);return s>=3600?String.format(Locale.ROOT,"%d:%02d:%02d",s/3600,(s/60)%60,s%60):String.format(Locale.ROOT,"%d:%02d",s/60,s%60);}
     @Override public void changed() {
         title.setText(InfinityCastSource.receiverTitle(cast.title()));status.setText(cast.message);
+        if(details.getVisibility()==View.VISIBLE)details.setText(InfinityCastDiagnostics.summary());
         boolean active=cast.casting(),busy=cast.transferring();
         transport.setVisibility(active?View.VISIBLE:View.GONE);receiverScroll.setVisibility(active || busy?View.GONE:View.VISIBLE);
         receiver.setText(cast.receiverName().isEmpty()?"":"TV · "+cast.receiverName());receiver.setVisibility((active || busy) && !cast.receiverName().isEmpty()?View.VISIBLE:View.GONE);

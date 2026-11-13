@@ -101,6 +101,10 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private final Map<Response,Call> responses=new ConcurrentHashMap<>();
     private final AtomicInteger jobs=new AtomicInteger(),requests=new AtomicInteger();
     private volatile boolean closed,ownerDone;
+    private boolean fullyRetired;
+    private Runnable retirementCallback;
+    private final java.util.concurrent.atomic.AtomicLong deliveredBytes=new java.util.concurrent.atomic.AtomicLong();
+    private final Set<String> reportedKinds=Collections.newSetFromMap(new ConcurrentHashMap<String,Boolean>());
     private volatile String mime,lastFailure="";
     private volatile boolean hlsFmp4,hlsSeparateAudio;
     String hlsVideoFormat(){return hlsFmp4?"fmp4":null;}
@@ -229,7 +233,12 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(closed)throw new IOException("transport_closed");
             Request.Builder request=new Request.Builder().url(target.toASCIIString()).method(method,null)
                 .header("Accept-Encoding","identity").header("User-Agent","InfinityCast/1");
-            if(privateHeaders)for(Map.Entry<String,String> header:(resource==root || resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH?source.headers:source.streamHeaders).entrySet())request.header(header.getKey(),header.getValue());
+            for(Map.Entry<String,String> header:(resource==root || resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH?source.headers:source.streamHeaders).entrySet()) {
+                String name=header.getKey();
+                // Keep ordinary media negotiation across CDN redirects, while
+                // credentials, Origin and Referer remain exact-origin scoped.
+                if(privateHeaders || name.equals("user-agent") || name.equals("accept") || name.equals("accept-language"))request.header(name,header.getValue());
+            }
             String explicit=privateHeaders?(resource==root || resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH?source.headers:source.streamHeaders).get("cookie"):null;
             String cookie=cookies.header(target,explicit);if(!cookie.isEmpty())request.header("Cookie",cookie);
             if(range!=null)request.header("Range",range);
@@ -321,13 +330,15 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(requests.incrementAndGet()==1)InfinityCastDiagnostics.event("receiver_access","received",0);
             boolean knownManifest=resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH || (resource==root && InfinityCastAdaptive.adaptive(mime));
             response=open(resource,knownManifest?"GET":method,knownManifest?null:range);
+            String kind=resource==root?"root":resource.kind.name().toLowerCase(Locale.ROOT);
+            if(reportedKinds.add(kind+":"+response.code()))InfinityCastDiagnostics.event("relay_http",kind,response.code());
             if(response.code()!=200 && response.code()!=206)throw new IOException("source_http_"+response.code());
             String contentType=response.header("Content-Type"),type=InfinityCastSource.mime(contentType,resource==root?mime:resource.hint);
             if(knownManifest || InfinityCastAdaptive.adaptive(type)) {
                 if(response.body()==null || response.code()!=200)throw new IOException("invalid_manifest_response");
                 String manifestType=type!=null?type:resource.kind==InfinityCastAdaptive.Kind.DASH?"application/dash+xml":"application/vnd.apple.mpegurl";
                 byte[] translated=InfinityCastAdaptive.rewrite(read(response.body().byteStream(),InfinityCastAdaptive.LIMIT),manifestType,response.request().url().uri(),this);
-                reply(output,200,manifestType,translated.length,null);if(method.equals("GET"))output.write(translated);return;
+                reply(output,200,manifestType,translated.length,null);if(method.equals("GET")){output.write(translated);delivered(translated.length);}return;
             }
             if(type==null) {
                 String raw=contentType==null?"":contentType.split(";",2)[0].trim().toLowerCase(Locale.ROOT);
@@ -337,17 +348,18 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             }
             if(resource.kind==InfinityCastAdaptive.Kind.KEY && method.equals("GET")) {
                 byte[] key=read(response.body().byteStream(),16);if(key.length!=16)throw new IOException("unsupported_hls_key");
-                reply(output,200,"application/octet-stream",16,null);output.write(key);return;
+                reply(output,200,"application/octet-stream",16,null);output.write(key);delivered(key.length);return;
             }
             String contentRange=response.header("Content-Range");
             if(response.code()==206 && (contentRange==null || !contentRange.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}")))throw new IOException("invalid_source_range");
             long length=response.body()==null?-1:response.body().contentLength();String declared=response.header("Content-Length");
             if(method.equals("HEAD") && declared!=null && declared.matches("[0-9]{1,16}"))length=Long.parseLong(declared);
             reply(output,response.code(),type,length,contentRange);
-            if(method.equals("GET") && response.body()!=null){InputStream body=response.body().byteStream();byte[] buffer=new byte[65536];int count;while(!closed && (count=body.read(buffer))!=-1)output.write(buffer,0,count);}
+            if(method.equals("GET") && response.body()!=null){InputStream body=response.body().byteStream();byte[] buffer=new byte[65536];int count;while(!closed && (count=body.read(buffer))!=-1){output.write(buffer,0,count);delivered(count);}}
         } catch(IOException | RuntimeException failure){if(!closed)reason(failure);}
         finally{if(response!=null)release(response);}
     }
+    private void delivered(int count){if(deliveredBytes.getAndAdd(count)==0)InfinityCastDiagnostics.event("receiver_access","body_written",count);}
     private void reply(OutputStream output,int code,String type,long length,String range) throws IOException {
         String response="HTTP/1.1 "+code+" "+(code==200?"OK":code==206?"Partial Content":code==204?"No Content":"Unavailable")+"\r\n"+
             "Connection: close\r\nCache-Control: no-store\r\nAccess-Control-Allow-Origin: *\r\nAccept-Ranges: bytes\r\n"+
@@ -364,7 +376,19 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         for(Call call:new ArrayList<>(calls))call.cancel();
         try{lifecycle.execute(()->{cancelCalls();ownerDone=true;retired();});}catch(RuntimeException full){/* accept owner still closes and retires */}
     }
+    /** Completion means listener, upstream calls and all admitted jobs ended. */
+    void closeWhenRetired(Runnable completed) {
+        boolean ready;
+        synchronized(this){ready=fullyRetired;if(!ready)retirementCallback=completed;}
+        close();if(ready)completed.run();
+    }
     private void retired() {
-        if(closed && ownerDone && jobs.get()==0)synchronized(InfinityCastRelay.class){if(active==this){cookies.clear();active=null;InfinityCastDiagnostics.event("relay","retired",0);}}
+        if(!closed || !ownerDone || jobs.get()!=0)return;
+        Runnable completed;
+        synchronized(InfinityCastRelay.class){if(active==this){cookies.clear();active=null;}}
+        synchronized(this){if(fullyRetired)return;fullyRetired=true;completed=retirementCallback;retirementCallback=null;}
+        InfinityCastDiagnostics.event("relay","retired",requests.get());
+        InfinityCastDiagnostics.event("relay","body_bytes_written",(int)Math.min(Integer.MAX_VALUE,deliveredBytes.get()));
+        if(completed!=null)completed.run();
     }
 }
