@@ -1,0 +1,63 @@
+{
+  "producer": {
+    "digest": "sha256:3f78e6cde55fb5a29878833974a44fd95f5a4b8eb756b67d7878fb6147d8b687",
+    "id": 14011267176,
+    "name": "Infinity94-MKV-Install-Recovery-43367488710-NO-APK",
+    "run": 43367488710,
+    "size_in_bytes": 906,
+    "source": "fbc1d39ecfd60d455d2e2d360eb595af36fa4d77",
+    "workflow_id": 393886994
+  },
+  "report": {
+    "Fold_acceptance": "NOT_RUN",
+    "application_launch": false,
+    "application_startup": "NOT_SELECTED",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "data_preservation": "PackageManager retained UID, dataDir and firstInstallTime. No owner profile/database opened or modified.",
+    "data_reset": false,
+    "emulator_abis": "x86_64,arm64-v8a",
+    "forced_downgrade": false,
+    "playback": "OWNER_QA_AFTER_SIGNING",
+    "schema": 1,
+    "shutdown": "OWNER_QA_AFTER_SIGNING",
+    "source": "fbc1d39ecfd60d455d2e2d360eb595af36fa4d77",
+    "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+    "steps": [
+      {
+        "APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+        "kind": "baseline",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-13 04:48:26",
+          "uid": "10216",
+          "versionCode": 2103494
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+        "kind": "candidate",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-13 04:48:26",
+          "uid": "10216",
+          "versionCode": 2103496
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "27153a4e861743c0f212a5bc8ccd76d6a9937ec99e9f40b2dc1155d3aa3ab6b2",
+        "kind": "recovery",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-13 04:48:26",
+          "uid": "10216",
+          "versionCode": 2103497
+        },
+        "status": "PASS"
+      }
+    ],
+    "uninstall": false
+  },
+  "schema": 1
+}
