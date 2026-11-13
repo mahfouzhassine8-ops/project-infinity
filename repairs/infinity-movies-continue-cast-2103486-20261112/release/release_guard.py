@@ -56,7 +56,14 @@ def transition(previous,proposed,targets):
     b={k:v for k,v in proposed['payload'].items() if v['owner']==OWNER}
     require(set(a)==set(b) and {k for k in a if a[k]!=b[k]}=={'member:AndroidManifest.xml'},'ALL_EXISTING_SHARED_CLASSES_AND_RESOURCES_FROZEN')
     if proof['mode']=='candidate':
-        if previous['candidate_versionCode']==2103489 and proposed['candidate_versionCode']==2103490:
+        if previous['candidate_versionCode']==2103491 and proposed['candidate_versionCode']==2103492:
+            require(validate(previous)['mode']=='recovery','EXACT91_TO92_CAST90_PARENT')
+            evidence=proposed.get('owner_update_evidence',{})
+            require(evidence.get('owner')=='INFINITY_CAST_REPAIR90_CANDIDATE' and
+                    evidence.get('baseline_APK_sha256')=='63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733' and
+                    evidence.get('original_five_DEX_unchanged') is True and evidence.get('Cobra_changed') is False and
+                    'repairs/infinity-cast-repair-2103490-20261112/SCOPE.json' in evidence.get('source_files',{}),'EXACT_OWNER_AUTHORIZED_CAST90_SUCCESSOR92')
+        elif previous['candidate_versionCode']==2103489 and proposed['candidate_versionCode']==2103490:
             require(validate(previous)['mode']=='recovery','EXACT89_TO90_CAST_REPAIR_PARENT')
             evidence=proposed.get('owner_update_evidence',{})
             scope='repairs/infinity-cast-final-2103488-20261112/SCOPE.json'

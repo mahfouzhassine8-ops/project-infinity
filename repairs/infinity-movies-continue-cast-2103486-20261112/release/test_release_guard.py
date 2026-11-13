@@ -30,6 +30,15 @@ class CastGuard(unittest.TestCase):
   with self.assertRaises(ValueError):guard.transition(before,after,self.owners)
   after['owner_update_evidence']=dict(owner='INFINITY_CAST_FINAL_CANDIDATE',baseline_APK_sha256='4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566',original_five_DEX_unchanged=True,Cobra_changed=False,source_files={'repairs/infinity-cast-final-2103488-20261112/SCOPE.json':'bound-by-outer-original-evidence-verifier'})
   guard.transition(before,after,self.owners)
+ def test_exact90_based92_requires_bound_scope_and_baseline(self):
+  before=json.loads(subprocess.check_output(['git','show','9ad36336b23c91d45de7dec8d45a192a2702868d:repairs/dual-experience-isolation-2103420/release-authority.json'],cwd=ROOT))
+  after=copy.deepcopy(before);after['candidate_versionCode']=2103492;after['cast_manifest_exception']=copy.deepcopy(self.proof)
+  after['payload']['member:AndroidManifest.xml']=dict(owner=guard.OWNER,sha256=self.proof['candidate_manifest_sha256'])
+  with self.assertRaises(ValueError):guard.transition(before,after,self.owners)
+  after['owner_update_evidence']=dict(owner='INFINITY_CAST_REPAIR90_CANDIDATE',baseline_APK_sha256='63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733',original_five_DEX_unchanged=True,Cobra_changed=False,source_files={'repairs/infinity-cast-repair-2103490-20261112/SCOPE.json':'bound-by-outer-original-evidence-verifier'})
+  guard.transition(before,after,self.owners)
+  after['owner_update_evidence']['baseline_APK_sha256']='4217b217bca06084121572bbde71164abe67d05ef49741c78d4f83c5c5d4a566'
+  with self.assertRaises(ValueError):guard.transition(before,after,self.owners)
  def test_any_other_shared_class_or_resource_change_is_rejected(self):
   key=next(k for k,v in self.after['payload'].items() if v['owner']==guard.OWNER and k!='member:AndroidManifest.xml')
   self.after['payload'][key]['sha256']='0'*64
