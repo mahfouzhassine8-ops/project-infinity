@@ -1,0 +1,111 @@
+{
+  "installer": {
+    "APK_sha256": "2cf9343ea2fe17cadb73360963aaf557c07abffd2161052d09d749773702177c",
+    "digest": "sha256:4ae2a07dfac5d307ff314c21a0886e50162c41c4aa7a597effed90aa6c0d7e66",
+    "id": 13998143809,
+    "name": "Infinity90-CastRepair-OriginalSigned-43338973202-QA-Fold-Pending",
+    "run": 43338973202,
+    "size_in_bytes": 347814031,
+    "source": "68b62b96ebebadea2b922fe2ce72dab5854d11ea",
+    "workflow_id": 397702717
+  },
+  "preservation": {
+    "APK_sha256": "2cf9343ea2fe17cadb73360963aaf557c07abffd2161052d09d749773702177c",
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "baseline_APK_sha256": "63b1e380d9ff079e47793b0a182725561a9265cd63a0de288fc8357dfb1d7733",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "ce1d157d998b4aeeb855c1b81dd355e248c58ea0d772d600b4d8b145fa588c6e",
+        "before": "474c3d334ce6444bc1f210a36729b266e963b273f6e1d97dea944cbfbbdea00f"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "fd1602b53ce0e56b542840adbabc8125658b1732b4ba9c54ffeb907eb2cf3abd",
+        "before": "78859a51467548ff127eb737cfe21d599dd7e7a96a945b0aa4694451e7d7ac53"
+      }
+    },
+    "kind": "recovery",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103490,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "68b62b96ebebadea2b922fe2ce72dab5854d11ea",
+    "status": "PASS_EXACT_SIGNED90_CAST_ONLY_MEMBER_VECTOR",
+    "unchanged_payload_members": 7773,
+    "versionCode": 2103493
+  },
+  "receipt": {
+    "accepted_pointer_updated": false,
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "component_sources": {
+      "CHOOSER_SHELL": "55770bb611837a47f5e514bb94be39b68fe8d12c",
+      "COBRA": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
+      "INFINITY": "55770bb611837a47f5e514bb94be39b68fe8d12c",
+      "MINIMAL_ANDROID_CONTRACT": "55770bb611837a47f5e514bb94be39b68fe8d12c"
+    },
+    "component_versions": {
+      "CHOOSER_SHELL": "2103493.chooser_shell.cast_repair90.1",
+      "COBRA": "2103445.cobra.1",
+      "INFINITY": "2103493.infinity.cast_repair90.1",
+      "MINIMAL_ANDROID_CONTRACT": "2103492.minimal_android_contract.cast_repair90.1"
+    },
+    "generation": 78,
+    "launcher_icon_resources": {
+      "adaptive_symbol_alpha": "EXACT_ORIGINAL_MONO_AND_COLOR_ALPHA; RESOURCE_BLACK_TINT_ONLY",
+      "launcher_limits": "Launcher caches may retain an old drawable; user-enabled themed-icon palettes control monochrome colors. Resource resolution does not guarantee every Samsung surface refreshes immediately.",
+      "legacy_symbol": "SAME_ORIGINAL_MONO_ALPHA; STANDARD_CENTERED_72_OF_108_ADAPTIVE_VIEWPORT_RESAMPLED_TO_ORIGINAL_DENSITY",
+      "legacy_tile_alpha": "EXACT_ORIGINAL_DENSITY_TILE_ALPHA",
+      "manifest": "NOT_MODIFIED_BY_ICON_IMPLEMENTATION",
+      "new_entries": 1079,
+      "new_path_sha256": {
+        "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
+        "res/infinity_launcher_light_mdpi.png": "20521d2e6de937d79c4a6e5d9ea6ce1a34a623b2dfbf5827fee3d8e59b2d835f",
+        "res/infinity_launcher_light_v26.xml": "545b354ba229d2d197950801d8740b364238e52b86f0f9f93d779cc9b4abd8e7",
+        "res/infinity_launcher_light_v33.xml": "b894acef7408a8934b2ed989b625e2d1d15bf3c409ca583c15a3bc4a10576c8d",
+        "res/infinity_launcher_light_xhdpi.png": "2cf279c8855cb756d4070e1eb532dbdb40d7549a4332fb2ce9aef5e65c47f741",
+        "res/infinity_launcher_light_xxhdpi.png": "481b64281afbe845d9f22de796c4d26a7f00825b56b750e9bce41f16d7f920b9",
+        "res/infinity_launcher_light_xxxhdpi.png": "0fce20ccd57efa60921c940603b5e0a1d8d740c06fafcf5f8cec783e4cb34622"
+      },
+      "new_resource_ids": 0,
+      "night_config_additions": 14,
+      "non_icon_resource_entries": "EXACT_SEMANTIC_AND_ORIGINAL_CHUNK_IDENTITY",
+      "original_dark_assets": "ALL_BYTE_IDENTICAL",
+      "original_entries": 1065,
+      "original_table_sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616",
+      "physical_Samsung": "NOT_VERIFIED",
+      "resource_ids": [
+        "0x7f080000",
+        "0x7f080001"
+      ],
+      "shutdown": "NOT_RUN",
+      "status": "PASS_EXACT_ICON_ONLY_TABLE_TRANSFORM",
+      "table_sha256": "cb3a6f25572858e9fb64dd21713ab1e1c1a0965d0e1d3951c59dd690c9551f5c"
+    },
+    "payload_digest": "3726cda784a45ea9a74c2c2828248320b04255e45d7f4cc153f54ba0e1ec22b0",
+    "physical_Fold": "PENDING",
+    "registry_sha256": "67fa28feb35571c4ea0dfb8c70cb5a7ad237068719a4cf045cb886de2a3d4e11",
+    "signed_apk_sha256": "2cf9343ea2fe17cadb73360963aaf557c07abffd2161052d09d749773702177c",
+    "source": "68b62b96ebebadea2b922fe2ce72dab5854d11ea",
+    "status": "PRE_SIGN_PAYLOAD_VERIFIED",
+    "unsigned_apk_sha256": "7227a0f5039e1879f34fede9b17f065297068a1a562bc562f2d0524681c27a04",
+    "versionCode": 2103493
+  },
+  "receipt_artifact": {
+    "digest": "sha256:30ec5388bbac911dd41261b371c02960d9d9b5452a59a7aba56b0475c768cc71",
+    "id": 13998153784
+  },
+  "schema": 1,
+  "signature_schemes": {
+    "v1": true,
+    "v2": true,
+    "v3": true
+  },
+  "status": "PASS_ORIGINAL_SIGNED_FORWARD_RECOVERY_TO2103490"
+}
