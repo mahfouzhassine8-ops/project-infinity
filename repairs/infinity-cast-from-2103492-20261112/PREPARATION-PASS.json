@@ -1,0 +1,82 @@
+{
+  "MINIMAL_ANDROID_CONTRACT": "Same normalized payload, approved source, version and revision; typed APK versionCode only changes",
+  "candidate": {
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "baseline_APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "1054836535e4cbdaf986a28b040c4fe9ff9f1634fa01c70cbd74aea72d80a4dd",
+        "before": "2f2c8a1b408b15566f56bab84285e28381190547f01972a7c9cdf5da8d42dfa3"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "5a281c520fb8cede8bb9dd2cef9c54a6125bcf90d3356a81d4233df597b80cff",
+        "before": "cfd42005f880502af636cbc1542cd3e0a48a71c847df363a427ba712c63ab333"
+      },
+      "classes6.dex": {
+        "after": "1cb133100ac9261895ffd270564eac8212d8c8b243b7f0e5051f77f3256e09ba",
+        "before": "e7c81dd4eab6be48dc34382a8358cb30b8467e9c6e3d2cedfab9607ccc117d37"
+      }
+    },
+    "kind": "candidate",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103492,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "66d409ed26c80bfbce5ebde1fd8ed1590603a184",
+    "status": "PASS_EXACT_SIGNED92_CAST_ONLY_MEMBER_VECTOR",
+    "unchanged_payload_members": 7772,
+    "unsigned_sha256": "11124408bbe8d5ab5eeeb12c5e020cc463e7d7fbccbb76a9975aba0a914de0ab",
+    "versionCode": 2103494
+  },
+  "ownership_policy": "Exact original policy plus one generated Cast-only class root w; no existing owner relabeled",
+  "prepared_producer": {
+    "digest": "sha256:d13aaeba86d5e0021ab3b105e9f806fc99de21631994ce4172ac84c76daf4db3",
+    "id": 14002266312,
+    "name": "Infinity92-CastRepair-Prepared-43346220579-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43346220579,
+    "size_in_bytes": 1317483649,
+    "source": "66d409ed26c80bfbce5ebde1fd8ed1590603a184",
+    "workflow_id": 397702717
+  },
+  "recovery": {
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "baseline_APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "052b7e8c0417ce64c39a8f0be03d6bf3211aa65878b42bd858d35b95b4941e65",
+        "before": "2f2c8a1b408b15566f56bab84285e28381190547f01972a7c9cdf5da8d42dfa3"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "ce108c7c60c8c374e5676917ec5f89e4d18c2fc59ab487c6a62d27527a9a34ae",
+        "before": "cfd42005f880502af636cbc1542cd3e0a48a71c847df363a427ba712c63ab333"
+      }
+    },
+    "kind": "recovery",
+    "original_five_DEX_unchanged": true,
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103492,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "66d409ed26c80bfbce5ebde1fd8ed1590603a184",
+    "status": "PASS_EXACT_SIGNED92_CAST_ONLY_MEMBER_VECTOR",
+    "unchanged_payload_members": 7773,
+    "unsigned_sha256": "fa4e6131a271eb790b5e7fa2fadcee58eaa4c751c1882e5faa08efaf4521b523",
+    "versionCode": 2103495
+  },
+  "run": 43346220579,
+  "schema": 1,
+  "signed": false
+}
