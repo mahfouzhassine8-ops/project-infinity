@@ -1,0 +1,51 @@
+{
+  "checks": [
+    "actual source video/audio codec inspection",
+    "actual Matroska cue index, not invented fixed boundaries",
+    "strict source-derived timeline",
+    "video encoded packet bytes and order preserved, zero transcoding",
+    "video original presentation timestamps preserved within source tick",
+    "audio encoded packet bytes and order preserved, zero transcoding",
+    "audio original presentation timestamps preserved within source tick",
+    "all decoded video frames identical",
+    "decoded audio identical, no boundary gaps or repeated samples",
+    "real full-VOD HLS seek and decode",
+    "actual HEVC codec inspection",
+    "HEVC video bit-exact packet preservation",
+    "HEVC video normalized presentation timestamps",
+    "HEVC audio bit-exact packet preservation",
+    "HEVC audio normalized presentation timestamps",
+    "HEVC fMP4/HLS actual decode",
+    "unsupported DTS identified before media output, no codec masquerading",
+    "unsupported source creates no receiver media"
+  ],
+  "fixture_sha256": "d0a6fda254370f25b774489c3ab5e6f240f038ef3e718fa121ad2f54982bf52f",
+  "inspection": {
+    "audio": "aac",
+    "duration_us": 8021000,
+    "origin_us": -21000,
+    "starts_us": [
+      0,
+      2021000,
+      4021000,
+      6021000,
+      8021000
+    ],
+    "video": "h264"
+  },
+  "real_receiver": false,
+  "relative_video_start_us": 21000,
+  "schema": 1,
+  "shutdown": "NOT_SELECTED",
+  "source_hashes": {
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": "e05ad4fc180e0d90f2d4b6a38445a66e5e46b9b1994a457961502d4685eee3a9",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/native_driver.cpp": "049129ce2f322329b004c93d5bfb07e6e3f0401e8904c68842ebe673cc8eb319",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/test_native.py": "09c6d3113e477beb4742047e2161559073c5d8c98a163bf7273ddfbe8bee43c1"
+  },
+  "source_packets": {
+    "audio": 376,
+    "video": 192
+  },
+  "status": "PASS_REAL_FFMPEG6_MKV_STREAM_COPY",
+  "transcoding": false
+}

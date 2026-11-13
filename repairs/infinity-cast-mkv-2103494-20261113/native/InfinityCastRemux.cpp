@@ -27,8 +27,13 @@ namespace InfinityMkv {
 using Clock=std::chrono::steady_clock;
 constexpr size_t FragmentLimit=8*1024*1024,InitLimit=1024*1024;
 constexpr int IndexLimit=8192;
+// One fixed MPEG presentation epoch for the ENTIRE HLS rendition. This is a
+// timestamp origin, never a wait/delay. HLS maps its first presentation to zero.
+// Positive DTS avoids negative-CTS/edit-list ambiguities with B-frame video.
+constexpr int64_t TransportEpoch=10LL*AV_TIME_BASE;
+int denyOpen(AVFormatContext*,AVIOContext**,const char*,int,AVDictionary**){return AVERROR(EPERM);}
 struct Failure:std::runtime_error{using std::runtime_error::runtime_error;};
-#define FUNCTIONS(F) F(av_version_info) F(avutil_version) F(av_malloc) F(av_free) F(av_freep) F(av_dict_set) F(av_dict_get) F(av_dict_free) F(av_rescale_q) F(avformat_alloc_context) F(avformat_open_input) F(avformat_find_stream_info) F(avformat_close_input) F(avio_alloc_context) F(avio_context_free) F(avio_flush) F(avformat_index_get_entries_count) F(avformat_index_get_entry) F(av_seek_frame) F(avformat_alloc_output_context2) F(avformat_new_stream) F(avformat_free_context) F(avcodec_parameters_copy) F(avcodec_get_name) F(avformat_query_codec) F(avformat_write_header) F(av_interleaved_write_frame) F(av_write_frame) F(av_write_trailer) F(av_packet_alloc) F(av_packet_free) F(av_packet_unref) F(av_packet_rescale_ts) F(av_read_frame)
+#define FUNCTIONS(F) F(av_version_info) F(avutil_version) F(av_malloc) F(av_free) F(av_freep) F(av_dict_set) F(av_dict_get) F(av_dict_free) F(av_rescale_q) F(av_find_input_format) F(avformat_alloc_context) F(avformat_open_input) F(avformat_find_stream_info) F(avformat_close_input) F(avio_alloc_context) F(avio_context_free) F(avio_flush) F(avformat_index_get_entries_count) F(avformat_index_get_entry) F(av_seek_frame) F(avformat_alloc_output_context2) F(av_stream_new_side_data) F(avformat_new_stream) F(avformat_free_context) F(avcodec_parameters_copy) F(avcodec_get_name) F(avformat_query_codec) F(avformat_write_header) F(av_interleaved_write_frame) F(av_write_frame) F(av_write_trailer) F(av_packet_alloc) F(av_packet_free) F(av_packet_unref) F(av_packet_rescale_ts) F(av_read_frame)
 struct Api {
  void* image=nullptr;
 #define DECLARE(f) decltype(&::f) f=nullptr;
@@ -77,13 +82,19 @@ struct Output {
   for(int in:{s.video,s.audio})if(in>=0){
    auto* source=s.format->streams[in];if(api().avformat_query_codec(format->oformat,source->codecpar->codec_id,FF_COMPLIANCE_NORMAL)<=0)throw Failure("mkv_codec_not_mp4_compatible");
    auto* out=api().avformat_new_stream(format,nullptr);if(!out || api().avcodec_parameters_copy(out->codecpar,source->codecpar)<0)throw Failure("mkv_stream_copy_failed");
+   for(int k=0;k<source->nb_side_data;k++) {
+    const auto& side=source->side_data[k];
+    if(side.type==AV_PKT_DATA_MASTERING_DISPLAY_METADATA || side.type==AV_PKT_DATA_CONTENT_LIGHT_LEVEL || side.type==AV_PKT_DATA_DISPLAYMATRIX || side.type==AV_PKT_DATA_STEREO3D || side.type==AV_PKT_DATA_DOVI_CONF){
+     if(side.size>65536)throw Failure("mkv_display_metadata_limit");auto* copy=api().av_stream_new_side_data(out,side.type,side.size);if(!copy)throw Failure("mkv_memory_limit");std::memcpy(copy,side.data,side.size);
+    }
+   }
    out->codecpar->codec_tag=0;out->time_base=source->time_base;out->avg_frame_rate=source->avg_frame_rate;out->sample_aspect_ratio=source->sample_aspect_ratio;out->id=int(format->nb_streams);out->disposition=source->disposition;
   }
   auto* buffer=static_cast<unsigned char*>(api().av_malloc(32768));if(!buffer)throw Failure("mkv_memory_limit");
   io=api().avio_alloc_context(buffer,32768,1,this,nullptr,write,nullptr);if(!io){api().av_free(buffer);throw Failure("mkv_memory_limit");}
-  io->seekable=0;format->pb=io;format->flags|=AVFMT_FLAG_CUSTOM_IO;format->avoid_negative_ts=AVFMT_AVOID_NEG_TS_DISABLED;
+  io->seekable=0;format->pb=io;format->flags|=AVFMT_FLAG_CUSTOM_IO;format->avoid_negative_ts=AVFMT_AVOID_NEG_TS_DISABLED;format->io_open=denyOpen;
   AVDictionary* options=nullptr;
-  api().av_dict_set(&options,"movflags","empty_moov+frag_custom+frag_discont+default_base_moof+omit_tfhd_offset+negative_cts_offsets+skip_trailer",0);
+  api().av_dict_set(&options,"movflags","empty_moov+frag_custom+frag_discont+default_base_moof+omit_tfhd_offset+skip_trailer",0);
   api().av_dict_set(&options,"use_editlist","0",0);
   int code=api().avformat_write_header(format,&options);api().av_dict_free(&options);api().avio_flush(io);
   if(code<0 || failure)throw Failure(failure?failure:"mkv_mux_header_failed");if(bytes.empty() || bytes.size()>InitLimit)throw Failure("mkv_init_limit");
@@ -95,12 +106,25 @@ int select(AVFormatContext* f,AVMediaType kind){
  for(unsigned n=0;n<f->nb_streams;n++){auto* s=f->streams[n];if(s->codecpar->codec_type!=kind || (s->disposition&AV_DISPOSITION_ATTACHED_PIC))continue;first=int(n);count++;if(s->disposition&AV_DISPOSITION_DEFAULT){defaultIndex=int(n);defaults++;}}
  if(count<=1)return first;if(defaults==1)return defaultIndex;throw Failure(kind==AVMEDIA_TYPE_AUDIO?"mkv_ambiguous_audio_tracks":"mkv_ambiguous_video_tracks");
 }
+// A true closed random-access picture is required for independent JIT chunks.
+bool closedPicture(const AVPacket* packet,const AVCodecParameters* codec){
+ if(!codec->extradata || codec->extradata_size<6 || codec->extradata[0]!=1)return false;
+ int bytes=codec->codec_id==AV_CODEC_ID_H264?(codec->extradata[4]&3)+1:codec->extradata_size>21?(codec->extradata[21]&3)+1:0;
+ if(bytes<1 || bytes>4)return false;
+ for(int at=0;at+bytes<packet->size;){uint32_t n=0;for(int j=0;j<bytes;j++)n=(n<<8)|packet->data[at++];if(!n || n>uint32_t(packet->size-at))return false;
+  int type=codec->codec_id==AV_CODEC_ID_H264?packet->data[at]&31:(packet->data[at]>>1)&63;
+  if(codec->codec_id==AV_CODEC_ID_H264 && type>=1 && type<=5)return type==5;
+  if(codec->codec_id==AV_CODEC_ID_HEVC && type<=31)return type==19 || type==20;
+  at+=int(n);
+ }return false;
+}
 void State::inspect(){
  deadline=Clock::now()+std::chrono::seconds(15);format=api().avformat_alloc_context();if(!format)throw Failure("mkv_memory_limit");
  auto* buffer=static_cast<unsigned char*>(api().av_malloc(32768));if(!buffer)throw Failure("mkv_memory_limit");
  io=api().avio_alloc_context(buffer,32768,0,this,read,nullptr,seek);if(!io){api().av_free(buffer);throw Failure("mkv_memory_limit");}
- io->seekable=AVIO_SEEKABLE_NORMAL;format->pb=io;format->flags|=AVFMT_FLAG_CUSTOM_IO;format->interrupt_callback={interrupt,this};format->probesize=4*1024*1024;format->max_analyze_duration=2*AV_TIME_BASE;format->max_streams=32;format->max_index_size=IndexLimit*sizeof(AVIndexEntry);
- if(api().avformat_open_input(&format,"cast-private-input.mkv",nullptr,nullptr)<0)throw Failure("mkv_input_probe_failed");check();
+ io->seekable=AVIO_SEEKABLE_NORMAL;format->pb=io;format->flags|=AVFMT_FLAG_CUSTOM_IO;format->interrupt_callback={interrupt,this};format->probesize=4*1024*1024;format->max_analyze_duration=2*AV_TIME_BASE;format->max_streams=32;format->max_index_size=IndexLimit*sizeof(AVIndexEntry);format->io_open=denyOpen;
+ const AVInputFormat* matroska=api().av_find_input_format("matroska");if(!matroska)throw Failure("mkv_existing_demuxer_unavailable");
+ if(api().avformat_open_input(&format,"cast-private-input.mkv",matroska,nullptr)<0)throw Failure("mkv_input_probe_failed");check();
  if(!format->iformat || std::string(format->iformat->name).find("matroska")==std::string::npos)throw Failure("mkv_wrong_container");
  if(api().avformat_find_stream_info(format,nullptr)<0)throw Failure("mkv_stream_info_failed");check();
  video=select(format,AVMEDIA_TYPE_VIDEO);audio=select(format,AVMEDIA_TYPE_AUDIO);if(video<0)throw Failure("mkv_video_missing");
@@ -108,7 +132,7 @@ void State::inspect(){
  auto v=format->streams[video]->codecpar->codec_id;if(v!=AV_CODEC_ID_H264 && v!=AV_CODEC_ID_HEVC)throw Failure("mkv_unsupported_video_codec");
  if(audio>=0){auto a=format->streams[audio]->codecpar->codec_id;if(a!=AV_CODEC_ID_AAC && a!=AV_CODEC_ID_MP3 && a!=AV_CODEC_ID_AC3 && a!=AV_CODEC_ID_EAC3)throw Failure("mkv_unsupported_audio_codec");}
  for(int n:{video,audio})if(n>=0){auto* s=format->streams[n];if(s->codecpar->extradata_size<0 || s->codecpar->extradata_size>65536)throw Failure("mkv_codec_private_limit");if(api().av_dict_get(s->metadata,"enc_key_id",nullptr,0))throw Failure("drm_or_unsupported_encryption");for(int k=0;k<s->nb_side_data;k++)if(s->side_data[k].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO || s->side_data[k].type==AV_PKT_DATA_ENCRYPTION_INFO)throw Failure("drm_or_unsupported_encryption");}
- origin=format->start_time;if(origin==AV_NOPTS_VALUE || origin<0)throw Failure("mkv_unverified_timeline");duration=format->duration;if(duration<=0 || duration>30LL*24*3600*AV_TIME_BASE)throw Failure("mkv_unverified_duration");
+ origin=format->start_time;if(origin==AV_NOPTS_VALUE || origin< -30LL*24*3600*AV_TIME_BASE || origin>30LL*24*3600*AV_TIME_BASE)throw Failure("mkv_unverified_timeline");duration=format->duration;if(duration<=0 || duration>30LL*24*3600*AV_TIME_BASE)throw Failure("mkv_unverified_duration");
  auto* stream=format->streams[video];int64_t middle=api().av_rescale_q(origin+duration/2,AV_TIME_BASE_Q,stream->time_base);
  if(api().av_seek_frame(format,video,middle,AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_seek_index_unavailable");check();
  int count=api().avformat_index_get_entries_count(stream);if(count<=0 || count>IndexLimit)throw Failure("mkv_seek_index_limit");
@@ -129,9 +153,9 @@ std::vector<uint8_t> State::segment(int index){
   auto* stream=format->streams[source];if(p->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");int64_t at=micros(p->pts,stream->time_base);
   if(source==video && (p->flags&AV_PKT_FLAG_KEY) && at>=end){if(boundary && at>end){api().av_packet_unref(p);break;}boundary=true;}
   if(at<begin || at>=end){api().av_packet_unref(p);continue;}
-  if(source==video && writtenVideo==0 && (!(p->flags&AV_PKT_FLAG_KEY) || p->pts!=keys[index]))throw Failure("mkv_keyframe_mismatch");
+  if(source==video && writtenVideo==0){if(!(p->flags&AV_PKT_FLAG_KEY) || p->pts!=keys[index])throw Failure("mkv_keyframe_mismatch");if(!closedPicture(p,stream->codecpar))throw Failure("mkv_open_gop_not_supported");}
   for(int n=0;n<p->side_data_elems;n++)if(p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO || p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
-  int mapped=source==video?0:1;int64_t offset=api().av_rescale_q(origin,AV_TIME_BASE_Q,stream->time_base);p->pts-=offset;if(p->dts!=AV_NOPTS_VALUE)p->dts-=offset;
+  int mapped=source==video?0:1;int64_t offset=api().av_rescale_q(origin-TransportEpoch,AV_TIME_BASE_Q,stream->time_base);p->pts-=offset;if(p->dts!=AV_NOPTS_VALUE){p->dts-=offset;if(p->dts<0)throw Failure("mkv_unsupported_decode_preroll");}
   api().av_packet_rescale_ts(p,stream->time_base,out.format->streams[mapped]->time_base);p->stream_index=mapped;p->pos=-1;
   if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_packet_mux_failed");
   if(source==video)writtenVideo++;else writtenAudio++;
@@ -142,7 +166,7 @@ std::vector<uint8_t> State::segment(int index){
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
 std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
-std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
+std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
 } // namespace InfinityMkv
 #ifndef INFINITY_REMUX_HOST
 namespace {

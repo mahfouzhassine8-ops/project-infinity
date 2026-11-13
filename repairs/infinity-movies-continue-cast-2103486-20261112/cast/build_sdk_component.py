@@ -15,7 +15,7 @@ import private_classes
 HERE=Path(__file__).resolve().parent
 WORK=Path(sys.argv[1]).resolve();APK=Path(sys.argv[2]).resolve()
 SDK=WORK/'tools';DEPS=WORK/'maven';OUT=WORK/'component-reuse86';OUT.mkdir(exist_ok=True)
-assert hashlib.file_digest(APK.open('rb'),'sha256').hexdigest()=='3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827'
+assert hashlib.file_digest(APK.open('rb'),'sha256').hexdigest()=='fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c'
 baseline={}
 with ZipFile(APK) as z:
  for n in z.namelist():
@@ -142,7 +142,7 @@ if reuse:
  assert len(candidates)==1, 'Reuse requires exactly one authenticated component receipt'
  verified=candidates[0].parent;receipt=json.loads(candidates[0].read_text())
  assert receipt['status']=='PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT'
- assert receipt['baseline_APK_sha256']=='3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827'
+ assert receipt['baseline_APK_sha256']=='fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c'
  assert receipt['feature_Java_sha256']==source_hashes, 'Java input changed; cannot reuse prior SDK component'
  assert receipt.get('build_inputs')==build_inputs, 'Dependency, rules, shader or component build logic changed; stale component refused'
  assert receipt['resources']['sha256']==hashlib.sha256(resource_apk.read_bytes()).hexdigest(), 'Resource input changed; cannot reuse prior SDK component'

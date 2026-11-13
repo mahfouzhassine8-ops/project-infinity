@@ -1,13 +1,13 @@
 """Actual pinned FFmpeg6 core; authenticated Android I/O is checked separately."""
 from pathlib import Path
-import collections,hashlib,json,subprocess,sys
+import collections,hashlib,json,subprocess,sys,os
 work=Path(sys.argv[1]);driver=Path(sys.argv[2]);fixtures=work/'fixtures';fixtures.mkdir(exist_ok=True)
 checks=[]
 def run(args,**kw):return subprocess.run(list(map(str,args)),check=True,capture_output=True,**kw)
 def check(value,label):
  if not value:raise AssertionError(label)
  checks.append(label)
-def probe(path):return json.loads(run(['ffprobe','-v','error','-show_streams','-show_packets','-show_data_hash','sha256','-of','json',path]).stdout)
+def probe(path):return json.loads(run(['ffprobe','-v','error','-show_format','-show_streams','-show_packets','-show_data_hash','sha256','-of','json',path]).stdout)
 base=fixtures/'h264-aac.mkv'
 run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=320x180:rate=24','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','8','-c:v','libx264','-preset','ultrafast','-g','48','-bf','2','-pix_fmt','yuv420p','-c:a','aac','-b:a','96k',base])
 output=work/'h264-copy';result=run([driver,base,output]);meta=json.loads((output/'inspection.json').read_text())
@@ -22,7 +22,9 @@ for kind in ['video','audio']:
  ai=next(x['index'] for x in a['streams'] if x['codec_type']==kind);bi=next(x['index'] for x in b['streams'] if x['codec_type']==kind)
  ap=[x for x in a['packets'] if x['stream_index']==ai];bp=[x for x in b['packets'] if x['stream_index']==bi]
  check([x['data_hash'] for x in ap]==[x['data_hash'] for x in bp],kind+' encoded packet bytes and order preserved, zero transcoding')
- delta=[abs(float(x['pts_time'])-float(y['pts_time'])) for x,y in zip(ap,bp)]
+ # Kodi's existing CDVDDemuxFFmpeg::ConvertTimestamp subtracts format.start_time.
+ # Compare exactly the same normalized movie clock, including negative AAC priming.
+ delta=[abs(float(x['pts_time'])-meta['origin_us']/1000000-(float(y['pts_time'])-float(b['format']['start_time']))) for x,y in zip(ap,bp)]
  print(json.dumps({'track':kind,'source_first':[{k:x.get(k) for k in ['pts_time','dts_time','duration_time']} for x in ap[:5]],'output_first':[{k:x.get(k) for k in ['pts_time','dts_time','duration_time']} for x in bp[:5]],'max_pts_delta':max(delta)}),flush=True)
  check(max(delta)<0.002,kind+' original presentation timestamps preserved within source tick')
 original=run(['ffmpeg','-v','error','-i',base,'-map','0:v:0','-f','framemd5','-']).stdout
@@ -33,10 +35,26 @@ audioA=run(['ffmpeg','-v','error','-i',base,'-map','0:a:0','-f','s16le','-']).st
 audioB=run(['ffmpeg','-v','error','-i',playlist,'-map','0:a:0','-f','s16le','-']).stdout
 check(audioA==audioB,'decoded audio identical, no boundary gaps or repeated samples')
 run(['ffmpeg','-v','error','-ss','4.5','-i',playlist,'-t','1','-f','null','-']);check(True,'real full-VOD HLS seek and decode')
+# A second supported video family must preserve quality and the same clock.
+hevc=fixtures/'hevc-aac.mkv'
+run(['ffmpeg','-v','error','-y','-f','lavfi','-i','testsrc2=size=160x96:rate=24','-f','lavfi','-i','sine=frequency=660:sample_rate=48000','-t','4','-c:v','libx265','-preset','ultrafast','-x265-params','open-gop=0:pools=1:frame-threads=1:log-level=error:keyint=48:min-keyint=48','-c:a','aac',hevc])
+hevcOut=work/'hevc-copy';run([driver,hevc,hevcOut]);hm=json.loads((hevcOut/'inspection.json').read_text());check(hm['video']=='hevc','actual HEVC codec inspection')
+hp=hevcOut/'movie.m3u8';ht='#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:30\n#EXT-X-MAP:URI="init.mp4"\n'
+for n in range(len(hm['starts_us'])-1):ht+=f"#EXTINF:{(hm['starts_us'][n+1]-hm['starts_us'][n])/1000000:.6f},\nseg{n}.m4s\n"
+hp.write_text(ht+'#EXT-X-ENDLIST\n');ha=probe(hevc);hb=probe(hp)
+for kind in ['video','audio']:
+ ai=next(x['index'] for x in ha['streams'] if x['codec_type']==kind);bi=next(x['index'] for x in hb['streams'] if x['codec_type']==kind)
+ ap=[x for x in ha['packets'] if x['stream_index']==ai];bp=[x for x in hb['packets'] if x['stream_index']==bi]
+ check([x['data_hash'] for x in ap]==[x['data_hash'] for x in bp],'HEVC '+kind+' bit-exact packet preservation')
+ check(max(abs(float(x['pts_time'])-hm['origin_us']/1000000-(float(y['pts_time'])-float(hb['format']['start_time']))) for x,y in zip(ap,bp))<0.002,'HEVC '+kind+' normalized presentation timestamps')
+run(['ffmpeg','-v','error','-i',hp,'-f','null','-']);check(True,'HEVC fMP4/HLS actual decode')
+
 unsupported=fixtures/'h264-dts.mkv'
 run(['ffmpeg','-v','error','-y','-i',base,'-c:v','copy','-c:a','dca','-strict','-2',unsupported])
 r=subprocess.run([str(driver),str(unsupported),str(work/'must-not-render')],capture_output=True,text=True)
 check(r.returncode!=0 and 'mkv_unsupported_audio_codec' in r.stderr and '"audio":"dts"' in r.stderr,'unsupported DTS identified before media output, no codec masquerading')
 check(not (work/'must-not-render').exists(),'unsupported source creates no receiver media')
-report=dict(schema=1,status='PASS_REAL_FFMPEG6_MKV_STREAM_COPY',checks=checks,fixture_sha256=hashlib.sha256(base.read_bytes()).hexdigest(),inspection=meta,source_packets={k:len([p for p in a['packets'] if p['stream_index']==i]) for k,i in [('video',0),('audio',1)]},transcoding=False,real_receiver=False,shutdown='NOT_SELECTED')
+source_root=Path(__file__).resolve().parents[3]
+source_files=[Path(__file__),Path(__file__).with_name('native_driver.cpp'),Path(__file__).parents[1]/'native/InfinityCastRemux.cpp']
+report=dict(source_hashes={str(p.relative_to(source_root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files},relative_video_start_us=round((min(float(x['pts_time']) for x in a['packets'] if x['stream_index']==0)-min(float(x['pts_time']) for x in a['packets'] if x['stream_index']==1))*1000000),schema=1,status='PASS_REAL_FFMPEG6_MKV_STREAM_COPY',checks=checks,fixture_sha256=hashlib.sha256(base.read_bytes()).hexdigest(),inspection=meta,source_packets={k:len([p for p in a['packets'] if p['stream_index']==i]) for k,i in [('video',0),('audio',1)]},transcoding=False,real_receiver=False,shutdown='NOT_SELECTED')
 (work/'CAST-MKV-HOST.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

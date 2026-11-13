@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "source_clock": "Existing Kodi CDVDDemuxFFmpeg::ConvertTimestamp subtracts AVFormatContext.start_time; this engine code remains unchanged",
+  "strict_comparison": "Normalized source and HLS presentation timestamps within0.002sec; no widened tolerance",
+  "transport_epoch_us": 10000000,
+  "transport_epoch_meaning": "One fixed positive timestamp origin for the entire HLS rendition, not a wait/delay. Source packet PTS/DTS spacing and A/V relationship are preserved. HLS maps the rendition to a zero-based movie clock; actual Android MediaPlayer seek/playback must verify that.",
+  "negative_source_start": "Read and normalized from container metadata; valid AAC priming is supported",
+  "verified_local": [
+    "H264/AAC encoded packets, decoded video/audio, source-derived random seeks and timestamps",
+    "HEVC/AAC encoded packets, timestamps and HLS/fMP4 decode"
+  ],
+  "unsupported": [
+    "DTS and unapproved audio codec families fail explicitly",
+    "Missing/ambiguous tracks, missing/sparse cues and non-IDR/open-GOP fragment starts fail safely",
+    "DRM/encrypted sources remain rejected"
+  ],
+  "engine_changed": false,
+  "physical_receiver": "PENDING_OWNER"
+}
