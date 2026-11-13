@@ -50,7 +50,7 @@ def owners(row,kind):
  c.producer(row);folder=ROOT/'cast-final-owner-input';folder.mkdir(exist_ok=True);archive=folder/'authenticated.zip'
  if not archive.exists():
   with archive.open('xb') as out:subprocess.run(['gh','api','repos/'+c.REPO+'/actions/artifacts/'+str(row['id'])+'/zip'],stdout=out,check=True,timeout=900)
- c.require('sha256:'+c.sha(archive)==row['digest'] and archive.stat().st_size==row['size_in_bytes'],'EXACT_88_OWNER_ARCHIVE')
+ c.require('sha256:'+c.sha(archive)==row['digest'] and archive.stat().st_size==row['size_in_bytes'],'EXACT_SIGNED92_OWNER_ARCHIVE')
  dest=folder/'selected';dest.mkdir(exist_ok=True)
  with ZipFile(archive) as z:
   c.require(len(z.namelist())==len(set(z.namelist())) and sum(x.file_size for x in z.infolist())<8*1024**3,'SAFE_COMPLETE_OWNER_ARCHIVE')
@@ -121,7 +121,7 @@ def prepare():
  base=c.unique(c.obtain(r['inputs']['baseline'],'final-base'),'Infinity-2103492-Combined-Original-Signer.apk');c.require(c.sha(base)==c.BASE,'EXACT_SIGNED92_STARTING_APK');c.signature(base)
  owner_root,catalog=owners(r['inputs']['owners'],'candidate');recovery_owners,recovery_catalog=owner_root,catalog;native,component,dex,proof=compiled(r)
  recovery_base=base
- with ZipFile(base) as frozen:c.require(old.member_sha(frozen,LIB)=='3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75','EXACT_UNCHANGED90_NATIVE')
+ with ZipFile(base) as frozen:c.require(old.member_sha(frozen,LIB)=='3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75','EXACT_UNCHANGED92_NATIVE')
  inventory,cb,_,_,review=c.tools();out=ROOT/'cast-final-prepared';out.mkdir(exist_ok=False);c.save(out/'SOURCE-PRESERVATION.json',source_proof)
  olddex=out/'baseline-cast.dex'
  with ZipFile(base) as z:olddex.write_bytes(z.read(DEX))
