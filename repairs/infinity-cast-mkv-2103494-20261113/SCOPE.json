@@ -1,0 +1,48 @@
+{
+  "acceptance": "ONE_OWNER_FOLD_TV_SESSION; NOT_AUTOMATIC",
+  "allowed_new_production_sources": [
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java",
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp"
+  ],
+  "baseline_APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+  "baseline_signing_source": "a8d732beec1272bd526741e2eb7dc009e2190c0b",
+  "baseline_source_snapshot": "1320688d167a861aa9c6a69447c61ec92776db5b",
+  "baseline_versionCode": 2103494,
+  "changed_existing_APK_members": [
+    "classes6.dex",
+    "AndroidManifest.xml versionCode only",
+    "assets/experience-component-updates.properties version labels only"
+  ],
+  "existing_libkodi_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+  "existing_native_libraries_frozen": true,
+  "new_APK_members": [
+    "lib/arm64-v8a/libinfinitycastremux.so"
+  ],
+  "new_native_ownership": "Cast-only bridge; dynamically resolves existing exact FFmpeg6.0.1 public APIs in already-loaded libkodi; no encoder, global callbacks, network policy, engine source or runtime replacement",
+  "production_allowlist": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": "dd5788233cf23ca6db90eeeaf293d18ccb3a32ea5a539963b843cf08b92eaa15",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "e8144934ab4a442a9ef517e30f2806837282b5d3d629234780568928fee4c1cd",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "b7f391b8105f7fec29370673b21c643cbdb6c6701db72d16d53a4db8d9c7d8f4"
+  },
+  "protected": [
+    "Cobra",
+    "Movies/Infinity Movies/Continue Watching/TV",
+    "Search/providers",
+    "Python startup",
+    "shutdown/coordinator/persistence/SQLite/deadlines",
+    "tracking/resume/Watchlists/Trakt",
+    "all existing user data/settings/profiles and unrelated UI/runtime"
+  ],
+  "recovery": "Higher-version exact signed2103494 functionality; original94/95 and historical artifacts remain unchanged",
+  "schema": 1,
+  "scope": "CAST_ONLY_ACTUAL_MKV_CODEC_INSPECTION_AND_AUTHENTICATED_STREAM_COPY_REMUX",
+  "tests_selected": [
+    "Pinned FFmpeg ABI and exact signed94 engine exports",
+    "Real Matroska codec inspection and stream-copy HLS/fMP4 decode; packet quality, timestamps, A/V sync and random seeks",
+    "Authenticated range input, cancellation and complete native/network/clock/session retirement",
+    "Actual Android Cast remux component and original-signature install-over/recovery checks",
+    "Post-Cast normal shutdown independently where executable; never modify shutdown or fabricate unavailable receiver proof"
+  ],
+  "versions": "Reconcile actual registry after engineering; no reservation yet"
+}
