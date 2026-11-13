@@ -262,7 +262,8 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             MediaInfo.Builder info=new MediaInfo.Builder(owner.address()).setContentType(mime)
                 .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED).setMetadata(metadata)
                 .setCustomData(new JSONObject().put("infinity_transaction",mediaToken));
-            if(source.optLong("duration_ms")>0)info.setStreamDuration(source.optLong("duration_ms"));
+            long mediaDuration=owner.durationMs()>0?owner.durationMs():source.optLong("duration_ms");
+            if(mediaDuration>0)info.setStreamDuration(mediaDuration);
             if(owner.hlsVideoFormat()!=null)info.setHlsVideoSegmentFormat(owner.hlsVideoFormat());
             if(owner.hlsAudioFormat()!=null)info.setHlsSegmentFormat(owner.hlsAudioFormat());
             message="Preparing the receiver; phone playback continues.";changed();
@@ -462,6 +463,9 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private String mediaFailure(String reason) {
         if(reason==null)return "Media preparation failed. Phone playback continues.";
         if(reason.equals("drm_or_unsupported_encryption"))return "This source uses DRM or unsupported encryption; Cast cannot transfer it. Phone playback continues.";
+        if(reason.startsWith("mkv_unsupported_audio_"))return "This MKV's "+reason.substring("mkv_unsupported_audio_".length()).toUpperCase(java.util.Locale.ROOT)+" audio cannot be stream-copied to this Cast path. Phone playback continues.";
+        if(reason.startsWith("mkv_unsupported_video_"))return "This MKV's "+reason.substring("mkv_unsupported_video_".length()).toUpperCase(java.util.Locale.ROOT)+" video cannot be stream-copied to this Cast path. Phone playback continues.";
+        if(reason.startsWith("mkv_"))return "MKV conversion could not establish compatible, seekable stream-copy delivery ("+reason+"). Phone playback continues.";
         if(reason.startsWith("source_http_"))return "The media source refused Cast delivery (HTTP "+reason.substring(12)+"). Phone playback continues.";
         if(reason.equals("unsupported_matroska_container"))return "This source is Matroska (MKV), not WebM. This Cast receiver path cannot transfer that container. Phone playback continues.";
         if(reason.startsWith("unsupported_") || reason.startsWith("invalid_"))return "This source uses an unsupported media or manifest feature. Phone playback continues.";

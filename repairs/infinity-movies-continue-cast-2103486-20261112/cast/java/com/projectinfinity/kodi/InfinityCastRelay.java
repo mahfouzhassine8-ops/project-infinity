@@ -101,6 +101,8 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private final Map<Response,Call> responses=new ConcurrentHashMap<>();
     private final AtomicInteger jobs=new AtomicInteger(),requests=new AtomicInteger();
     private volatile boolean closed,ownerDone;
+    private volatile InfinityCastRemux remux;
+    private boolean retiring;
     private boolean fullyRetired;
     private Runnable retirementCallback;
     private final java.util.concurrent.atomic.AtomicLong deliveredBytes=new java.util.concurrent.atomic.AtomicLong();
@@ -140,7 +142,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         return relay;
     }
     private String reason(Exception error) {
-        String code=error.getMessage();if(code==null || !code.matches("[a-z_]{1,48}(?:_[0-9]{3})?"))code="source_network_or_transport_failure";
+        String code=error.getMessage();if(code==null || !code.matches("[a-z][a-z0-9_]{0,63}"))code="source_network_or_transport_failure";
         lastFailure=code;InfinityCastDiagnostics.event("relay",code,0);return code;
     }
     private static InetAddress localAddress(InetAddress peer) throws IOException {
@@ -167,6 +169,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private String base(){return "http://"+listener.getInetAddress().getHostAddress()+":"+listener.getLocalPort()+path;}
     String address(){return base()+"/media"+("application/vnd.apple.mpegurl".equals(mime)?".m3u8":"application/dash+xml".equals(mime)?".mpd":root.suffix);}
     boolean closed(){return closed;}
+    long durationMs(){InfinityCastRemux value=remux;return value==null?0:value.durationMs();}
     String failure(){return lastFailure;}
     static synchronized boolean busy(){return active!=null;}
     private static boolean sameOrigin(URI a,URI b) {
@@ -277,7 +280,11 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             InputStream input=response.body().byteStream();byte[] prefix=new byte[8192];int used=0,count;
             while(used<prefix.length && (count=input.read(prefix,used,prefix.length-used))!=-1){used+=count;if(used>=512)break;}
             byte[] sample=java.util.Arrays.copyOf(prefix,used);
-            if("matroska".equals(InfinityCastSource.ebmlDocType(sample)))throw new IOException("unsupported_matroska_container");
+            if("matroska".equals(InfinityCastSource.ebmlDocType(sample))) {
+                release(response);response=null;if(closed)throw new IOException("transport_closed");
+                remux=new InfinityCastRemux(new RemuxInput());if(closed){remux.cancel();throw new IOException("transport_closed");}
+                remux.prepare();hlsFmp4=true;hlsSeparateAudio=false;return "application/vnd.apple.mpegurl";
+            }
             type=InfinityCastSource.sniff(sample,response.header("Content-Type"),source.hint);
             if(InfinityCastAdaptive.adaptive(type)) {
                 ByteArrayOutputStream all=new ByteArrayOutputStream();all.write(sample);all.write(read(input,InfinityCastAdaptive.LIMIT-used));
@@ -297,7 +304,40 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
                 }
             }
             return type;
-        } finally {release(response);}
+        } finally {if(response!=null)release(response);}
+    }
+    /** Native reads use the SAME authenticated, TLS-verifying origin policy. */
+    final class RemuxInput implements InfinityCastRemux.Input {
+        private Response response;private InputStream body;private long position,total=-1;private String validator,problem="";
+        private void disconnect(){if(response!=null){release(response);response=null;body=null;}}
+        private void connect(long target) throws IOException {
+            disconnect();if(closed)throw new IOException("mkv_cancelled");
+            response=open(root,"GET","bytes="+target+"-");
+            long length=-1;String range=response.header("Content-Range");
+            if(response.code()==206 && range!=null && range.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}")) {
+                String[] parts=range.substring(6).split("[-/]");if(Long.parseLong(parts[0])!=target)throw new IOException("mkv_invalid_source_range");length=Long.parseLong(parts[2]);
+            } else if(response.code()==200 && target==0 && response.body()!=null)length=response.body().contentLength();
+            else if(response.code()==200)throw new IOException("mkv_source_not_range_seekable");else throw new IOException("source_http_"+response.code());
+            if(length<=0 || length>1099511627776L || (total>0 && total!=length))throw new IOException("mkv_source_changed_or_unknown_length");
+            String etag=response.header("ETag");if(validator!=null && !validator.equals(etag))throw new IOException("mkv_source_changed_during_remux");
+            if(total<0 && etag!=null && etag.length()<=256 && !etag.startsWith("W/"))validator=etag;
+            total=length;position=target;if(response.body()==null)throw new IOException("mkv_source_body_missing");body=response.body().byteStream();
+        }
+        private IOException failed(IOException error){String code=error.getMessage();problem=code!=null && code.matches("[a-z][a-z0-9_]{0,63}")?code:"mkv_source_network_failure";return new IOException(problem);}
+        public int read(byte[] target,int size) throws IOException {
+            try{if(closed)throw new IOException("mkv_cancelled");if(total>0 && position==total)return 0;if(body==null)connect(position);int count=body.read(target,0,Math.min(size,target.length));if(count>0)position+=count;return Math.max(0,count);}catch(IOException error){throw failed(error);}
+        }
+        public long seek(long offset,int whence) throws IOException {
+            try {
+                if(closed)throw new IOException("mkv_cancelled");if(total<0)connect(0);
+                if((whence&0x10000)!=0)return total;whence&=~0x20000;
+                long next=whence==0?offset:whence==1?position+offset:whence==2?total+offset:-1;
+                if(next<0 || next>total)throw new IOException("mkv_invalid_source_seek");if(next==position)return position;
+                if(next==total){disconnect();position=next;return next;}connect(next);return position;
+            }catch(IOException error){throw failed(error);}
+        }
+        public String failure(){return problem;}
+        public void close(){disconnect();}
     }
     private void accept() {
         try {
@@ -320,7 +360,9 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(tail!=0x0d0a0d0a)return;
             String[] lines=header.toString("US-ASCII").split("\r\n"),first=lines[0].split(" ");
             if(first.length!=3 || !(first[2].equals("HTTP/1.1") || first[2].equals("HTTP/1.0")))return;
-            Resource resource=resolveRequest(first[1]);if(resource==null)return;
+            Resource resource=resolveRequest(first[1]);
+            boolean converted=remux!=null && (first[1].equals(URI.create(address()).getRawPath()) || first[1].startsWith(path+"/mkv/"));
+            if(resource==null && !converted)return;
             String method=first[0];OutputStream output=client.getOutputStream();
             if(method.equals("OPTIONS")){reply(output,204,null,0,null);return;}
             if(!(method.equals("GET") || method.equals("HEAD")))return;
@@ -328,6 +370,15 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
                 if(range!=null)return;range=lines[i].substring(6).trim();if(!range.matches("bytes=[0-9]{0,16}-[0-9]{0,16}") || range.equals("bytes=-"))return;
             }
             if(requests.incrementAndGet()==1)InfinityCastDiagnostics.event("receiver_access","received",0);
+            if(converted) {
+                boolean playlist=first[1].equals(URI.create(address()).getRawPath());
+                byte[] data=playlist?remux.playlist(base()):remux.resource(first[1].substring((path+"/mkv/").length()));
+                String type=playlist?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
+                if(range!=null && !playlist){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
+                if(from>to || from>=data.length){reply(output,416,type,0,"bytes */"+data.length);return;}
+                reply(output,code,type,to-from+1,code==206?"bytes "+from+"-"+to+"/"+data.length:null);
+                if(method.equals("GET")){output.write(data,(int)from,(int)(to-from+1));delivered((int)(to-from+1));}return;
+            }
             boolean knownManifest=resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH || (resource==root && InfinityCastAdaptive.adaptive(mime));
             response=open(resource,knownManifest?"GET":method,knownManifest?null:range);
             String kind=resource==root?"root":resource.kind.name().toLowerCase(Locale.ROOT);
@@ -370,7 +421,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     }
     private void cancelCalls(){for(Call call:new ArrayList<>(calls))call.cancel();upstream.connectionPool().evictAll();}
     @Override public synchronized void close() {
-        if(closed)return;closed=true;try{listener.close();}catch(IOException ignored){}
+        if(closed)return;closed=true;if(remux!=null)remux.cancel();try{listener.close();}catch(IOException ignored){}
         for(Socket client:new ArrayList<>(clients))try{client.close();}catch(IOException ignored){}
         // cancel() is nonblocking; do not queue it behind an accept() owner.
         for(Call call:new ArrayList<>(calls))call.cancel();
@@ -384,9 +435,11 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     }
     private void retired() {
         if(!closed || !ownerDone || jobs.get()!=0)return;
+        synchronized(this){if(fullyRetired || retiring)return;retiring=true;}
+        if(remux!=null){remux.close();remux=null;}
         Runnable completed;
         synchronized(InfinityCastRelay.class){if(active==this){cookies.clear();active=null;}}
-        synchronized(this){if(fullyRetired)return;fullyRetired=true;completed=retirementCallback;retirementCallback=null;}
+        synchronized(this){fullyRetired=true;completed=retirementCallback;retirementCallback=null;}
         InfinityCastDiagnostics.event("relay","retired",requests.get());
         InfinityCastDiagnostics.event("relay","body_bytes_written",(int)Math.min(Integer.MAX_VALUE,deliveredBytes.get()));
         if(completed!=null)completed.run();
