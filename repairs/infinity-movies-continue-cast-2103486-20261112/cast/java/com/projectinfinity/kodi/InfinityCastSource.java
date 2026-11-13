@@ -68,6 +68,33 @@ final class InfinityCastSource {
         if(type.equals("video/mp2t") || type.equals("video/mpeg"))return type;
         return (type.isEmpty() || type.equals("application/octet-stream"))?hint:null;
     }
+    /** Bounded EBML header parse. Matroska and WebM share the same magic. */
+    static String ebmlDocType(byte[] bytes) {
+        if(bytes.length<5 || (bytes[0]&255)!=0x1a || (bytes[1]&255)!=0x45 || (bytes[2]&255)!=0xdf || (bytes[3]&255)!=0xa3)return "";
+        int[] at={4};long size=ebmlVint(bytes,at,false,8);
+        if(size<0 || size>4096 || size>bytes.length-at[0])return "";
+        int end=at[0]+(int)size;
+        while(at[0]<end) {
+            long id=ebmlVint(bytes,at,true,4),length=ebmlVint(bytes,at,false,8);
+            if(id<0 || length<0 || length>end-at[0])return "";
+            if(id==0x4282) {
+                if(length!=4 && length!=8)return "";
+                return new String(bytes,at[0],(int)length,StandardCharsets.US_ASCII);
+            }
+            at[0]+=(int)length;
+        }
+        return "";
+    }
+    private static long ebmlVint(byte[] bytes,int[] at,boolean id,int max) {
+        if(at[0]>=bytes.length)return -1;
+        int first=bytes[at[0]]&255,width=1,mask=128;
+        while(width<=max && (first&mask)==0){width++;mask>>=1;}
+        if(width>max || at[0]+width>bytes.length)return -1;
+        long value=id?first:first&(mask-1);at[0]++;
+        for(int i=1;i<width;i++)value=(value<<8)|(bytes[at[0]++]&255);
+        if(!id && value==((1L<<(7*width))-1))return -1;
+        return value;
+    }
     static String sniff(byte[] bytes,String contentType,String hint) {
         String type=mime(contentType,hint);
         String text=new String(bytes,0,Math.min(bytes.length,512),StandardCharsets.UTF_8).trim();
@@ -79,7 +106,9 @@ final class InfinityCastSource {
         // An HTML/error body must never be advertised as video by a URL hint.
         if(text.toLowerCase(Locale.ROOT).startsWith("<!doctype html") || text.toLowerCase(Locale.ROOT).startsWith("<html"))return null;
         if(bytes.length>=12 && bytes[4]=='f' && bytes[5]=='t' && bytes[6]=='y' && bytes[7]=='p')return "video/mp4";
-        if(bytes.length>=4 && (bytes[0]&255)==0x1a && (bytes[1]&255)==0x45 && (bytes[2]&255)==0xdf && (bytes[3]&255)==0xa3)return "video/webm";
+        if(bytes.length>=4 && (bytes[0]&255)==0x1a && (bytes[1]&255)==0x45 && (bytes[2]&255)==0xdf && (bytes[3]&255)==0xa3)
+            return "webm".equals(ebmlDocType(bytes))?"video/webm":null;
+        if("video/webm".equals(type))return null;
         return type;
     }
     static String receiverTitle(String title) {

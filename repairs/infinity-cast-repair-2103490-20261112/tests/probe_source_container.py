@@ -22,5 +22,5 @@ for(String path:paths){byte[] bytes=Files.readAllBytes(Paths.get(path));System.o
  for name in names:
   data=(work/name).read_bytes();assert (b'matroska' if name.endswith('.mkv') else b'webm') in data[:128]
   probes[name]=json.loads(run(['ffprobe','-v','error','-show_entries','stream=codec_name,codec_type:format=format_name','-of','json',work/name]))
- report=dict(schema=1,test='Actual production sniff against genuine FFmpeg Matroska and WebM',source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),containers=probes,classifications=results,matroska_misclassified_as_webm=results['actual-matroska.mkv']=='video/webm',valid_webm_retained=results['actual-webm.webm']=='video/webm',owner_stream_container='UNKNOWN_FROM_VIDEO',real_receiver=False,production_modified=False)
+ report=dict(schema=1,test='Actual production sniff against genuine FFmpeg Matroska and WebM',source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),containers=probes,classifications=results,matroska_misclassified_as_webm=results['actual-matroska.mkv']=='video/webm',valid_webm_retained=results['actual-webm.webm']=='video/webm',owner_stream_container='UNKNOWN_FROM_VIDEO',real_receiver=False,production_modified=hashlib.sha256(source.read_bytes()).hexdigest()!='5b3f30822ce141ef04fba3b752ed8c707ae0af00e4804dd63bb54a62907fecdc')
  print(json.dumps(report,indent=2))

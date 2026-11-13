@@ -260,14 +260,16 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(response.code()==200 || response.code()==206)type=InfinityCastSource.mime(response.header("Content-Type"),source.hint);
             // A method-bound signed source may reject HEAD yet permit GET.
             // Only the actual bounded GET response may reject that source.
-            if(type!=null && !InfinityCastAdaptive.adaptive(type))return type;
+            if(type!=null && !InfinityCastAdaptive.adaptive(type) && !"video/webm".equals(type))return type;
         } finally {release(response);}
         response=open(root,"GET",null);
         try {
             if(response.code()!=200 || response.body()==null)throw new IOException("source_http_"+response.code());
             InputStream input=response.body().byteStream();byte[] prefix=new byte[8192];int used=0,count;
             while(used<prefix.length && (count=input.read(prefix,used,prefix.length-used))!=-1){used+=count;if(used>=512)break;}
-            byte[] sample=java.util.Arrays.copyOf(prefix,used);type=InfinityCastSource.sniff(sample,response.header("Content-Type"),source.hint);
+            byte[] sample=java.util.Arrays.copyOf(prefix,used);
+            if("matroska".equals(InfinityCastSource.ebmlDocType(sample)))throw new IOException("unsupported_matroska_container");
+            type=InfinityCastSource.sniff(sample,response.header("Content-Type"),source.hint);
             if(InfinityCastAdaptive.adaptive(type)) {
                 ByteArrayOutputStream all=new ByteArrayOutputStream();all.write(sample);all.write(read(input,InfinityCastAdaptive.LIMIT-used));
                 InfinityCastAdaptive.rewrite(all.toByteArray(),type,response.request().url().uri(),this);

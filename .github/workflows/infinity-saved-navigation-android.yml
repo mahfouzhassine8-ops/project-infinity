@@ -2113,8 +2113,8 @@ jobs:
           if-no-files-found: warn
 
   movies-cast-sdk:
-    name: Cast SDK with signed88 APIs/resources, separate CI package; no owner installer or shutdown
-    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-sdk' && github.ref == 'refs/heads/work/infinity-cast-final-from-2103488-20261112'
+    name: Cast SDK with signed90 APIs/resources, separate CI package; no owner installer or shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'movies-cast-sdk' && github.ref == 'refs/heads/work/infinity-cast-repair-from-2103490-20261112'
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     env:
@@ -2130,7 +2130,7 @@ jobs:
       - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
         with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
-        with: {artifact-ids: '13979655699', run-id: '43294871896', merge-multiple: true, github-token: '${{ github.token }}', path: signed88}
+        with: {artifact-ids: '13992273256', run-id: '43325382217', merge-multiple: true, github-token: '${{ github.token }}', path: signed90}
       - name: Build isolated component using locked official SDK and existing immutable baseline APIs
         run: |
           set -euo pipefail
@@ -2142,8 +2142,8 @@ jobs:
           ln -s "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" cast-sdk-work/tools/d8.jar
           ln -s "$ANDROID_HOME/build-tools/35.0.0/core-lambda-stubs.jar" cast-sdk-work/tools/core-lambda-stubs.jar
           python "$task/cast/resolve_sdk.py" cast-sdk-work/maven
-          python "$task/cast/build_sdk_component.py" cast-sdk-work signed88/Infinity-2103488-Combined-Original-Signer.apk
-          python "$task/cast/build_probe.py" cast-sdk-work signed88/Infinity-2103488-Combined-Original-Signer.apk
+          python "$task/cast/build_sdk_component.py" cast-sdk-work signed90/Infinity-2103490-Combined-Original-Signer.apk
+          python "$task/cast/build_probe.py" cast-sdk-work signed90/Infinity-2103490-Combined-Original-Signer.apk
       - name: Separate disposable test package identity, standard CI-only key; never the owner installer
         run: |
           set -euo pipefail
@@ -2165,7 +2165,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: Infinity88-CastSDK-Component-${{ github.run_id }}-NOT-AN-INSTALLER
+          name: Infinity90-CastSDK-Component-${{ github.run_id }}-NOT-AN-INSTALLER
           path: |
             cast-sdk-android/
             cast-sdk-work/component-reuse86/COMPONENT-RESULT.json
