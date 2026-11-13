@@ -2311,7 +2311,7 @@ jobs:
           avd-name: infinity-cast-sdk-component
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python repairs/infinity-movies-continue-cast-2103486-20261112/cast/run_probe.py cast-sdk-android cast-sdk-work/probe/CI-ONLY-OTHER-PACKAGE.apk
+          script: python repairs/infinity-cast-mkv-2103494-20261113/run_probe.py cast-sdk-android cast-sdk-work/probe/CI-ONLY-OTHER-PACKAGE.apk
       - uses: actions/upload-artifact@v4
         if: always()
         with:
