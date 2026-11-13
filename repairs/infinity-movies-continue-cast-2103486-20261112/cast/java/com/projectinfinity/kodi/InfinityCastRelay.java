@@ -308,7 +308,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     }
     /** Native reads use the SAME authenticated, TLS-verifying origin policy. */
     final class RemuxInput implements InfinityCastRemux.Input {
-        private Response response;private InputStream body;private long position,total=-1;private String validator,problem="";
+        private Response response;private InputStream body;private long position,total=-1,remaining;private String validator,problem="";
         private void disconnect(){if(response!=null){release(response);response=null;body=null;}}
         private void connect(long target) throws IOException {
             disconnect();if(closed)throw new IOException("mkv_cancelled");
@@ -324,8 +324,9 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             total=length;position=target;if(response.body()==null)throw new IOException("mkv_source_body_missing");body=response.body().byteStream();
         }
         private IOException failed(IOException error){String code=error.getMessage();problem=code!=null && code.matches("[a-z][a-z0-9_]{0,63}")?code:"mkv_source_network_failure";return new IOException(problem);}
+        public void budget(long bytes){remaining=bytes;problem="";}
         public int read(byte[] target,int size) throws IOException {
-            try{if(closed)throw new IOException("mkv_cancelled");if(total>0 && position==total)return 0;if(body==null)connect(position);int count=body.read(target,0,Math.min(size,target.length));if(count>0)position+=count;return Math.max(0,count);}catch(IOException error){throw failed(error);}
+            try{if(closed)throw new IOException("mkv_cancelled");if(total>0 && position==total)return 0;if(remaining<=0)throw new IOException("mkv_source_read_limit");if(body==null)connect(position);int count=body.read(target,0,(int)Math.min(remaining,Math.min(size,target.length)));if(count>0){position+=count;remaining-=count;}return Math.max(0,count);}catch(IOException error){throw failed(error);}
         }
         public long seek(long offset,int whence) throws IOException {
             try {

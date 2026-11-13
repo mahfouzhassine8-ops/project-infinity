@@ -13,6 +13,7 @@ final class InfinityCastRemux implements AutoCloseable {
         int read(byte[] target,int size) throws IOException;
         long seek(long offset,int whence) throws IOException;
         String failure();
+        void budget(long bytes);
         @Override void close();
     }
     private final Input input;
@@ -31,6 +32,7 @@ final class InfinityCastRemux implements AutoCloseable {
         synchronized(worker){
             check();
             try{
+                input.budget(16L*1024*1024);
                 String raw=InfinityCastRemuxNative.inspect(handle);if(raw==null || raw.length()>262144)throw new IOException("mkv_inspection_limit");
                 JSONObject metadata=new JSONObject(raw);video=metadata.optString("video","unknown");audio=metadata.optString("audio","unknown");
                 InfinityCastDiagnostics.event("mkv_video",video,0);InfinityCastDiagnostics.event("mkv_audio",audio,0);
@@ -64,7 +66,7 @@ final class InfinityCastRemux implements AutoCloseable {
             if(!suffix.matches("[0-9]{1,4}\\.m4s"))throw new IOException("mkv_unknown_resource");
             int index=Integer.parseInt(suffix.substring(0,suffix.length()-4));if(starts==null || index>=starts.length-1)throw new IOException("mkv_segment_out_of_range");
             byte[] bytes=fragments.get(index);if(bytes!=null)return bytes;
-            try{bytes=InfinityCastRemuxNative.segment(handle,index);check();if(bytes==null || bytes.length==0 || bytes.length>8388608)throw new IOException("mkv_fragment_limit");}
+            try{input.budget(32L*1024*1024);bytes=InfinityCastRemuxNative.segment(handle,index);check();if(bytes==null || bytes.length==0 || bytes.length>8388608)throw new IOException("mkv_fragment_limit");}
             catch(IOException error){throw failure(error);}
             while(fragments.size()>=2)fragments.remove(fragments.keySet().iterator().next());fragments.put(index,bytes);
             InfinityCastDiagnostics.event("mkv_fragment","copied",index);return bytes;

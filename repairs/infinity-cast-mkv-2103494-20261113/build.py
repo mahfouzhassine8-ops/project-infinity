@@ -17,7 +17,7 @@ def sources():
  if not src.exists():
   raw=urllib.request.urlopen('https://ffmpeg.org/releases/ffmpeg-6.0.1.tar.gz',timeout=90).read();assert hashlib.sha512(raw).hexdigest()==PIN
   with tarfile.open(fileobj=io.BytesIO(raw),mode='r:gz') as t:
-   for item in t.getmembers():assert item.name.startswith('ffmpeg-6.0.1/') and '..' not in Path(item.name).parts and not item.issym() and not item.islnk()
+   for item in t.getmembers():assert (item.name=='ffmpeg-6.0.1' or item.name.startswith('ffmpeg-6.0.1/')) and '..' not in Path(item.name).parts and not item.issym() and not item.islnk()
    t.extractall(WORK)
  return src
 def native():
