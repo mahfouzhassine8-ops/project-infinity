@@ -1,0 +1,76 @@
+{
+  "duration_seconds": 25.543333,
+  "engineering_reproductions": {
+    "connection_timer": "Actual unmodified production controller test: quick flow passes; connected12s+relay5s+load6s aborts under original20s connection timer",
+    "container_detection": {
+      "classifications": {
+        "actual-matroska.mkv": "video/webm",
+        "actual-webm.webm": "video/webm"
+      },
+      "containers": {
+        "actual-matroska.mkv": {
+          "format": {
+            "format_name": "matroska,webm"
+          },
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "h264",
+              "codec_type": "video"
+            },
+            {
+              "codec_name": "aac",
+              "codec_type": "audio"
+            }
+          ]
+        },
+        "actual-webm.webm": {
+          "format": {
+            "format_name": "matroska,webm"
+          },
+          "programs": [],
+          "stream_groups": [],
+          "streams": [
+            {
+              "codec_name": "vp9",
+              "codec_type": "video"
+            },
+            {
+              "codec_name": "opus",
+              "codec_type": "audio"
+            }
+          ]
+        }
+      },
+      "matroska_misclassified_as_webm": true,
+      "owner_stream_container": "UNKNOWN_FROM_VIDEO",
+      "production_modified": false,
+      "real_receiver": false,
+      "schema": 1,
+      "source_sha256": "5b3f30822ce141ef04fba3b752ed8c707ae0af00e4804dd63bb54a62907fecdc",
+      "test": "Actual production sniff against genuine FFmpeg Matroska and WebM",
+      "valid_webm_retained": true
+    }
+  },
+  "log_from_same_attempt": "NOT_SUPPLIED; no existing log assumed",
+  "not_proven": [
+    "Timer caused this recorded failure",
+    "Receiver accessed relay media bytes",
+    "Source is Matroska or receiver codec unsupported",
+    "Cast resource caused a shutdown blocker"
+  ],
+  "observations": [
+    "Compatible video receiver selected; movie title appears on receiver loading screen",
+    "Phone displays receiver-preparation status while local movie continues",
+    "Touch near Cancel/Disconnect before connection-only20s timeout; exact failure trigger unproven",
+    "Phone subsequently displays Returned to phone playback; receiver returns home",
+    "No confirmed TV movie frames, readable receiver error code, source container/codec, relay request trace or shutdown sequence"
+  ],
+  "owner_reference": "22306.mp4",
+  "production_modified": false,
+  "raw_video_private": true,
+  "recording_name": "VID_20261112_190202.mp4",
+  "schema": 1,
+  "sha256": "a88925f2debe5247ae1a8893405cb10edee3a944a92e3fede18bba2475c47ef0"
+}
