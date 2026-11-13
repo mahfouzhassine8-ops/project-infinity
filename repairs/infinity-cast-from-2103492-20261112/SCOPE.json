@@ -1,0 +1,50 @@
+{
+  "APK_candidate_allowlist": [
+    "classes6.dex",
+    "AndroidManifest.xml",
+    "assets/experience-component-updates.properties"
+  ],
+  "accepted_pointer_updated": false,
+  "allowed_new_production_sources": [],
+  "baseline_APK_sha256": "3a3c08d5d168d040a34562d6a033f75b8680a242202afef965ac42fdd7383827",
+  "baseline_signing_source": "c5c82e47ed776b10326f6837c121f77e26628bb2",
+  "baseline_source_snapshot": "4323fba0e717f8cda4a3039dcd925a3890a86bc3",
+  "future_versions_provisional": {
+    "candidate": 2103494,
+    "recovery": 2103495
+  },
+  "native_source_frozen": true,
+  "no_APK_additions_or_removals": true,
+  "owner_acceptance": "ONE_FINAL_FOLD_AND_TV_SESSION_AFTER_ENGINEERING",
+  "production_allowlist": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastAdaptive.java": "aa0b978cf26910ace0919b221a7e03888b36602621cae117fe2b3a808dabce08",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastChannel.java": "dc8c9a5a0cf3fa33eb186357c3674284b459e4d6dc7bb8b46b33179200f9b800",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": "fbafd4f04ebf94811bb54aec350052f782dc7f4bca466e7c461f079a120feb96",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "cd5a50b94d2c4d7777ab386e26042a1719f5a19bdc85cdcab624c62fc0d90dc9",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "3540019ffa701206e1fc7883a716bb05a7c80a9a353062ae70251738e683fa3b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRpc.java": "ca5f9be8be9677cd67581db470b2fcc62da842e04158795aff30ac908f4cf85b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "bc3b195c9dbe54b94d85971f3e7f486d9739443f60192cd7b7281b83b4467863",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java": "9475ee0bbe1b98fb33ad6e8cc59782de6621154f5f07ea4d4260221ffc322b8f"
+  },
+  "prohibited": [
+    "shutdown coordinator/admission/deadlines/persistence guards/SQLite rules",
+    "TMDb Helper",
+    "provider/Search implementations",
+    "Movies/Infinity Movies/Home Continue Watching/TV",
+    "tracking/resume/Trakt/Watchlists",
+    "Cobra",
+    "Python startup",
+    "all unrelated UI/native/dependencies/settings/user data"
+  ],
+  "recovery": "Higher-version restore of exact signed2103492 functionality; historical releases unchanged",
+  "schema": 1,
+  "scope": "CAST_ONLY_PROVIDER_TRANSFER_AND_OWNED_CLEANUP_DIRECTLY_ON_SIGNED2103492",
+  "shutdown_investigation": "READ_ONLY; no source correction authorized",
+  "tests_selected": [
+    "Reproduce only confirmed Cast delivery/receiver callback/cleanup defects in actual production paths",
+    "Retain valid progressive/HLS/DASH/authentication evidence; rerun only affected checks",
+    "Focused actual Android component, exact APK preservation, original signatures and signed in-place update/recovery",
+    "Independent post-Cast shutdown only where executable; physical owner acceptance remains pending"
+  ]
+}
