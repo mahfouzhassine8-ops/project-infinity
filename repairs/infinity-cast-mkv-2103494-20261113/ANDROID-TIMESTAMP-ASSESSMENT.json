@@ -3,6 +3,14 @@
   "Android_MediaExtractor_relative_us": 82000,
   "Android_native_HLS_limit": "AOSP PlaylistFetcher accepts MPEG2-TS/ADTS audio, not EXT-X-MAP fragmented MP4. This legacy client is not the Cast receiver transport.",
   "acceptance_weakened": false,
+  "actual_Android_output_quality": {
+    "audio_packets": 376,
+    "encoded_packet_bytes_identical": true,
+    "max_pts_error_seconds_less_than": 0.002,
+    "run": 43364026552,
+    "timing_tolerance_unchanged": true,
+    "video_packets": 192
+  },
   "cause": "AOSP MPEG4Extractor fragmentedRead initializes mCurrentTime to zero per track and uses compositionOffset without applying tfdt; MediaExtractor sampleTime is not the absolute fMP4 packet clock.",
   "compatible_Android_test": "Run actual HLS/fMP4 playback and seeking using immutable baseline Media3 APIs inside CI-only separate test package. No Cobra feature entry points, new production dependencies or owner APK changes.",
   "correction": "Keep native/source production unchanged. Keep actual Android track/sample proof; replace invalid extractor-time comparison with strict every-packet source PTS/hash check on actual Android output. Keep <2ms tolerance and require real Android HLS play/seek/cancellation.",

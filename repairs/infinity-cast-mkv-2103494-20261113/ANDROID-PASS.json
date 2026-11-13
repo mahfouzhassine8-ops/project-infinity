@@ -1,0 +1,55 @@
+{
+  "producer": {
+    "digest": "sha256:0f6be3907c4bbf07f7f3672d943eaba4a10be23188c370b47d36ede1a7ca33b3",
+    "id": 14010490017,
+    "name": "Infinity94-MKV-Android-Component-43364496265-NOT-AN-INSTALLER",
+    "run": 43364496265,
+    "size_in_bytes": 2941017,
+    "source": "9a80cc1d2cba7eb75d9876faca14b06d37e49fd7",
+    "workflow_id": 393886994
+  },
+  "report": {
+    "API": 36,
+    "HLS": {
+      "actual_Android_HLS_playback": true,
+      "duration_ms": 8021,
+      "player": "immutable baseline Media3 APIs; CI package only, no Cobra entry point or production dependency",
+      "seek_position_ms": 4500
+    },
+    "Kodi_player_handback": "NOT_TESTED",
+    "TV_receiver": "NOT_TESTED",
+    "actual_Android_output_packet_proof": {
+      "audio": {
+        "encoded_bytes_identical": true,
+        "max_source_pts_error_seconds": 1.7763568394002505e-15,
+        "packets": 376
+      },
+      "video": {
+        "encoded_bytes_identical": true,
+        "max_source_pts_error_seconds": 8.881784197001252e-16,
+        "packets": 192
+      }
+    },
+    "authenticated_ranges": true,
+    "baseline_versionCode": 2103494,
+    "cancellation": true,
+    "exact_packet_quality_timing": true,
+    "existing_original_engine": true,
+    "fMP4": {
+      "MediaExtractor_relative_start_us": 82000,
+      "audio_samples": 376,
+      "real_MP4_packet_clock": "CHECKED_BY_WRAPPER",
+      "video_samples": 192
+    },
+    "native_contexts_after_close": 0,
+    "new_ARM64_JNI": true,
+    "original_APK_modified": false,
+    "owner_device": "NOT_TESTED",
+    "pass": true,
+    "random_segment_seeking": true,
+    "scope": "Actual original94 ARM64 FFmpeg via Cast JNI, private authenticated relay, every output packet timing/quality, compatible Android HLS playback/seek and cancellation. Separate CI package only.",
+    "shutdown": "NOT_SELECTED",
+    "stream_copy_not_transcode": true
+  },
+  "schema": 1
+}

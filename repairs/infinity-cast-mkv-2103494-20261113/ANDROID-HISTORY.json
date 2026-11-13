@@ -1,0 +1,48 @@
+{
+  "TV_receiver": "NOT_TESTED",
+  "results": [
+    {
+      "cause": "dex_contract import absent; fixed helper sys.path; production unchanged",
+      "run": 43361223191,
+      "stage": "CI helper import",
+      "status": "FAIL_BEFORE_ANDROID"
+    },
+    {
+      "cause": "short source ref rejected by checkout; retried full exact SHA",
+      "run": 43362271088,
+      "stage": "checkout",
+      "status": "FAIL_BEFORE_ANDROID"
+    },
+    {
+      "codec_inspection": "h264/aac",
+      "complete_packets_delivered": true,
+      "investigation": "Preserve failed assertion. Next selected run captures actual Android timeline and synthetic MP4; no production change or weaker tolerance.",
+      "job": 131678426981,
+      "native_context_after_failure": 0,
+      "native_engine_loaded": true,
+      "run": 43362302017,
+      "source": "3b466b191d25473835a39111a75d00bf02fdf03e",
+      "stage": "random_seek_copy",
+      "status": "FAIL_A_V_ASSERTION"
+    },
+    {
+      "actual_MP4_packet_timing": "PASS_SOURCE_PTS_AND_EVERY_PACKET_HASH",
+      "raw_extractor_video_relative_us": 82000,
+      "resolution": "AOSP extractor omits tfdt; strict packet-clock assertion now uses real MP4 output, unchanged 2ms tolerance.",
+      "run": 43363103587,
+      "source": "89bed9a0dada5ff2f122266871f5dd6a32d60915",
+      "source_relative_us": 0,
+      "status": "FAIL_EXTRACTOR_CLOCK_ASSERTION"
+    },
+    {
+      "actual_output_packet_quality_timing": "PASS_EVERY_ENCODED_VIDEO_AUDIO_PACKET_HASH_AND_PTS",
+      "resolution": "AOSP native HLS client does not implement EXT-X-MAP/fMP4. Selected compatible immutable Media3 client for CI only, without new or changed owner APK libraries.",
+      "run": 43364026552,
+      "source": "d816ade9cf38524c698e7efebeb1a2e3faa8c84e",
+      "stage": "actual_HLS_player_prepare",
+      "status": "FAIL_LEGACY_ANDROID_HLS_PLAYER"
+    }
+  ],
+  "schema": 1,
+  "shutdown": "NOT_SELECTED"
+}

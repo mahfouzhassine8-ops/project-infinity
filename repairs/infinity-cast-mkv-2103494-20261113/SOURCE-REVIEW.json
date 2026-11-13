@@ -1,0 +1,61 @@
+{
+  "baseline_APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+  "baseline_source": "1320688d167a861aa9c6a69447c61ec92776db5b",
+  "controller_contracts": {
+    "actual_receiver": false,
+    "passed": 24,
+    "source": "tests/test_controller.py"
+  },
+  "conversion": "Per-Cast RAM-only HLS/fMP4 stream copy; verified codec, cue index and independent fragments. No encoder. No second tracking or database.",
+  "frozen_existing_engine_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+  "limitations": [
+    "Only receiver-compatible H264/HEVC and supported AAC/MP3/AC3/EAC3 audio are stream-copied; profiles and codec support vary by TV.",
+    "A complete bounded Matroska cue index and independently decodable closed keyframes are required; ambiguous tracks and unsupported codecs fail explicitly.",
+    "HTTP source must support authenticated consistent byte ranges; no DRM bypass.",
+    "RAM output is bounded at 8 MiB per fragment with two-fragment cache.",
+    "Actual owner movie codecs were not supplied and will be inspected at runtime; no guessed codecs."
+  ],
+  "physical_acceptance": "PENDING_OWNER; Android component does not prove receiver playback or Kodi phone return or post-Cast shutdown",
+  "preservation": {
+    "Cobra_changed": false,
+    "Command_Center_or_skin_changed": false,
+    "normal_playback_tracking_or_resume_changed": false,
+    "original_native_libraries_changed": false,
+    "provider_implementations_changed": false,
+    "shutdown_source_changed": false
+  },
+  "production_changes": {
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": {
+      "after_sha256": "e05ad4fc180e0d90f2d4b6a38445a66e5e46b9b1994a457961502d4685eee3a9",
+      "before_sha256": null,
+      "change": "new"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": {
+      "after_sha256": "eebc1f202f90077d78c9d9497ef3be38bdfc5996515822d90d331a1c6a996fec",
+      "before_sha256": "dd5788233cf23ca6db90eeeaf293d18ccb3a32ea5a539963b843cf08b92eaa15",
+      "change": "modify"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": {
+      "after_sha256": "6bf64af562cb09fce327b20d2355bb3032d84dda42c3d33a4205fa52adba2699",
+      "before_sha256": "e8144934ab4a442a9ef517e30f2806837282b5d3d629234780568928fee4c1cd",
+      "change": "modify"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": {
+      "after_sha256": "ef9a1d3af38cdfc7f28af7de6eb3a309d63b842183fa001f57ab689055639aad",
+      "before_sha256": null,
+      "change": "new"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": {
+      "after_sha256": "2b8e321e6a544101ebe121d5a9d416b0931b24e49ddcfdfeb078a15d74c5f6e3",
+      "before_sha256": null,
+      "change": "new"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": {
+      "after_sha256": "48cec98f6eae8a12203345151ec77145327e235979d8a86f34b8c4216601c48c",
+      "before_sha256": "b7f391b8105f7fec29370673b21c643cbdb6c6701db72d16d53a4db8d9c7d8f4",
+      "change": "modify"
+    }
+  },
+  "reuses_original_FFmpeg": "6.0.1; public APIs, existing engine NOLOAD only",
+  "schema": 1
+}
