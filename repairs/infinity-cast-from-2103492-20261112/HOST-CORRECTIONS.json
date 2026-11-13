@@ -1,0 +1,56 @@
+{
+  "causation_of_physical_receiver_failure": "NOT_ESTABLISHED",
+  "native": "UNCHANGED_EXACT2103492",
+  "physical_receiver": "NOT_TESTED",
+  "post_Cast_shutdown": "NOT_TESTED",
+  "results": {
+    "adaptive": {
+      "selected_result": [
+        "PASS_ADAPTIVE_ACTUAL_AUTHENTICATED_HTTP_DECODE_SEEK_AND_CLEANUP checks=57; NOT_A_REAL_CAST_RECEIVER_TEST"
+      ],
+      "sha256": "1eb717087ed99f3b6740bf139e62157fcfafa39b9465d5c644c9efa8f22978f0"
+    },
+    "cleanup_after": {
+      "selected_result": [
+        "PASS_ACTUAL_CAST_CONTROLLER_CONTRACT checks=15; deterministic SDK/native backends; no receiver claim",
+        "PASS_CAST_CLEANUP_COMPLETION checks=9; production controller; deterministic native/SDK backends, no receiver claim"
+      ],
+      "sha256": "756bb14faeef8ed286b37cb3fe14f13fa6129702a2243d5fc19dad63c3f039ba"
+    },
+    "cleanup_before": {
+      "selected_result": [
+        "PASS_ACTUAL_CAST_CONTROLLER_CONTRACT checks=15; deterministic SDK/native backends; no receiver claim",
+        "Exception in thread \"main\" java.lang.AssertionError: must retain cleanup ownership while actual relay/channel retirement is pending"
+      ],
+      "sha256": "dcab36e467a4a68924af78786cdd420f0f8ab768f355596cc9c6cbe04ffbbe0f"
+    },
+    "redirect_after": {
+      "selected_result": [
+        "PASS_CAST_CROSS_ORIGIN_PUBLIC_HEADERS checks=7"
+      ],
+      "sha256": "566fa1a1ff5c6da6e39ae8f41cfa66bb5a82031d1b70f76a2d71ce213c579bd3"
+    },
+    "redirect_before": {
+      "selected_result": [
+        "Exception in thread \"main\" java.lang.AssertionError: original public User-Agent/Accept must survive redirect; current error=source_http_403"
+      ],
+      "sha256": "3c435eb1c358591f04f9a846645909bb5553ea14b0ddc12d82eceec915fcf25f"
+    },
+    "relay": {
+      "selected_result": [
+        "PASS_CAST_RELAY_HTTP_AND_OWNERSHIP checks=38 (host only; no real Cast receiver)"
+      ],
+      "sha256": "9f967d846c115e212f98efbd8c779618cfee08ccecfa956c12b36923e9da3301"
+    }
+  },
+  "schema": 1,
+  "scope": "SELECTED_CAST_ONLY_PRODUCTION_PATHS",
+  "source_hashes": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastChannel.java": "0c5fec46c2283fc9db186f6dc74531af55d668ee49e1fcefb5d022b06fb4b5f4",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java": "dd5788233cf23ca6db90eeeaf293d18ccb3a32ea5a539963b843cf08b92eaa15",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "f4c7ae25010820b07704bdb9f9597500dc6f3b1384de96d79122f0451f1f0edc",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "e8144934ab4a442a9ef517e30f2806837282b5d3d629234780568928fee4c1cd",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "b7f391b8105f7fec29370673b21c643cbdb6c6701db72d16d53a4db8d9c7d8f4"
+  },
+  "status": "PASS_FOCUSED_HOST_WITH_RETAINED_BASELINE_FAILURES"
+}
