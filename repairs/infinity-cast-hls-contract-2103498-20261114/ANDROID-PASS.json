@@ -1,0 +1,187 @@
+{
+  "Google_MPL": {
+    "Google_public_MPL_sha256": "60b5baf53621d8a39261c780ba36a5b7680807431ca41da551da8b013a0ff7f3",
+    "actual_Android_master_sha256": "dd4da8bcead3e3f747992f9bc6e2926f4621fddc5d27a647bb57f8c79691e8a8",
+    "cases": [
+      {
+        "errors": [],
+        "name": "unchanged498_media_contract",
+        "ready": 1,
+        "streams": [
+          {
+            "Eh": null,
+            "Wa": [],
+            "bitrate": 0,
+            "codecs": "mp4a.40.2",
+            "framerate": null,
+            "mimeType": "video/mp4",
+            "resolution": {
+              "height": null,
+              "width": null
+            },
+            "rj": "variant",
+            "url": "http://127.0.0.1:8080/media.m3u8",
+            "vj": null
+          }
+        ]
+      },
+      {
+        "errors": [],
+        "name": "corrected_actual_master",
+        "ready": 1,
+        "streams": [
+          {
+            "Eh": null,
+            "Jm": false,
+            "Wa": [],
+            "bitrate": 528384,
+            "codecs": "hev1.1.6.L30.90,ec-3",
+            "codecsProvided": true,
+            "framerate": null,
+            "mimeType": "video/mp4",
+            "resolution": {
+              "height": null,
+              "width": null
+            },
+            "rj": "variant",
+            "url": "http://127.0.0.1:35319/4058233c5c5148c8a98ea8de814b51c8/mkv/media.m3u8",
+            "vj": null
+          }
+        ]
+      }
+    ],
+    "decoder": "NOT_TESTED",
+    "expected_actual_native_codecs": "hev1.1.6.L30.90,ec-3",
+    "limitation": "Specific ONN receiver runtime/version and exact owner codec profile unavailable; fixes a causally reproduced public Cast HLS contract defect, not a claim of physical success.",
+    "physical_receiver": "NOT_TESTED",
+    "status": "PASS_ACTUAL_GOOGLE_MPL_BEFORE_AFTER_CODEC_CONTRACT"
+  },
+  "actual": {
+    "API": 36,
+    "Dolby_header_and_media_delivery": true,
+    "EAC3_decoder_available": false,
+    "HLS": {
+      "actual_Android_HLS_playback": false,
+      "reason": "No EAC3 decoder in test environment; actual TV codec playback pending"
+    },
+    "Kodi_player_handback": "NOT_TESTED",
+    "TV_receiver": "NOT_TESTED",
+    "actual_Android_output_packet_proof": {
+      "audio": {
+        "encoded_bytes_identical": true,
+        "max_source_pts_error_seconds": 8.881784197001252e-16,
+        "packets": 126
+      },
+      "video": {
+        "encoded_bytes_identical": true,
+        "max_source_pts_error_seconds": 4.440892098500626e-16,
+        "packets": 96
+      }
+    },
+    "actual_fMP4_bytes_identical_to_498": true,
+    "authenticated_ranges": true,
+    "baseline_versionCode": 2103498,
+    "cancellation": true,
+    "cancellation_stage": "pending_JNI_authenticated_Range_read_during_prepare",
+    "converted_HTTP_complete_range_type_CORS": true,
+    "exact_packet_quality_timing": true,
+    "existing_original_engine": true,
+    "explicit_master_codecs": true,
+    "fMP4": {
+      "MediaExtractor_relative_start_us": 82000,
+      "audio_samples": 126,
+      "real_MP4_packet_clock": "CHECKED_BY_WRAPPER",
+      "video_samples": 96
+    },
+    "native_contexts_after_close": 0,
+    "new_ARM64_JNI": true,
+    "original_APK_modified": false,
+    "owner_device": "NOT_TESTED",
+    "pass": true,
+    "random_segment_seeking": true,
+    "real_Dolby_configuration": true,
+    "scope": "Actual original498 ARM64 FFmpeg via Cast JNI, private authenticated relay, every output packet timing/quality, actual Dolby header/segments; playback/seek when EAC3 decoder available and cancellation. Separate CI package only.",
+    "shutdown": "NOT_SELECTED",
+    "stream_copy_not_transcode": true
+  },
+  "native": {
+    "FFmpeg_source_sha512": "945e34840092dc0fd3824eb1af2be79868af2afb4fe13159b19a9bcfc464cc4d53243c13ff065199290e9393ddbf4b1c5c8abccf83a31a31d6c7490e499fd1fc",
+    "baseline_APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+    "dependencies": [
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libm.so"
+    ],
+    "engine_changed": false,
+    "existing_engine_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+    "existing_native_libraries_replaced": false,
+    "exports": [
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect",
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment",
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close",
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_open",
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active",
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init",
+      "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel"
+    ],
+    "global_FFmpeg_callbacks_or_init_changed": false,
+    "new_library_sha256": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a",
+    "required_FFmpeg_symbols": [
+      "av_version_info",
+      "avutil_version",
+      "av_malloc",
+      "av_free",
+      "av_freep",
+      "av_dict_set",
+      "av_dict_get",
+      "av_dict_free",
+      "av_rescale_q",
+      "av_find_input_format",
+      "avformat_alloc_context",
+      "avformat_open_input",
+      "avformat_find_stream_info",
+      "avformat_close_input",
+      "avio_alloc_context",
+      "avio_context_free",
+      "avio_flush",
+      "avformat_index_get_entries_count",
+      "avformat_index_get_entry",
+      "av_seek_frame",
+      "avformat_alloc_output_context2",
+      "av_stream_new_side_data",
+      "avformat_new_stream",
+      "avformat_free_context",
+      "avcodec_parameters_copy",
+      "avcodec_get_name",
+      "av_ac3_parse_header",
+      "avformat_query_codec",
+      "avformat_write_header",
+      "av_interleaved_write_frame",
+      "av_write_frame",
+      "av_write_trailer",
+      "av_packet_alloc",
+      "av_packet_free",
+      "av_packet_unref",
+      "av_packet_rescale_ts",
+      "av_read_frame"
+    ],
+    "source": "37c1000df277009fdc11071d333cd5511db7a210",
+    "source_hashes": {
+      "repairs/infinity-cast-hls-contract-2103498-20261114/build_native.py": "6f7855f8f3af442fdd7e7a13665cb3dd6901388288c5de63e59fe5706713457f",
+      "repairs/infinity-cast-mkv-2103494-20261113/build.py": "f365c32cfcbba5d7b80b56a4ee928f3d9acb479fc45c393410be89ecbcc26e5b",
+      "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": "8d6db252f299f2da738e8842046c6082a4e3294b2defc992c1ba9f3247ef403d"
+    },
+    "status": "PASS_REAL_ARM64_HLS_CODEC_METADATA_EXACT498_ORIGINAL_ENGINE"
+  },
+  "producer": {
+    "digest": "sha256:e9ebe576cd3e9729e0855a302e3f2e6a1789e06506fad72ce1806432789c1f08",
+    "id": 14128391211,
+    "name": "Infinity498-HLS-Android-Component-43630707565-NOT-AN-INSTALLER",
+    "run": 43630707565,
+    "size_in_bytes": 2026447,
+    "source": "37c1000df277009fdc11071d333cd5511db7a210",
+    "workflow_id": 393886994
+  },
+  "schema": 1
+}

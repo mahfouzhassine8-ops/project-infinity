@@ -1,0 +1,113 @@
+{
+  "cases": {
+    "h264-aac": {
+      "all_initialization_and_fragment_bytes_identical_to_498": true,
+      "files_sha256": {
+        "init.mp4": "aca729347a54d8904fb30a62a684cfab93ea1884a542918081c62a2d01a156d0",
+        "seg0.m4s": "ffa085a0bd6b424d60a4598bec8b1799bf82e1493ef804242ba64c8d03cc0571",
+        "seg1.m4s": "d15d420cd9f0965d876d565859aabde2ebe2cb40eda114db61b81f40466ffdaf",
+        "seg2.m4s": "b6b89bb954d5fd6c79081e28de4dd7051253b527139942582376bfbd821e3328",
+        "seg3.m4s": "960c7ad2de9cfb8c3e42f328da65ceb91e8d6f927cbec15433e471665df46a0d"
+      },
+      "native_inspection": {
+        "audio": "aac",
+        "codecs": "avc1.4D400C,mp4a.40.2",
+        "duration_us": 8021000,
+        "origin_us": -21000,
+        "starts_us": [
+          0,
+          2021000,
+          4021000,
+          6021000,
+          8021000
+        ],
+        "video": "h264"
+      }
+    },
+    "hevc-aac": {
+      "all_initialization_and_fragment_bytes_identical_to_498": true,
+      "files_sha256": {
+        "init.mp4": "3adbbbb2ddc07f90f1374c3df24fecfa6b44116544e3ee51463b82a890b7b2d4",
+        "seg0.m4s": "773f343482902ef06efc4dae885374f87a14b7144f5cdf59c5bf420fba3f653b",
+        "seg1.m4s": "a5f408e20b7a530aea71455b3e1f28770241f130dcdf5718f3d59d644179cc3d"
+      },
+      "native_inspection": {
+        "audio": "aac",
+        "codecs": "hev1.1.6.L30.90,mp4a.40.2",
+        "duration_us": 4021000,
+        "origin_us": -21000,
+        "starts_us": [
+          0,
+          2021000,
+          4021000
+        ],
+        "video": "hevc"
+      }
+    },
+    "hevc-ac3_6ch": {
+      "all_initialization_and_fragment_bytes_identical_to_498": true,
+      "files_sha256": {
+        "init.mp4": "e10a9f5e9c8041fc03e0a5b80b7a52778fe100123e40db8bd11a7abdfe9d12d6",
+        "seg0.m4s": "c8aa692bc6d6a4ba665bb765df0d4fbd3871166b3c7d6efac2254a75b6c99b67",
+        "seg1.m4s": "92a37a0423e1c6485702373ea38a20ef9687e26d5075d7af3d64cd0f81fa6d6a"
+      },
+      "native_inspection": {
+        "audio": "ac3",
+        "codecs": "hev1.1.6.L30.90,ac-3",
+        "duration_us": 4032000,
+        "origin_us": -5000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video": "hevc"
+      }
+    },
+    "hevc-eac3_2ch": {
+      "all_initialization_and_fragment_bytes_identical_to_498": true,
+      "files_sha256": {
+        "init.mp4": "cde5ca8bb50541c54efe010bce24e009725bbafb98570469e9dafefe60471adc",
+        "seg0.m4s": "945ffb565221cc271139d8c239460ec3093a87ddc830b34795973ccdc5cced00",
+        "seg1.m4s": "c8186dd54f7f1c6cc0e7559ed250bab4e16cafad28fbc1377775f69d95027438"
+      },
+      "native_inspection": {
+        "audio": "eac3",
+        "codecs": "hev1.1.6.L30.90,ec-3",
+        "duration_us": 4032000,
+        "origin_us": -5000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video": "hevc"
+      }
+    },
+    "hevc-eac3_6ch": {
+      "all_initialization_and_fragment_bytes_identical_to_498": true,
+      "files_sha256": {
+        "init.mp4": "f47e4f1ced24c17387da3339176ccbbe9476b97c94a43e70d4fa57ff1c6dd06e",
+        "seg0.m4s": "7d416844f18bd023400e297f4c2870d91cc5e88fd1a2892feff91cfa8fbf80d4",
+        "seg1.m4s": "2d2e0b856d9824a176d3bd6eedc3f16b9f47212c53054c755bc5db99dba35378"
+      },
+      "native_inspection": {
+        "audio": "eac3",
+        "codecs": "hev1.1.6.L30.90,ec-3",
+        "duration_us": 4032000,
+        "origin_us": -5000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video": "hevc"
+      }
+    }
+  },
+  "physical_TV": "NOT_TESTED",
+  "schema": 1,
+  "source_sha256": "8d6db252f299f2da738e8842046c6082a4e3294b2defc992c1ba9f3247ef403d",
+  "status": "PASS_REAL_FFMPEG6_SCOPED_METADATA_WITH_ALL_MEDIA_BYTES_UNCHANGED",
+  "transcoding": false
+}

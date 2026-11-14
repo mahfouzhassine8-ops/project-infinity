@@ -1,0 +1,39 @@
+{
+  "ONN_compatibility": "Exact ONN model, receiver runtime and actual source HEVC profile/level not available. Default Media Receiver supports device-dependent HEVC and Dolby passthrough; no exact hardware decode PASS claimed.",
+  "baseline_versionCode": 2103498,
+  "causal_reproduction": {
+    "Chromium_actual_init_append_with_wrong_AAC_type": "SOURCEBUFFER_ERROR; AAC type supported; real unchanged HEVC/EAC3 initialization rejected",
+    "after": "video/mp4; codecs=hev1.1.6.L30.90,ec-3; codecsProvided true",
+    "before": "video/mp4; codecs=mp4a.40.2",
+    "original_callback": "MasterPlaylist.Gg -> variant metadata codecs mp4a.40.2",
+    "public_Google_MPL_url": "https://www.gstatic.com/cast/sdk/libs/mediaplayer/1.0.0/media_player.js",
+    "sha256": "60b5baf53621d8a39261c780ba36a5b7680807431ca41da551da8b013a0ff7f3"
+  },
+  "checkpoint": "1d245cf9617c98023e9b26e66b1ec88e8b64adb1",
+  "confirmed_sender_defect": "A bare multiplexed HLS media playlist plus hlsSegmentFormat=fmp4 causes the pinned public Google MPL to create video/mp4 with codecs=mp4a.40.2, although real sample entries are HEVC hev1 and EAC3 ec-3.",
+  "owner_observed_first_failure": "Receiver LOADING5 -> IDLE1 reasonERROR4, after LOAD accepted and3458206 relay bytes written; no decoded frames",
+  "preserved": [
+    "498 Dolby packet-derived header correction",
+    "Every tested MP4 init/fragment byte",
+    "HEVC hev1 sample entry (official Google media documentation lists hev1 support; no unsupported hvc1 relabel assumption)",
+    "HEVC/EAC3 encoded quality; no transcoding",
+    "Original Kodi engine and all out-of-Cast code"
+  ],
+  "references": [
+    "https://developers.google.com/cast/docs/media",
+    "https://www.rfc-editor.org/rfc/rfc8216#section-4.3.4.2",
+    "https://developers.google.com/android/reference/com/google/android/gms/cast/HlsSegmentFormat"
+  ],
+  "schema": 1,
+  "smallest_correction": [
+    "Report RFC6381 codec/profile metadata from already verified native muxer parameters",
+    "Serve explicit single-variant HLS master, route original media playlist unchanged; use existing fragment cache",
+    "Add bounded credential-safe converted-HTTP status and completed-body-write diagnostics"
+  ],
+  "unverified": [
+    "Whether this sender defect is the only cause of the physical attempt",
+    "Actual physical receiver consumption/decoding;3458206 bytes written is not that proof",
+    "Owner media source HTTP responses and codec profile; screenshots contain neither",
+    "No causal link to shutdown established; shutdown untouched"
+  ]
+}
