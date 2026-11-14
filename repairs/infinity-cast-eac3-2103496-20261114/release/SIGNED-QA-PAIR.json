@@ -1,0 +1,38 @@
+{
+  "application_startup": false,
+  "inputs": {
+    "baseline": {
+      "APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+      "digest": "sha256:bbd8d526976ce54610c7f9f587a42b5d801f48f85da93a7f7465e733ea0e4dfb",
+      "id": 14010547149,
+      "name": "Infinity94-MKV-OriginalSigned-43366259258-QA-Fold-Pending",
+      "run": 43366259258,
+      "size_in_bytes": 347903186,
+      "source": "cf85829c860f96f0ca2e38d2c4ba485ae6ca32d6",
+      "workflow_id": 397702717
+    },
+    "candidate": {
+      "APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+      "digest": "sha256:113a8ebd8299d555dbd2313dd76be71eeab20e3ea1892ce5a342bb8bf08dd137",
+      "id": 14091080152,
+      "name": "Infinity496-Dolby-OriginalSigned-43538121392-QA-Fold-Pending",
+      "run": 43538121392,
+      "size_in_bytes": 347905804,
+      "source": "80aef0a13b2390076d263435b4a98ee497ecf0d4",
+      "workflow_id": 397702717
+    },
+    "recovery": {
+      "APK_sha256": "ce2ff86ba689d673bbc979a40a80461b2a1c8efcce13e3b28f65a3ee3337044e",
+      "digest": "sha256:09d867041a27819c9b91f73d9fdcc22bfa9d16ed25f9d8b6a62777ca6ee39b84",
+      "id": 14090254056,
+      "name": "Infinity496-Dolby-OriginalSigned-43538975117-QA-Fold-Pending",
+      "run": 43538975117,
+      "size_in_bytes": 347902936,
+      "source": "8657528e1cc92542f825aa379b3c7bf809548b18",
+      "workflow_id": 397702717
+    }
+  },
+  "schema": 1,
+  "selected_test": "PackageManager only: exact original-signed496 to498 then forward499; no app launch/reset/uninstall/data read",
+  "shutdown": false
+}

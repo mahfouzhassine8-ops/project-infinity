@@ -1,0 +1,103 @@
+{
+  "build_receipt": {
+    "accepted_pointer_updated": false,
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "component_sources": {
+      "CHOOSER_SHELL": "6626b404624f5da48c9d6673f9c00b6e763382f2",
+      "COBRA": "73edb4f25b9e25d67cd8e0c41d44e74931f2b8ef",
+      "INFINITY": "6626b404624f5da48c9d6673f9c00b6e763382f2",
+      "MINIMAL_ANDROID_CONTRACT": "55770bb611837a47f5e514bb94be39b68fe8d12c"
+    },
+    "component_versions": {
+      "CHOOSER_SHELL": "2103499.chooser_shell.cast_dolby496.1",
+      "COBRA": "2103445.cobra.1",
+      "INFINITY": "2103499.infinity.cast_dolby496.1",
+      "MINIMAL_ANDROID_CONTRACT": "2103492.minimal_android_contract.cast_repair90.1"
+    },
+    "generation": 84,
+    "launcher_icon_resources": {
+      "adaptive_symbol_alpha": "EXACT_ORIGINAL_MONO_AND_COLOR_ALPHA; RESOURCE_BLACK_TINT_ONLY",
+      "launcher_limits": "Launcher caches may retain an old drawable; user-enabled themed-icon palettes control monochrome colors. Resource resolution does not guarantee every Samsung surface refreshes immediately.",
+      "legacy_symbol": "SAME_ORIGINAL_MONO_ALPHA; STANDARD_CENTERED_72_OF_108_ADAPTIVE_VIEWPORT_RESAMPLED_TO_ORIGINAL_DENSITY",
+      "legacy_tile_alpha": "EXACT_ORIGINAL_DENSITY_TILE_ALPHA",
+      "manifest": "NOT_MODIFIED_BY_ICON_IMPLEMENTATION",
+      "new_entries": 1079,
+      "new_path_sha256": {
+        "res/infinity_launcher_light_hdpi.png": "e059b58ec3af72994725510e2e4e518879ed36eb654b050463b3e98d94685f3c",
+        "res/infinity_launcher_light_mdpi.png": "20521d2e6de937d79c4a6e5d9ea6ce1a34a623b2dfbf5827fee3d8e59b2d835f",
+        "res/infinity_launcher_light_v26.xml": "545b354ba229d2d197950801d8740b364238e52b86f0f9f93d779cc9b4abd8e7",
+        "res/infinity_launcher_light_v33.xml": "b894acef7408a8934b2ed989b625e2d1d15bf3c409ca583c15a3bc4a10576c8d",
+        "res/infinity_launcher_light_xhdpi.png": "2cf279c8855cb756d4070e1eb532dbdb40d7549a4332fb2ce9aef5e65c47f741",
+        "res/infinity_launcher_light_xxhdpi.png": "481b64281afbe845d9f22de796c4d26a7f00825b56b750e9bce41f16d7f920b9",
+        "res/infinity_launcher_light_xxxhdpi.png": "0fce20ccd57efa60921c940603b5e0a1d8d740c06fafcf5f8cec783e4cb34622"
+      },
+      "new_resource_ids": 0,
+      "night_config_additions": 14,
+      "non_icon_resource_entries": "EXACT_SEMANTIC_AND_ORIGINAL_CHUNK_IDENTITY",
+      "original_dark_assets": "ALL_BYTE_IDENTICAL",
+      "original_entries": 1065,
+      "original_table_sha256": "1b8c1788a5a86242635277f063ebdce6b82ed12eafe3cfdf331b902c8eb7e616",
+      "physical_Samsung": "NOT_VERIFIED",
+      "resource_ids": [
+        "0x7f080000",
+        "0x7f080001"
+      ],
+      "shutdown": "NOT_RUN",
+      "status": "PASS_EXACT_ICON_ONLY_TABLE_TRANSFORM",
+      "table_sha256": "cb3a6f25572858e9fb64dd21713ab1e1c1a0965d0e1d3951c59dd690c9551f5c"
+    },
+    "payload_digest": "7faf56d7a5588ae5b017ca8d1d8cfd67f2c64451afcd899334a0e7b8b442b85d",
+    "physical_Fold": "PENDING",
+    "registry_sha256": "02c278e568318326fbd0a22551b8535787f477e4d3086e3fc9623371dd0c53b1",
+    "signed_apk_sha256": "ce2ff86ba689d673bbc979a40a80461b2a1c8efcce13e3b28f65a3ee3337044e",
+    "source": "8657528e1cc92542f825aa379b3c7bf809548b18",
+    "status": "PRE_SIGN_PAYLOAD_VERIFIED",
+    "unsigned_apk_sha256": "3e236126168f333dfacf1f95cde47377df7e9b85e046f6a5a4c1b80a1de2d24b",
+    "versionCode": 2103499
+  },
+  "preservation": {
+    "APK_sha256": "ce2ff86ba689d673bbc979a40a80461b2a1c8efcce13e3b28f65a3ee3337044e",
+    "Cobra_changed": false,
+    "Command_Center_or_movie_or_tracking_changed": false,
+    "Fold_acceptance": "PENDING_OWNER_ONE_SESSION",
+    "Python_startup_changed": false,
+    "added_members": [],
+    "all_original_native_libraries_except_Cast_bridge_unchanged": true,
+    "all_six_DEX_unchanged": true,
+    "baseline_APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "changed_members": {
+      "AndroidManifest.xml": {
+        "after": "a5246149f7bd8b8fc14f805db1a4fbef4beb8fe65fc6a82e868b17b64b67238a",
+        "before": "6a2fbf016782df2120ecd85fdfe0e27357d2fd8c47e4bbdb8177f5e911034a05"
+      },
+      "assets/experience-component-updates.properties": {
+        "after": "aacba73dda43e7bb9ecb23e3c2a7ad9c9fb07a01797fa496f62f4e628b2e5330",
+        "before": "88112fe113fe78668b26e0b925cf488ed2eaed955381964502ae4ab37ef31270"
+      }
+    },
+    "kind": "recovery",
+    "profiles_or_databases_read_or_changed": false,
+    "protected_recovery_functional_baseline": 2103496,
+    "providers_or_Search_changed": false,
+    "removed_members": [],
+    "shutdown_or_persistence_guards_changed": false,
+    "skin_changed": false,
+    "source": "8657528e1cc92542f825aa379b3c7bf809548b18",
+    "status": "PASS_EXACT_SIGNED496_ONE_CAST_LIBRARY_ONLY",
+    "unchanged_payload_members": 7774,
+    "versionCode": 2103499
+  },
+  "producer": {
+    "APK_sha256": "ce2ff86ba689d673bbc979a40a80461b2a1c8efcce13e3b28f65a3ee3337044e",
+    "digest": "sha256:09d867041a27819c9b91f73d9fdcc22bfa9d16ed25f9d8b6a62777ca6ee39b84",
+    "id": 14090254056,
+    "name": "Infinity496-Dolby-OriginalSigned-43538975117-QA-Fold-Pending",
+    "run": 43538975117,
+    "size_in_bytes": 347902936,
+    "source": "8657528e1cc92542f825aa379b3c7bf809548b18",
+    "workflow_id": 397702717
+  },
+  "schema": 1,
+  "signature": "Verifies\nVerified using v1 scheme (JAR signing): true\nVerified using v2 scheme (APK Signature Scheme v2): true\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nSigner #1 certificate DN: CN=Project Infinity Release, O=Project Infinity, C=US\nSigner #1 certificate SHA-256 digest: d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7\nSigner #1 certificate SHA-1 digest: 0dcc254f4563adb4ad63232526a72192780a8a65\nSigner #1 certificate MD5 digest: 86d3f7d9855f7d40843ea22bc3ecbbbe\nSigner #1 key algorithm: RSA\nSigner #1 key size (bits): 4096\nSigner #1 public key SHA-256 digest: 7bddb51e9cd7386a25be0c4245866978a957dbb295eb0c1fbb3dc67c7e59466f\nSigner #1 public key SHA-1 digest: 73f3b8699adff34bf7aeac75657ed8a3f4dece58\nSigner #1 public key MD5 digest: 3397416423e6344899c22f3fffa92724\nWARNING: META-INF/androidx.annotation_annotation-experimental.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/androidx.arch.core_core-runtime.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/androidx.core_core.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/androidx.exifinterface_exifinterface.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/androidx.lifecycle_lifecycle-runtime.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/androidx.tvprovider_tvprovider.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/androidx.versionedparcelable_versionedparcelable.version not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\nWARNING: META-INF/com/android/build/gradle/app-metadata.properties not protected by signature. Unauthorized modifications to this JAR entry will not be detected. Delete or move the entry outside of META-INF/.\n"
+}
