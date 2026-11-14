@@ -24,6 +24,8 @@ final class InfinityCastRemux implements AutoCloseable {
     private long[] starts;
     private byte[] initialization;
     private String video,audio;
+    private String codecs;
+    private byte[] master;
     InfinityCastRemux(Input input) throws IOException {
         this.input=input;InfinityCastRemuxNative.load();handle=InfinityCastRemuxNative.open(input);
         if(handle==0)throw new IOException("mkv_native_context_unavailable");
@@ -46,6 +48,9 @@ final class InfinityCastRemux implements AutoCloseable {
                 starts=new long[times.length()];for(int n=0;n<starts.length;n++){starts[n]=times.getLong(n);if(starts[n]<0 || (n>0 && starts[n]<=starts[n-1]))throw new IOException("mkv_invalid_seek_index");}
                 if(starts[0]!=0 || starts[starts.length-1]!=metadata.getLong("duration_us"))throw new IOException("mkv_unverified_timeline");
                 initialization=InfinityCastRemuxNative.init(handle);if(initialization==null || initialization.length<16 || initialization.length>1048576)throw new IOException("mkv_init_limit");
+                codecs=metadata.optString("codecs","");
+                if(!codecs.matches("(avc1\\.[0-9A-F]{6}|hev1\\.[ABC]?[0-9]+\\.[0-9A-F]+\\.[LH][0-9]+(?:\\.[0-9A-F]{2}){0,6})(?:,(?:mp4a\\.(?:40\\.[0-9]+|69|6B)|ac-3|ec-3))?"))throw new IOException("mkv_invalid_codec_description");
+                if("hevc".equals(video)){String descriptor=codecs.split(",")[0];String[] fields=descriptor.split("\\.");InfinityCastDiagnostics.event("mkv_video_profile","hevc",Integer.parseInt(fields[1].replaceAll("[ABC]","")));InfinityCastDiagnostics.event("mkv_video_level",fields[3].startsWith("H")?"high_tier":"main_tier",Integer.parseInt(fields[3].substring(1)));}
                 check();InfinityCastDiagnostics.event("mkv_inspection","stream_copy_ready",starts.length-1);
             }catch(IOException e){throw failure(e);}catch(Exception e){throw new IOException("mkv_inspection_failed");}
         }
@@ -54,6 +59,20 @@ final class InfinityCastRemux implements AutoCloseable {
     private void check() throws IOException{if(cancelled || handle==0)throw new IOException("mkv_cancelled");}
     long durationMs(){return starts==null?0:starts[starts.length-1]/1000;}
     byte[] playlist(String base) throws IOException {
+        synchronized(worker){
+            check();if(starts==null || codecs==null)throw new IOException("mkv_not_prepared");
+            if(master==null){
+                // Measured first-segment estimate for a single JIT rendition.
+                // Use the existing cache: the receiver's next request reuses it.
+                byte[] first=resource("0.m4s");long span=starts[1]-starts[0];
+                long rate=((first.length+(long)initialization.length)*8000000L+span-1)/span;
+                master=("#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-STREAM-INF:BANDWIDTH="+rate+",CODECS=\""+codecs+"\"\n"+base+"/mkv/media.m3u8\n").getBytes(StandardCharsets.UTF_8);
+                InfinityCastDiagnostics.event("mkv_manifest","explicit_codec_master",1);
+            }
+            return master;
+        }
+    }
+    byte[] mediaPlaylist(String base) throws IOException {
         check();if(starts==null)throw new IOException("mkv_not_prepared");long largest=0;
         for(int n=1;n<starts.length;n++)largest=Math.max(largest,starts[n]-starts[n-1]);
         StringBuilder text=new StringBuilder("#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:").append((largest+999999)/1000000).append("\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-MAP:URI=\"").append(base).append("/mkv/init.mp4\"\n");
@@ -76,7 +95,7 @@ final class InfinityCastRemux implements AutoCloseable {
     void cancel(){cancelled=true;long current=handle;if(current!=0)InfinityCastRemuxNative.cancel(current);}
     /** Relay invokes this only after every admitted probe/serve job retired. */
     @Override public void close(){
-        cancel();synchronized(worker){long current=handle;handle=0;if(current!=0)InfinityCastRemuxNative.close(current);input.close();fragments.clear();initialization=null;starts=null;}
+        cancel();synchronized(worker){long current=handle;handle=0;if(current!=0)InfinityCastRemuxNative.close(current);input.close();fragments.clear();initialization=null;starts=null;master=null;codecs=null;}
         InfinityCastDiagnostics.event("mkv_context","retired",InfinityCastRemuxNative.active());
     }
 }

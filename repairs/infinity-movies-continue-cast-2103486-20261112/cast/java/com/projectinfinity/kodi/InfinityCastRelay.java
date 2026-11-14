@@ -373,12 +373,15 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(requests.incrementAndGet()==1)InfinityCastDiagnostics.event("receiver_access","received",0);
             if(converted) {
                 boolean playlist=first[1].equals(URI.create(address()).getRawPath());
-                byte[] data=playlist?remux.playlist(base()):remux.resource(first[1].substring((path+"/mkv/").length()));
-                String type=playlist?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
-                if(range!=null && !playlist){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
-                if(from>to || from>=data.length){reply(output,416,type,0,"bytes */"+data.length);return;}
+                boolean media=first[1].equals(path+"/mkv/media.m3u8");String asset=playlist?"master":media?"media":first[1].endsWith("/init.mp4")?"init":"fragment";
+                byte[] data=playlist?remux.playlist(base()):media?remux.mediaPlaylist(base()):remux.resource(first[1].substring((path+"/mkv/").length()));
+                String type=playlist || media?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
+                if(range!=null && !playlist && !media){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
+                if(from>to || from>=data.length){reply(output,416,type,0,"bytes */"+data.length);InfinityCastDiagnostics.event("converted_http",asset+"_range_unsatisfied",416);return;}
+                boolean diagnostic=reportedKinds.add("converted:"+asset+":"+method+":"+code);
+                if(diagnostic)InfinityCastDiagnostics.event("converted_http",asset+(method.equals("HEAD")?"_head":"_get"),code);
                 reply(output,code,type,to-from+1,code==206?"bytes "+from+"-"+to+"/"+data.length:null);
-                if(method.equals("GET")){output.write(data,(int)from,(int)(to-from+1));delivered((int)(to-from+1));}return;
+                if(method.equals("GET")){try{output.write(data,(int)from,(int)(to-from+1));output.flush();delivered((int)(to-from+1));if(diagnostic)InfinityCastDiagnostics.event("converted_body",asset+"_written",(int)(to-from+1));}catch(IOException failed){InfinityCastDiagnostics.event("converted_body",asset+"_write_failed",0);throw failed;}}return;
             }
             boolean knownManifest=resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH || (resource==root && InfinityCastAdaptive.adaptive(mime));
             response=open(resource,knownManifest?"GET":method,knownManifest?null:range);

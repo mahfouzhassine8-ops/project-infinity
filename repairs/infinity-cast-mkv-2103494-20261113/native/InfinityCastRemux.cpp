@@ -72,7 +72,7 @@ struct State {
  std::unique_ptr<Input> input;AVFormatContext* format=nullptr;AVIOContext* io=nullptr;
  std::atomic<bool> cancelled{false};Clock::time_point deadline;
  int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts;
- std::vector<uint8_t> init;std::string videoName,audioName;
+ std::vector<uint8_t> init;std::string videoName,audioName,codecs;
  explicit State(std::unique_ptr<Input> value):input(std::move(value)){api();}
  ~State(){if(format)api().avformat_close_input(&format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
  bool stopped()const{return cancelled.load() || Clock::now()>deadline;}
@@ -130,6 +130,23 @@ struct Output {
  }
 };
 struct Packet {AVPacket* value=api().av_packet_alloc();~Packet(){if(value)api().av_packet_free(&value);}Packet(){if(!value)throw Failure("mkv_memory_limit");}};
+std::string codecDescription(const AVCodecParameters* p){
+ // RFC6381, using the same verified configuration copied into the MP4 muxer.
+ // Keep FFmpeg's existing avc1/hev1 sample entries and every media packet.
+ std::ostringstream out;out<<std::uppercase<<std::hex;
+ if(p->codec_id==AV_CODEC_ID_HEVC){
+  if(p->extradata_size<23 || p->extradata[0]!=1)throw Failure("mkv_invalid_hevc_configuration");const auto* b=p->extradata;
+  out<<"hev1.";int space=(b[1]>>6)&3;if(space)out<<char('A'+space-1);out<<std::dec<<int(b[1]&31)<<'.';uint32_t reversed=0;
+  for(int n=0;n<32;n++)reversed|=uint32_t((b[2+n/8]>>(7-n%8))&1)<<n;
+  out<<std::hex<<reversed<<'.'<<((b[1]&32)?'H':'L')<<std::dec<<int(b[12]);int last=11;while(last>=6 && b[last]==0)last--;
+  for(int n=6;n<=last;n++){out<<'.'<<std::hex;if(b[n]<16)out<<'0';out<<int(b[n]);}return out.str();
+ }
+ if(p->codec_id==AV_CODEC_ID_H264){if(p->extradata_size<4 || p->extradata[0]!=1)throw Failure("mkv_invalid_avc_configuration");out<<"avc1.";for(int n=1;n<4;n++){if(p->extradata[n]<16)out<<'0';out<<int(p->extradata[n]);}return out.str();}
+ if(p->codec_id==AV_CODEC_ID_EAC3)return "ec-3";if(p->codec_id==AV_CODEC_ID_AC3)return "ac-3";
+ if(p->codec_id==AV_CODEC_ID_MP3)return p->sample_rate>24000?"mp4a.6B":"mp4a.69";
+ if(p->codec_id==AV_CODEC_ID_AAC){if(p->extradata_size<2)throw Failure("mkv_invalid_aac_configuration");int type=p->extradata[0]>>3;if(type==31)type=32+((p->extradata[0]&7)<<3)+(p->extradata[1]>>5);if(!type)throw Failure("mkv_invalid_aac_configuration");return "mp4a.40."+std::to_string(type);}
+ throw Failure("mkv_unsupported_codec_description");
+}
 int select(AVFormatContext* f,AVMediaType kind){
  int first=-1,defaultIndex=-1,count=0,defaults=0;
  for(unsigned n=0;n<f->nb_streams;n++){auto* s=f->streams[n];if(s->codecpar->codec_type!=kind || (s->disposition&AV_DISPOSITION_ATTACHED_PIC))continue;first=int(n);count++;if(s->disposition&AV_DISPOSITION_DEFAULT){defaultIndex=int(n);defaults++;}}
@@ -189,7 +206,7 @@ void State::inspect(){
   if(api().av_write_frame(out.format,nullptr)<0 || api().av_write_trailer(out.format)<0)throw Failure("mkv_audio_header_flush_failed");api().avio_flush(out.io);check();
   if(out.failure)throw Failure(out.failure);size_t header=out.headerSize();init.assign(out.bytes.begin(),out.bytes.begin()+header);
  }else init=out.bytes;
- check();
+ codecs=codecDescription(out.format->streams[0]->codecpar);if(audio>=0)codecs+=","+codecDescription(out.format->streams[1]->codecpar);check();
 }
 std::vector<uint8_t> State::segment(int index){
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
@@ -216,7 +233,7 @@ std::vector<uint8_t> State::segment(int index){
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
 std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
-std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
+std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
 } // namespace InfinityMkv
 #ifndef INFINITY_REMUX_HOST
 namespace {
