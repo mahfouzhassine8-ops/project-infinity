@@ -1,0 +1,133 @@
+diff --git a/repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp b/repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp
+index 503c51d8..86cf8ea8 100644
+--- a/repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp
++++ b/repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp
+@@ -72,7 +72,7 @@ struct State {
+  std::unique_ptr<Input> input;AVFormatContext* format=nullptr;AVIOContext* io=nullptr;
+  std::atomic<bool> cancelled{false};Clock::time_point deadline;
+  int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts;
+- std::vector<uint8_t> init;std::string videoName,audioName;
++ std::vector<uint8_t> init;std::string videoName,audioName,codecs;
+  explicit State(std::unique_ptr<Input> value):input(std::move(value)){api();}
+  ~State(){if(format)api().avformat_close_input(&format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
+  bool stopped()const{return cancelled.load() || Clock::now()>deadline;}
+@@ -130,6 +130,23 @@ struct Output {
+  }
+ };
+ struct Packet {AVPacket* value=api().av_packet_alloc();~Packet(){if(value)api().av_packet_free(&value);}Packet(){if(!value)throw Failure("mkv_memory_limit");}};
++std::string codecDescription(const AVCodecParameters* p){
++ // RFC6381, using the same verified configuration copied into the MP4 muxer.
++ // Keep FFmpeg's existing avc1/hev1 sample entries and every media packet.
++ std::ostringstream out;out<<std::uppercase<<std::hex;
++ if(p->codec_id==AV_CODEC_ID_HEVC){
++  if(p->extradata_size<23 || p->extradata[0]!=1)throw Failure("mkv_invalid_hevc_configuration");const auto* b=p->extradata;
++  out<<"hev1.";int space=(b[1]>>6)&3;if(space)out<<char('A'+space-1);out<<std::dec<<int(b[1]&31)<<'.';uint32_t reversed=0;
++  for(int n=0;n<32;n++)reversed|=uint32_t((b[2+n/8]>>(7-n%8))&1)<<n;
++  out<<std::hex<<reversed<<'.'<<((b[1]&32)?'H':'L')<<std::dec<<int(b[12]);int last=11;while(last>=6 && b[last]==0)last--;
++  for(int n=6;n<=last;n++){out<<'.'<<std::hex;if(b[n]<16)out<<'0';out<<int(b[n]);}return out.str();
++ }
++ if(p->codec_id==AV_CODEC_ID_H264){if(p->extradata_size<4 || p->extradata[0]!=1)throw Failure("mkv_invalid_avc_configuration");out<<"avc1.";for(int n=1;n<4;n++){if(p->extradata[n]<16)out<<'0';out<<int(p->extradata[n]);}return out.str();}
++ if(p->codec_id==AV_CODEC_ID_EAC3)return "ec-3";if(p->codec_id==AV_CODEC_ID_AC3)return "ac-3";
++ if(p->codec_id==AV_CODEC_ID_MP3)return p->sample_rate>24000?"mp4a.6B":"mp4a.69";
++ if(p->codec_id==AV_CODEC_ID_AAC){if(p->extradata_size<2)throw Failure("mkv_invalid_aac_configuration");int type=p->extradata[0]>>3;if(type==31)type=32+((p->extradata[0]&7)<<3)+(p->extradata[1]>>5);if(!type)throw Failure("mkv_invalid_aac_configuration");return "mp4a.40."+std::to_string(type);}
++ throw Failure("mkv_unsupported_codec_description");
++}
+ int select(AVFormatContext* f,AVMediaType kind){
+  int first=-1,defaultIndex=-1,count=0,defaults=0;
+  for(unsigned n=0;n<f->nb_streams;n++){auto* s=f->streams[n];if(s->codecpar->codec_type!=kind || (s->disposition&AV_DISPOSITION_ATTACHED_PIC))continue;first=int(n);count++;if(s->disposition&AV_DISPOSITION_DEFAULT){defaultIndex=int(n);defaults++;}}
+@@ -189,7 +206,7 @@ void State::inspect(){
+   if(api().av_write_frame(out.format,nullptr)<0 || api().av_write_trailer(out.format)<0)throw Failure("mkv_audio_header_flush_failed");api().avio_flush(out.io);check();
+   if(out.failure)throw Failure(out.failure);size_t header=out.headerSize();init.assign(out.bytes.begin(),out.bytes.begin()+header);
+  }else init=out.bytes;
+- check();
++ codecs=codecDescription(out.format->streams[0]->codecpar);if(audio>=0)codecs+=","+codecDescription(out.format->streams[1]->codecpar);check();
+ }
+ std::vector<uint8_t> State::segment(int index){
+  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
+@@ -216,7 +233,7 @@ std::vector<uint8_t> State::segment(int index){
+  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
+ }
+ std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
+-std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
++std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
+ } // namespace InfinityMkv
+ #ifndef INFINITY_REMUX_HOST
+ namespace {
+diff --git a/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java b/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java
+index 5d20d087..723583e3 100644
+--- a/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java
++++ b/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java
+@@ -373,12 +373,15 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
+             if(requests.incrementAndGet()==1)InfinityCastDiagnostics.event("receiver_access","received",0);
+             if(converted) {
+                 boolean playlist=first[1].equals(URI.create(address()).getRawPath());
+-                byte[] data=playlist?remux.playlist(base()):remux.resource(first[1].substring((path+"/mkv/").length()));
+-                String type=playlist?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
+-                if(range!=null && !playlist){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
+-                if(from>to || from>=data.length){reply(output,416,type,0,"bytes */"+data.length);return;}
++                boolean media=first[1].equals(path+"/mkv/media.m3u8");String asset=playlist?"master":media?"media":first[1].endsWith("/init.mp4")?"init":"fragment";
++                byte[] data=playlist?remux.playlist(base()):media?remux.mediaPlaylist(base()):remux.resource(first[1].substring((path+"/mkv/").length()));
++                String type=playlist || media?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
++                if(range!=null && !playlist && !media){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
++                if(from>to || from>=data.length){reply(output,416,type,0,"bytes */"+data.length);InfinityCastDiagnostics.event("converted_http",asset+"_range_unsatisfied",416);return;}
++                boolean diagnostic=reportedKinds.add("converted:"+asset+":"+method+":"+code);
++                if(diagnostic)InfinityCastDiagnostics.event("converted_http",asset+(method.equals("HEAD")?"_head":"_get"),code);
+                 reply(output,code,type,to-from+1,code==206?"bytes "+from+"-"+to+"/"+data.length:null);
+-                if(method.equals("GET")){output.write(data,(int)from,(int)(to-from+1));delivered((int)(to-from+1));}return;
++                if(method.equals("GET")){try{output.write(data,(int)from,(int)(to-from+1));output.flush();delivered((int)(to-from+1));if(diagnostic)InfinityCastDiagnostics.event("converted_body",asset+"_written",(int)(to-from+1));}catch(IOException failed){InfinityCastDiagnostics.event("converted_body",asset+"_write_failed",0);throw failed;}}return;
+             }
+             boolean knownManifest=resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH || (resource==root && InfinityCastAdaptive.adaptive(mime));
+             response=open(resource,knownManifest?"GET":method,knownManifest?null:range);
+diff --git a/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java b/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java
+index 69a6ba9a..12e67b5e 100644
+--- a/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java
++++ b/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java
+@@ -24,6 +24,8 @@ final class InfinityCastRemux implements AutoCloseable {
+     private long[] starts;
+     private byte[] initialization;
+     private String video,audio;
++    private String codecs;
++    private byte[] master;
+     InfinityCastRemux(Input input) throws IOException {
+         this.input=input;InfinityCastRemuxNative.load();handle=InfinityCastRemuxNative.open(input);
+         if(handle==0)throw new IOException("mkv_native_context_unavailable");
+@@ -46,6 +48,9 @@ final class InfinityCastRemux implements AutoCloseable {
+                 starts=new long[times.length()];for(int n=0;n<starts.length;n++){starts[n]=times.getLong(n);if(starts[n]<0 || (n>0 && starts[n]<=starts[n-1]))throw new IOException("mkv_invalid_seek_index");}
+                 if(starts[0]!=0 || starts[starts.length-1]!=metadata.getLong("duration_us"))throw new IOException("mkv_unverified_timeline");
+                 initialization=InfinityCastRemuxNative.init(handle);if(initialization==null || initialization.length<16 || initialization.length>1048576)throw new IOException("mkv_init_limit");
++                codecs=metadata.optString("codecs","");
++                if(!codecs.matches("(avc1\\.[0-9A-F]{6}|hev1\\.[ABC]?[0-9]+\\.[0-9A-F]+\\.[LH][0-9]+(?:\\.[0-9A-F]{2}){0,6})(?:,(?:mp4a\\.(?:40\\.[0-9]+|69|6B)|ac-3|ec-3))?"))throw new IOException("mkv_invalid_codec_description");
++                if("hevc".equals(video)){String descriptor=codecs.split(",")[0];String[] fields=descriptor.split("\\.");InfinityCastDiagnostics.event("mkv_video_profile","hevc",Integer.parseInt(fields[1].replaceAll("[ABC]","")));InfinityCastDiagnostics.event("mkv_video_level",fields[3].startsWith("H")?"high_tier":"main_tier",Integer.parseInt(fields[3].substring(1)));}
+                 check();InfinityCastDiagnostics.event("mkv_inspection","stream_copy_ready",starts.length-1);
+             }catch(IOException e){throw failure(e);}catch(Exception e){throw new IOException("mkv_inspection_failed");}
+         }
+@@ -54,6 +59,20 @@ final class InfinityCastRemux implements AutoCloseable {
+     private void check() throws IOException{if(cancelled || handle==0)throw new IOException("mkv_cancelled");}
+     long durationMs(){return starts==null?0:starts[starts.length-1]/1000;}
+     byte[] playlist(String base) throws IOException {
++        synchronized(worker){
++            check();if(starts==null || codecs==null)throw new IOException("mkv_not_prepared");
++            if(master==null){
++                // Measured first-segment estimate for a single JIT rendition.
++                // Use the existing cache: the receiver's next request reuses it.
++                byte[] first=resource("0.m4s");long span=starts[1]-starts[0];
++                long rate=((first.length+(long)initialization.length)*8000000L+span-1)/span;
++                master=("#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-STREAM-INF:BANDWIDTH="+rate+",CODECS=\""+codecs+"\"\n"+base+"/mkv/media.m3u8\n").getBytes(StandardCharsets.UTF_8);
++                InfinityCastDiagnostics.event("mkv_manifest","explicit_codec_master",1);
++            }
++            return master;
++        }
++    }
++    byte[] mediaPlaylist(String base) throws IOException {
+         check();if(starts==null)throw new IOException("mkv_not_prepared");long largest=0;
+         for(int n=1;n<starts.length;n++)largest=Math.max(largest,starts[n]-starts[n-1]);
+         StringBuilder text=new StringBuilder("#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-PLAYLIST-TYPE:VOD\n#EXT-X-TARGETDURATION:").append((largest+999999)/1000000).append("\n#EXT-X-MEDIA-SEQUENCE:0\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-MAP:URI=\"").append(base).append("/mkv/init.mp4\"\n");
+@@ -76,7 +95,7 @@ final class InfinityCastRemux implements AutoCloseable {
+     void cancel(){cancelled=true;long current=handle;if(current!=0)InfinityCastRemuxNative.cancel(current);}
+     /** Relay invokes this only after every admitted probe/serve job retired. */
+     @Override public void close(){
+-        cancel();synchronized(worker){long current=handle;handle=0;if(current!=0)InfinityCastRemuxNative.close(current);input.close();fragments.clear();initialization=null;starts=null;}
++        cancel();synchronized(worker){long current=handle;handle=0;if(current!=0)InfinityCastRemuxNative.close(current);input.close();fragments.clear();initialization=null;starts=null;master=null;codecs=null;}
+         InfinityCastDiagnostics.event("mkv_context","retired",InfinityCastRemuxNative.active());
+     }
+ }

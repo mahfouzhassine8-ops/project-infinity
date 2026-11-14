@@ -1,0 +1,98 @@
+{
+  "accepted_pointer_updated": false,
+  "baseline_APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+  "baseline_versionCode": 2103498,
+  "candidate": {
+    "APK_sha256": "224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40",
+    "digest": "sha256:891c587de989319883ed453a7a2fcd583626a0436f363db62021aa3fa779c0dd",
+    "download": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43632329510/artifacts/14128448982",
+    "id": 14128448982,
+    "name": "Infinity498-HLS-OriginalSigned-43632329510-QA-Fold-Pending",
+    "run": 43632329510,
+    "size_in_bytes": 347909108,
+    "source": "ccc30a77e07c2cf0abc3800ea60f4a68dc6bd9a3",
+    "versionCode": 2103500,
+    "workflow_id": 397702717
+  },
+  "existing_signed499": {
+    "download": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43538975117/artifacts/14090254056",
+    "unchanged": true
+  },
+  "fix": [
+    "Existing native bridge publishes accurate muxer codec configuration",
+    "HLS master declares codecs; original media playlist and original media bytes retained",
+    "Converted-resource HTTP and completion diagnostics contain no original source URLs, headers or credentials"
+  ],
+  "installation": [
+    "Extract Infinity-2103500-Combined-Original-Signer.apk from its artifact ZIP and install normally as an update over498 or499; retain application data",
+    "Keep signed501 forward recovery; it installs over500 and restores exact498 functionality. Existing signed499 remains unchanged but is lower than500",
+    "Owner one physical session: provider movie to ONN TV, actual playback and seek/position, Return to Phone, Continue Watching and normal Exit/relaunch"
+  ],
+  "installation_test_source": "4cb645182b752a00a0e4a407e0cafe77d3091b20",
+  "minimal_source_diff": "MINIMAL-SOURCE.patch",
+  "minimal_source_diff_sha256": "e79c410ef245b6b98fb0e42dc31b5b397265809f07f0d1e8ebe9b0337ab1eadb",
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "owner_acceptance": "PENDING",
+  "package": "com.projectinfinity.kodi",
+  "production_changed_files": [
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java"
+  ],
+  "production_commit": "37c1000df277009fdc11071d333cd5511db7a210",
+  "protected": {
+    "Cobra_unchanged": true,
+    "Kodi_engine_unchanged": true,
+    "Movies_TV_Search_providers_tracking_networking_shutdown_unchanged": true,
+    "original_five_DEX_unchanged": true,
+    "other_Cast_SDK_and_UI_classes_unchanged": true,
+    "settings_profiles_databases_untouched": true
+  },
+  "recovery": {
+    "APK_sha256": "bf0760ad1db2b4ded892a836830231417b966913aae3e5db1d536d99b5a5ef14",
+    "digest": "sha256:fa989648c48f905193e9ada017f1b8558803ae783e423afed5e7940cfcde2575",
+    "download": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43633159266/artifacts/14128574247",
+    "id": 14128574247,
+    "name": "Infinity498-HLS-OriginalSigned-43633159266-QA-Fold-Pending",
+    "restores_exact_functional_baseline": 2103498,
+    "run": 43633159266,
+    "size_in_bytes": 347905664,
+    "source": "2b80aed5fbbd8c91789328a1c4948af067887a69",
+    "versionCode": 2103501,
+    "workflow_id": 397702717
+  },
+  "remaining_limitations": [
+    "Specific ONN receiver runtime/model and owner source codec profile were not available; no independent hardware decoding PASS",
+    "Public MPL reproduction proves a genuine sender compatibility defect, not that it is the only cause of the physical failure",
+    "API36 emulator lacks EAC3 decoder; no EAC3 HLS decode PASS claimed",
+    "Actual TV movie playback, seeking/Return to Phone and post-Cast normal shutdown await one owner acceptance session; shutdown unchanged"
+  ],
+  "root_cause_evidence": "ROOT-CAUSE.json",
+  "schema": 1,
+  "signatures": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "starting_checkpoint": "1d245cf9617c98023e9b26e66b1ec88e8b64adb1",
+  "status": "PASS_SELECTED_ENGINEERING_ORIGINAL_SIGNING_PRESERVATION_AND_ANDROID_INSTALL_PHYSICAL_ACCEPTANCE_PENDING",
+  "verification": {
+    "APK_payload_members_unchanged": 7772,
+    "Android_all_init_fragment_packet_bytes_timing_vs498": "PASS_BYTE_IDENTICAL",
+    "Android_complete_HTTP_type_range_CORS": "PASS",
+    "actual_Android_install_over_and_recovery": "PASS_STABLE_UID_DATADIR_FIRST_INSTALL_TIME",
+    "authority_review_run": 43632106779,
+    "cancellation": "PASS_PENDING_JNI_RANGE_READ_NATIVE_CONTEXTS0",
+    "focused_ARM64_Android_Google_MPL_run": 43630707565,
+    "install_over_run": 43633554181,
+    "original_signing_run": 43632329510,
+    "preparation_run": 43631621888,
+    "private_classes_changed": [
+      "InfinityCastRemux",
+      "InfinityCastRelay"
+    ],
+    "private_classes_unchanged": 1035,
+    "recovery_sign_run": 43633159266
+  },
+  "verified_mechanism": "Pinned public Google MPL selected AAC-only from bare498 HLS media playlist/fmp4 hint; actual HEVC/EAC3 initialization causes a SourceBuffer error for that type. Correct actual master declares RFC6381 codecs and MPL selects them."
+}

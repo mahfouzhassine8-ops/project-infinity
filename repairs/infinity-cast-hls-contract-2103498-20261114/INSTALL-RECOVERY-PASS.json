@@ -1,0 +1,62 @@
+{
+  "actual": {
+    "Fold_acceptance": "NOT_RUN",
+    "application_launch": false,
+    "application_startup": "NOT_SELECTED",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "data_preservation": "PackageManager retained UID, dataDir and firstInstallTime. No owner profile/database opened or modified.",
+    "data_reset": false,
+    "emulator_abis": "x86_64,arm64-v8a",
+    "forced_downgrade": false,
+    "playback": "OWNER_QA_AFTER_SIGNING",
+    "schema": 1,
+    "shutdown": "OWNER_QA_AFTER_SIGNING",
+    "source": "4cb645182b752a00a0e4a407e0cafe77d3091b20",
+    "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+    "steps": [
+      {
+        "APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+        "kind": "baseline",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-14 19:46:25",
+          "uid": "10216",
+          "versionCode": 2103498
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40",
+        "kind": "candidate",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-14 19:46:25",
+          "uid": "10216",
+          "versionCode": 2103500
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "bf0760ad1db2b4ded892a836830231417b966913aae3e5db1d536d99b5a5ef14",
+        "kind": "recovery",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-14 19:46:25",
+          "uid": "10216",
+          "versionCode": 2103501
+        },
+        "status": "PASS"
+      }
+    ],
+    "uninstall": false
+  },
+  "producer": {
+    "digest": "sha256:86f155c7be3a6e799c90fbae4ba2970e77e96f06d32cf8cfcb2c75ef21df53a6",
+    "id": 14128644681,
+    "name": "Infinity498-HLS-Install-Recovery-43633554181-NO-APK",
+    "run": 43633554181,
+    "size_in_bytes": 910,
+    "source": "4cb645182b752a00a0e4a407e0cafe77d3091b20",
+    "workflow_id": 393886994
+  }
+}
