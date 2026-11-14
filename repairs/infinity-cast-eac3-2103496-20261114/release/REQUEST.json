@@ -37,6 +37,15 @@
   },
   "owner_acceptance_after_signing": true,
   "parent_authority_sha256": "8d8c4539856157a74581443d71fddd548d91bb4386d788c5e99e548c460c72d0",
+  "prepared_producer": {
+    "digest": "sha256:1fe66034db5b8c6a16e283ad42e11739ac8896e8becf64fabb3af89f29639627",
+    "id": 14089792423,
+    "name": "Infinity496-Dolby-Prepared-43537064304-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43537064304,
+    "size_in_bytes": 1317824665,
+    "source": "6626b404624f5da48c9d6673f9c00b6e763382f2",
+    "workflow_id": 397702717
+  },
   "recovery": "Higher version restores exact signed496 payload; historical originals untouched.",
   "registry_parent_source": "e3cd32eb4fe3c50a8e1a744491e317acf45c46b5",
   "schema": 1,
@@ -48,6 +57,7 @@
     "repairs/infinity-cast-eac3-2103496-20261114/ANDROID-REQUEST.json": "90aa7f22efd112e0f859bcce6cc13bdc203a0fdb6ece143a0644545360585ee4",
     "repairs/infinity-cast-eac3-2103496-20261114/ENGINEERING-PRODUCER.json": "453d303b8fc1c3239f7c2dc556a10e06721cf59dff717b4c5a77799854040703",
     "repairs/infinity-cast-eac3-2103496-20261114/LOCAL-HOST-PASS.json": "347dad43f0019bc9ca60c391d4a351a78323be2d34ec83862d5648734f6cd793",
+    "repairs/infinity-cast-eac3-2103496-20261114/PREPARATION-PASS.json": "1108b4c838929f4a5de1fcb7398dc05cafcde7da615a561947eecfdcc4b7b266",
     "repairs/infinity-cast-eac3-2103496-20261114/ROOT-CAUSE.json": "58a711126bf9b6f661b5c09fd69e4db2b2f2ae3c94f57f17bebf55b203299467",
     "repairs/infinity-cast-eac3-2103496-20261114/SCOPE.json": "76899aefdc9db98df89f29b3d32a3ea525dc229f787f30b893924756e5c7c3cf",
     "repairs/infinity-cast-eac3-2103496-20261114/SOURCE-REVIEW.json": "1a42b3cbdff76638cd524c335647564b7cf9899eecb2a4357be50045580747f3",
