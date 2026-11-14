@@ -127,10 +127,10 @@ def prepare():
  olddex=out/'baseline-cast.dex'
  with ZipFile(base) as z:olddex.write_bytes(z.read(DEX))
  old_classes=class_rows(olddex,out,'old-cast');new_classes=class_rows(dex,out,'new-cast');olddex.unlink()
- c.require(set(old_classes)==set(new_classes) and len(old_classes)==1033,'NO_CAST_OR_SDK_CLASS_ADDITIONS_OR_REMOVALS')
+ c.require(set(old_classes)==set(new_classes) and len(old_classes)==1037,'NO_CAST_OR_SDK_CLASS_ADDITIONS_OR_REMOVALS')
  changed_classes=[n for n in old_classes if old_classes[n]['sha256']!=new_classes[n]['sha256']]
  for n in changed_classes:c.require(any(n==root+';' or n.startswith(root+'$') for root in ['Lcom/projectinfinity/kodi/InfinityCastRemux','Lcom/projectinfinity/kodi/InfinityCastRelay']),'OUTSIDE_TWO_CAST_SOURCE_CLASSES:'+n)
- c.save(out/'CLASS-PRESERVATION.json',dict(status='PASS_TWO_CAST_SOURCE_ROOTS_ONLY',changed=changed_classes,unchanged=len(old_classes)-len(changed_classes),total=1033))
+ c.save(out/'CLASS-PRESERVATION.json',dict(status='PASS_TWO_CAST_SOURCE_ROOTS_ONLY',changed=changed_classes,unchanged=len(old_classes)-len(changed_classes),total=1037))
  with ZipFile(base) as z:c.require(z.read('assets/infinity/cast/RESOURCE-IDENTITY.json')==(component/'RESOURCE-IDENTITY.json').read_bytes() and old.member_sha(z,'assets/infinity/cast/resources.apk')==c.sha(component/'resources.apk'),'CAST_UI_AND_SDK_RESOURCES_FROZEN')
  for kind,version in VERSIONS.items():
   dest=out/kind;dest.mkdir();components=dest/'components';components.mkdir();changes=updates(base,kind,native,dex,version);apk=dest/('Infinity-'+str(version)+'-UNSIGNED-NOT-INSTALLABLE.apk')
