@@ -1,0 +1,30 @@
+{
+  "FFmpeg": "6.0.1",
+  "actual_owner_stream_bytes_available": false,
+  "baseline_cpp_sha256": "e05ad4fc180e0d90f2d4b6a38445a66e5e46b9b1994a457961502d4685eee3a9",
+  "baseline_driver_exit": 1,
+  "baseline_failure": "Cannot write moov atom before EAC3 packets parsed. / mkv_mux_header_failed",
+  "diagnostic_ZIP_app_versionCode": 2103496,
+  "diagnostic_ZIP_sha256": "b4f9170bc02649ab49a65d328bd75111486e18de6bce09a402f94df84a57e76a",
+  "diagnostic_close_duration_ms": 25128,
+  "diagnostic_close_error": "native_admission: checkpoint_deadline_exceeded; owner proof incomplete",
+  "diagnostic_contains_Cast_events": false,
+  "diagnostic_current_inventory_PID": 23190,
+  "diagnostic_retained_close_PID": 13807,
+  "evidence_boundary": "Owner screenshot plus matching real codec/container reproduction proves local header preparation failure; it does not prove receiver codec playback or post-Cast shutdown success.",
+  "owner_screenshot": {
+    "audio": "eac3",
+    "body_bytes_written": 0,
+    "mkv_context_retired": 0,
+    "native_released": true,
+    "outcome": "mkv_mux_header_failed",
+    "session_released": true,
+    "stage": "relay",
+    "video": "hevc"
+  },
+  "schema": 1,
+  "shutdown_causation_by_Cast": "NOT_PROVEN; retained ItemQueries.db transaction evidence is not modified or bypassed",
+  "source_reference": "FFmpeg6.0.1 libavformat/movenc.c::mov_write_eac3_tag, mov_write_ac3_tag, handle_eac3; supported delay_moov flag",
+  "status": "REPRODUCED_SAME_496_FAILURE_BEFORE_EDIT",
+  "synthetic_source_sha256": "2eaffa93fb484c35f1c88c91c5301213230265832f76299235e8033c4537caed"
+}

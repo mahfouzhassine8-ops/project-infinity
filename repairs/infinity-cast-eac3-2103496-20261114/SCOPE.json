@@ -1,0 +1,42 @@
+{
+  "actual_failure": "Owner496 screenshot: receiver connected; source preparation; HEVC/EAC3 detected; mkv_mux_header_failed; body_bytes_written0; native/session released. No receiver LOAD stage reached.",
+  "all_original_Kodi_and_other_native_libraries_frozen": true,
+  "allowed_APK_member_changes": [
+    "lib/arm64-v8a/libinfinitycastremux.so",
+    "AndroidManifest.xml typed versionCode only",
+    "assets/experience-component-updates.properties Infinity version only"
+  ],
+  "baseline_APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+  "baseline_signing_source": "cf85829c860f96f0ca2e38d2c4ba485ae6ca32d6",
+  "baseline_versionCode": 2103496,
+  "branch": "work/infinity-cast-root-cause-from-2103496-20261114",
+  "classes6_DEX_frozen": true,
+  "new_diagnostic_APK": false,
+  "production_allowlist": {
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": "e05ad4fc180e0d90f2d4b6a38445a66e5e46b9b1994a457961502d4685eee3a9"
+  },
+  "protected": [
+    "Cobra",
+    "shutdown and persistence/SQLite guards",
+    "native Kodi engine",
+    "Movies/TV and Infinity Movies/TV",
+    "Search/providers",
+    "tracking/resume/Watchlist/Trakt",
+    "skin/navigation/UI",
+    "network settings",
+    "user data/profiles/accounts/settings"
+  ],
+  "release_registry": "Reconcile current authority after engineering; no version reserved",
+  "root_cause": "FFmpeg6 MP4 AC3/EAC3 configuration boxes require actual audio packets.496 requests empty_moov before feeding audio, so avformat_write_header fails. Exact HEVC/EAC3 fixture reproduces the same code; no app-ID/DIAL change justified.",
+  "schema": 1,
+  "shutdown_changes_authorized": false,
+  "smallest_correction": "Use supported delayed MP4 header generation only for packet-derived Dolby audio configuration; feed real source audio, retain complete stream-copy/timing/security/cancellation protections. No transcode, guessed codec config or format mislabel.",
+  "tests_selected": [
+    "Reproduce exact HEVC/EAC3 header failure against unchanged496 native source",
+    "Real pinned FFmpeg6 AC3/EAC3 header generation, encoded/decoded quality, A/V timeline, indexed seeking and malformed/config-change refusal",
+    "Affected H264/HEVC AAC stream-copy regressions only",
+    "Actual ARM64 Cast bridge compilation/linkage against exact signed496 existing engine",
+    "Android actual JNI/EC3 header and authenticated HLS segment delivery, source timestamps and cancellation; real TV codec playback remains owner acceptance",
+    "Original-key signing, exact496 member preservation, install-over and higher forward recovery only; no application shutdown test"
+  ]
+}
