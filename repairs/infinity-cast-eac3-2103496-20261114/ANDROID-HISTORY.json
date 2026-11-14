@@ -1,0 +1,30 @@
+{
+  "historical_failures_preserved": [
+    {
+      "engine_changed": false,
+      "evidence": "ARM translation SIGSEGV talloc_lib_init; new Cast JNI not loaded",
+      "owner_device_implication": "Not established",
+      "result": "FAIL_BEFORE_CAST",
+      "run": 43533970881,
+      "source": "5f33602786c66cfd588b59dbaa4c283fc0ba3e14",
+      "stage": "CI loader dlopen unchanged signed496 libkodi.so"
+    },
+    {
+      "correction": "Cancel pending JNI authenticated Range read during initial prepare; prove native context active, retain4second retirement bound and zero-context assertion.",
+      "failure": "Test expected a network read when requesting first fragment after tiny4second file had been buffered. No pending read established; did not demonstrate cancellation failure.",
+      "passed": [
+        "Actual original ARM64 engine load",
+        "Dolby JNI configuration and HLS segments",
+        "96 video and126 audio encoded packet hashes unchanged",
+        "Every packet source PTS within original2ms"
+      ],
+      "result": "FAIL_TEST_CANCELLATION_STALL_NOT_ESTABLISHED",
+      "run": 43535136212,
+      "source": "5f33602786c66cfd588b59dbaa4c283fc0ba3e14"
+    }
+  ],
+  "production_source": "ce21629528db63806fa0598278f4d531b349492a",
+  "real_TV_codec_playback": "NOT_TESTED; API36 emulator reports no EAC3 decoder. Host decoded video/audio bit-identically; real receiver acceptance remains owner.",
+  "schema": 1,
+  "shutdown": "NOT_SELECTED_NO_CHANGE"
+}

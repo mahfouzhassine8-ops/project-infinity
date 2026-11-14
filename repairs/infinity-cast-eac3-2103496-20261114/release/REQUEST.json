@@ -1,0 +1,69 @@
+{
+  "APK_versions_provisional": {
+    "candidate": 2103498,
+    "recovery": 2103499
+  },
+  "accepted_pointer_updated": false,
+  "active_kind": "candidate",
+  "baseline_APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+  "inputs": {
+    "android": {
+      "digest": "sha256:75a3a61cabfb7de140433397241c53c83a7922b3d2d7dda2b1949280511ac0ca",
+      "id": 14089567106,
+      "name": "Infinity496-Dolby-Android-Component-43536250363-NOT-AN-INSTALLER",
+      "run": 43536250363,
+      "size_in_bytes": 1991265,
+      "source": "eccf76ba82a1b0c5864c678be5965ec6cabb4156",
+      "workflow_id": 393886994
+    },
+    "baseline": {
+      "digest": "sha256:bbd8d526976ce54610c7f9f587a42b5d801f48f85da93a7f7465e733ea0e4dfb",
+      "id": 14010547149,
+      "name": "Infinity94-MKV-OriginalSigned-43366259258-QA-Fold-Pending",
+      "run": 43366259258,
+      "size_in_bytes": 347903186,
+      "source": "cf85829c860f96f0ca2e38d2c4ba485ae6ca32d6",
+      "workflow_id": 397702717
+    },
+    "owners": {
+      "digest": "sha256:e3d7ce71a9cfc0471c37a8addc90eb7a08066fee61050a746434675b715eb209",
+      "id": 14009573772,
+      "name": "Infinity94-MKV-Prepared-43365336147-UNSIGNED-NOT-INSTALLABLE",
+      "run": 43365336147,
+      "size_in_bytes": 1317657547,
+      "source": "9298cda8b0969d9932c81d3adae80915653d1b71",
+      "workflow_id": 397702717
+    }
+  },
+  "owner_acceptance_after_signing": true,
+  "parent_authority_sha256": "8d8c4539856157a74581443d71fddd548d91bb4386d788c5e99e548c460c72d0",
+  "recovery": "Higher version restores exact signed496 payload; historical originals untouched.",
+  "registry_parent_source": "e3cd32eb4fe3c50a8e1a744491e317acf45c46b5",
+  "schema": 1,
+  "source_bindings": {
+    ".github/workflows/infinity-saved-navigation-android.yml": "0187d06b0acc6b37c9695fc0dfeff7cd4cd097f38587ed9b6be7f3ca1565bb02",
+    "repairs/infinity-cast-eac3-2103496-20261114/.gitignore": "32dae3052f331ee34d628ef535709b301259a45df7c7522c4d35dcf49873f00b",
+    "repairs/infinity-cast-eac3-2103496-20261114/ANDROID-HISTORY.json": "cfb59ea2bbdca462ff585ba332e2e5ec4476aadd093e0c7a5c8a1fb471c3d162",
+    "repairs/infinity-cast-eac3-2103496-20261114/ANDROID-PASS.json": "950a3d441ede0a68b5d8e4b571becd10c4cd83d21e7fd79a42088f8a681413a2",
+    "repairs/infinity-cast-eac3-2103496-20261114/ANDROID-REQUEST.json": "90aa7f22efd112e0f859bcce6cc13bdc203a0fdb6ece143a0644545360585ee4",
+    "repairs/infinity-cast-eac3-2103496-20261114/ENGINEERING-PRODUCER.json": "453d303b8fc1c3239f7c2dc556a10e06721cf59dff717b4c5a77799854040703",
+    "repairs/infinity-cast-eac3-2103496-20261114/LOCAL-HOST-PASS.json": "347dad43f0019bc9ca60c391d4a351a78323be2d34ec83862d5648734f6cd793",
+    "repairs/infinity-cast-eac3-2103496-20261114/ROOT-CAUSE.json": "58a711126bf9b6f661b5c09fd69e4db2b2f2ae3c94f57f17bebf55b203299467",
+    "repairs/infinity-cast-eac3-2103496-20261114/SCOPE.json": "76899aefdc9db98df89f29b3d32a3ea525dc229f787f30b893924756e5c7c3cf",
+    "repairs/infinity-cast-eac3-2103496-20261114/SOURCE-REVIEW.json": "1a42b3cbdff76638cd524c335647564b7cf9899eecb2a4357be50045580747f3",
+    "repairs/infinity-cast-eac3-2103496-20261114/audit_component.py": "05ba74d19f08db9e911b31a1ed9d8d4c9aa11cf03931d89d16f8e199161142b8",
+    "repairs/infinity-cast-eac3-2103496-20261114/build.py": "cd2f56aaf519074710613bee46256bae0219aa2aab437c2068880d36bed94edd",
+    "repairs/infinity-cast-eac3-2103496-20261114/build_component.py": "b5462e0399fe835d52789053ab7d907b22beaa7c120f1a2a85a62f99c5f7c621",
+    "repairs/infinity-cast-eac3-2103496-20261114/build_probe.py": "0a0a1d2ea3c9d42d56f1d6c092446231e8ca12323cbd4e1cf251edcf96622da6",
+    "repairs/infinity-cast-eac3-2103496-20261114/prepare_android.py": "11ead80936d990ce7c372adf43463188f2bcbc2125ff58700d78f44fa19b41bf",
+    "repairs/infinity-cast-eac3-2103496-20261114/release/gate.py": "2c7e165787eaadce49e5750214296699b11bd789608b4ea1999c7c84037c5e3e",
+    "repairs/infinity-cast-eac3-2103496-20261114/release/verify_install.py": "f321fdcd6cfa3cf6d328b75ecc90d0f5977623892477b39f051f425e3f90aa99",
+    "repairs/infinity-cast-eac3-2103496-20261114/run_probe.py": "12ae316b7cd343ac6d778dabb7b5041e3a8ba936471b663843542dd785b87e2d",
+    "repairs/infinity-cast-eac3-2103496-20261114/tests/android/InfinityCastProbeActivity.java": "cc387308c8217c3ac666667d3ec7c5079503aeda893bb20ca1c82d583dfdce8f",
+    "repairs/infinity-cast-eac3-2103496-20261114/tests/android/MkvHlsPlayerProbe.java": "4c6e0bd28bb14eed3683b34c4e9c4d9bf3506ef60564fdb2ab3af84bb7086b0c",
+    "repairs/infinity-cast-eac3-2103496-20261114/tests/android/loader.cpp": "3e47812cebf151ee1162a7841f3f5a3e33667963bee6983753ee004381b38347",
+    "repairs/infinity-cast-eac3-2103496-20261114/tests/test_dolby.py": "9ef84a01c7b2c57073e7d6dc3e1e07d3beb951467e727ec2c43b8123086467c6",
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": "97ead734c3d9cfbc16fe7650c2169678f41e00499562565355dc14f4b3c91c6b"
+  },
+  "workflow_sha256": "02f572eca53d362fcf61150c160ba9309e364a14a8898a59b50d647d000330ed"
+}

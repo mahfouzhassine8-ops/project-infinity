@@ -1,0 +1,39 @@
+{
+  "Dolby_output": "Encoded packets and decoded frames/PCM identical, original source timing, all channels retained",
+  "existing_engine_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+  "host_job": 132256476256,
+  "inputs": {
+    "host": {
+      "digest": "sha256:d53c02a2be8283add41c7fb480420697608f999b644bdfaba4fd22c0721d44d6",
+      "id": 14088122523,
+      "name": "Infinity496-Dolby-host-43533424543-NOT-INSTALLABLE",
+      "run": 43533424543,
+      "size_in_bytes": 3636603,
+      "source": "ce21629528db63806fa0598278f4d531b349492a",
+      "workflow_id": 393886994
+    },
+    "native": {
+      "digest": "sha256:8a8f1554f6bf0bbed3604830b72aada2935ba77854e30b4d18fddd58cb34f2e4",
+      "id": 14088691831,
+      "name": "Infinity496-Dolby-native-43533424543-NOT-INSTALLABLE",
+      "run": 43533424543,
+      "size_in_bytes": 79781,
+      "source": "ce21629528db63806fa0598278f4d531b349492a",
+      "workflow_id": 393886994
+    }
+  },
+  "native_job": 132256476003,
+  "new_library_sha256": "39d571773f536271320f270a7f0c26c68849285ca29ed7555fbd5d96c83bed64",
+  "no_transcoding": true,
+  "original_AAC_output": "BYTE_IDENTICAL_TO_496",
+  "physical_TV": "NOT_TESTED",
+  "run": 43533424543,
+  "schema": 1,
+  "shutdown": "NOT_SELECTED",
+  "source": "ce21629528db63806fa0598278f4d531b349492a",
+  "status": "PASS_ACTUAL_ARM64_AND_REAL_FFMPEG_DOLBY_STREAM_COPY",
+  "tests": {
+    "existing_AAC": 18,
+    "new_Dolby": 40
+  }
+}

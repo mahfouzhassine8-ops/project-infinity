@@ -1,0 +1,33 @@
+{
+  "baseline_versionCode": 2103496,
+  "mechanism": [
+    "Use existing FFmpeg6 delay_moov only for packet-derived AC3/EAC3 configuration",
+    "Use existing public av_ac3_parse_header to reject malformed audio before output; export verified in original engine",
+    "Bootstrap real source audio into isolated muxer; discard bootstrap media and context",
+    "Generate each segment with fresh muxer, preserve every original packet and timestamp, reject changed init",
+    "Unchanged AAC and MP3 immediate-header code; AAC fixture outputs byte-identical to496"
+  ],
+  "native_source_sha256": "97ead734c3d9cfbc16fe7650c2169678f41e00499562565355dc14f4b3c91c6b",
+  "not_claimed": [
+    "Physical receiver codec support",
+    "Physical TV playback",
+    "Phone handback acceptance",
+    "Post-Cast shutdown acceptance"
+  ],
+  "production_change": "One existing Cast-owned C++ file only",
+  "resource_review": [
+    "All bootstrap and per-segment state RAII-owned; no new threads, persistent files or databases",
+    "FFmpeg avformat_free_context invokes mov deinit; releases packet-derived Dolby configuration",
+    "Existing deadline, read/fragment/init limits, cancellation and zero-context retirement retained"
+  ],
+  "schema": 1,
+  "untouched": [
+    "All Cast Java/DEX and UI",
+    "All Kodi native engine and non-Cast libraries",
+    "Cobra",
+    "Shutdown/persistence/SQLite rules",
+    "Providers/Search",
+    "Movies/TV/tracking/resume",
+    "Settings/profiles/data"
+  ]
+}

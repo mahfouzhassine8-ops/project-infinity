@@ -1,0 +1,58 @@
+{
+  "actual": {
+    "API": 36,
+    "Dolby_header_and_media_delivery": true,
+    "EAC3_decoder_available": false,
+    "HLS": {
+      "actual_Android_HLS_playback": false,
+      "reason": "No EAC3 decoder in test environment; actual TV codec playback pending"
+    },
+    "Kodi_player_handback": "NOT_TESTED",
+    "TV_receiver": "NOT_TESTED",
+    "actual_Android_output_packet_proof": {
+      "audio": {
+        "encoded_bytes_identical": true,
+        "max_source_pts_error_seconds": 8.881784197001252e-16,
+        "packets": 126
+      },
+      "video": {
+        "encoded_bytes_identical": true,
+        "max_source_pts_error_seconds": 4.440892098500626e-16,
+        "packets": 96
+      }
+    },
+    "authenticated_ranges": true,
+    "baseline_versionCode": 2103496,
+    "cancellation": true,
+    "cancellation_stage": "pending_JNI_authenticated_Range_read_during_prepare",
+    "exact_packet_quality_timing": true,
+    "existing_original_engine": true,
+    "fMP4": {
+      "MediaExtractor_relative_start_us": 82000,
+      "audio_samples": 126,
+      "real_MP4_packet_clock": "CHECKED_BY_WRAPPER",
+      "video_samples": 96
+    },
+    "native_contexts_after_close": 0,
+    "new_ARM64_JNI": true,
+    "original_APK_modified": false,
+    "owner_device": "NOT_TESTED",
+    "pass": true,
+    "random_segment_seeking": true,
+    "real_Dolby_configuration": true,
+    "scope": "Actual original496 ARM64 FFmpeg via Cast JNI, private authenticated relay, every output packet timing/quality, actual Dolby header/segments; playback/seek when EAC3 decoder available and cancellation. Separate CI package only.",
+    "shutdown": "NOT_SELECTED",
+    "stream_copy_not_transcode": true
+  },
+  "producer": {
+    "digest": "sha256:75a3a61cabfb7de140433397241c53c83a7922b3d2d7dda2b1949280511ac0ca",
+    "id": 14089567106,
+    "name": "Infinity496-Dolby-Android-Component-43536250363-NOT-AN-INSTALLER",
+    "run": 43536250363,
+    "size_in_bytes": 1991265,
+    "source": "eccf76ba82a1b0c5864c678be5965ec6cabb4156",
+    "workflow_id": 393886994
+  },
+  "schema": 1,
+  "status": "PASS_REAL_ARM64_DOLBY_HEADER_DELIVERY_PACKET_TIMING_AND_CANCELLATION"
+}
