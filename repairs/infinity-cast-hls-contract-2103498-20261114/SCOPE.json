@@ -1,0 +1,32 @@
+{
+  "all_original_provider_and_UI_sources_frozen": true,
+  "all_other_DEX_frozen": true,
+  "allowed_APK_member_changes": [
+    "classes6.dex Cast-owned classes only",
+    "AndroidManifest.xml typed versionCode only",
+    "assets/experience-component-updates.properties Infinity version only"
+  ],
+  "baseline_APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+  "baseline_signing_source": "80aef0a13b2390076d263435b4a98ee497ecf0d4",
+  "baseline_versionCode": 2103498,
+  "branch": "work/infinity-cast-root-cause-from-2103496-20261114",
+  "native_engine_and_all_native_libraries_frozen": true,
+  "not_claimed": [
+    "Actual ONN codec support or exact owner source profile; unavailable",
+    "Physical TV decoded frames or physical shutdown acceptance"
+  ],
+  "production_allowlist": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "6bf64af562cb09fce327b20d2355bb3032d84dda42c3d33a4205fa52adba2699",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "ef9a1d3af38cdfc7f28af7de6eb3a309d63b842183fa001f57ab689055639aad"
+  },
+  "schema": 1,
+  "shutdown_selected": false,
+  "starting_checkpoint": "1d245cf9617c98023e9b26e66b1ec88e8b64adb1",
+  "tests_selected": [
+    "Read-only498 HLS/fMP4 structure and complete converted HTTP responses/ranges",
+    "Pinned public Google MPL parser before/after actual codec declaration; no receiver code shipped",
+    "Codec declaration parsed from actual MP4 initialization, malformed/unsupported refusal",
+    "Real ARM64 existing JNI authenticated relay and exact media packet/timestamp preservation with new master/media routing and cancellation",
+    "Original signature, source/APK member preservation and normal install-over/forward recovery only"
+  ]
+}
