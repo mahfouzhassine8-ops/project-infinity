@@ -50,10 +50,17 @@ public final class InfinityCastProbeActivity extends Activity {
   result.put("EAC3_decoder_available",decoder);
   if(decoder)result.put("HLS",MkvHlsPlayerProbe.play(this,relay.address(),relay.durationMs()));
   else result.put("HLS",new JSONObject().put("actual_Android_HLS_playback",false).put("reason","No EAC3 decoder in test environment; actual TV codec playback pending"));check(!origin.privateFailure,"provider_auth_preserved_only_phone_side");retire(relay);relay=null;
-  stage="conversion_cancellation";relay=start(origin);origin.stallRanges=true;
-  // New transfer has a fresh capability. Derive its own first segment URL.
-  String next=new String(body(relay.address()),StandardCharsets.UTF_8);String target=null;for(String l:next.split("\n"))if(l.startsWith("http")){target=l;break;}
-  final String fetch=target;Thread requester=new Thread(()->{try{body(fetch);}catch(Exception cancelledFetch){}},"CancelledReceiver");requester.start();check(origin.stalled.await(5,TimeUnit.SECONDS),"actual_pending_native_HTTP_read");retire(relay);relay=null;origin.release.countDown();requester.join(3000);check(!requester.isAlive(),"receiver_request_retired");
+  stage="conversion_cancellation";origin.stallRanges=true;
+  // Cancel a demonstrably pending JNI input read during preparation. A completed
+  // four-second fixture can be buffered by FFmpeg; requesting its first segment
+  // after prepare() does not guarantee a network read and is not a valid stall.
+  // Only RemuxInput issues Range requests; HEAD/format sniff remain unstalled.
+  CountDownLatch cancelledCallback=new CountDownLatch(1);AtomicReference<String> cancelledFailure=new AtomicReference<>();
+  InfinityCastSource cancelSource=InfinityCastSource.parse(origin.address()+"|Authorization=Bearer%20fixture&Cookie=session%3Dfixture&User-Agent=ExistingPlayer%2F1");
+  relay=InfinityCastRelay.start(InetAddress.getByName("127.0.0.1"),cancelSource,(owner,mime,error)->{cancelledFailure.set(error);cancelledCallback.countDown();});
+  check(origin.stalled.await(5,TimeUnit.SECONDS),"actual_pending_native_HTTP_read");check(InfinityCastRemuxNative.active()==1,"pending_native_context_owned");
+  retire(relay);relay=null;check(cancelledCallback.await(1,TimeUnit.SECONDS) && cancelledFailure.get()!=null,"cancelled_prepare_reports_failure");origin.release.countDown();
+  result.put("cancellation_stage","pending_JNI_authenticated_Range_read_during_prepare");
   result.put("pass",true).put("baseline_versionCode",2103496).put("existing_original_engine",true).put("new_ARM64_JNI",true).put("stream_copy_not_transcode",true).put("Dolby_header_and_media_delivery",true).put("authenticated_ranges",true).put("random_segment_seeking",true).put("native_contexts_after_close",InfinityCastRemuxNative.active()).put("cancellation",true).put("TV_receiver","NOT_TESTED").put("Kodi_player_handback","NOT_TESTED").put("shutdown","NOT_SELECTED");
  }catch(Throwable failure){try{result.put("pass",false).put("stage",stage).put("reason",failure.getMessage()==null?failure.getClass().getSimpleName():failure.getMessage());}catch(Exception ignored){}}
  finally{if(relay!=null)relay.close();if(origin!=null)origin.close();try{result.put("API",Build.VERSION.SDK_INT);}catch(Exception ignored){}android.util.Log.i("InfinityCastProbe",result.toString());}}
