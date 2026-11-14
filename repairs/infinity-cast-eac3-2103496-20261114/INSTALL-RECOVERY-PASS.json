@@ -1,0 +1,62 @@
+{
+  "actual": {
+    "Fold_acceptance": "NOT_RUN",
+    "application_launch": false,
+    "application_startup": "NOT_SELECTED",
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "data_preservation": "PackageManager retained UID, dataDir and firstInstallTime. No owner profile/database opened or modified.",
+    "data_reset": false,
+    "emulator_abis": "x86_64,arm64-v8a",
+    "forced_downgrade": false,
+    "playback": "OWNER_QA_AFTER_SIGNING",
+    "schema": 1,
+    "shutdown": "OWNER_QA_AFTER_SIGNING",
+    "source": "246a3d5eb1861df4b3fed534b620f6dea5c76036",
+    "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+    "steps": [
+      {
+        "APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+        "kind": "baseline",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-14 01:19:08",
+          "uid": "10216",
+          "versionCode": 2103496
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+        "kind": "candidate",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-14 01:19:08",
+          "uid": "10216",
+          "versionCode": 2103498
+        },
+        "status": "PASS"
+      },
+      {
+        "APK_sha256": "ce2ff86ba689d673bbc979a40a80461b2a1c8efcce13e3b28f65a3ee3337044e",
+        "kind": "recovery",
+        "package": {
+          "dataDir": "/data/user/0/com.projectinfinity.kodi",
+          "firstInstallTime": "2026-11-14 01:19:08",
+          "uid": "10216",
+          "versionCode": 2103499
+        },
+        "status": "PASS"
+      }
+    ],
+    "uninstall": false
+  },
+  "producer": {
+    "digest": "sha256:b60113b7b58acbfbbbfb076e9fa57a1216c8bc750a19a4a286e3669586d7c916",
+    "id": 14091900373,
+    "name": "Infinity496-Dolby-Install-Recovery-43539469581-NO-APK",
+    "run": 43539469581,
+    "size_in_bytes": 908,
+    "source": "246a3d5eb1861df4b3fed534b620f6dea5c76036",
+    "workflow_id": 393886994
+  }
+}

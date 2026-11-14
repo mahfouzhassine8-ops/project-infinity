@@ -1,0 +1,93 @@
+{
+  "accepted_pointer_updated": false,
+  "baseline_APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+  "candidate": {
+    "APK_sha256": "2fd158bbdd26d47f4204c8c474f15c9ca69cfef00fcecdb62c866b42559d3004",
+    "digest": "sha256:113a8ebd8299d555dbd2313dd76be71eeab20e3ea1892ce5a342bb8bf08dd137",
+    "download": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43538121392/artifacts/14091080152",
+    "id": 14091080152,
+    "name": "Infinity496-Dolby-OriginalSigned-43538121392-QA-Fold-Pending",
+    "run": 43538121392,
+    "size_in_bytes": 347905804,
+    "source": "80aef0a13b2390076d263435b4a98ee497ecf0d4",
+    "versionCode": 2103498,
+    "workflow_id": 397702717
+  },
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "development_baseline": 2103496,
+  "engineering": {
+    "ARM64_and_host_run": 43533424543,
+    "Android_cancel": "PASS_PENDING_AUTHENTICATED_JNI_RANGE_READ_RETIRED_NATIVE_CONTEXTS0",
+    "Android_packet_bytes_and_timing": "PASS_EVERY_PACKET_UNCHANGED_WITHIN_ORIGINAL_2MS",
+    "Dolby_cases": 40,
+    "actual_Android_JNI_delivery_cancel_run": 43536250363,
+    "actual_Android_install_over_and_recovery": "PASS_PACKAGE_MANAGER_STABLE_UID_DATADIR_FIRST_INSTALL_TIME",
+    "candidate_sign_run": 43538121392,
+    "existing_AAC_cases": 18,
+    "install_over_and_forward_recovery_run": 43539469581,
+    "recovery_sign_run": 43538975117
+  },
+  "install_report": "INSTALL-RECOVERY-PASS.json",
+  "installation": [
+    "Download candidate artifact ZIP, extract Infinity-2103498-Combined-Original-Signer.apk, install normally over2103496; no uninstall/data clear",
+    "Keep2103499 forward recovery; installing it normally restores496 functionality without a version downgrade",
+    "Owner one acceptance session: actual provider movie to TV, position/pause/seek, Return to Phone, Continue Watching and normal Exit/relaunch"
+  ],
+  "installation_test_source": "246a3d5eb1861df4b3fed534b620f6dea5c76036",
+  "original_v1_v2_v3_signatures": true,
+  "owner_acceptance_required": true,
+  "package": "com.projectinfinity.kodi",
+  "physical_Fold_acceptance": "PENDING_OWNER",
+  "preservation": {
+    "Cobra_changed": false,
+    "added_or_removed_APK_members": [],
+    "all_six_DEX_unchanged": true,
+    "candidate_changed_members": [
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties",
+      "lib/arm64-v8a/libinfinitycastremux.so"
+    ],
+    "candidate_unchanged_members": 7773,
+    "original_Kodi_engine_and_nonCast_libraries_unchanged": true,
+    "providers_Search_Movies_TV_tracking_settings_profiles_changed": false,
+    "recovery_changed_members": [
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties"
+    ],
+    "recovery_unchanged_members": 7774,
+    "shutdown_changed": false
+  },
+  "production_files": {
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": [
+      "Api existing-FFmpeg public parser binding",
+      "validateDolby packet validation",
+      "Output.begin Dolby-only delay_moov",
+      "Output.headerSize real bounded FFmpeg box extraction",
+      "State.inspect isolated packet-derived bootstrap",
+      "State.segment preserve packet stream-copy and verify stable initialization"
+    ]
+  },
+  "recovery": {
+    "APK_sha256": "ce2ff86ba689d673bbc979a40a80461b2a1c8efcce13e3b28f65a3ee3337044e",
+    "digest": "sha256:09d867041a27819c9b91f73d9fdcc22bfa9d16ed25f9d8b6a62777ca6ee39b84",
+    "download": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43538975117/artifacts/14090254056",
+    "id": 14090254056,
+    "name": "Infinity496-Dolby-OriginalSigned-43538975117-QA-Fold-Pending",
+    "restores_exact_functional_baseline": 2103496,
+    "run": 43538975117,
+    "size_in_bytes": 347902936,
+    "source": "8657528e1cc92542f825aa379b3c7bf809548b18",
+    "versionCode": 2103499,
+    "workflow_id": 397702717
+  },
+  "remaining_limitations": [
+    "Physical receiver HEVC/EAC3 decoding and actual movie playback require owner acceptance",
+    "API36 emulator has no EAC3 decoder; no Android HLS decode PASS claimed",
+    "Return to Phone and post-Cast normal shutdown not executed; shutdown engine unchanged",
+    "Historical first emulator bridge crash before Cast remains recorded in ANDROID-HISTORY.json; later identical engine loaded and actual corrected JNI checks passed",
+    "Raw owner source stream bytes were not available; matching failure reproduced with source-verified HEVC/EAC3 fixtures"
+  ],
+  "root_cause": "FFmpeg6 requires real AC3/EAC3 packets before producing dac3/dec3 MP4 configuration;496 tried empty_moov too early and failed before receiver LOAD.",
+  "schema": 1,
+  "status": "PASS_SIGNED_CAST_ONLY_QA_AND_MATCHING_FORWARD_RECOVERY_ENGINEERING_GATES_PHYSICAL_ACCEPTANCE_PENDING"
+}
