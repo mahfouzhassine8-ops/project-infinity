@@ -2,6 +2,7 @@
   "all_original_provider_and_UI_sources_frozen": true,
   "all_other_DEX_frozen": true,
   "allowed_APK_member_changes": [
+    "lib/arm64-v8a/libinfinitycastremux.so Cast metadata only",
     "classes6.dex Cast-owned classes only",
     "AndroidManifest.xml typed versionCode only",
     "assets/experience-component-updates.properties Infinity version only"
@@ -10,12 +11,14 @@
   "baseline_signing_source": "80aef0a13b2390076d263435b4a98ee497ecf0d4",
   "baseline_versionCode": 2103498,
   "branch": "work/infinity-cast-root-cause-from-2103496-20261114",
-  "native_engine_and_all_native_libraries_frozen": true,
+  "native_engine_and_all_native_libraries_frozen": false,
+  "native_scope": "Only existing Cast bridge may change to publish RFC6381 metadata from its already verified codec parameters. Kodi and all other native libraries frozen.",
   "not_claimed": [
     "Actual ONN codec support or exact owner source profile; unavailable",
     "Physical TV decoded frames or physical shutdown acceptance"
   ],
   "production_allowlist": {
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": "97ead734c3d9cfbc16fe7650c2169678f41e00499562565355dc14f4b3c91c6b",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "6bf64af562cb09fce327b20d2355bb3032d84dda42c3d33a4205fa52adba2699",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "ef9a1d3af38cdfc7f28af7de6eb3a309d63b842183fa001f57ab689055639aad"
   },
