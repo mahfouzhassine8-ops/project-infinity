@@ -1,0 +1,131 @@
+{
+  "APK_changes": [
+    "classes6.dex (existing isolated Cast component only)",
+    "lib/arm64-v8a/libinfinitycastremux.so (new Cast-only bridge)",
+    "AndroidManifest.xml versionCode only",
+    "assets/experience-component-updates.properties Infinity version label only"
+  ],
+  "Cobra_or_shutdown_or_providers_or_skin_or_Command_Center_changed": false,
+  "accepted_pointer_updated": false,
+  "baseline_APK_sha256": "fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c",
+  "candidate": {
+    "APK_sha256": "17a9648070a6d2d1b670c3e550e905d75a99a7dc3f21692a56b8a69c6e9c7ebc",
+    "digest": "sha256:bbd8d526976ce54610c7f9f587a42b5d801f48f85da93a7f7465e733ea0e4dfb",
+    "id": 14010547149,
+    "name": "Infinity94-MKV-OriginalSigned-43366259258-QA-Fold-Pending",
+    "run": 43366259258,
+    "size_in_bytes": 347903186,
+    "source": "cf85829c860f96f0ca2e38d2c4ba485ae6ca32d6",
+    "workflow_id": 397702717
+  },
+  "data_migrations_or_profile_writes": false,
+  "development_baseline": 2103494,
+  "download_artifacts": {
+    "candidate": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43366259258/artifacts/14010547149",
+    "recovery": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43367090552/artifacts/14010458728"
+  },
+  "engineering": {
+    "ARM64_build_and_linkage": 43360795719,
+    "H264_HEVC_encoded_and_decoded_quality": 43360795719,
+    "actual_Android_HLS_play_seek_auth_cancellation": 43364496265,
+    "candidate_authority_review": 43365937378,
+    "candidate_original_signing": 43366259258,
+    "controller_contracts": 24,
+    "preservation_preparation": 43365336147,
+    "recovery_authority_review": 43366837184
+  },
+  "install_over_and_forward_recovery": {
+    "UID_dataDir_firstInstallTime_unchanged": true,
+    "owner_profile_not_read": true,
+    "producer": {
+      "digest": "sha256:3f78e6cde55fb5a29878833974a44fd95f5a4b8eb756b67d7878fb6147d8b687",
+      "id": 14011267176,
+      "name": "Infinity94-MKV-Install-Recovery-43367488710-NO-APK",
+      "run": 43367488710,
+      "size_in_bytes": 906,
+      "source": "fbc1d39ecfd60d455d2e2d360eb595af36fa4d77",
+      "workflow_id": 393886994
+    },
+    "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY"
+  },
+  "instructions": [
+    "Download the candidate artifact ZIP, extract Infinity-2103496-Combined-Original-Signer.apk and install over current Infinity. Do not uninstall or reset data.",
+    "One Fold acceptance: same compatible MKV -> Cast -> verify TV playback, position, controls -> Return to Phone -> Continue Watching -> normal Power/Exit and same-profile relaunch.",
+    "Only if recovery is needed, install Infinity-2103497-Combined-Original-Signer.apk over the candidate; restores exact2103494 functionality with a higher version code. Do not force a downgrade."
+  ],
+  "limitations": [
+    "The actual owner MKV source/codec bytes were not supplied; the real source is inspected at runtime before receiver load.",
+    "Video H264/HEVC; supported AAC/MP3/AC3/EAC3 audio is copied unchanged. No transcoding or DRM bypass. Receiver profile/codec compatibility varies.",
+    "One verified video and one verified/default audio track. Embedded subtitle/alternative track delivery is not implemented in this remux.",
+    "Consistent authenticated byte-range source and complete bounded cue index required. Open GOP, ambiguous tracks and unsupported codecs fail explicitly.",
+    "Per-fragment output capped at8MiB, two-fragment cache. Native/context and I/O cancellation are verified; physical post-Cast Kodi shutdown remains pending."
+  ],
+  "original_Kodi_engine_changed": false,
+  "original_Kodi_engine_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+  "original_five_DEX_or_other_existing_native_libraries_changed": false,
+  "physical_receiver_and_Kodi_phone_return_and_post_Cast_shutdown": "NOT_TESTED; ONE_OWNER_ACCEPTANCE_SESSION_AFTER_DELIVERY",
+  "production_source_files": [
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java"
+  ],
+  "recovery": {
+    "APK_sha256": "27153a4e861743c0f212a5bc8ccd76d6a9937ec99e9f40b2dc1155d3aa3ab6b2",
+    "digest": "sha256:ef36a5229bcb748d23bfa20932bc1d24de714b0eabef827c7f85cc4982c106cf",
+    "id": 14010458728,
+    "name": "Infinity94-MKV-OriginalSigned-43367090552-QA-Fold-Pending",
+    "run": 43367090552,
+    "size_in_bytes": 347817351,
+    "source": "ea2012a52581491bdac11830a15ebcb5009c05b4",
+    "workflow_id": 397702717
+  },
+  "schema": 1,
+  "signing_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "source_change_names": [
+    ".github/workflows/infinity-combined-release.yml",
+    ".github/workflows/infinity-saved-navigation-android.yml",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json",
+    "repairs/dual-experience-isolation-2103420/release-authority.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/.gitignore",
+    "repairs/infinity-cast-mkv-2103494-20261113/ANDROID-HISTORY.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/ANDROID-PASS.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/ANDROID-REQUEST.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/ANDROID-TIMESTAMP-ASSESSMENT.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/BASELINE.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/ENGINEERING-PRODUCER.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/LOCAL-STREAM-COPY-PASS.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/PREPARATION-PASS.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/SCOPE.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/SIGNED-CANDIDATE-PASS.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/SIGNED-RECOVERY-PASS.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/SOURCE-REVIEW.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/TIMELINE-CONTRACT.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/build.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/build_probe.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp",
+    "repairs/infinity-cast-mkv-2103494-20261113/prepare_android.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/release/REQUEST.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/release/SIGNED-QA-PAIR.json",
+    "repairs/infinity-cast-mkv-2103494-20261113/release/gate.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/release/verify_install.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/run_probe.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/android/InfinityCastProbeActivity.java",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/android/MkvHlsPlayerProbe.java",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/android/loader.cpp",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/native_driver.cpp",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/test_controller.py",
+    "repairs/infinity-cast-mkv-2103494-20261113/tests/test_native.py",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/audit_sdk_component.py",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/build_sdk_component.py",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDiagnostics.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java"
+  ],
+  "status": "ORIGINAL_SIGNED_QA_PAIR_ENGINEERING_GATES_PASS_OWNER_ACCEPTANCE_PENDING",
+  "v1_v2_v3_original_signatures": true
+}
