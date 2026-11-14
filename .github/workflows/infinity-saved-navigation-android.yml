@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, movies-cast-mkv-engineering, movies-cast-mkv-android, movies-cast-sdk, movies-cast-install, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
+        options: [select-a-feature, cast96-dolby-engineering, cast96-dolby-android, cast96-dolby-install, movies-cast-mkv-engineering, movies-cast-mkv-android, movies-cast-sdk, movies-cast-install, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -1812,7 +1812,7 @@ jobs:
           retention-days: 90
           if-no-files-found: error
   android17:
-    if: inputs.feature != 'movies-cast-mkv-engineering' && inputs.feature != 'movies-cast-mkv-android' && inputs.feature != 'movies-cast-sdk' && inputs.feature != 'movies-cast-install' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
+    if: inputs.feature != 'cast96-dolby-engineering' && inputs.feature != 'cast96-dolby-android' && inputs.feature != 'cast96-dolby-install' && inputs.feature != 'movies-cast-mkv-engineering' && inputs.feature != 'movies-cast-mkv-android' && inputs.feature != 'movies-cast-sdk' && inputs.feature != 'movies-cast-install' && github.ref != 'refs/heads/work/infinity-final-release-462-20261107' && inputs.feature != 'preview-fullscreen451-android' && inputs.feature != 'preview-layout450-android' && inputs.feature != 'preview-chrome449-android' && inputs.feature != 'preview-resume448-android' && inputs.feature != 'external-player447-android' && inputs.feature != 'infinity-performance-host' && inputs.feature != 'infinity-performance-android' && inputs.feature != 'cobra-owner-host' && inputs.feature != 'cobra-android-launch' && inputs.feature != 'cobra-cards-baseline' && inputs.feature != 'cobra-cards-host' && inputs.feature != 'cobra-fold-more433' && inputs.feature != 'cobra-rejected434-controls' && inputs.feature != 'infinity-seamless-loading434' && inputs.feature != 'cobra-drawer436-prepare' && inputs.feature != 'cobra-drawer436-android' && inputs.feature != 'cobra-quality444-final' && inputs.feature != 'watchlist-playback-android'
     name: Selected feature ${{ inputs.feature || 'explicit baseline Search request' }}
     runs-on: ubuntu-22.04
     timeout-minutes: 150
@@ -2327,5 +2327,47 @@ jobs:
             cast-sdk-work/component-reuse86/private-resources/
             cast-sdk-work/maven/SDK-DEPENDENCIES.json
             cast-sdk-work/mkv/
+          if-no-files-found: warn
+          retention-days: 90
+
+  cast96-dolby-engineering:
+    name: Exact496 Cast-only Dolby header ${{ matrix.mode }} verification; no shutdown
+    if: github.event_name == 'workflow_dispatch' && inputs.feature == 'cast96-dolby-engineering' && github.ref == 'refs/heads/work/infinity-cast-root-cause-from-2103496-20261114'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix: {mode: [native, host]}
+    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {ref: '${{ inputs.source_ref }}', fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        if: matrix.mode == 'native'
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        if: matrix.mode == 'native'
+        with: {packages: 'platform-tools build-tools;35.0.0 ndk;21.4.7075529', log-accepted-android-sdk-licenses: false}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        if: matrix.mode == 'native'
+        with: {artifact-ids: '14010547149', run-id: '43366259258', merge-multiple: true, github-token: '${{ github.token }}', path: signed496}
+      - name: Selected host media fixture tool only
+        if: matrix.mode == 'host'
+        run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - name: Exact baseline, pinned FFmpeg APIs, isolated bridge and selected real media tests
+        run: python repairs/infinity-cast-eac3-2103496-20261114/build.py '${{ matrix.mode }}' cast-dolby-build signed496/Infinity-2103496-Combined-Original-Signer.apk
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: Infinity496-Dolby-${{ matrix.mode }}-${{ github.run_id }}-NOT-INSTALLABLE
+          path: |
+            cast-dolby-build/CAST-MKV-*.json
+            cast-dolby-build/CAST-DOLBY-*.json
+            cast-dolby-build/EXACT94-SIGNATURE.txt
+            cast-dolby-build/native/
+            cast-dolby-build/fixtures/
+            cast-dolby-build/h264-copy/
           if-no-files-found: warn
           retention-days: 90

@@ -1,0 +1,129 @@
+{
+  "baseline_cpp_sha256": "e05ad4fc180e0d90f2d4b6a38445a66e5e46b9b1994a457961502d4685eee3a9",
+  "cases": {
+    "ac3_6ch": {
+      "fixture_sha256": "3538493144c0ffbe10914574fa9f515eb074f85e6a5cfaeb165986f41d5baaa5",
+      "inspection": {
+        "audio": "ac3",
+        "duration_us": 4032000,
+        "origin_us": -5000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video": "hevc"
+      },
+      "packets": {
+        "audio": {
+          "max_pts_error_seconds": 8.881784197001252e-16,
+          "packets": 126
+        },
+        "video": {
+          "max_pts_error_seconds": 4.440892098500626e-16,
+          "packets": 96
+        }
+      }
+    },
+    "eac3_2ch": {
+      "fixture_sha256": "d1fa042dcd94a8e35c8b90a95c2203558ce61d716a274d5fe7d4d03c709fedaf",
+      "inspection": {
+        "audio": "eac3",
+        "duration_us": 4032000,
+        "origin_us": -5000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video": "hevc"
+      },
+      "packets": {
+        "audio": {
+          "max_pts_error_seconds": 8.881784197001252e-16,
+          "packets": 126
+        },
+        "video": {
+          "max_pts_error_seconds": 4.440892098500626e-16,
+          "packets": 96
+        }
+      }
+    },
+    "eac3_6ch": {
+      "fixture_sha256": "f5b236c02f125fc6d02800c317f1622aa7b459484dee4ba15ad1867475d46357",
+      "inspection": {
+        "audio": "eac3",
+        "duration_us": 4032000,
+        "origin_us": -5000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video": "hevc"
+      },
+      "packets": {
+        "audio": {
+          "max_pts_error_seconds": 8.881784197001252e-16,
+          "packets": 126
+        },
+        "video": {
+          "max_pts_error_seconds": 4.440892098500626e-16,
+          "packets": 96
+        }
+      }
+    }
+  },
+  "checks": [
+    "eac3_2ch reproduces496 before real Dolby packets",
+    "eac3_2ch actual codec retained",
+    "eac3_2ch real Dolby configuration box, no guessed header",
+    "eac3_2ch bootstrap contains no media samples",
+    "eac3_2ch video every encoded packet unchanged, no dropped or duplicated primer",
+    "eac3_2ch video source clock within original2ms",
+    "eac3_2ch audio every encoded packet unchanged, no dropped or duplicated primer",
+    "eac3_2ch audio source clock within original2ms",
+    "eac3_2ch full channel layout retained",
+    "eac3_2ch all decoded video frames identical",
+    "eac3_2ch all decoded audio samples identical",
+    "eac3_2ch indexed HLS seek and decode",
+    "eac3_6ch reproduces496 before real Dolby packets",
+    "eac3_6ch actual codec retained",
+    "eac3_6ch real Dolby configuration box, no guessed header",
+    "eac3_6ch bootstrap contains no media samples",
+    "eac3_6ch video every encoded packet unchanged, no dropped or duplicated primer",
+    "eac3_6ch video source clock within original2ms",
+    "eac3_6ch audio every encoded packet unchanged, no dropped or duplicated primer",
+    "eac3_6ch audio source clock within original2ms",
+    "eac3_6ch full channel layout retained",
+    "eac3_6ch all decoded video frames identical",
+    "eac3_6ch all decoded audio samples identical",
+    "eac3_6ch indexed HLS seek and decode",
+    "ac3_6ch reproduces496 before real Dolby packets",
+    "ac3_6ch actual codec retained",
+    "ac3_6ch real Dolby configuration box, no guessed header",
+    "ac3_6ch bootstrap contains no media samples",
+    "ac3_6ch video every encoded packet unchanged, no dropped or duplicated primer",
+    "ac3_6ch video source clock within original2ms",
+    "ac3_6ch audio every encoded packet unchanged, no dropped or duplicated primer",
+    "ac3_6ch audio source clock within original2ms",
+    "ac3_6ch full channel layout retained",
+    "ac3_6ch all decoded video frames identical",
+    "ac3_6ch all decoded audio samples identical",
+    "ac3_6ch indexed HLS seek and decode",
+    "h264 AAC init and every out-of-order fragment byte-identical to496",
+    "hevc AAC init and every out-of-order fragment byte-identical to496",
+    "malformed Dolby refused before init or delivery, no silent audio dropping",
+    "midstream Dolby configuration change refused; source identity and init remain verified"
+  ],
+  "physical_receiver": "NOT_TESTED",
+  "schema": 1,
+  "shutdown": "NOT_SELECTED",
+  "source_hashes": {
+    "repairs/infinity-cast-eac3-2103496-20261114/build.py": "cd2f56aaf519074710613bee46256bae0219aa2aab437c2068880d36bed94edd",
+    "repairs/infinity-cast-eac3-2103496-20261114/tests/test_dolby.py": "9ef84a01c7b2c57073e7d6dc3e1e07d3beb951467e727ec2c43b8123086467c6",
+    "repairs/infinity-cast-mkv-2103494-20261113/native/InfinityCastRemux.cpp": "97ead734c3d9cfbc16fe7650c2169678f41e00499562565355dc14f4b3c91c6b"
+  },
+  "status": "PASS_REAL_DOLBY_HEADER_STREAM_COPY_AND_496_AAC_PRESERVATION",
+  "transcoding": false
+}
