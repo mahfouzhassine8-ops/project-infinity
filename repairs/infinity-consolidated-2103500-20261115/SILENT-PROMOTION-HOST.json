@@ -9,7 +9,7 @@
     "plugin.py": "f197feaf23a5115e3d593a2cb7586b70706cd93701e107feb2c859be593f3ad0",
     "dialog.py": "ab3e19bd94f3575ba0a2b3ec957bfa69f1fe4a439d3f2a21cd4cc2e45cb56e97"
   },
-  "header_sha256": "50aea2e1b99390ea3beeaa0e63197220600804541d1d563a4d86271bf77d0956",
+  "header_sha256": "009a3819706d074859e979d1902d2cad65758d2a3d5ab3769cbdb261a9f9570d",
   "results": [
     {
       "optimization": 0,
@@ -71,6 +71,18 @@
         {
           "case": "source_fifo",
           "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "native_io_exception_restores_state",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": true
+        },
+        {
+          "case": "native_io_does_not_hold_GIL",
+          "matched": true,
           "qr_closed": true,
           "pending_error_preserved": false
         },
@@ -148,6 +160,18 @@
           "pending_error_preserved": false
         },
         {
+          "case": "native_io_exception_restores_state",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": true
+        },
+        {
+          "case": "native_io_does_not_hold_GIL",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
           "case": "audit_reentrancy",
           "matched": true,
           "qr_closed": true,
@@ -217,6 +241,18 @@
         {
           "case": "source_fifo",
           "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "native_io_exception_restores_state",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": true
+        },
+        {
+          "case": "native_io_does_not_hold_GIL",
+          "matched": true,
           "qr_closed": true,
           "pending_error_preserved": false
         },

@@ -79,6 +79,21 @@ def child(root,extension):
     (source/'dialog.py').rename(source/'real-dialog.py');os.mkfifo(source/'dialog.py')
     invoke('source_fifo',lambda:display(folder),False)
     (source/'dialog.py').unlink();(source/'real-dialog.py').rename(source/'dialog.py')
+    # A source-read fault cannot leak its fd or leave the interpreter detached.
+    descriptors=len(os.listdir('/proc/self/fd'));probe.read_mode(2)
+    invoke('native_io_exception_restores_state',lambda:display(folder),False,pending=True)
+    probe.read_mode(0);assert len(os.listdir('/proc/self/fd'))==descriptors
+    import threading,time
+    release_events=[]
+    def release_from_python():
+        deadline=time.monotonic()+3
+        while time.monotonic()<deadline:
+            if probe.read_entered():
+                probe.release_read();release_events.append(True);return
+            time.sleep(.002)
+    probe.read_mode(1);other=threading.Thread(target=release_from_python);other.start()
+    invoke('native_io_does_not_hold_GIL',lambda:display(folder),True)
+    other.join(3);assert not other.is_alive() and release_events==[True]
     def audit(event,args):
         if event in ('compile','marshal.dumps'):probe.reenter()
     sys.addaudithook(audit)
@@ -96,7 +111,7 @@ def main():
     for name,digest in PINS.items():assert hashlib.sha256((a.publisher/name).read_bytes()).hexdigest()==digest
     with tempfile.TemporaryDirectory(prefix='infinity500-promotion-') as temporary:
         work=Path(temporary);extension=work/('promotion_probe'+sysconfig.get_config_var('EXT_SUFFIX'))
-        subprocess.run(['g++','-std=c++17','-shared','-fPIC','-O1','-Wall','-Wextra','-Werror','-Wno-missing-field-initializers',
+        subprocess.run(['g++','-std=c++17','-shared','-fPIC','-pthread','-O1','-Wall','-Wextra','-Werror','-Wno-missing-field-initializers',
             '-I'+sysconfig.get_path('include'),'-I'+str(PRODUCTION),str(HERE/'probe.cpp'),'-lcrypto','-o',str(extension)],check=True)
         rows=[]
         for optimize in (0,1,2):

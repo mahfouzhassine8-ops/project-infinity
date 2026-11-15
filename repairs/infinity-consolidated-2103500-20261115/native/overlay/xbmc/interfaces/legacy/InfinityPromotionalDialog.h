@@ -45,6 +45,14 @@ struct FileDescriptor
   FileDescriptor(const FileDescriptor&)=delete;
   FileDescriptor& operator=(const FileDescriptor&)=delete;
 };
+struct NativeIoScope
+{
+  PyThreadState* state{PyEval_SaveThread()};
+  ~NativeIoScope(){PyEval_RestoreThread(state);}
+  NativeIoScope()=default;
+  NativeIoScope(const NativeIoScope&)=delete;
+  NativeIoScope& operator=(const NativeIoScope&)=delete;
+};
 static bool Text(PyObject* object,std::string& text)
 {
   if(!object || !PyUnicode_CheckExact(object) || PyUnicode_GetLength(object)>4096)return false;
@@ -224,8 +232,17 @@ static bool Capture(Surface surface) noexcept
     const auto dialogSlash=dialogPath.rfind('/'),pluginSlash=pluginPath.rfind('/');
     if(dialogPath.substr(0,dialogSlash)!=pluginPath.substr(0,pluginSlash))return false;
     std::string dialogSource,pluginSource;
-    if(!Source(dialogPath,"dialog.py","ab3e19bd94f3575ba0a2b3ec957bfa69f1fe4a439d3f2a21cd4cc2e45cb56e97",dialogSource) ||
-        !Source(pluginPath,"plugin.py","f197feaf23a5115e3d593a2cb7586b70706cd93701e107feb2c859be593f3ad0",pluginSource))return false;
+    bool verifiedSources=false;
+    {
+      // Regular files on Android FUSE can block despite O_NONBLOCK. Only
+      // native I/O and hashing run without the GIL. Owned Python references
+      // remain outside this scope and are released after this same state is
+      // restored, including on native allocation or file-operation errors.
+      NativeIoScope nativeIo;
+      verifiedSources=Source(dialogPath,"dialog.py","ab3e19bd94f3575ba0a2b3ec957bfa69f1fe4a439d3f2a21cd4cc2e45cb56e97",dialogSource) &&
+          Source(pluginPath,"plugin.py","f197feaf23a5115e3d593a2cb7586b70706cd93701e107feb2c859be593f3ad0",pluginSource);
+    }
+    if(!verifiedSources)return false;
     Ref dialogModule(Py_CompileStringExFlags(dialogSource.c_str(),dialogPath.c_str(),Py_file_input,nullptr,-1));
     Ref pluginModule(Py_CompileStringExFlags(pluginSource.c_str(),pluginPath.c_str(),Py_file_input,nullptr,-1));
     return dialogModule.value && pluginModule.value &&

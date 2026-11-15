@@ -4,7 +4,7 @@
   "baseline": 2103500,
   "files": {
     "native/overlay/xbmc/interfaces/legacy/Dialog.cpp": "359dfb92f77810180a47494b0a70bd3930a2b62426e74b8b68b2d606e6e2bde5",
-    "native/overlay/xbmc/interfaces/legacy/InfinityPromotionalDialog.h": "50aea2e1b99390ea3beeaa0e63197220600804541d1d563a4d86271bf77d0956",
+    "native/overlay/xbmc/interfaces/legacy/InfinityPromotionalDialog.h": "009a3819706d074859e979d1902d2cad65758d2a3d5ab3769cbdb261a9f9570d",
     "native/overlay/xbmc/interfaces/legacy/WindowDialogMixin.cpp": "b4699bac6885b20d9d03dafb94301c3be9e765cb356254f2a49affd50e10d810"
   },
   "findings": {
@@ -12,7 +12,8 @@
     "fd_resource": "RAII closes source fd on allocation exception and checks explicit close outcome",
     "lock_order": "Classify under binding GIL; GuiLock releases GIL before frameguard; ends before original presentation",
     "QR_close": "Unchanged close targets only inactive QR window; native Close_Internal returns without deinit/navigation",
-    "preservation": "Exact Dialog.cpp and WindowDialogMixin.cpp preimages equal authenticated500source; onlyincludes and two policy branches differ; no provider,Cobra,settings,data,close,manual,error changes"
+    "preservation": "Exact Dialog.cpp and WindowDialogMixin.cpp preimages equal authenticated500source; onlyincludes and two policy branches differ; no provider,Cobra,settings,data,close,manual,error changes",
+    "native_IO_GIL": "Astra required release during possible FUSE reads. NativeIoScope releases only around native Source I/O/hash and restores the same thread before Python compilation/comparison/ref cleanup, including exceptions. Reentrancy remains guarded."
   },
   "not_verified": [
     "Android policy compilation/runtime",
@@ -20,5 +21,13 @@
     "installedSlyGuy version/source coverage",
     "ownerpopup repaired",
     "release authorization"
-  ]
+  ],
+  "focused_host_cases": 39,
+  "additional_tests": "A blocked read requires a Python thread to acquire GIL and release it; bad_alloc preserves interpreter state, pending exception/errno and fd count.",
+  "superseded_build": {
+    "run": 43771295868,
+    "conclusion": "cancelled",
+    "stage": "dependencies; compile not reached",
+    "reason": "Superseded by independently requested GIL-safe native I/O revision; no failed application outcome or empty-shell cause inferred."
+  }
 }

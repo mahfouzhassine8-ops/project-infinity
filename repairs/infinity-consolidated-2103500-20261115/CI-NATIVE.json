@@ -3,7 +3,8 @@
   "baseline": 2103500,
   "preserved_checkpoint": "ae28a27a",
   "selected_checks": "SCOPE.json#native500_promotion_integration",
-  "attempt": 2,
+  "attempt": 3,
   "retained_observer_run": 43767411079,
-  "reason": "New independently reviewed native UI policy requires compilation; prior observer/Cast passes remain retained"
+  "reason": "Independent review requires releasing the GIL around native source-file reads; same-state RAII and 39 focused cases passed. Original observer ARM64 and eight Android checks are retained.",
+  "superseded_policy_run": 43771295868
 }

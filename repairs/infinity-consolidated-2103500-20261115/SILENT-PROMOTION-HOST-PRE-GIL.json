@@ -1,0 +1,237 @@
+{
+  "status": "PASS_NATIVE_CALLER_CLASSIFIER_HOST_ONLY",
+  "Python": [
+    3,
+    11,
+    7
+  ],
+  "source_pins": {
+    "plugin.py": "f197feaf23a5115e3d593a2cb7586b70706cd93701e107feb2c859be593f3ad0",
+    "dialog.py": "ab3e19bd94f3575ba0a2b3ec957bfa69f1fe4a439d3f2a21cd4cc2e45cb56e97"
+  },
+  "header_sha256": "50aea2e1b99390ea3beeaa0e63197220600804541d1d563a4d86271bf77d0956",
+  "results": [
+    {
+      "optimization": 0,
+      "cases": [
+        {
+          "case": "automatic_folder",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "automatic_player",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "manual_donation",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "error_security_dialog",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "pending_exception",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": true
+        },
+        {
+          "case": "loaded_code_differs_from_disk",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "automatic_caller_modified",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "unknown_source",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "source_symlink",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "source_fifo",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "audit_reentrancy",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        }
+      ],
+      "GUI": "NOT_TESTED",
+      "installed_provider": "NOT_TESTED"
+    },
+    {
+      "optimization": 1,
+      "cases": [
+        {
+          "case": "automatic_folder",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "automatic_player",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "manual_donation",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "error_security_dialog",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "pending_exception",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": true
+        },
+        {
+          "case": "loaded_code_differs_from_disk",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "automatic_caller_modified",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "unknown_source",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "source_symlink",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "source_fifo",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "audit_reentrancy",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        }
+      ],
+      "GUI": "NOT_TESTED",
+      "installed_provider": "NOT_TESTED"
+    },
+    {
+      "optimization": 2,
+      "cases": [
+        {
+          "case": "automatic_folder",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "automatic_player",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "manual_donation",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "error_security_dialog",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "pending_exception",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": true
+        },
+        {
+          "case": "loaded_code_differs_from_disk",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "automatic_caller_modified",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "unknown_source",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "source_symlink",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "source_fifo",
+          "matched": false,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        },
+        {
+          "case": "audit_reentrancy",
+          "matched": true,
+          "qr_closed": true,
+          "pending_error_preserved": false
+        }
+      ],
+      "GUI": "NOT_TESTED",
+      "installed_provider": "NOT_TESTED"
+    }
+  ],
+  "Android": "NOT_RUN",
+  "GUI_rendering": "NOT_RUN",
+  "owner_popup_coverage": "INSTALLED_SOURCE_UNVERIFIED"
+}

@@ -1,4 +1,4 @@
-name: Infinity500 reviewed observer - full ARM64 integration
+name: Infinity500 reviewed native corrections - full ARM64 integration
 on:
   push:
     branches: [work/infinity-2103500-consolidated-repair-20261115]
@@ -39,7 +39,7 @@ jobs:
       - name: Exact native binary and full source map authenticated inside signed500
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with: {artifact-ids: '13990558917', run-id: '43314732573', merge-multiple: true, github-token: '${{ github.token }}', path: baseline500-native}
-      - name: Restore exact500 native source and apply only reviewed observer correction
+      - name: Restore exact500 native source and apply reviewed native allowlist
         run: python repairs/infinity-consolidated-2103500-20261115/build_native.py prepare
       - name: Pinned official Ubuntu dependency tooling
         run: bash repairs/infinity-consolidated-2103500-20261115/prepare_ci_tooling.sh
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: Infinity500-Observer-ARM64-${{ github.run_id }}-NO-INSTALLER
+          name: Infinity500-Native-ARM64-${{ github.run_id }}-NO-INSTALLER
           path: |
             native500-output/libkodi.so
             native500-output/ARM64.json

@@ -190,7 +190,9 @@
         "audithookreentrancy",
         "optimization0/1/2",
         "QRcleanupcallretained",
-        "descriptor RAII closes on allocation exception; reviewed source"
+        "descriptor RAII closes on allocation exception; reviewed source",
+        "A blocked native source read permits another Python thread to acquire the GIL",
+        "Native I/O exceptions restore the exact interpreter state, pending error and fd count"
       ],
       "environment": "HostCPython3.11.7 nativeCAPIclassification; separatelycompiledpinnedpublisherfunctions; inertUI/networkfixtures",
       "id": "unsolicited_promotion_classifier",
