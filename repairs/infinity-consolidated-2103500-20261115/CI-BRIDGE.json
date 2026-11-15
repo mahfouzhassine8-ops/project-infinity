@@ -1,8 +1,10 @@
 {
-  "variant": "baseline",
-  "native_source": "16df356f0acffbf9ca28ab7095f3a21233998d6d",
-  "purpose": "One actualembeddedAndroid baselineclosedflush causalcontrol while correctedenginecompiles; notcorrectionPASS",
-  "attempt": 5,
-  "previous_run": 43770436282,
-  "specific_correction": "Installation now succeeds. Android ApplicationInfo update recreated same Activity while asset staging was active; duplicate setup hit fresh-case guard before native execution. Retain one fixture worker per process across Activity recreation; original fresh-profile and case assertions unchanged."
+  "variant": "candidate",
+  "native_source": "b37fcb89cda1665b3e007516b9e889a743e8dfa7",
+  "native_run": 43767411079,
+  "native_artifact": 14184690584,
+  "native_artifact_sha256": "47f77058987e7312cdbecc958bef20e6db009213ded78b7003441287ec96d1e7",
+  "retained_baseline_control": 43771035776,
+  "purpose": "Eight selected actualembedded correctedobserver cases; no repeatedbaseline; actualwrites/SQLite/durability/cancellation safety remain gated",
+  "attempt": 1
 }

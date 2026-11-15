@@ -107,6 +107,10 @@ def prepare():
     assert len(expected) == 9413 and hasher().hashes(native) == expected, 'Exact500 source preimage mismatch'
     save('BASE500-NATIVE-SOURCE-MAP.json', expected)
     rows = [r for r in json.loads((HERE / 'SCOPE.json').read_text())['production_allowlist'] if 'native_path' in r]
+    assert {r['native_path'] for r in rows} == {
+        OBSERVER, 'xbmc/interfaces/legacy/Dialog.cpp',
+        'xbmc/interfaces/legacy/WindowDialogMixin.cpp',
+        'xbmc/interfaces/legacy/InfinityPromotionalDialog.h'}
     after = dict(expected)
     changed = {}
     for row in rows:

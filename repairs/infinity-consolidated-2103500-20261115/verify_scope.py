@@ -38,6 +38,10 @@ def main():
             assert hashlib.sha256(before).hexdigest() == row['baseline_sha256'], source
         after = (ROOT / row['path']).read_bytes()
         evidence.append(dict(path=row['path'], before=row['baseline_sha256'], after=hashlib.sha256(after).hexdigest()))
+    review = json.loads((HERE / 'SILENT-PROMOTION-REVIEW.json').read_text())
+    assert review['status'] == 'PASS_SOURCE_AND_HOST_RECEIPT_REVIEW_NOT_APPLICATION_ACCEPTANCE'
+    for name, digest in review['files'].items():
+        assert hashlib.sha256((HERE / name).read_bytes()).hexdigest() == digest, 'Policy source no longer matches independent review'
     # The embedded Python source must compile before any native build consumes it.
     header = (HERE / 'native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h').read_bytes()
     source = header.split(b'R"infinity_source(', 1)[1].rsplit(b')infinity_source";', 1)[0]

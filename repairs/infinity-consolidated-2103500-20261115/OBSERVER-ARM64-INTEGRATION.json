@@ -1,0 +1,82 @@
+{
+  "run": 43767411079,
+  "artifact_id": 14184690584,
+  "artifact_sha256": "47f77058987e7312cdbecc958bef20e6db009213ded78b7003441287ec96d1e7",
+  "source": "b37fcb89cda1665b3e007516b9e889a743e8dfa7",
+  "ARM64": {
+    "Android_execution": "NOT_RUN",
+    "application_acceptance": false,
+    "baseline_native_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+    "dependencies": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "exported_interfaces_preserved": 136120,
+    "native_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+    "physical_Fold_acceptance": false,
+    "signed": false,
+    "source": "b37fcb89cda1665b3e007516b9e889a743e8dfa7",
+    "status": "PASS_FULL_ARM64_LINK_AND_EXACT500_ABI"
+  },
+  "preservation": {
+    "Android_execution": "NOT_RUN",
+    "Cast_native": "UNCHANGED",
+    "Cobra": "UNCHANGED",
+    "Python_startup": "UNCHANGED",
+    "admission_SQLite_durability_guards": "UNCHANGED",
+    "baseline_native_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+    "baseline_source_map_sha256": "26525c76540cd62fbc483b4d4ec2eb2579ef595a64f2fe564859131139498f1c",
+    "changed": {
+      "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": {
+        "after": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+        "before": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3"
+      }
+    },
+    "signed": false,
+    "source": "b37fcb89cda1665b3e007516b9e889a743e8dfa7",
+    "status": "PASS_EXACT_SIGNED500_SOURCE_PLUS_ONE_REVIEWED_OBSERVER_HEADER",
+    "unchanged_native_files": 9412
+  },
+  "ABI": {
+    "added": [],
+    "dependencies_after": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "dependencies_before": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "removed": []
+  },
+  "Android": "PENDING_SELECTED_BRIDGE_CASES",
+  "APK": "NOT_BUILT",
+  "signed": false
+}
