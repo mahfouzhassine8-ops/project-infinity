@@ -130,7 +130,9 @@ def build(apk,native,work):
             run([tools/'aapt2','link','--manifest',manifest,'-I',sdk/'platforms/android-34/android.jar','-o',shell])
             unsigned=work/(variant+'-unsigned.apk')
             with ZipFile(unsigned,'w',ZIP_DEFLATED) as out,ZipFile(shell) as stub:
-                for n in stub.namelist():out.writestr(n,stub.read(n))
+                # Retain aapt2 storage modes: resources.arsc must remain
+                # uncompressed for targetSdk >= 30 (then zipalign aligns it).
+                for entry in stub.infolist():out.writestr(entry,stub.read(entry))
                 out.write(dex/'classes.dex','classes.dex')
                 for n in ('libc++_shared.so','libshairplay.so'):
                     path='lib/arm64-v8a/'+n;out.writestr(path,baseline.read(path))
@@ -144,6 +146,7 @@ def build(apk,native,work):
                 for name,code in cases.CASES.items():out.writestr('assets/cases/'+name+'.py',code)
             aligned=work/(variant+'-aligned.apk');signed=work/(variant+'-CI-ONLY.apk')
             run([tools/'zipalign','-f','4',unsigned,aligned])
+            run([tools/'zipalign','-c','4',aligned])
             run([tools/'apksigner','sign','--ks',key,'--ks-pass','pass:fixture-only','--out',signed,aligned])
             receipts[variant]={'APK_sha256':sha(signed),'engine_sha256':BASE_ENGINE if variant=='baseline' else proof['native_sha256']}
             unsigned.unlink();aligned.unlink()

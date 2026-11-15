@@ -3,6 +3,7 @@
 from pathlib import Path
 import argparse
 import json
+import shlex
 import subprocess
 import time
 
@@ -27,16 +28,17 @@ def run(work,out):
             # This fixture contains the unchanged 611MiB native engine. Its
             # package transfer/extraction is not a Python admission deadline.
             installation_started=time.monotonic()
-            installed=adb('install',str(work/(variant+'-CI-ONLY.apk')),timeout=180)
+            installed=adb('install',str(work/(variant+'-CI-ONLY.apk')),timeout=180,check=False)
             (out/(variant+'-install.txt')).write_text(installed.stdout+installed.stderr)
             (out/(variant+'-install-time.json')).write_text(json.dumps({'seconds':time.monotonic()-installation_started,'bounded_limit_seconds':180})+'\n')
-            assert 'Success' in installed.stdout
+            assert installed.returncode==0 and 'Success' in installed.stdout, 'Installation failed; see retained install stdout/stderr'
             # Baseline closed text is the causal control; other cases were
             # already host verified. Candidate checks cover native integration.
             selected=('closed_text',) if variant=='baseline' else tuple(build['cases'])
             for case in selected:
                 component=package+'/com.projectinfinity.observerqa.ProbeActivity$'+build['cases'][case]
-                launch=adb('shell','am','start','-W','-n',component,'--es','case',case)
+                # adb shell joins arguments; protect the nested Java class '$'.
+                launch=adb('shell','am','start','-W','-n',shlex.quote(component),'--es','case',case)
                 (out/(variant+'-'+case+'-launch.txt')).write_text(launch.stdout+launch.stderr)
                 remote='/sdcard/Android/data/'+package+'/files/'+case+'.json'
                 deadline=time.monotonic()+120;row=None
