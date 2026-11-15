@@ -15,8 +15,9 @@ def main():
     allowed = {row['path'] for row in scope['production_allowlist']}
     changed = subprocess.check_output(['git', 'diff', '--name-only', ANCESTOR], cwd=ROOT, text=True).splitlines()
     prefix = HERE.relative_to(ROOT).as_posix() + '/'
-    workflow = '.github/workflows/infinity-500-focused-verification.yml'
-    assert all(name in allowed or name.startswith(prefix) or name == workflow for name in changed), changed
+    workflows = {'.github/workflows/infinity-500-focused-verification.yml',
+                 '.github/workflows/infinity-500-native-integration.yml'}
+    assert all(name in allowed or name.startswith(prefix) or name in workflows for name in changed), changed
     evidence = []
     for row in scope['production_allowlist']:
         source = row['baseline_source']
