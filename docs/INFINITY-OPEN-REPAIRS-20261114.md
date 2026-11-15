@@ -38,6 +38,20 @@ This is a **tracking record only**, not authorization to modify production sourc
 
 **Record provenance:** Derived from the above November 14 diagnostic archive; no new phone test requested by this list update.
 
+## SEARCH-WATCHLIST-02 — Infinity Search result does not expose existing Infinity Trakt / Watchlist action
+
+- **Status:** OPEN — user-reported screenshot on November 14, 2026; underlying code cause not yet demonstrated.
+- **Priority:** High for the Search → Save to Watchlist user journey.
+- **User observation:** In **Infinity Search — TV Shows**, **Otaku — 1 results** returned **From Overshadowed to Overpowered: Second Reincarnation of a Talentless Sage** (2026). The selected aggregate result showed title, poster, and synopsis; long-press opened **Open in Otaku** and **Information** only, without the expected **Infinity Trakt** / **Add to Watchlist** popup. The screenshot does not show the installed APK version and cannot establish whether a verified cross-provider media identifier was present.
+- **Preserved expectation:** Ordinary TV Shows search → long press → **Infinity Trakt** → Add to Watchlist → title visible under **Infinity TV → Watchlist**. Saving is not playback and must never create progress, watched, history, or Next Episode records.
+- **Narrow source clue (not root-cause proof):** Existing Command Center `plugin.py` from the watchlist playback branch has `_menu_rows()` and `show_item_menu()` supporting an **Add to Watchlist** action for a valid selected entry. An older registered native `Infinity Trakt` Kodi context entry also exists separately. The screenshot shows the aggregated Search's **Open in Otaku / Information** actions instead. Determine whether the normalized aggregate item fails to expose the existing context entry, lacks validated media identity/type, or invokes a separate menu path; **do not assume provider search itself failed**.
+- **Investigation:** Trace the selected Search result's exact ListItem, native `kodi.context.item` visibility, provider opening action and first-party Watchlist menu. Preserve source URL, media kind, verified IDs and selection/token across the Search display/long-press seam when available. If identity is ambiguous or unavailable, keep existing safe behavior and show a truthful path to verify/resolve; never invent IDs or match by title alone.
+- **Required regression coverage:** Otaku single-result TV title; known good native TV provider result; a regular movie; repeated Search, long press, focus and cancel; typed identity with verified IDs and missing-ID cases; Add to Watchlist duplicate-safe and no fake playback. The provider's own native search and player navigation must remain unchanged.
+- **Strict scope:** Universal **Infinity Search to existing first-party Watchlist menu** integration, not an Otaku-specific workaround. Do not edit Otaku or other providers, Trakt storage semantics, playback tracking/resume, search engines, unrelated UI, shutdown, Cast, Cobra, or signing/release pointers without separate approval.
+- **Acceptance:** A recognized TV title from aggregated Infinity Search can use the existing Infinity Trakt popup and be saved into the existing Infinity TV Watchlist without changing provider search results or creating playback history. Evidence-backed minimal code fix, focused tests and preservation proof before any signed update.
+
+**Record provenance:** User-submitted screenshot `22513.jpg`; no runtime log or exact installed version supplied with this screenshot. A visible missing action is established; a specific implementation defect is **not yet proved**.
+
 ## Other workstreams
 
 Casting is separately tracked in existing Cast branches and is **not changed or authorized** by SHUTDOWN-01.
