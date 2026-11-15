@@ -52,6 +52,24 @@ This is a **tracking record only**, not authorization to modify production sourc
 
 **Record provenance:** User-submitted screenshot `22513.jpg`; no runtime log or exact installed version supplied with this screenshot. A visible missing action is established; a specific implementation defect is **not yet proved**.
 
+## CAST-DISCOVERY-03 — Previously visible video Cast devices missing from selector
+
+- **Status:** OPEN; reported November 15, 2026. Current user screenshot displays only one device in Infinity's Cast to Device dialog, while two parental-household devices are known to the owner and were expected to be listed.
+- **Evidence:** User screenshot of the Cast chooser while a movie is playing. This demonstrates current UI device omission, not proof that missing devices are disconnected, Cast-capable right now, or unavailable in another app.
+- **Source trace:** Existing Cast Java `InfinityCastSession.updateDevices()` filters Android `MediaRouter.getRoutes()` by `route.isEnabled()`, `!route.isDefault()`, `route.matchesSelector(selector)`, successful `CastDevice.getFromBundle(route.getExtras())`, and `CAPABILITY_VIDEO_OUT`. Selector is built for Google's Default Media Receiver. Discovery uses `CALLBACK_FLAG_REQUEST_DISCOVERY` while dialog is attached and stops on detach. Dialog renders only `cast.devices`.
+- **Required read-only diagnosis:** Compare raw current `MediaRouter` route count, filtered device count, and sanitized *rejection reasons*, without recording local IPs or user-defined device labels; check discovery callback lifecycle, Android network permission, active Wi-Fi/VPN/SSID isolation, Cast receiver app compatibility and whether other Cast apps can see those devices under the same connection. Avoid assuming the newer Dolby native remux module affected Java discovery (its reported build left all six DEX files unchanged).
+- **Scope:** Make the existing selector reflect all genuinely compatible available receivers; do not add unsupported devices, bypass video capability checks, use YouTube proprietary receivers, add DIAL, or change Cobra.
+- **Acceptance:** All known compatible, reachable receivers appear in the Infinity chooser on the same network, with device additions/removals updating dynamically and no loss of existing successful routes. No media playback test is required just to investigate list visibility.
+
+## MOVIE-CONTINUE-04 — Movies Continue Playing saved cards missing; recovery safeguard shown
+
+- **Status:** OPEN; reported November 15, 2026. The user says previously available movie saved entries disappeared from the Movies Continue Playing view and the existing fail-safe/recovery appeared. **Do not label records deleted without inspecting the authoritative save state.**
+- **Current source contract:** `resume_hub.py` names `continue-watching.json` as the sole local saved progress/list store. `load_view()` uses checked participant/engine signatures and the shared read; `_entries_projection(data, 'movie', 'items')` filters by media and `resume_visible(data,key)`, which tests `resume_hidden`, then groups identical verified identities. `plugin.py` provides a saved-navigation recovery path and an explicit 'This source is unavailable or has expired … Resume Hub kept your local state' safeguard for unavailable saved source.
+- **Unknowns to discriminate:** (1) authoritative `items` data absent/corrupt, (2) display-projection/cache/active-profile mismatch, (3) `resume_hidden` flags and watched/completed behavior, (4) expired provider route showing fallback while progress still exists, (5) incomplete checkpoint/durable write reconciliation given independent ongoing SHUTDOWN-01.
+- **Non-destructive investigation:** Inspect original state and checkpoint participant receipts **read-only**, record media-specific raw `items` counts, display projections, hidden flags, profile identifier and view revision, source recovery availability and provenance. Confirm whether movie Resume and Home/Movies Continue disagree for the same original record. Back up only to private secure location before any authorized mutation; never publish account/profile data, record URLs, or contents of the private store. **Do not uninstall, clear data, Start Fresh, rewrite/rebuild saved JSON, migrate, silently unhide or fabricate history**.
+- **Expected result:** Previously saved unfinished movies remain visible in Movies Continue Playing when eligible, their exact resume positions preserved. Unavailable source shows safe recovery options without deleting saved metadata or fabricating a replacement source. Completed/explicitly hidden movies remain correctly excluded.
+- **Hard lock:** Keep existing playback tracker, Home/UI skin and all unrelated TV/Movies, Search, Cast, shutdown and Cobra untouched until the exact defect boundary is proven. No speculative APK.
+
 ## Other workstreams
 
 Casting is separately tracked in existing Cast branches and is **not changed or authorized** by SHUTDOWN-01.
