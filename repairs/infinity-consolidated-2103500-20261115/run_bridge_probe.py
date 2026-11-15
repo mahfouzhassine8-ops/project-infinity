@@ -7,8 +7,8 @@ import subprocess
 import time
 
 
-def adb(*args, check=True):
-    return subprocess.run(['adb',*args],text=True,capture_output=True,check=check,timeout=40)
+def adb(*args, check=True, timeout=40):
+    return subprocess.run(['adb',*args],text=True,capture_output=True,check=check,timeout=timeout)
 
 
 def run(work,out):
@@ -24,8 +24,12 @@ def run(work,out):
         for variant in (build['variant'],):
             package='com.projectinfinity.observerqa.'+variant
             assert adb('shell','pm','path',package,check=False).stdout.strip()=='','Fresh fixture identity required'
-            installed=adb('install',str(work/(variant+'-CI-ONLY.apk')))
+            # This fixture contains the unchanged 611MiB native engine. Its
+            # package transfer/extraction is not a Python admission deadline.
+            installation_started=time.monotonic()
+            installed=adb('install',str(work/(variant+'-CI-ONLY.apk')),timeout=180)
             (out/(variant+'-install.txt')).write_text(installed.stdout+installed.stderr)
+            (out/(variant+'-install-time.json')).write_text(json.dumps({'seconds':time.monotonic()-installation_started,'bounded_limit_seconds':180})+'\n')
             assert 'Success' in installed.stdout
             # Baseline closed text is the causal control; other cases were
             # already host verified. Candidate checks cover native integration.
