@@ -42,6 +42,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private final ExecutorService initialization=Executors.newSingleThreadExecutor(r->{
         Thread t=new Thread(r,"InfinityCastInitialization");t.setDaemon(true);return t;});
     private boolean initializing,initialized,discovering,initializationAttempted,listening;
+    private boolean pickerVisible;
     private CastContext sdk;
     private MediaRouter router;
     private MediaRouteSelector selector;
@@ -95,12 +96,14 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private InfinityCastSession(Context context){this.context=context;}
     void attach(View value) {
         view=new WeakReference<>(value);
+        pickerVisible=true;
         if(!initialized && !initializationAttempted)initialize();
         else if(initialized){listen();discover();if(!cleanupPending && !returning && !selecting && !transferStarted && !handedOff && !phone.busy())capture();}
         changed();
     }
     void detach(View value) {
-        if(view.get()==value)view.clear();
+        if(view.get()!=value)return;
+        view.clear();pickerVisible=false;
         stopDiscovery();
         // Close Controls dismisses presentation only; transfer/session owns its bounded cleanup.
         if(!selecting && !transferStarted && !handedOff && !cleanupPending){if(!token.isEmpty())leaveReceiver(false);else unlisten();}
@@ -140,11 +143,21 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     private void unavailable(String reason){initializing=false;if(!initialized)initializationAttempted=false;message=reason;changed();}
     private void listen(){if(sdk!=null && !listening){sdk.getSessionManager().addSessionManagerListener(this,CastSession.class);listening=true;}}
     private void unlisten(){if(sdk!=null && listening){sdk.getSessionManager().removeSessionManagerListener(this,CastSession.class);listening=false;}}
-    private void discover() {
-        if(router==null || selector==null || discovering)return;
-        discovering=true;router.addCallback(selector,routes,MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);updateDevices();
+    void pickerVisibility(View value,boolean visible) {
+        if(view.get()!=value)return;
+        pickerVisible=visible;
+        if(visible)discover();else stopDiscovery();
     }
-    private void stopDiscovery(){if(router!=null && discovering)router.removeCallback(routes);discovering=false;}
+    private void discover() {
+        if(router==null || selector==null || discovering || !pickerVisible || view.get()==null ||
+                selecting || transferStarted || handedOff || returning || cleanupPending)return;
+        // Match the pinned SDK's chooser. MediaRouter1.3.0 bounds active scans
+        // to 30 seconds; route/status callbacks must not renew that deadline.
+        discovering=true;router.addCallback(selector,routes,
+            MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY | MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
+        InfinityCastDiagnostics.event("discovery","active_scan_requested",0);updateDevices();
+    }
+    private void stopDiscovery(){if(router!=null && discovering){router.removeCallback(routes);InfinityCastDiagnostics.event("discovery","stopped",0);}discovering=false;}
     private void updateDevices() {
         devices.clear();
         if(router!=null)for(MediaRouter.RouteInfo route:router.getRoutes())
@@ -188,6 +201,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         CastDevice chosen=CastDevice.getFromBundle(devices.get(index).getExtras());
         if(chosen==null || !chosen.hasCapability(CastDevice.CAPABILITY_VIDEO_OUT)){selecting=false;message="That receiver does not support video.";changed();return;}
         selectedDeviceId=chosen.getDeviceId();
+        stopDiscovery();
         ++epoch;stage("receiver_connect",20000,"The TV connection did not become ready. Phone playback continues.");devices.get(index).select();
         CastSession existing=sdk==null?null:sdk.getSessionManager().getCurrentCastSession();
         if(existing!=null && existing.isConnected() && existing.getCastDevice()!=null && selectedDeviceId.equals(existing.getCastDevice().getDeviceId()))connectedSession(existing);

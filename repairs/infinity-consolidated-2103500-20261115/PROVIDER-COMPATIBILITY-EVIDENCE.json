@@ -1,0 +1,48 @@
+{
+  "status": "READ_ONLY_COMPATIBILITY_GAP_NOT_INCIDENT_ATTRIBUTION",
+  "providers": [
+    {
+      "provider": "umbrella",
+      "repository": "umbrellaplug/umbrellaplug.github.io",
+      "commit": "f53e04a100e97e8bdcafec06c47af2539df5e7a0",
+      "path": "omega/zips/plugin.video.umbrella/plugin.video.umbrella-6.8.01.zip",
+      "blob_sha1": "3d57e72dab73ec30ef7434398f5f2d7839c6c263",
+      "zip_sha256": "b2aead01642301b561632e4f57f76b7307e113c0d380aa5bc674f5c913d9ea63",
+      "source_status": "PUBLISHER_REFERENCE_NOT_FULL_DEVICE_SOURCE_VERIFICATION",
+      "reported_device_version": "6.8.01",
+      "reported_device_hash_matches": {
+        "addon.xml": true,
+        "service.py": false
+      },
+      "complete_device_source_match": false,
+      "saved_route_identity_verified": false,
+      "production_contract_changed": false
+    },
+    {
+      "provider": "pov",
+      "repository": "kodifitzwell/repo",
+      "commit": "2c8390c6e65213853a862a00044597946b946132",
+      "path": "plugin.video.pov/plugin.video.pov-6.11.03.zip",
+      "blob_sha1": "be3d304c39b52f8f2a877060228f05a203c8a448",
+      "zip_sha256": "9ac93ad045910774503cbfeeb45b63bbd9b23837c9e76749885076c9b11edfba",
+      "source_status": "PUBLISHER_REFERENCE_NOT_FULL_DEVICE_SOURCE_VERIFICATION",
+      "reported_device_version": "6.11.03",
+      "reported_device_hash_matches": {
+        "addon.xml": true
+      },
+      "complete_device_source_match": false,
+      "saved_route_identity_verified": false,
+      "production_contract_changed": false
+    }
+  ],
+  "movie_dispatch_comparison": {
+    "umbrella_6.8.01": "movie entry unchanged; router adds unrelated tools_cleanupMDBListPlayback action",
+    "pov_6.11.03": "movie entry/router unchanged; episodes widget calendar focus condition and player Trakt slug field change"
+  },
+  "limitations": [
+    "Raw continue-watching.json absent; no record rewrite, filter change or production route-contract extension authorized before original store preservation requirement is met",
+    "Diagnostic pins provider manifests and one Umbrella service file, not native route source",
+    "Umbrella installed service hash differs from publisher package; no provider files replaced",
+    "Compatible Search does not establish saved-navigation source validation"
+  ]
+}

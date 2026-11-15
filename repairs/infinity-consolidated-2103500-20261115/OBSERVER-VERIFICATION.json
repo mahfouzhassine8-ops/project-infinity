@@ -1,0 +1,41 @@
+{
+  "observer_header_sha256": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+  "CPython_host": {
+    "version": "3.11.7",
+    "baseline_cases": 16,
+    "candidate_cases": 16,
+    "result": "PASS"
+  },
+  "native_ledger": {
+    "result": "REUSE_9_PASS_HOST_CALLBACK_CASES",
+    "source_headers_unchanged": true,
+    "callback_contract_matches_final_observer_cases": true,
+    "receipt": "CLOSED-FLUSH-LEDGER.json",
+    "actual_embedded_native_bridge": "NOT_EXECUTED"
+  },
+  "actual_ARM64_engine": "NOT_COMPILED_FOR_THIS_CANDIDATE",
+  "Android_observer": "NOT_EXECUTED",
+  "physical_shutdown_causality": "NOT_ESTABLISHED",
+  "test_attempt_history": [
+    {
+      "attempt": "initial native ledger headers",
+      "result": "precompile hash gate rejected incorrect reference path; corrected to exact producer source; guard unchanged"
+    },
+    {
+      "attempt": "initial durability case",
+      "result": "deleted target correctly synced parent; invalid test expectation replaced with actual fsync EIO fault; production unchanged"
+    },
+    {
+      "attempt": "post-review host input",
+      "result": "missing sparse baseline path; no tests executed; exact header materialized from pinned source and SHA verified"
+    },
+    {
+      "attempt": "Astra review 1",
+      "result": "unsafe overridable closed property guard replaced with exact native descriptor and bound method proof"
+    },
+    {
+      "attempt": "Astra review 2",
+      "result": "added trusted pre-call closed-state proof; real close-during-flush failure regression case added"
+    }
+  ]
+}

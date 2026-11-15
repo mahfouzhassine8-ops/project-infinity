@@ -1,0 +1,220 @@
+{
+  "status": "REPRODUCED_CLOSED_STREAM_FALSE_FAILURE_CALLBACK",
+  "baseline_header_sha256": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3",
+  "results": {
+    "baseline": [
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [
+          "buffer_flush_failed"
+        ],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_text"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [
+          "buffer_flush_failed"
+        ],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_binary"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [
+          "layered_buffer_flush_failed"
+        ],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_writer"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [
+          "layered_buffer_flush_failed"
+        ],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_random"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [
+          "layered_buffer_flush_failed"
+        ],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_layered_text"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [
+          "buffer_flush_failed"
+        ],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "prior_failure_and_dirty"
+      },
+      {
+        "dirty_state_retained": true,
+        "exception": "OSError",
+        "real_failure_retained": true,
+        "scenario": "open_oserror"
+      },
+      {
+        "dirty_state_retained": true,
+        "exception": "ValueError",
+        "real_failure_retained": true,
+        "scenario": "open_valueerror"
+      },
+      {
+        "real_failure_retained": true,
+        "scenario": "lying_file_closed"
+      },
+      {
+        "real_failure_retained": true,
+        "scenario": "lying_buffer_closed"
+      },
+      {
+        "ambiguous_state_failure_retained": true,
+        "scenario": "custom_raw_closed"
+      },
+      {
+        "no_new_waiver": true,
+        "original_exception_preserved": true,
+        "scenario": "throwing_closed_getter"
+      },
+      {
+        "custom_method_failure_retained": true,
+        "scenario": "custom_native_flush"
+      },
+      {
+        "dirty_state_retained": true,
+        "real_failure_retained": true,
+        "scenario": "closes_during_real_flush"
+      },
+      {
+        "original_file_behavior": true,
+        "scenario": "normal_file"
+      },
+      {
+        "no_automatic_commit_or_rollback": true,
+        "pending_transaction_blocked_retirement": true,
+        "scenario": "pending_transaction"
+      }
+    ],
+    "candidate": [
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_text"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_binary"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_writer"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_random"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "closed_layered_text"
+      },
+      {
+        "bytes_preserved": true,
+        "exception": "ValueError",
+        "new_failures": [],
+        "new_leases": [],
+        "previous_failures_and_dirty_state_unchanged": true,
+        "scenario": "prior_failure_and_dirty"
+      },
+      {
+        "dirty_state_retained": true,
+        "exception": "OSError",
+        "real_failure_retained": true,
+        "scenario": "open_oserror"
+      },
+      {
+        "dirty_state_retained": true,
+        "exception": "ValueError",
+        "real_failure_retained": true,
+        "scenario": "open_valueerror"
+      },
+      {
+        "real_failure_retained": true,
+        "scenario": "lying_file_closed"
+      },
+      {
+        "real_failure_retained": true,
+        "scenario": "lying_buffer_closed"
+      },
+      {
+        "ambiguous_state_failure_retained": true,
+        "scenario": "custom_raw_closed"
+      },
+      {
+        "no_new_waiver": true,
+        "original_exception_preserved": true,
+        "scenario": "throwing_closed_getter"
+      },
+      {
+        "custom_method_failure_retained": true,
+        "scenario": "custom_native_flush"
+      },
+      {
+        "dirty_state_retained": true,
+        "real_failure_retained": true,
+        "scenario": "closes_during_real_flush"
+      },
+      {
+        "original_file_behavior": true,
+        "scenario": "normal_file"
+      },
+      {
+        "no_automatic_commit_or_rollback": true,
+        "pending_transaction_blocked_retirement": true,
+        "scenario": "pending_transaction"
+      }
+    ]
+  },
+  "candidate_header_sha256": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+  "interpreter": {
+    "implementation": "CPython",
+    "version": "3.11.7"
+  },
+  "correction": "PASS_HOST_ONLY",
+  "physical_incident_causality": "NOT_ESTABLISHED",
+  "native_shutdown_impact": "NOT_YET_TESTED"
+}

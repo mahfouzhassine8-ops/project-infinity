@@ -1,0 +1,587 @@
+{
+  "INFINITY-MODULES.v1": {
+    "sha256": "df66656d30cc4c6ad3d94866ddd7a09de7f064cd2947026517f4b65db9054b40",
+    "source_paths": []
+  },
+  "INFINITY-MODULES.v1.sig": {
+    "sha256": "24c2aa48787a84301717dd70dd86aeb3bbd4a4924198b87e08dfe6cc23694f58",
+    "source_paths": []
+  },
+  "INSTALL-BASELINE.v1": {
+    "sha256": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
+    "source_paths": [
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/INSTALL-BASELINE.v1"
+    ]
+  },
+  "MODE-CLASS-SEARCH-POLICY.json": {
+    "sha256": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
+    "source_paths": [
+      "repairs/infinity-final-closure-2103407/MODE-CLASS-SEARCH-POLICY.json",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json"
+    ]
+  },
+  "NAVIGATION-CONTRACTS.json": {
+    "sha256": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/NAVIGATION-CONTRACTS.json",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/NAVIGATION-CONTRACTS.json"
+    ]
+  },
+  "SEARCH-STRUCTURES.json": {
+    "sha256": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
+    "source_paths": [
+      "repairs/infinity-final-closure-2103407/SEARCH-STRUCTURES.json",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/SEARCH-STRUCTURES.json",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/SEARCH-STRUCTURES.json"
+    ]
+  },
+  "action_loading.py": {
+    "sha256": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+    "source_paths": [
+      "repairs/infinity-2103436-end-to-end-loading/overlay/script.infinity.commandcenter/action_loading.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/action_loading.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/action_loading.py"
+    ]
+  },
+  "addon.xml": {
+    "sha256": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4",
+    "source_paths": []
+  },
+  "cast_runtime.py": {
+    "sha256": "da2b071f120487dce2f424d98c4f8a0040e11527f9caa0eaf4336c5bb3377690",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/cast_runtime.py"
+    ]
+  },
+  "checkpoint_runtime.py": {
+    "sha256": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/checkpoint_runtime.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/checkpoint_runtime.py"
+    ]
+  },
+  "common.py": {
+    "sha256": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/common.py",
+      "repairs/infinity-performance-ui-2103477-20261110/overlay/script.infinity.commandcenter/common.py"
+    ]
+  },
+  "context.py": {
+    "sha256": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
+    "source_paths": [
+      "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/context.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/context.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/context.py"
+    ]
+  },
+  "default.py": {
+    "sha256": "1e671c44c6d0cfbb1e7c372e79843e292958b7f3ad59f06eb6756214169f494c",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/default.py"
+    ]
+  },
+  "experience.py": {
+    "sha256": "c358be6a7aa18e7bc59d048b77911b44c6e6e3a8f5d7c3229fb1da8ae90bb2eb",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/experience.py"
+    ]
+  },
+  "infinity_modules/__init__.py": {
+    "sha256": "dd65da30f3d82529011a305293041fabcc63d369f4805a446774996ae9ae5fc3",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/__init__.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/__init__.py"
+    ]
+  },
+  "infinity_modules/rails/__init__.py": {
+    "sha256": "8798e72d7a93a29641e5368044bd7164b2f1024108791daf4b57c2d3cc7b79ab",
+    "source_paths": [
+      "features/infinity-rails-investigation-20261014/addons/script.infinity.rails/resources/lib/__init__.py",
+      "features/infinity-rails217/addons/script.infinity.rails/resources/lib/__init__.py",
+      "features/infinity-rails218/addons/script.infinity.rails/resources/lib/__init__.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/__init__.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/__init__.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/__init__.py"
+    ]
+  },
+  "infinity_modules/rails/catalog.py": {
+    "sha256": "7c307a52bf4fef44d9c1b1b910c1f76bd8b689c6de7f4a456205f13b5c1ab457",
+    "source_paths": [
+      "features/infinity-rails-investigation-20261014/addons/script.infinity.rails/resources/lib/catalog.py",
+      "features/infinity-rails217/addons/script.infinity.rails/resources/lib/catalog.py",
+      "features/infinity-rails218/addons/script.infinity.rails/resources/lib/catalog.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/catalog.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/catalog.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/catalog.py"
+    ]
+  },
+  "infinity_modules/rails/dialog.py": {
+    "sha256": "34dd1815176455278dabc10640627faffe16feabbcaa945578d573bbd8ec66ee",
+    "source_paths": [
+      "features/infinity-rails-investigation-20261014/addons/script.infinity.rails/resources/lib/dialog.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/dialog.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/dialog.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/dialog.py"
+    ]
+  },
+  "infinity_modules/rails/input_status.py": {
+    "sha256": "217073f1e9df990aa39215cf29067776612528fd0311b5c2d723e866812db111",
+    "source_paths": [
+      "features/infinity-rails-investigation-20261014/addons/script.infinity.rails/resources/lib/input_status.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/input_status.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/input_status.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/input_status.py"
+    ]
+  },
+  "infinity_modules/rails/mocha.py": {
+    "sha256": "b813b5d7a340c697917fa7b2b29b6cee86d97d284da59ce8bc96bde9ad629c96",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/mocha.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/mocha.py"
+    ]
+  },
+  "infinity_modules/rails/runtime.py": {
+    "sha256": "2cb188fbc6f59da3c2c2bf43e64f1b523921290cd6e4937cf9303743785bcd3f",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/runtime.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/runtime.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/runtime.py"
+    ]
+  },
+  "infinity_modules/rails/stability_probe.py": {
+    "sha256": "e275668b0638fdffb8810ee6f1cab1d9590a9bc8b9f08f402216a8ae50d754f9",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/stability_probe.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/stability_probe.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/stability_probe.py"
+    ]
+  },
+  "infinity_modules/rails/store.py": {
+    "sha256": "22fc4b1f4ddb4d18be77acb89cd49e975f65cc9db410df40d17c62f4ad4171e4",
+    "source_paths": [
+      "features/infinity-rails-investigation-20261014/addons/script.infinity.rails/resources/lib/store.py",
+      "features/infinity-rails217/addons/script.infinity.rails/resources/lib/store.py",
+      "features/infinity-rails218/addons/script.infinity.rails/resources/lib/store.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/rails/store.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/rails/store.py",
+      "repairs/stability-probe-2103377/helper/resources/lib/store.py"
+    ]
+  },
+  "infinity_modules/uirepair/__init__.py": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_paths": [
+      "repairs/cobra-2103440-playing-dot-pro-viewport/evidence/baseline-dot.log",
+      "repairs/cobra-2103440-playing-dot-pro-viewport/evidence/candidate-resize.log",
+      "repairs/cobra-2103441-approved-live-pro/evidence/callback-render-tests.log",
+      "repairs/cobra-2103441-approved-live-pro/evidence/cards-tests.log",
+      "repairs/cobra-2103441-approved-live-pro/final-evidence/PRO-FOCUSED.log",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/results/TEST-OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/results/correctness/baseline-six/OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/results/correctness/prototype-six/OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/header/REFINEMENT-TEST-OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/header/TEST-OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/header/WIDTH-CLOSEOUT-TEST-OUTPUT.txt",
+      "repairs/infinity-2103458-six-corrections-20261105/functional-1aac/LEASE-COMPILE.txt",
+      "repairs/infinity-browser-visual-20261105/results/linux/1080x2520-recursive-projection/failure.png",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/linux/media-write-guard/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/linux/pointer-diagnostic/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-cinema/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-compact/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-folder-semantics/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-regular-diagnostic/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-regular-fixed/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-regular/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-slim/native-signal-python.log",
+      "repairs/infinity-kodi-checkpoint-pause-stop-20261104/evidence/after-compile.txt",
+      "repairs/infinity-kodi-checkpoint-pause-stop-20261104/evidence/before-compile.txt",
+      "repairs/infinity-kodi-pause-stop-arm64-20261104/evidence/HOST-CONTROL-COMPILE.txt",
+      "repairs/infinity-kodi-pause-stop-arm64-20261104/evidence/HOST-WATCHED-COMPILE.txt",
+      "repairs/infinity-kodi-settings-retirement-final-proof-20261104/evidence/contract-COMPILE.txt",
+      "repairs/infinity-kodi-settings-retirement-final-proof-20261104/evidence/native_coverage-COMPILE.txt",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/__init__.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py",
+      "repairs/infinity-native-touch-2103451-20261105/AFTER-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/BEFORE-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/INITIAL-AFTER-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/INITIAL-BEFORE-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/INITIAL-BEFORE-GESTURES.txt",
+      "repairs/infinity-tracking-integration-2103469-20261108/evidence/c1-native-constructor-block-42604600259/raw/tracking-android-results/lifecycle-filtered.stderr",
+      "repairs/infinity-tracking-integration-2103469-20261108/evidence/genuine-origin-record-and-service-fail-42593220047/raw/tracking-android-results/lifecycle-filtered.stderr",
+      "repairs/infinity-tracking-integration-2103469-20261108/evidence/origin-observer-blocked-42591104063/raw/tracking-android-results/lifecycle-filtered.stderr",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/__init__.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py"
+    ]
+  },
+  "infinity_modules/uirepair/controller_access.py": {
+    "sha256": "4160a511efa9e12776db5bba28ab16d5d9d5e1a7825826df16ed76b7430ad826",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/controller_access.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/controller_access.py"
+    ]
+  },
+  "infinity_modules/uirepair/default.py": {
+    "sha256": "5bbeb30b76ae9b169c18d2abcdc5a036f8c952ae91cadb317bf4a4576c3bb5c1",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/default.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/default.py"
+    ]
+  },
+  "infinity_modules/uirepair/home_option_b.py": {
+    "sha256": "01dbb12c89cbb95d7b28200816a30fb0fbe66fb320928a65bb8be804e3d582f0",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/home_option_b.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/home_option_b.py"
+    ]
+  },
+  "infinity_modules/uirepair/latest_identity.py": {
+    "sha256": "225ac23336701db63715583ca8b6716afa96bb9b738b4b99750d9a5bbd8ab223",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/latest_identity.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/latest_identity.py",
+      "repairs/three-corrections-2103400/overlay/plugin.infinity.latestreleases/identity.py"
+    ]
+  },
+  "infinity_modules/uirepair/menu_model.py": {
+    "sha256": "eea9605cf7b3712b6029bf49958d470dbc59df6b92e7f394799c1098e58956da",
+    "source_paths": [
+      "repairs/four-repair-20261018/addon/menu_model.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/menu_model.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/menu_model.py"
+    ]
+  },
+  "infinity_modules/uirepair/plugin.py": {
+    "sha256": "a7bcae40488ae5e015372e9538a536e98768b4bbc744582ed5d39b10c87ac593",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/plugin.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/plugin.py"
+    ]
+  },
+  "infinity_modules/uirepair/popup.py": {
+    "sha256": "230ee5646bf5b73faa9e9bc9988bb29e9a6d238da95efeec06e480a9c6d259de",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/popup.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/popup.py",
+      "repairs/save-later-multiimage-20261023/performance/overlay/script.infinity.uirepair/popup.py"
+    ]
+  },
+  "infinity_modules/uirepair/runtime.py": {
+    "sha256": "31f7494146e476636e2732bb3a9cd37776d59ee61414335e7a03bb5eb81fee79",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/runtime.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/runtime.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/PROVIDER-CONTRACTS.json": {
+    "sha256": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/PROVIDER-CONTRACTS.json",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.watchedbridge/PROVIDER-CONTRACTS.json",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/PROVIDER-CONTRACTS.json",
+      "repairs/watched-bridge-20261017/addon/PROVIDER-CONTRACTS.json"
+    ]
+  },
+  "infinity_modules/watchedbridge/__init__.py": {
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "source_paths": [
+      "repairs/cobra-2103440-playing-dot-pro-viewport/evidence/baseline-dot.log",
+      "repairs/cobra-2103440-playing-dot-pro-viewport/evidence/candidate-resize.log",
+      "repairs/cobra-2103441-approved-live-pro/evidence/callback-render-tests.log",
+      "repairs/cobra-2103441-approved-live-pro/evidence/cards-tests.log",
+      "repairs/cobra-2103441-approved-live-pro/final-evidence/PRO-FOCUSED.log",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/logo-clear/results/TEST-OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/results/correctness/baseline-six/OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/profile-reads/results/correctness/prototype-six/OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/header/REFINEMENT-TEST-OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/header/TEST-OUTPUT.txt",
+      "repairs/cobra-next-from-2103427/cards-from-2103431/visual-closeout/header/WIDTH-CLOSEOUT-TEST-OUTPUT.txt",
+      "repairs/infinity-2103458-six-corrections-20261105/functional-1aac/LEASE-COMPILE.txt",
+      "repairs/infinity-browser-visual-20261105/results/linux/1080x2520-recursive-projection/failure.png",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/linux/media-write-guard/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/linux/pointer-diagnostic/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-cinema/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-compact/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-folder-semantics/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-regular-diagnostic/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-regular-fixed/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-regular/native-signal-python.log",
+      "repairs/infinity-kodi-2103453-ui-navigation/results/list-continuation/list-registration-slim/native-signal-python.log",
+      "repairs/infinity-kodi-checkpoint-pause-stop-20261104/evidence/after-compile.txt",
+      "repairs/infinity-kodi-checkpoint-pause-stop-20261104/evidence/before-compile.txt",
+      "repairs/infinity-kodi-pause-stop-arm64-20261104/evidence/HOST-CONTROL-COMPILE.txt",
+      "repairs/infinity-kodi-pause-stop-arm64-20261104/evidence/HOST-WATCHED-COMPILE.txt",
+      "repairs/infinity-kodi-settings-retirement-final-proof-20261104/evidence/contract-COMPILE.txt",
+      "repairs/infinity-kodi-settings-retirement-final-proof-20261104/evidence/native_coverage-COMPILE.txt",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/uirepair/__init__.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py",
+      "repairs/infinity-native-touch-2103451-20261105/AFTER-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/BEFORE-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/INITIAL-AFTER-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/INITIAL-BEFORE-COMPILE.txt",
+      "repairs/infinity-native-touch-2103451-20261105/INITIAL-BEFORE-GESTURES.txt",
+      "repairs/infinity-tracking-integration-2103469-20261108/evidence/c1-native-constructor-block-42604600259/raw/tracking-android-results/lifecycle-filtered.stderr",
+      "repairs/infinity-tracking-integration-2103469-20261108/evidence/genuine-origin-record-and-service-fail-42593220047/raw/tracking-android-results/lifecycle-filtered.stderr",
+      "repairs/infinity-tracking-integration-2103469-20261108/evidence/origin-observer-blocked-42591104063/raw/tracking-android-results/lifecycle-filtered.stderr",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/uirepair/__init__.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/bridge_state.py": {
+    "sha256": "babe606965d4e81481ea573dd4ecc7cec82a7d23476364326731eb86ce1eeb1d",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/bridge_state.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/bridge_state.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/context.py": {
+    "sha256": "fb9867572530edec876192152c9adca8cb82387323ec26b6cbf7ffdc5a0b22d3",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/context.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/context.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/controller.py": {
+    "sha256": "a629c46a693f5d025fb8bc6805b7302e7876593d0918f07b45c96cd1bab5b703",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/controller.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/controller.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/default.py": {
+    "sha256": "77c65366ed07261992d12357bb284c3f96039452fd393cc0e36e15c2f75d5f9d",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/default.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/default.py",
+      "repairs/watched-bridge-20261017/addon/default.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/provider_contracts.py": {
+    "sha256": "5819eec3f7b29f43de164c4739753db0ad48bb5c5d92fe6ae136fa5c9753f804",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/provider_contracts.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/provider_contracts.py",
+      "repairs/watched-bridge-20261017/addon/provider_contracts.py"
+    ]
+  },
+  "infinity_modules/watchedbridge/service.py": {
+    "sha256": "0450559f72dbb1a3894de7075934bdc28d3fea5b91fc0d83f1da34e1ef4c1014",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_modules/watchedbridge/service.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_modules/watchedbridge/service.py"
+    ]
+  },
+  "infinity_search.py": {
+    "sha256": "a5949485c723cd56f727feec40f3be66eb60976af255ede431040511c145dc44",
+    "source_paths": [
+      "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/infinity_search.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_search.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_search.py"
+    ]
+  },
+  "infinity_settings.py": {
+    "sha256": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_settings.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_settings.py",
+      "repairs/save-later-multiimage-20261023/performance/overlay/script.infinity.commandcenter/infinity_settings.py"
+    ]
+  },
+  "infinity_trakt.py": {
+    "sha256": "e2f8b87ed45bea2423b0a12d3b2d30fad822e9435d6115f6b96adf3ffb0778af",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/infinity_trakt.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/reference66/infinity_trakt.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/infinity_trakt.py"
+    ]
+  },
+  "information.py": {
+    "sha256": "9033cc6042eb5349c0f6e53e81564a137853c32190287e2cebe3e654f78f47b1",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/information.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/information.py"
+    ]
+  },
+  "library_navigation.py": {
+    "sha256": "7fd5c5a75ba054a92a46914dfbc0348b11b6e4988650d952b7c3c8fad3c505fe",
+    "source_paths": [
+      "repairs/infinity-master-corrective-20261105/overlay/assets/addons/script.infinity.commandcenter/library_navigation.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/library_navigation.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/library_navigation.py"
+    ]
+  },
+  "media_view.py": {
+    "sha256": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "source_paths": [
+      "repairs/infinity-kodi-2103453-ui-navigation/overlay/assets/addons/script.infinity.commandcenter/media_view.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/media_view.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/media_view.py"
+    ]
+  },
+  "module_contract.py": {
+    "sha256": "759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267",
+    "source_paths": [
+      "repairs/infinity-final-closure-2103407/isolated-python/module_contract.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/module_contract.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/module_contract.py"
+    ]
+  },
+  "native_search_compatibility.py": {
+    "sha256": "1281c379d2dca044d11727ba017e5c6b05e1ce2ce818b8d942d9ecb4771608b9",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/native_search_compatibility.py",
+      "repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/native_search_compatibility.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/native_search_compatibility.py"
+    ]
+  },
+  "persistence_participant.py": {
+    "sha256": "7658db0f21c20853f272f61832e720df02b2b4b9ebaeba83ca1c7ba8758e1b9b",
+    "source_paths": [
+      "repairs/android-checkpoint-shutdown/installed/overlay/script.infinity.commandcenter/persistence_participant.py",
+      "repairs/android-checkpoint-shutdown/runtime/commandcenter/overlay/persistence_participant.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/persistence_participant.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/persistence_participant.py"
+    ]
+  },
+  "plugin.py": {
+    "sha256": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/plugin.py"
+    ]
+  },
+  "provider_capabilities.py": {
+    "sha256": "7b0fda13e0fb529aa974b1e8ef792afb3adf0f681490784cb7837b715ae1fc44",
+    "source_paths": [
+      "repairs/infinity-final-closure-2103407/isolated-python/provider_capabilities.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/provider_capabilities.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/provider_capabilities.py"
+    ]
+  },
+  "provider_inventory.py": {
+    "sha256": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/provider_inventory.py",
+      "repairs/infinity-only-performance-2103425/overlay/script.infinity.commandcenter/provider_inventory.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/provider_inventory.py"
+    ]
+  },
+  "resources/settings.xml": {
+    "sha256": "7cf7649f80c4c3e6c81caa6e80b1f325f470055e7de62fdf37367effe8484451",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/resources/settings.xml",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resources/settings.xml"
+    ]
+  },
+  "resources/skins/Default/1080i/InfinityInformation.xml": {
+    "sha256": "b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443",
+    "source_paths": [
+      "repairs/infinity-2103402-final/overlay/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml"
+    ]
+  },
+  "resources/skins/Default/1080i/InfinityItemOptions.xml": {
+    "sha256": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml",
+      "repairs/save-later-multiimage-20261023/performance/overlay/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml",
+      "repairs/save-later-multiimage-20261023/performance/overlay/script.infinity.uirepair/resources/skins/Default/1080i/InfinityItemOptions.xml",
+      "repairs/save-later-multiimage-20261023/performance/overlay/skin.infinity.diggz/unified/InfinityItemOptions.xml"
+    ]
+  },
+  "resources/skins/Default/1080i/InfinitySearch.xml": {
+    "sha256": "0fb440287b00d6dc4f6c15c99e16be0a4e4e70a62cd4be08b1dd9375595272ad",
+    "source_paths": [
+      "repairs/fold-corrective-2103394/InfinitySearch.xml",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/resources/skins/Default/1080i/InfinitySearch.xml",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resources/skins/Default/1080i/InfinitySearch.xml"
+    ]
+  },
+  "resources/skins/Default/1080i/InfinityTraktNotice.xml": {
+    "sha256": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+    "source_paths": [
+      "repairs/final-corrective-2103401/overlay/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml"
+    ]
+  },
+  "resume_hub.py": {
+    "sha256": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/resume_hub.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/overlay/script.infinity.commandcenter/resume_hub.py"
+    ]
+  },
+  "runtime_visibility.py": {
+    "sha256": "11a985fc544fdb37c906f2575516b78c6141ed2b68e95b6c390d824f4386560a",
+    "source_paths": [
+      "repairs/android-checkpoint-shutdown/installed/parent/script.infinity.commandcenter/runtime_visibility.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/runtime_visibility.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/runtime_visibility.py"
+    ]
+  },
+  "saved_navigation.py": {
+    "sha256": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/saved_navigation.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/reference66/saved_navigation.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/saved_navigation.py",
+      "repairs/save-later-multiimage-20261023/universal/overlay/script.infinity.commandcenter/saved_navigation.py"
+    ]
+  },
+  "saved_playback.py": {
+    "sha256": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/saved_playback.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/saved_playback.py",
+      "repairs/infinity-watchlist-playback-2103466-20261108/overlay/script.infinity.commandcenter/saved_playback.py"
+    ]
+  },
+  "selection_contract.py": {
+    "sha256": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/selection_contract.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/selection_contract.py",
+      "repairs/save-later-multiimage-20261023/universal/overlay/script.infinity.commandcenter/selection_contract.py"
+    ]
+  },
+  "service.py": {
+    "sha256": "ed0c9a2a1856c7eeae21603fdcd8b2c3f068bf33e53dbbe10d3faf74590a872b",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/overlay/script.infinity.commandcenter/service.py"
+    ]
+  },
+  "skin_upgrade.py": {
+    "sha256": "e3aadefa8345a78dc71bb9ab5ee428e947819d6e76576c772bb34e474b3eaedb",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/skin_upgrade.py",
+      "repairs/infinity-only-performance-2103425/continuation/overlay/script.infinity.commandcenter/skin_upgrade.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/skin_upgrade.py"
+    ]
+  },
+  "structural_search.py": {
+    "sha256": "dd0b200829fc63372ec88a0ba991bd98a7a3459f597853a5bc991a9e4e6693b3",
+    "source_paths": [
+      "repairs/infinity-final-closure-2103407/structural_search.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/structural_search.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/structural_search.py"
+    ]
+  },
+  "title_metadata.py": {
+    "sha256": "115ac88c67e3fc9b3568ede2b3b019e10ab2829c6d0c14bef60d90d6248ad51e",
+    "source_paths": [
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/title_metadata.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/title_metadata.py"
+    ]
+  },
+  "view_mode.py": {
+    "sha256": "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71",
+    "source_paths": [
+      "repairs/android-checkpoint-shutdown/installed/parent/script.infinity.commandcenter/view_mode.py",
+      "repairs/android-checkpoint-shutdown/runtime/commandcenter/unchanged/view_mode.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/baseline/script.infinity.commandcenter/view_mode.py",
+      "repairs/infinity-tracking-integration-2103469-20261108/reference/script.infinity.commandcenter/view_mode.py"
+    ]
+  }
+}

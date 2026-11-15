@@ -1,0 +1,49 @@
+{
+  "status": "PASS_HOST_NATIVE_LEDGER_CALLBACK_REPLAY",
+  "source_headers": {
+    "xbmc/platform/android/activity/InfinityScriptPersistence.h": "12e26e9ee008ec65b3def04e7dc0919ff66a0d1a2d1f22cc220d83c393f7c67e",
+    "xbmc/platform/android/activity/InfinityProtectedWrites.h": "bcd235ab97e38cd09c768a47488a14106208ff9ba1ac5da550864f2aaaa757ac"
+  },
+  "cases": [
+    {
+      "case": "baseline_closed",
+      "result": "PASS baseline_closed sealed=0 blockers=1"
+    },
+    {
+      "case": "candidate_closed",
+      "result": "PASS candidate_closed sealed=1 blockers=0"
+    },
+    {
+      "case": "optional_failure",
+      "result": "PASS optional_failure sealed=1 blockers=0"
+    },
+    {
+      "case": "real_failure",
+      "result": "PASS real_failure sealed=0 blockers=1"
+    },
+    {
+      "case": "prior_failure",
+      "result": "PASS prior_failure sealed=0 blockers=1"
+    },
+    {
+      "case": "dirty",
+      "result": "PASS dirty sealed=0 blockers=1"
+    },
+    {
+      "case": "transaction",
+      "result": "PASS transaction sealed=0 blockers=1"
+    },
+    {
+      "case": "unobserved",
+      "result": "PASS unobserved sealed=0 blockers=1"
+    },
+    {
+      "case": "fsync_failure",
+      "result": "PASS fsync_failure sealed=0 blockers=2"
+    }
+  ],
+  "actual_embedded_CPython_native_bridge": "NOT_EXECUTED",
+  "ARM64": "NOT_EXECUTED",
+  "Android_process_termination": "NOT_EXECUTED",
+  "physical_incident_root_cause": "NOT_ESTABLISHED"
+}

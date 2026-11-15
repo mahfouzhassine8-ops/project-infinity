@@ -1,0 +1,100 @@
+{
+  "active_corrections": [
+    "functional_startup",
+    "saved_destination_and_progress_display",
+    "safe_shutdown",
+    "verified_Search_Watchlist_context",
+    "existing_Silent_Mode_policy",
+    "Cast_discovery_and_end_to_end_delivery_owner_addendum"
+  ],
+  "allowlist_rule": "Record exact authenticated preimage and source-demonstrated necessity before each production change; additional protected component requires owner authorization",
+  "baseline": 2103500,
+  "branch": "work/infinity-2103500-consolidated-repair-20261115",
+  "frozen": [
+    "Cobra",
+    "provider_implementations",
+    "unrelated_UI",
+    "networking",
+    "user_profiles_settings_databases_and_saved_state",
+    "existing_Cast_improvements_until_exact_defect_and_allowlist_review"
+  ],
+  "not_authorized_by_this_record": [
+    "full regression sweep",
+    "owner phone capture",
+    "profile reset",
+    "global dialog suppression"
+  ],
+  "production_allowlist": [
+    {
+      "baseline_sha256": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3",
+      "baseline_source": "repairs/infinity-essential-only-shutdown-2103483-20261112/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h",
+      "functions": [
+        "Observer.__init__ native type table",
+        "Observer.install exact observed type registration",
+        "Observer.native_file_closed",
+        "File.flush",
+        "CheckedBuffer.flush"
+      ],
+      "native_path": "xbmc/interfaces/python/InfinityPythonPersistenceSource.h",
+      "path": "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h",
+      "reason": "Real closed-stream flush raises ValueError after completed close; must not create a new persistence failure; preserve underlying exception and all existing dirty/durability state"
+    },
+    {
+      "baseline_sha256": "48cec98f6eae8a12203345151ec77145327e235979d8a86f34b8c4216601c48c",
+      "baseline_source": "ccc30a77e07c2cf0abc3800ea60f4a68dc6bd9a3:repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java",
+      "functions": [
+        "attach",
+        "detach",
+        "discover",
+        "stopDiscovery",
+        "pickerVisibility",
+        "choose"
+      ],
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java",
+      "reason": "Pinned MediaRouter1.3.0 official chooser requests active scan; current picker passive only; bounded visible-picker scan with unchanged DMR/video filtering and transfer/cleanup"
+    },
+    {
+      "baseline_sha256": "f4c7ae25010820b07704bdb9f9597500dc6f3b1384de96d79122f0451f1f0edc",
+      "baseline_source": "ccc30a77e07c2cf0abc3800ea60f4a68dc6bd9a3:repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java",
+      "functions": [
+        "onWindowFocusChanged"
+      ],
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java",
+      "reason": "Pinned MediaRouter1.3.0 official chooser requests active scan; current picker passive only; bounded visible-picker scan with unchanged DMR/video filtering and transfer/cleanup"
+    }
+  ],
+  "release": "BLOCKED_UNTIL_AUTHORIZED_CORRECTIONS_AND_ASTRA_REVIEW_PASS",
+  "selected_focused_checks": [
+    {
+      "application_execution": false,
+      "controls": [
+        "closed real text/binary/layered buffers",
+        "unchanged closed ValueError",
+        "successful bytes retained",
+        "open stream flush failures remain failures",
+        "pre-existing failures and dirty leases untouched",
+        "no SQLite transaction semantics changed",
+        "overridden closed property does not waive real error",
+        "unknown raw stream cannot prove closed native state",
+        "throwing closed getter preserves original exception",
+        "closed native stream with custom flush method retains failure",
+        "real write closes its raw file during failing flush; callback and dirty state retained"
+      ],
+      "environment": "isolated child processes/disposable files; host CPython 3.12.14 and pinned 3.11.7; not Android",
+      "id": "closed_flush_host",
+      "purpose": "Compare exact shipped observer on successful file close then flush against CPython contract; preserve closed ValueError; exercise real open-stream failures and unresolved writes"
+    },
+    {
+      "application_execution": false,
+      "environment": "host C++17 and disposable temporary files",
+      "id": "closed_flush_native_ledger",
+      "purpose": "Replay actual observer callback difference through unchanged source-map-authenticated native ledger; preserve real failure, dirty buffer, pending transaction, unknown writer, missing durability and late-write guards"
+    },
+    {
+      "application_execution": "separate disposable Android CI package only; no Infinity application or profile",
+      "id": "cast_picker_discovery",
+      "limits": "Receiver discovery over actual Wi-Fi and physical playback not verified",
+      "purpose": "Real pinned SDK API compilation and isolated discovery lifecycle/flags tests; no media or provider tests repeated"
+    }
+  ]
+}
