@@ -2,6 +2,18 @@
 
 This is a **tracking record only**, not authorization to modify production source, sign an APK, or update any release pointer. Preserve original files, source hashes, signing identity, user data, Cobra, and everything outside a separately authorized repair scope.
 
+## Active non-Cast priority — November 15, 2026
+
+**Casting status: ON HOLD / NOT VERIFIED.** The owner could not complete a proper current casting test because expected receiver choices were absent. Do not mark casting repaired, failed, or accepted; no new Cast test, patch, signing, or provider-discovery change is authorized in this workstream. Preserve existing Cast candidates and recovery.
+
+**Work these issues independently, in this order:**
+
+1. **MOVIE-CONTINUE-04:** Protect the current saved movie state first; compare authoritative `continue-watching.json` records, active profile, hidden flags, projection and source recovery read-only. The fallback dialog offering Seren does *not* itself prove saved records were deleted. No destructive migration or playback-history manipulation.
+2. **SHUTDOWN-01:** Investigate TMDb Helper SQLite transactions and Playlist Browser buffer flush `ValueError` as separate pending writer paths. Resolve durability and owner retirement without weakening checkpoint safeguards, then prove real exit.
+3. **SEARCH-WATCHLIST-02:** Trace the missing Infinity Trakt action on aggregated Otaku search results into the existing first-party Watchlist menu. Fix universally, not by modifying individual providers or inventing IDs.
+
+**Release discipline:** one isolated defect-specific diff at a time; no combined speculative build. Verify frozen production/member hashes and original signing continuity only after a proven fix. Cobra, Cast, UI/skins, personal data, search engines, playback tracking, native engine and everything outside the active defect boundary stay untouched.
+
 ## SHUTDOWN-01 — Exit checkpoint fails with unresolved Python/SQLite persistence
 
 - **Status:** OPEN — investigated from existing diagnostics; repair not implemented
@@ -54,7 +66,7 @@ This is a **tracking record only**, not authorization to modify production sourc
 
 ## CAST-DISCOVERY-03 — Previously visible video Cast devices missing from selector
 
-- **Status:** OPEN; reported November 15, 2026. Current user screenshot displays only one device in Infinity's Cast to Device dialog, while two parental-household devices are known to the owner and were expected to be listed.
+- **Status:** DEFERRED / NOT VERIFIED; reported November 15, 2026. Current user screenshot displays only one device in Infinity's Cast to Device dialog, while two parental-household devices are known to the owner and were expected to be listed.
 - **Evidence:** User screenshot of the Cast chooser while a movie is playing. This demonstrates current UI device omission, not proof that missing devices are disconnected, Cast-capable right now, or unavailable in another app.
 - **Source trace:** Existing Cast Java `InfinityCastSession.updateDevices()` filters Android `MediaRouter.getRoutes()` by `route.isEnabled()`, `!route.isDefault()`, `route.matchesSelector(selector)`, successful `CastDevice.getFromBundle(route.getExtras())`, and `CAPABILITY_VIDEO_OUT`. Selector is built for Google's Default Media Receiver. Discovery uses `CALLBACK_FLAG_REQUEST_DISCOVERY` while dialog is attached and stops on detach. Dialog renders only `cast.devices`.
 - **Required read-only diagnosis:** Compare raw current `MediaRouter` route count, filtered device count, and sanitized *rejection reasons*, without recording local IPs or user-defined device labels; check discovery callback lifecycle, Android network permission, active Wi-Fi/VPN/SSID isolation, Cast receiver app compatibility and whether other Cast apps can see those devices under the same connection. Avoid assuming the newer Dolby native remux module affected Java discovery (its reported build left all six DEX files unchanged).
