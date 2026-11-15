@@ -26,5 +26,12 @@
     "empty-shellincidentstartupcause"
   ],
   "source_tests_rerun_by_reviewer": false,
-  "release_approval": false
+  "release_approval": false,
+  "candidate_bridge": {
+    "run": 43771832750,
+    "status": "PASS_SCOPED_NATIVE_INTEGRATION",
+    "verified": "Eight actual embedded ARM64/Python bridge cases, matching native logs, corrected closed-file behavior and intact genuine-error/SQLite/durability/admission guards.",
+    "environment": "Android API 36, ARM64 translation on x86_64",
+    "full_application_acceptance": false
+  }
 }

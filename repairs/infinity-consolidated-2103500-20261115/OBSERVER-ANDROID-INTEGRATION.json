@@ -1,0 +1,144 @@
+{
+  "status": "PASS_SCOPED_NATIVE_ANDROID_INTEGRATION",
+  "run": 43771832750,
+  "source": "d81b5ebeeefcda00eb5979e756c0b5c38430ab05",
+  "artifact_id": 14184786294,
+  "artifact_sha256": "a217a4e6f1e3e62ae4bed9f75ff3ab17e2306b7e8bb6dba3a7a1065b99026e7e",
+  "artifact_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43771832750/artifacts/14184786294",
+  "native_source": "b37fcb89cda1665b3e007516b9e889a743e8dfa7",
+  "native_artifact_id": 14184690584,
+  "retained_baseline_control": 43771035776,
+  "receipt": {
+    "cases": [
+      {
+        "actual_engine_callbacks": true,
+        "case": "closed_binary",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": true,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "closed_layered",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": true,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "closed_text",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": true,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "dirty_buffer",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "python_writer:layered_buffer_flush_failed",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": false,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "durability_denied",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": false,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "flush_error",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "python_writer:buffer_flush_failed",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": false,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "late_write",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": true,
+        "status": "PASS",
+        "variant": "candidate"
+      },
+      {
+        "actual_engine_callbacks": true,
+        "case": "sqlite_pending",
+        "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+        "failure_before_finalization": "python_writer:sqlite_pending_transaction_at_retirement",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": false,
+        "status": "PASS",
+        "variant": "candidate"
+      }
+    ],
+    "correction_tested": true,
+    "environment": {
+      "execution": "ARM64 engine through Android native-bridge translation on x86_64 emulator",
+      "ro.build.version.sdk": "36",
+      "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+      "ro.product.cpu.abilist": "x86_64,arm64-v8a"
+    },
+    "fixture_disposal": "Activities finish normally; each test has its own process. No Infinity installation or process is controlled.",
+    "full_application_startup_shutdown": "NOT_TESTED",
+    "native_source": "b37fcb89cda1665b3e007516b9e889a743e8dfa7",
+    "physical_Fold": false,
+    "status": "PASS_ACTUAL_EMBEDDED_ARM64_BRIDGE",
+    "user_profile_accessed": false,
+    "variant": "candidate"
+  },
+  "independent_review": {
+    "reviewer": "/root/astra_500_review (gpt-6-astra)",
+    "status": "PASS_SCOPED_NATIVE_INTEGRATION",
+    "evidence": "All eight native log rows match the receipts and exact engine. Actual errors, dirty buffers, pending SQLite, durability failure and late-write admission assertions remain effective.",
+    "important_details": [
+      "The durability case requires an actual protected_durability_failed blocker, separate from the writer-failure field.",
+      "The late-write case seals first, then requires PermissionError, an increased native denied counter and absence of the requested new file.",
+      "The pending SQLite connection remains in_transaction before explicit fixture-only rollback."
+    ]
+  },
+  "not_claimed": [
+    "full application functional startup",
+    "full application shutdown and same-profile relaunch",
+    "physical Fold acceptance",
+    "cause of every historical owner incident",
+    "Silent Mode policy GUI execution"
+  ],
+  "APK": "NOT_BUILT",
+  "signed": false
+}

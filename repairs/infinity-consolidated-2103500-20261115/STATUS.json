@@ -14,10 +14,10 @@
       "blocker": "Owner requires original continue-watching.json preservation/verification before relevant changes; file not supplied in thisZIP; exact installed route sources not hashed here"
     },
     "shutdown": {
-      "status": "REVIEWED_OBSERVER_FULL_ARM64_ABI_PASS; ANDROID_BASELINE_FALSE_BLOCKER_REPRODUCED",
+      "status": "SCOPED_OBSERVER_ARM64_AND_ACTUAL_ANDROID_BRIDGE_PASS",
       "evidence": "Existing closed builtin file raises ValueError but observer reports nonexistent unfinished write; real write errors, dirty state, pending SQLite and durability remain blockers",
       "latest_device_close": "COMPLETE2.852s; not evidence this candidate fixed anything",
-      "remaining": "EightcorrectedengineAndroidbridgecasespending; fullapplicationshutdown/sameprofilerelaunch notverified; historicalownerincidentcausality notclaimed; genuinetransactionsremainprotected",
+      "remaining": "Full-application shutdown and same-profile relaunch remain unverified. This proves the closed-flush defect and its correction; it does not establish the cause of every historical device failure. Genuine SQLite transactions remain protected.",
       "code_changed": true,
       "ARM64_run": 43767411079,
       "baseline_control_run": 43771035776,
@@ -31,9 +31,9 @@
     },
     "Silent_Mode": {
       "status": "OWNER_AUTHORIZED_NARROW_POLICY_IMPLEMENTED_AND_SOURCE_REVIEWED; HOST33PASS",
-      "evidence": "Exactpinnedpublisherautomaticpromotionalcaller proof plusactiveInfinityskin/SilentMode required. Dialog::ok and QRWindowDialogMixin::show only; manual,error,security,unknown callers unchanged; noprovideredit.",
+      "evidence": "Suppression requires the exact verified publisher automatic-promotion caller plus the active Infinity skin and existing Silent Mode setting. Only Dialog::ok and QR WindowDialogMixin::show are hooked; manual, error, security and unknown callers retain normal behavior. No provider edit.",
       "code_changed": true,
-      "remaining": "CombinedpolicyengineARM64 pending; actualGUI suppression notverified; installedSlyGuyversion/source notprovided so ownerpopupcoverage notclaimed",
+      "remaining": "Combined policy engine ARM64 build is running. Actual GUI suppression is unverified. Installed SlyGuy source was not supplied, so coverage of the owner popup is not claimed.",
       "source": "465d6a08e1f6291044d5921f20b4ada18395e66a",
       "host_checks": 33,
       "native_build_run": 43771295868
@@ -47,7 +47,7 @@
     },
     "skin_discrepancy": {
       "status": "READ_ONLY_COMPARED",
-      "evidence": "2224reportedhashes,17differfromsigned500;13PowerMenuvariants+4metadata/OSD; noHomewidgetdiffidentified; runtimecopyUNKNOWN",
+      "evidence": "Of 2,224 reported skin hashes, 17 differ from signed500: 13 Power-menu variants and four metadata/OSD files. No inventoried Home widget differs; the active runtime copy is explicitly unknown.",
       "code_changed": false,
       "receipt": "SKIN-READONLY-COMPARISON.json",
       "cause_attributed": false
@@ -59,8 +59,8 @@
     "new_version": "NOT_RESERVED",
     "forward_recovery": "NOT_BUILT",
     "accepted_baseline_advanced": false,
-    "blocker": "Rawcontinue-watchingstore andsavedroute/selectedOtakuidentitymissing; empty-shellfailuremechanismunproven; candidateAndroidandpolicyGUIgatesincomplete. No resets,filterweakening,guessedIDs or inventedPASS.",
-    "next_engineering_gate": "CompletecorrectedengineAndroidbridgeandsafeguardcases,finishreviewedpolicyARM64; retainrecord/identity/startup evidenceblockers; no prematurepackaging/signing"
+    "blocker": "The original continue-watching store, exact saved destinations and selected Otaku identifiers are absent; the empty-shell failure mechanism is not established. Full-application and policy GUI verification remain incomplete. No record reset, relaxed eligibility, guessed identity or partial release is authorized.",
+    "next_engineering_gate": "Finish the reviewed promotional policy ARM64 build and focused GUI verification. Original progress-record, saved-route, selected Search-identity and startup-failure evidence gaps remain open."
   },
   "Cobra": "UNCHANGED",
   "user_data": "NO_PROFILE_STORE_OR_DATABASE_READ_OR_MODIFIED"
