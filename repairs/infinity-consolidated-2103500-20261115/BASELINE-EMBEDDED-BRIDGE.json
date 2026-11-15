@@ -1,0 +1,112 @@
+{
+  "status": "PASS_REPRODUCTION_ONLY",
+  "run": 43771035776,
+  "source": "75e2eb4f2c78dc4943d20caea91c00f90a4f98bb",
+  "artifact_id": 14184566457,
+  "artifact_sha256": "92e0ae33a54c22971cd11f47306ec67e2bb1afb72e4852d17ee0bac193347a96",
+  "artifact_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43771035776/artifacts/14184566457",
+  "receipt": {
+    "cases": [
+      {
+        "actual_engine_callbacks": true,
+        "case": "closed_text",
+        "engine_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+        "failure_before_finalization": "python_writer:buffer_flush_failed",
+        "full_application_startup_shutdown": "NOT_TESTED",
+        "observer_complete": true,
+        "physical_Fold": false,
+        "sealed": false,
+        "status": "PASS",
+        "variant": "baseline"
+      }
+    ],
+    "correction_tested": false,
+    "environment": {
+      "execution": "ARM64 engine through Android native-bridge translation on x86_64 emulator",
+      "ro.build.version.sdk": "36",
+      "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+      "ro.product.cpu.abilist": "x86_64,arm64-v8a"
+    },
+    "fixture_disposal": "Activities finish normally; each test has its own process. No Infinity installation or process is controlled.",
+    "full_application_startup_shutdown": "NOT_TESTED",
+    "native_source": "16df356f0acffbf9ca28ab7095f3a21233998d6d",
+    "physical_Fold": false,
+    "status": "PASS_ACTUAL_EMBEDDED_ARM64_BRIDGE",
+    "user_profile_accessed": false,
+    "variant": "baseline"
+  },
+  "build": {
+    "baseline_APK": "224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40",
+    "cases": {
+      "closed_binary": "ClosedBinary",
+      "closed_layered": "ClosedLayered",
+      "closed_text": "ClosedText",
+      "dirty_buffer": "DirtyBuffer",
+      "durability_denied": "DurabilityDenied",
+      "flush_error": "FlushError",
+      "late_write": "LateWrite",
+      "sqlite_pending": "SqlitePending"
+    },
+    "full_application_acceptance": false,
+    "native_source": "16df356f0acffbf9ca28ab7095f3a21233998d6d",
+    "original_signer_used": false,
+    "packages": {
+      "baseline": {
+        "APK_sha256": "3b22897a4899048bcc39e16edfafe2755f869282427f140c7c65cf3a879890fe",
+        "engine_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75"
+      }
+    },
+    "production_installer": false,
+    "status": "FIXTURES_BUILT_NOT_EXECUTED",
+    "symbols": {
+      "ACTIVE": "_ZN25InfinityScriptPersistence24ActiveProtectedResourcesEv",
+      "ADMIT": "_ZN25InfinityScriptPersistence5AdmitEiRKNSt6__ndk112basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEE",
+      "AUTHORIZED": "_ZN25InfinityScriptPersistence25EssentialWritesAuthorizedEm",
+      "BEGIN": "_ZN25InfinityScriptPersistence20BeginWriteProtectionEmRKNSt6__ndk16vectorINS0_12basic_stringIcNS0_11char_traitsIcEENS0_9allocatorIcEEEENS5_IS7_EEEESB_",
+      "CLOSE": "_ZN25InfinityScriptPersistence22CloseParticipantWritesEm",
+      "END": "_ZN25InfinityPythonPersistence3EndEPNS_7ContextEP3_is",
+      "FINISH": "_ZN25InfinityPythonPersistence6FinishEPNS_7ContextEP3_tsb",
+      "PROOF": "_ZN25InfinityScriptPersistence15EssentialWritesEv",
+      "SEAL": "_ZN25InfinityScriptPersistence19SealEssentialWritesEm",
+      "SNAPSHOT": "_ZN25InfinityScriptPersistence8SnapshotEv",
+      "START": "_ZN25InfinityPythonPersistence5StartEiP3_is",
+      "VFS": "_ZN14PythonBindings21PyInit_Module_xbmcvfsEv"
+    },
+    "types_source_sha256": "12e26e9ee008ec65b3def04e7dc0919ff66a0d1a2d1f22cc220d83c393f7c67e",
+    "variant": "baseline"
+  },
+  "independent_review": {
+    "reviewer": "/root/astra_500_review (gpt-6-astra)",
+    "result": "PASS_REPRODUCTION_ONLY",
+    "evidence": "AuthenticatedAPK/engine,realnativeexports/xbmcvfs,completeobserverinitialization,realclosedtextValueError,singlefalseblocker,sealingfalse andmatchingnativelog;noownerincidentcausalclaim"
+  },
+  "not_claimed": [
+    "corrected_engine_pass",
+    "full_application_functional_startup",
+    "full_application_shutdown",
+    "physical_Fold",
+    "owner_incident_cause"
+  ],
+  "retained_fixture_failures": [
+    {
+      "run": 43768569507,
+      "stage": "missing fixture demangler",
+      "correction": "Use available c++filt; exact12symbolbinding verified"
+    },
+    {
+      "run": 43768826617,
+      "stage": "fixture installation transfer deadline",
+      "correction": "611MiBenginefixtureinstallation180s; actualcases120s unchanged"
+    },
+    {
+      "run": 43769345144,
+      "stage": "Android PackageManager-124 compressed resources.arsc",
+      "correction": "Preserve aapt2 storage and zipalign; retain installer stderr"
+    },
+    {
+      "run": 43770436282,
+      "stage": "fixture Activity recreation duplicated staging",
+      "correction": "One worker per process across Activity recreation; freshdata assertion retained"
+    }
+  ]
+}

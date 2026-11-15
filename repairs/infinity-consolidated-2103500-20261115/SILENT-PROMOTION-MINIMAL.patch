@@ -1,0 +1,86 @@
+--- signed500/xbmc/interfaces/legacy/Dialog.cpp
++++ candidate/xbmc/interfaces/legacy/Dialog.cpp
+@@ -5,6 +5,16 @@
+  *  SPDX-License-Identifier: GPL-2.0-or-later
+  *  See LICENSES/README.md for more information.
+  */
++#ifdef HAS_PYTHON
++#include <Python.h>
++#include "InfinityPromotionalDialog.h"
++#include "AddonUtils.h"
++#include "GUIInfoManager.h"
++#include "guilib/WindowIDs.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++#endif
++
+ #include "Dialog.h"
+ 
+ #include "LanguageHook.h"
+@@ -180,6 +190,23 @@
+ 
+     bool Dialog::ok(const String& heading, const String& message)
+     {
++#ifdef HAS_PYTHON
++      // Classify the exact automatic producer with the GIL held; unknown or
++      // manual dialogs retain their original presentation path.
++      if (InfinityPromotionalDialog::Capture(InfinityPromotionalDialog::Surface::OkDialog))
++      {
++        // Existing GUI lock order releases the GIL before the frame guard.
++        // It ends before the original blocking presentation call below.
++        XBMCAddonUtils::GuiLock policyLock(languageHook, false);
++        auto* gui = CServiceBroker::GetGUI();
++        const auto settingsComponent = CServiceBroker::GetSettingsComponent();
++        const auto settings = settingsComponent ? settingsComponent->GetSettings() : nullptr;
++        if (gui && settings &&
++            settings->GetString(CSettings::SETTING_LOOKANDFEEL_SKIN) == "skin.infinity.diggz" &&
++            gui->GetInfoManager().EvaluateBool("Skin.HasSetting(Infinity.SilentMode)", WINDOW_HOME))
++          return true;
++      }
++#endif
+       DelayedCallGuard dcguard(languageHook);
+       return HELPERS::ShowOKDialogText(CVariant{heading}, CVariant{message});
+     }
+--- signed500/xbmc/interfaces/legacy/WindowDialogMixin.cpp
++++ candidate/xbmc/interfaces/legacy/WindowDialogMixin.cpp
+@@ -5,6 +5,16 @@
+  *  SPDX-License-Identifier: GPL-2.0-or-later
+  *  See LICENSES/README.md for more information.
+  */
++
++#ifdef HAS_PYTHON
++#include <Python.h>
++#include "InfinityPromotionalDialog.h"
++#include "AddonUtils.h"
++#include "GUIInfoManager.h"
++#include "guilib/WindowIDs.h"
++#include "settings/Settings.h"
++#include "settings/SettingsComponent.h"
++#endif
+ 
+ #include "WindowDialogMixin.h"
+ 
+@@ -23,6 +33,23 @@
+     void WindowDialogMixin::show()
+     {
+       XBMC_TRACE;
++#ifdef HAS_PYTHON
++      // Classify the exact automatic producer with the GIL held; unknown or
++      // manual dialogs retain their original presentation path.
++      if (InfinityPromotionalDialog::Capture(InfinityPromotionalDialog::Surface::QrWindow))
++      {
++        // Existing GUI lock order releases the GIL before the frame guard.
++        // It ends before the original blocking presentation call below.
++        XBMCAddonUtils::GuiLock policyLock(w->GetLanguageHook(), false);
++        auto* gui = CServiceBroker::GetGUI();
++        const auto settingsComponent = CServiceBroker::GetSettingsComponent();
++        const auto settings = settingsComponent ? settingsComponent->GetSettings() : nullptr;
++        if (gui && settings &&
++            settings->GetString(CSettings::SETTING_LOOKANDFEEL_SKIN) == "skin.infinity.diggz" &&
++            gui->GetInfoManager().EvaluateBool("Skin.HasSetting(Infinity.SilentMode)", WINDOW_HOME))
++          return;
++      }
++#endif
+       CServiceBroker::GetAppMessenger()->SendMsg(TMSG_GUI_PYTHON_DIALOG, HACK_CUSTOM_ACTION_OPENING,
+                                                  0, static_cast<void*>(w->window->get()));
+     }
