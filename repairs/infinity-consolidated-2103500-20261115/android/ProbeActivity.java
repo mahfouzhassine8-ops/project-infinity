@@ -6,9 +6,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Separate CI package/processes. Never installed on the owner's profile. */
 public class ProbeActivity extends Activity {
+  private static final AtomicBoolean started = new AtomicBoolean();
+  private static volatile ProbeActivity visible;
   static { System.loadLibrary("infinityobserverqa"); }
   private static native String runNative(String directory, String pythonPath,
       String caseName, String pythonCode, boolean corrected);
@@ -27,6 +30,10 @@ public class ProbeActivity extends Activity {
   }
   @Override public void onCreate(Bundle state) {
     super.onCreate(state);
+    visible=this;
+    // Android may recreate this Activity after the installation metadata
+    // notification. Each process still executes its case exactly once.
+    if (!started.compareAndSet(false,true)) return;
     final String scenario=getIntent().getStringExtra("case");
     new Thread(()->{
       String result;
@@ -46,14 +53,19 @@ public class ProbeActivity extends Activity {
         result=runNative(root.getAbsolutePath(),python.getAbsolutePath(),scenario,code,
             getPackageName().endsWith("candidate"));
       } catch(Exception error) {
+        android.util.Log.e("InfinityObserverQA","fixture failed",error);
         result="{\"status\":\"FAIL\",\"stage\":\"java_fixture\",\"reason\":\""+
             error.getClass().getSimpleName()+"\"}";
       }
       try(FileOutputStream out=new FileOutputStream(new File(getExternalFilesDir(null),scenario+".json"))) {
         out.write(result.getBytes(StandardCharsets.UTF_8));
       } catch(Exception error) { android.util.Log.e("InfinityObserverQA","receipt write failed",error); }
-      runOnUiThread(this::finishAndRemoveTask);
+      runOnUiThread(()->{ProbeActivity current=visible;if(current!=null)current.finishAndRemoveTask();});
     },"observer-fixture").start();
+  }
+  @Override public void onDestroy() {
+    if(visible==this) visible=null;
+    super.onDestroy();
   }
   public static class ClosedBinary extends ProbeActivity {}
   public static class ClosedText extends ProbeActivity {}
