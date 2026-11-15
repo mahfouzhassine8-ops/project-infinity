@@ -61,6 +61,38 @@
       ],
       "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java",
       "reason": "Pinned MediaRouter1.3.0 official chooser requests active scan; current picker passive only; bounded visible-picker scan with unchanged DMR/video filtering and transfer/cleanup"
+    },
+    {
+      "path": "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/Dialog.cpp",
+      "native_path": "xbmc/interfaces/legacy/Dialog.cpp",
+      "baseline_source": "authenticated500-native:xbmc/interfaces/legacy/Dialog.cpp",
+      "baseline_sha256": "ed08b1edbd77c0ded6d49c8942bfb5028fa5c4d278b02ae8fb96161378754315",
+      "functions": [
+        "Dialog::ok"
+      ],
+      "reason": "Owner-authorized narrow Silent Mode extension: authenticated automatic publisher promotion only; preserve all other dialog routes, errors and manual actions; unchanged QR close lifecycle"
+    },
+    {
+      "path": "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/WindowDialogMixin.cpp",
+      "native_path": "xbmc/interfaces/legacy/WindowDialogMixin.cpp",
+      "baseline_source": "authenticated500-native:xbmc/interfaces/legacy/WindowDialogMixin.cpp",
+      "baseline_sha256": "46a79e7f92d3921b7006ea4bf2cb1b87908ad06fa2f4e115765efbfca6ba1de1",
+      "functions": [
+        "WindowDialogMixin::show"
+      ],
+      "reason": "Owner-authorized narrow Silent Mode extension: authenticated automatic publisher promotion only; preserve all other dialog routes, errors and manual actions; unchanged QR close lifecycle"
+    },
+    {
+      "path": "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/InfinityPromotionalDialog.h",
+      "native_path": "xbmc/interfaces/legacy/InfinityPromotionalDialog.h",
+      "baseline_source": "NEW_AUTHORIZED_SILENT_POLICY_HEADER",
+      "baseline_sha256": null,
+      "functions": [
+        "Capture",
+        "SameCode",
+        "Source"
+      ],
+      "reason": "Bounded exact-code/source proof for unsolicited promotion; no provider modification, no global dialog suppression, no persistence exemption"
     }
   ],
   "release": "BLOCKED_UNTIL_AUTHORIZED_CORRECTIONS_AND_ASTRA_REVIEW_PASS",
@@ -145,6 +177,39 @@
         "physicalFoldacceptance"
       ],
       "sequence": "Onebaselineclosedtextcontrol now; eightcandidatecasesafterARM64gate. Retainbaselineevidence; no unnecessaryrepeat"
+    },
+    {
+      "authorization": "Latestownerexplicitlyauthorizednarrowpromotionalpolicyextension; Astrareviewednativecallchainanddefaultallowcontract",
+      "checks": [
+        "automaticFolderandItemchains",
+        "manualdonation/errorremainallowed",
+        "loadedcodevsdiskmismatch",
+        "sourcehashmismatch",
+        "symlinkandFIFOdefaultallow",
+        "pendingexception/errno preservation",
+        "audithookreentrancy",
+        "optimization0/1/2",
+        "QRcleanupcallretained",
+        "descriptor RAII closes on allocation exception; reviewed source"
+      ],
+      "environment": "HostCPython3.11.7 nativeCAPIclassification; separatelycompiledpinnedpublisherfunctions; inertUI/networkfixtures",
+      "id": "unsolicited_promotion_classifier",
+      "not_claimed": [
+        "actualKodiGUIdismissal",
+        "installedSlyGuyversionmatch",
+        "ownerpopupfixed"
+      ],
+      "production_status": "Two exact500 GUI call sites staged after native classifier tests and Astra review; Android behavior NOT VERIFIED"
+    },
+    {
+      "id": "native500_promotion_integration",
+      "purpose": "Compile/link reviewed owner-authorized promotional UI extension together with unchanged closedflush correction; exact500map preimage,9410unchangednativefiles, originalABI/dependencies preserved",
+      "environment": "PinnedNDKr21e AndroidARM64; realGUI execution separate",
+      "not_claimed": [
+        "installedSlyGuy source confirmed",
+        "ownerpopup fixed",
+        "fullapplication acceptance"
+      ]
     }
   ]
 }

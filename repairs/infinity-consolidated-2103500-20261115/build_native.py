@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
-"""Reproduce signed500's native source, then apply only the reviewed flush fix.
+"""Reproduce signed500's native source, then apply the reviewed, explicitly allowlisted native fixes.
 
 Historical tools reconstruct provenance, not an older application payload.
 The entire reconstructed map must equal the authenticated signed500 map before
-the sole candidate header is applied. No APK, profile or signing key is used.
+the allowlisted candidate overlays are applied. No APK, profile or signing key is used.
 """
 from pathlib import Path
 import hashlib
 import importlib.util
 import json
+import mmap
 import os
 import re
 import subprocess
@@ -105,21 +106,31 @@ def prepare():
     expected = json.loads((ROOT / 'baseline500-native/NATIVE-SOURCE-MAP.json').read_text())
     assert len(expected) == 9413 and hasher().hashes(native) == expected, 'Exact500 source preimage mismatch'
     save('BASE500-NATIVE-SOURCE-MAP.json', expected)
-    row = next(r for r in json.loads((HERE / 'SCOPE.json').read_text())['production_allowlist'] if r.get('native_path') == OBSERVER)
-    assert sha(native / OBSERVER) == expected[OBSERVER] == row['baseline_sha256']
-    candidate = HERE / 'native/overlay' / OBSERVER
-    (native / OBSERVER).write_bytes(candidate.read_bytes())
+    rows = [r for r in json.loads((HERE / 'SCOPE.json').read_text())['production_allowlist'] if 'native_path' in r]
     after = dict(expected)
-    after[OBSERVER] = sha(candidate)
-    assert after[OBSERVER] != expected[OBSERVER]
+    changed = {}
+    for row in rows:
+        name = row['native_path']
+        previous = row['baseline_sha256']
+        if previous is None:
+            assert name == 'xbmc/interfaces/legacy/InfinityPromotionalDialog.h'
+            assert name not in expected and not (native / name).exists()
+        else:
+            assert sha(native / name) == expected[name] == previous
+        candidate = ROOT / row['path']
+        (native / name).parent.mkdir(parents=True, exist_ok=True)
+        (native / name).write_bytes(candidate.read_bytes())
+        after[name] = sha(candidate)
+        assert after[name] != previous
+        changed[name] = dict(before=previous, after=after[name])
+    assert len(changed) == 4 and len(after) == 9414
     assert hasher().hashes(native) == after
     save('NATIVE-SOURCE-MAP.json', after)
     save('SOURCE-PRESERVATION.json', dict(
-        status='PASS_EXACT_SIGNED500_SOURCE_PLUS_ONE_REVIEWED_OBSERVER_HEADER',
+        status='PASS_EXACT_SIGNED500_PLUS_REVIEWED_OBSERVER_AND_NARROW_PROMOTION_POLICY',
         source=os.environ['GITHUB_SHA'], baseline_native_sha256=ENGINE,
-        baseline_source_map_sha256=MAP, unchanged_native_files=9412,
-        changed={OBSERVER: dict(before=expected[OBSERVER], after=after[OBSERVER])},
-        Cast_native='UNCHANGED', Cobra='UNCHANGED', Python_startup='UNCHANGED',
+        baseline_source_map_sha256=MAP, unchanged_native_files=9410,
+        changed=changed, Cast_native='UNCHANGED', Cobra='UNCHANGED', Python_startup='UNCHANGED',
         admission_SQLite_durability_guards='UNCHANGED', Android_execution='NOT_RUN', signed=False))
 
 
@@ -143,7 +154,7 @@ def dependencies():
 def compile_native():
     gate()
     expected = json.loads((OUT / 'NATIVE-SOURCE-MAP.json').read_text())
-    assert len(expected) == 9413
+    assert len(expected) == 9414
     compiler = load(TOOLS / 'repairs/universal-persistence-2103401/build.py', 'frozen500_arm64_compiler')
     compiler.OUT = OUT
     original = compiler.checked_sources
@@ -157,9 +168,14 @@ def compile_native():
 
     compiler.checked_sources = checked
     proof = with_tools(compiler.compile_engine)
-    assert proof['complete_native_engine_compiled'] and proof['reviewed_file_count'] == 9413
+    assert proof['complete_native_engine_compiled'] and proof['reviewed_file_count'] == 9414
     library = OUT / 'libkodi.so'
     assert sha(library) == proof['native_sha256']
+    # A disabled HAS_PYTHON branch must not masquerade as policy integration.
+    with library.open('rb') as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as binary:
+        for marker in (b'ab3e19bd94f3575ba0a2b3ec957bfa69f1fe4a439d3f2a21cd4cc2e45cb56e97',
+                       b'f197feaf23a5115e3d593a2cb7586b70706cd93701e107feb2c859be593f3ad0'):
+            assert binary.find(marker) >= 0, 'Promotional policy was not compiled into real engine'
     readelf = Path(os.environ['ANDROID_HOME']) / 'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
 
     def abi(path):
@@ -182,6 +198,7 @@ def compile_native():
     save('ARM64.json', dict(status='PASS_FULL_ARM64_LINK_AND_EXACT500_ABI',
         source=os.environ['GITHUB_SHA'], baseline_native_sha256=ENGINE,
         native_sha256=sha(library), exported_interfaces_preserved=len(after[0]),
+        promotional_policy_compiled=True,
         dependencies=sorted(after[1]), Android_execution='NOT_RUN', signed=False,
         application_acceptance=False, physical_Fold_acceptance=False))
 

@@ -1,0 +1,24 @@
+{
+  "reviewer": "/root/astra_500_review (gpt-6-astra)",
+  "status": "PASS_SOURCE_AND_HOST_RECEIPT_REVIEW_NOT_APPLICATION_ACCEPTANCE",
+  "baseline": 2103500,
+  "files": {
+    "native/overlay/xbmc/interfaces/legacy/Dialog.cpp": "359dfb92f77810180a47494b0a70bd3930a2b62426e74b8b68b2d606e6e2bde5",
+    "native/overlay/xbmc/interfaces/legacy/InfinityPromotionalDialog.h": "50aea2e1b99390ea3beeaa0e63197220600804541d1d563a4d86271bf77d0956",
+    "native/overlay/xbmc/interfaces/legacy/WindowDialogMixin.cpp": "b4699bac6885b20d9d03dafb94301c3be9e765cb356254f2a49affd50e10d810"
+  },
+  "findings": {
+    "code_verification": "Bounded structural comparison accepted; canonicalcode/localsplus,exactconstants,noPythonEquality; independentcompile0/1/2 positive plus loadedcode/source negatives",
+    "fd_resource": "RAII closes source fd on allocation exception and checks explicit close outcome",
+    "lock_order": "Classify under binding GIL; GuiLock releases GIL before frameguard; ends before original presentation",
+    "QR_close": "Unchanged close targets only inactive QR window; native Close_Internal returns without deinit/navigation",
+    "preservation": "Exact Dialog.cpp and WindowDialogMixin.cpp preimages equal authenticated500source; onlyincludes and two policy branches differ; no provider,Cobra,settings,data,close,manual,error changes"
+  },
+  "not_verified": [
+    "Android policy compilation/runtime",
+    "actual GUI rendering",
+    "installedSlyGuy version/source coverage",
+    "ownerpopup repaired",
+    "release authorization"
+  ]
+}

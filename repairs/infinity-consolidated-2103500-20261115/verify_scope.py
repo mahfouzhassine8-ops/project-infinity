@@ -22,10 +22,20 @@ def main():
     evidence = []
     for row in scope['production_allowlist']:
         source = row['baseline_source']
-        if ':' not in source:
-            source = '9ce852ebb044a82853ef93af24e34a07ed96daff:' + source
-        before = subprocess.check_output(['git', 'show', source], cwd=ROOT)
-        assert hashlib.sha256(before).hexdigest() == row['baseline_sha256'], source
+        if source == 'NEW_AUTHORIZED_SILENT_POLICY_HEADER':
+            assert row['baseline_sha256'] is None
+            assert row['native_path'] == 'xbmc/interfaces/legacy/InfinityPromotionalDialog.h'
+        elif source.startswith('authenticated500-native:'):
+            name = source.split(':', 1)[1]
+            before = (HERE / 'native/baseline' / name).read_bytes()
+            assert hashlib.sha256(before).hexdigest() == row['baseline_sha256'], source
+            # Full map equality is checked again against the authenticated
+            # native producer artifact by build_native.py before mutation.
+        else:
+            if ':' not in source:
+                source = '9ce852ebb044a82853ef93af24e34a07ed96daff:' + source
+            before = subprocess.check_output(['git', 'show', source], cwd=ROOT)
+            assert hashlib.sha256(before).hexdigest() == row['baseline_sha256'], source
         after = (ROOT / row['path']).read_bytes()
         evidence.append(dict(path=row['path'], before=row['baseline_sha256'], after=hashlib.sha256(after).hexdigest()))
     # The embedded Python source must compile before any native build consumes it.
