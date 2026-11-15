@@ -117,6 +117,34 @@
         "21 AndroidCastSDKchecks"
       ],
       "purpose": "Compile/link full9413 native map from authenticated500 with only reviewedobserverheader; compareall GLOBAL andWEAK exportedinterfaces anddependencies; exerciseembeddedPython/nativecallbacks separately"
+    },
+    {
+      "application_execution": false,
+      "cases": [
+        "closedtext",
+        "closedbinary",
+        "closedlayered",
+        "realflusherror",
+        "dirtybuffer",
+        "uncommittedSQLite",
+        "actualdurabilitydenied",
+        "latenativewritedenial"
+      ],
+      "environment": "API36 x86_64emulator executingrealARM64 engineviaAndroidnativebridge; independenttestpackageprocesses",
+      "functions": [
+        "Actual Py_Initialize/Py_NewInterpreter",
+        "Actual xbmcVFS moduleinitializer",
+        "Actual nativeAdmit/Start/Finish/End",
+        "Actual Snapshot/BeginWriteProtection/SealEssentialWrites"
+      ],
+      "id": "actual_embedded_android_bridge",
+      "not_claimed": [
+        "ownerprofileaccess",
+        "fullKodi appstartupshutdown",
+        "physicalARM64execution",
+        "physicalFoldacceptance"
+      ],
+      "sequence": "Onebaselineclosedtextcontrol now; eightcandidatecasesafterARM64gate. Retainbaselineevidence; no unnecessaryrepeat"
     }
   ]
 }

@@ -16,7 +16,8 @@ def main():
     changed = subprocess.check_output(['git', 'diff', '--name-only', ANCESTOR], cwd=ROOT, text=True).splitlines()
     prefix = HERE.relative_to(ROOT).as_posix() + '/'
     workflows = {'.github/workflows/infinity-500-focused-verification.yml',
-                 '.github/workflows/infinity-500-native-integration.yml'}
+                 '.github/workflows/infinity-500-native-integration.yml',
+                 '.github/workflows/infinity-500-native-bridge.yml'}
     assert all(name in allowed or name.startswith(prefix) or name in workflows for name in changed), changed
     evidence = []
     for row in scope['production_allowlist']:
