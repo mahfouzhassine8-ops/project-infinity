@@ -1,0 +1,168 @@
+--- signed500/xbmc/interfaces/python/InfinityPythonPersistenceSource.h
++++ candidate/xbmc/interfaces/python/InfinityPythonPersistenceSource.h
+@@ -119,6 +119,14 @@
+         self.held_connections = set()
+         self.held_handles = set()
+         self.children = set()
++        # Only exact native or observer-created types can prove a closed file.
++        # Keep original C descriptors; add-ons may override .closed or .raw.
++        self.native_file_types = {_io.FileIO: (_io.FileIO, None)}
++        for native_type, field in ((_io.BufferedReader, 'raw'),
++                                   (_io.BufferedWriter, 'raw'),
++                                   (_io.BufferedRandom, 'raw'),
++                                   (_io.TextIOWrapper, 'buffer')):
++            self.native_file_types[native_type] = (native_type, field)
+         self.host_probe = host_probe
+         self.child_scope = threading.local()
+         self.originals = []
+@@ -128,6 +136,25 @@
+         self.closed_error = closed_error
+         self.native_vfs_write = native_vfs_write
+         self.install()
++
++    def native_file_closed(self, handle, flush):
++        # At most TextIOWrapper -> buffered stream -> FileIO. Unknown/custom
++        # streams retain the original failure path, even if .closed says true.
++        native = self.native_file_types.get(type(handle))
++        if (native is None or type(flush) is not types.BuiltinMethodType or
++                flush != native[0].flush.__get__(handle)):
++            return False
++        for _ in range(3):
++            native = self.native_file_types.get(type(handle))
++            if native is None: return False
++            original, field = native
++            try:
++                if field is None:
++                    return original.closed.__get__(handle) is True
++                handle = getattr(original, field).__get__(handle)
++            except (AttributeError, TypeError, ValueError):
++                return False
++        return False
+ 
+     @contextmanager
+     def operation(self, name, targets):
+@@ -300,6 +327,7 @@
+         for method in ('write', 'truncate', 'flush', 'close'):
+             setattr(RawFile, method, protected_method('raw.'+method)(getattr(RawFile, method)))
+         self.raw_type = RawFile
++        self.native_file_types[RawFile] = (original_raw, None)
+         self.patch(_io, 'FileIO', RawFile)
+         self.patch(io, 'FileIO', RawFile)
+         for name in ('BufferedWriter', 'BufferedRandom', 'TextIOWrapper'):
+@@ -324,8 +352,14 @@
+                 def writelines(self, values):
+                     for value in values: self.write(value)
+                 def flush(self):
+-                    try: return super().flush()
+-                    except Exception:
++                    flush = super().flush
++                    already_closed = observer.native_file_closed(self, flush)
++                    try: return flush()
++                    except Exception as error:
++                        # Classify only an actual native closed-stream error;
++                        # do not skip the call, clear dirty state or trust .closed.
++                        if type(error) is ValueError and already_closed and observer.native_file_closed(self, flush):
++                            raise
+                         observer.error('layered_buffer_flush_failed')
+                         raise
+                 def truncate(self, size=None):
+@@ -345,6 +379,7 @@
+                 setattr(CheckedBuffer, method, protected_method('buffer.'+method,
+                         dirty=method in ('write', 'truncate'), clean=method in ('flush', 'close'))(
+                             getattr(CheckedBuffer, method)))
++            self.native_file_types[CheckedBuffer] = (base, 'buffer' if name == 'TextIOWrapper' else 'raw')
+             self.patch(_io, name, CheckedBuffer)
+             self.patch(io, name, CheckedBuffer)
+         _INFINITY_INITIALIZATION_STAGE = 'python.import._sqlite3'
+@@ -940,8 +975,16 @@
+             raise
+     @protected_method('file.flush', clean=True)
+     def flush(self):
+-        try: return self._infinity_handle.flush()
+-        except Exception:
++        handle, flush, already_closed = self._infinity_handle, None, False
++        try:
++            flush = handle.flush
++            already_closed = self.observer.native_file_closed(handle, flush)
++            return flush()
++        except Exception as error:
++            # Preserve the native closed-stream exception without inventing a
++            # failed write. Custom flush methods and all dirty state stay protected.
++            if type(error) is ValueError and already_closed and self.observer.native_file_closed(handle, flush):
++                raise
+             self.observer.error('buffer_flush_failed')
+             raise
+     @protected_method('file.close', clean=True)
+--- signed500/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java
++++ candidate/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java
+@@ -42,6 +42,7 @@
+     private final ExecutorService initialization=Executors.newSingleThreadExecutor(r->{
+         Thread t=new Thread(r,"InfinityCastInitialization");t.setDaemon(true);return t;});
+     private boolean initializing,initialized,discovering,initializationAttempted,listening;
++    private boolean pickerVisible;
+     private CastContext sdk;
+     private MediaRouter router;
+     private MediaRouteSelector selector;
+@@ -95,12 +96,14 @@
+     private InfinityCastSession(Context context){this.context=context;}
+     void attach(View value) {
+         view=new WeakReference<>(value);
++        pickerVisible=true;
+         if(!initialized && !initializationAttempted)initialize();
+         else if(initialized){listen();discover();if(!cleanupPending && !returning && !selecting && !transferStarted && !handedOff && !phone.busy())capture();}
+         changed();
+     }
+     void detach(View value) {
+-        if(view.get()==value)view.clear();
++        if(view.get()!=value)return;
++        view.clear();pickerVisible=false;
+         stopDiscovery();
+         // Close Controls dismisses presentation only; transfer/session owns its bounded cleanup.
+         if(!selecting && !transferStarted && !handedOff && !cleanupPending){if(!token.isEmpty())leaveReceiver(false);else unlisten();}
+@@ -140,11 +143,21 @@
+     private void unavailable(String reason){initializing=false;if(!initialized)initializationAttempted=false;message=reason;changed();}
+     private void listen(){if(sdk!=null && !listening){sdk.getSessionManager().addSessionManagerListener(this,CastSession.class);listening=true;}}
+     private void unlisten(){if(sdk!=null && listening){sdk.getSessionManager().removeSessionManagerListener(this,CastSession.class);listening=false;}}
++    void pickerVisibility(View value,boolean visible) {
++        if(view.get()!=value)return;
++        pickerVisible=visible;
++        if(visible)discover();else stopDiscovery();
++    }
+     private void discover() {
+-        if(router==null || selector==null || discovering)return;
+-        discovering=true;router.addCallback(selector,routes,MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY);updateDevices();
+-    }
+-    private void stopDiscovery(){if(router!=null && discovering)router.removeCallback(routes);discovering=false;}
++        if(router==null || selector==null || discovering || !pickerVisible || view.get()==null ||
++                selecting || transferStarted || handedOff || returning || cleanupPending)return;
++        // Match the pinned SDK's chooser. MediaRouter1.3.0 bounds active scans
++        // to 30 seconds; route/status callbacks must not renew that deadline.
++        discovering=true;router.addCallback(selector,routes,
++            MediaRouter.CALLBACK_FLAG_REQUEST_DISCOVERY | MediaRouter.CALLBACK_FLAG_PERFORM_ACTIVE_SCAN);
++        InfinityCastDiagnostics.event("discovery","active_scan_requested",0);updateDevices();
++    }
++    private void stopDiscovery(){if(router!=null && discovering){router.removeCallback(routes);InfinityCastDiagnostics.event("discovery","stopped",0);}discovering=false;}
+     private void updateDevices() {
+         devices.clear();
+         if(router!=null)for(MediaRouter.RouteInfo route:router.getRoutes())
+@@ -188,6 +201,7 @@
+         CastDevice chosen=CastDevice.getFromBundle(devices.get(index).getExtras());
+         if(chosen==null || !chosen.hasCapability(CastDevice.CAPABILITY_VIDEO_OUT)){selecting=false;message="That receiver does not support video.";changed();return;}
+         selectedDeviceId=chosen.getDeviceId();
++        stopDiscovery();
+         ++epoch;stage("receiver_connect",20000,"The TV connection did not become ready. Phone playback continues.");devices.get(index).select();
+         CastSession existing=sdk==null?null:sdk.getSessionManager().getCurrentCastSession();
+         if(existing!=null && existing.isConnected() && existing.getCastDevice()!=null && selectedDeviceId.equals(existing.getCastDevice().getDeviceId()))connectedSession(existing);
+--- signed500/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java
++++ candidate/repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java
+@@ -85,6 +85,10 @@
+             });
+         } catch(Exception ignored){}
+     }
++    @Override public void onWindowFocusChanged(boolean focused) {
++        super.onWindowFocusChanged(focused);
++        cast.pickerVisibility(this,focused && isShowing());
++    }
+     private int dp(int value){return Math.round(value*activity.getResources().getDisplayMetrics().density);}
+     private TextView text(String value,int size,boolean bold) {
+         TextView view=new TextView(activity);view.setText(value);view.setTextSize(size);view.setPadding(0,dp(4),0,dp(4));if(bold)view.setTypeface(Typeface.DEFAULT,Typeface.BOLD);return view;

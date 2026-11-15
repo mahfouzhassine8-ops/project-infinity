@@ -13,17 +13,35 @@
     "Inspect actual pinned SDK callback flags/removal; do not rely only on application boolean",
     "Ensure SDK timestamp clock has advanced before repeated-visibility comparison"
   ],
-  "not_claimed": [
-    "Android execution",
-    "ARM64 engine integration",
-    "Wi-Fi discovery of owner devices",
-    "physical receiver playback",
-    "physical incident resolution"
-  ],
   "SDK_source_reference": {
     "url": "https://dl.google.com/dl/android/maven2/androidx/mediarouter/mediarouter/1.3.0/mediarouter-1.3.0-sources.jar",
     "sha256": "912d3eaace340474289ef1e4f02e6526efe2af32f695c8c1c4a31444af343442",
     "active_scan_bound": "30000ms existing SDK throttler; not renewed by route/status callbacks"
   },
-  "scope_preservation": "DMR, video filtering, media transport/remux, shutdown guards outside classified flush, tracking, provider code, Cobra unchanged"
+  "scope_preservation": "DMR, video filtering, media transport/remux, shutdown guards outside classified flush, tracking, provider code, Cobra unchanged",
+  "post_execution_review": {
+    "verdict": "PASS_ISOLATED_CAST_DISCOVERY_STAGE",
+    "run": 43762472390,
+    "reviewed_receipts": [
+      "CAST-ANDROID.json",
+      "CAST-COMPONENT.json",
+      "CAST-CLASS-PRESERVATION.json",
+      "SOURCE-SCOPE.json"
+    ],
+    "limitations": [
+      "Actual InfinityCastDialog OS focus delivery",
+      "Wi-Fi receiver detection on owner LAN",
+      "Physical TV decoding/playback",
+      "Full Infinity application regression",
+      "Observer ARM64/native Python bridge",
+      "Candidate install-over/forward recovery"
+    ]
+  },
+  "pre_execution_not_claimed": [
+    "Android execution",
+    "ARM64 engine integration",
+    "Wi-Fi discovery of owner devices",
+    "physical receiver playback",
+    "physical incident resolution"
+  ]
 }

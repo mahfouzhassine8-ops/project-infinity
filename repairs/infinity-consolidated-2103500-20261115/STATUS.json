@@ -32,10 +32,11 @@
       "remaining": "Promotional-dialog suppression would extend policy; producer invocation/state still must be verified; no global suppression or provider change"
     },
     "Cast": {
-      "status": "SOURCE_CONFIRMED_DISCOVERY_CORRECTION; ANDROID_PENDING",
+      "status": "BOUNDED_DISCOVERY_CORRECTION_ANDROID_SDK_LIFECYCLE_PASS; FULL_CAST_ACCEPTANCE_PENDING",
       "evidence": "Passive-only picker upgraded to SDK bounded active discovery, stops on selection/focusloss/dismiss; stale detach cannot release current view",
       "playback": "500 already includesHLSmaster/Dolbyheader fixes; no additional decoder/relay defect established; physical playbackNOTVERIFIED",
-      "protected": "DMR, video filtering, secure relay, remux, tracking and cleanup unchanged"
+      "protected": "DMR, video filtering, secure relay, remux, tracking and cleanup unchanged",
+      "verification": "run43762472390: API36,21checks; exact500 class/resource preservation; Astra independently reviewed"
     }
   },
   "release": {
@@ -44,7 +45,8 @@
     "new_version": "NOT_RESERVED",
     "forward_recovery": "NOT_BUILT",
     "accepted_baseline_advanced": false,
-    "blocker": "All authorized corrections and Android/native preservation gates not yet complete"
+    "blocker": "All authorized corrections and Android/native preservation gates not yet complete",
+    "next_engineering_gate": "Resolve original record/identity/policy and startup evidence contracts before integrated native ARM64/full-application verification and signing"
   },
   "Cobra": "UNCHANGED",
   "user_data": "NO_PROFILE_STORE_OR_DATABASE_READ_OR_MODIFIED"

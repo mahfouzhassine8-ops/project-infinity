@@ -1,0 +1,20 @@
+{
+  "pass": true,
+  "reason": "SDK_picker_lifecycle_verified",
+  "API": 36,
+  "checks": 21,
+  "main_thread_pulses": 28,
+  "scope": "Real pinned SDK initialization and discovery callback lifecycle only; no receiver transfer, media probe, native observer or Infinity shutdown",
+  "SDK_active_scan_flag_verified": true,
+  "SDK_request_timestamp_not_renewed": true,
+  "active_scan_expiry": "30s_PINNED_SDK_SOURCE_CONTRACT_NOT_TIMED_ON_ANDROID",
+  "wifi_receiver_discovery": "NOT_TESTED",
+  "physical_TV_playback": "NOT_TESTED",
+  "media_delivery": "UNCHANGED_NOT_RERUN",
+  "Kodi_shutdown": "NOT_RUN",
+  "native_observer_correction": "NOT_INCLUDED_IN_THIS_PROBE",
+  "owner_installer": false,
+  "original_APK_modified": false,
+  "owner_device": "NOT_TESTED",
+  "shutdown": "NOT_SELECTED"
+}

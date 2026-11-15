@@ -1,0 +1,42 @@
+{
+  "status": "PASS_ISOLATED_CAST_SDK_COMPONENT_AND_DISCOVERY_LIFECYCLE",
+  "producer": {
+    "run": 43762472390,
+    "commit": "07a0ada538fd397430a6a1b7f3577c3cbfca8b83",
+    "artifact": 14180278660,
+    "artifact_sha256": "be931b1864a1fc08213935e6ae862d8bda37e64a18fede69b33befea74b41e19",
+    "url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43762472390"
+  },
+  "Android": {
+    "API": 36,
+    "arch": "x86_64",
+    "checks": 21,
+    "main_thread_pulses": 28,
+    "actual_SDK_active_flag": true,
+    "existing_SDK_timestamp_not_renewed": true,
+    "actual_callback_removed": true,
+    "stale_dialog_cannot_detach_current_view": true,
+    "scan_expiry": "Existing SDK30s source contract; no repeated timed test"
+  },
+  "preservation": {
+    "class_total": 1037,
+    "unchanged_class_fingerprints": 1035,
+    "changed_class_roots": [
+      "InfinityCastSession",
+      "InfinityCastDialog"
+    ],
+    "resources_private_HTTP_and_other_five_DEX": "MATCH_EXACT500"
+  },
+  "Astra_independent_review": "PASS_SCOPED_SOURCE_PROBE_AND_RETAINED_RESULTS; reviewer performed no additional executions",
+  "not_verified": [
+    "Actual InfinityCastDialog OS focus delivery",
+    "Wi-Fi receiver detection on owner LAN",
+    "Physical TV decoding/playback",
+    "Full Infinity application regression",
+    "Observer ARM64/native Python bridge",
+    "Candidate install-over/forward recovery"
+  ],
+  "owner_APK_produced": false,
+  "original_key_signing_started": false,
+  "CI_request_marker": "CI-DISCOVERY.json retained unchanged to avoid repeating completed tests"
+}
