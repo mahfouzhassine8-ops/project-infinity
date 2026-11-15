@@ -77,7 +77,9 @@ def build(apk,native,work):
     ndk=sdk/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin'
     symbols=subprocess.check_output([ndk/'llvm-nm','--dynamic','--defined-only',native/'libkodi.so'],text=True).splitlines()
     names=[line.split()[-1] for line in symbols]
-    demangled=subprocess.check_output([ndk/'llvm-cxxfilt'],input='\n'.join(names)+'\n',text=True).splitlines()
+    # NDK r21e ships llvm-nm but no llvm-cxxfilt. The runner's standard
+    # binutils demangler only labels the immutable symbol names for binding.
+    demangled=subprocess.check_output(['c++filt'],input='\n'.join(names)+'\n',text=True).splitlines()
     stems={
         'VFS':'PythonBindings::PyInit_Module_xbmcvfs()',
         'SNAPSHOT':'InfinityScriptPersistence::Snapshot()',
