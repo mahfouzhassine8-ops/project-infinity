@@ -1,0 +1,39 @@
+{
+  "status": "PASS_AGGREGATE_PRODUCTION_SOURCE_ONLY",
+  "reviewer": "/root/astra_500_review (gpt-6-astra)",
+  "reviewed_checkpoint": "2798c04f",
+  "production_checkpoint": "465d6a08e1f6291044d5921f20b4ada18395e66a",
+  "production_allowlist_entries": 6,
+  "files": {
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "1923f27eb318377798ab0a21cada92349bb9ae0b26af1e51afd736a5d205fb6e",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "a9c48ec8cd46a71bc5eebb59feee0a4dd787ab119fad3dbfbf40aaedf2e39509",
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/Dialog.cpp": "359dfb92f77810180a47494b0a70bd3930a2b62426e74b8b68b2d606e6e2bde5",
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/WindowDialogMixin.cpp": "b4699bac6885b20d9d03dafb94301c3be9e765cb356254f2a49affd50e10d810",
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/InfinityPromotionalDialog.h": "50aea2e1b99390ea3beeaa0e63197220600804541d1d563a4d86271bf77d0956"
+  },
+  "verified": "All existing-file preimages match authenticated500. The new private classifier is absent from the baseline. The full ancestor diff contains only the six production paths, repair evidence/build/probes and three selected CI workflows.",
+  "unchanged": [
+    "CC source",
+    "Search",
+    "Trakt",
+    "tracking",
+    "provider code",
+    "skin",
+    "relay/networking",
+    "Cobra",
+    "profile code"
+  ],
+  "older_source_substitution_found": false,
+  "pending": [
+    "policy-containing engine ARM64 build",
+    "policy GUI execution",
+    "original progress-store and saved-route verification",
+    "selected Otaku identity",
+    "empty-shell incident causality",
+    "complete APK preservation and original signing"
+  ],
+  "APK_approval": false,
+  "release_approval": false,
+  "tests_rerun_by_reviewer": false
+}
