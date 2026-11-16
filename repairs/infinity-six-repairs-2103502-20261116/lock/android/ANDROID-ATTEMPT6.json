@@ -1,0 +1,33 @@
+{
+  "run": 43837801524,
+  "source_commit": "ba78514c0a14f808461031f830760dcbbe038ad3",
+  "artifact": 14210794494,
+  "artifact_sha256": "9ed109d4adabd67f39ef7fadc096fcca96bae625dff5505378c381f75be3a8be",
+  "status": "FAIL_PIP_RETURN_AND_FIXTURE_RESTORE",
+  "production_Dialog_sha256": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+  "passed_both_profiles": [
+    "Exact approved geometry and theme",
+    "Underlay touch/key/Back exclusion",
+    "Short release/outside/reentry/CANCEL/batched movement/second pointer/Back interrupt",
+    "Continuous two-second hold and explicit Host ACK",
+    "Stale/reentrant ACK refusal after focus revoke",
+    "Five portrait-landscape cycles retaining lock",
+    "OS Home and foreground return retaining lock"
+  ],
+  "remaining_failure": [
+    "PiP return via immediate self-start; system PiP entry abort observed; no established production cause",
+    "Original empty secure fixture value lost by adb shell argument joining; restore gate rejected mismatch"
+  ],
+  "passed_receipt_sha256": {
+    "narrow-dark": "5b9430b3fc16231ea412bf476270fb2201e5506089980223ec5f8fb85dcb1d37",
+    "wide-light": "a09fccf069edf626ee07f7c1a8f166bdc615bb0fb3355f35c3f7685487c7512f"
+  },
+  "production_changes": "NONE_SELECTED",
+  "next_selected_check": [
+    "Changed test-fixture SDK compile only",
+    "pip_tail only: real callback/frame entry, exact SystemUI expansion and trailing lifecycle assertions"
+  ],
+  "full_application_and_physical_Fold": "NOT_RUN",
+  "production_State_sha256": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+  "driver_reference": "Android Activity.enterPictureInPictureMode sets acceptance flag before actual mode-change callback; old self-start driver lacked completion boundary"
+}

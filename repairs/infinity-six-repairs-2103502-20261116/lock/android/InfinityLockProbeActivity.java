@@ -23,6 +23,7 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
   long session = 1000, readyEpoch, requestEpoch, request, requestAt;
   int readyCount, revokeCount, requestCount, retiredCount, unavailableCount;
   int touches, keys, configurations, heartbeat;
+  int pipEnteredCallbacks, pipExitedCallbacks, pipDraws, pipDrawWidth, pipDrawHeight;
   boolean revokeConfirmRejected = true, reenterReady, alive = true;
   boolean lightPalette;
   final JSONArray events = new JSONArray();
@@ -32,6 +33,12 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
     super.onCreate(saved);
     underlay = new View(this) {
       @Override public boolean onTouchEvent(MotionEvent event) { touches++; return true; }
+      @Override protected void onDraw(android.graphics.Canvas canvas) {
+        super.onDraw(canvas);
+        if (isInPictureInPictureMode()) {
+          pipDraws++; pipDrawWidth=getWidth(); pipDrawHeight=getHeight();
+        }
+      }
     };
     underlay.setBackgroundColor(Color.rgb(12, 28, 44));
     underlay.setFocusableInTouchMode(true);
@@ -75,6 +82,8 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
   }
   @Override public void onPictureInPictureModeChanged(boolean active, Configuration configuration) {
     super.onPictureInPictureModeChanged(active, configuration);
+    if (active) pipEnteredCallbacks++; else pipExitedCallbacks++;
+    record(active ? "PIP_ENTER_CALLBACK" : "PIP_EXIT_CALLBACK",session,readyEpoch,0);
     lock.setPictureInPicture(active);
     if (!active) underlay.post(this::updateViewport);
   }
@@ -139,6 +148,9 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
       report.put("display_id", underlay.getDisplay() == null ? -1 : underlay.getDisplay().getDisplayId());
       report.put("rotation", underlay.getDisplay() == null ? -1 : underlay.getDisplay().getRotation());
       report.put("dialog_focused", dialogFocused()).put("ready_epoch", readyEpoch).put("locked", locked());
+      report.put("task_id",getTaskId()).put("in_pip",isInPictureInPictureMode())
+          .put("pip_enter_callbacks",pipEnteredCallbacks).put("pip_exit_callbacks",pipExitedCallbacks)
+          .put("pip_draws",pipDraws).put("pip_draw_width",pipDrawWidth).put("pip_draw_height",pipDrawHeight);
       report.put("target", new JSONArray(target()));
     } catch (Throwable unavailable) {
       try { report.put("unavailable", unavailable.getClass().getSimpleName()); }

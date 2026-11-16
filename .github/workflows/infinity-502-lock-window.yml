@@ -31,6 +31,14 @@ jobs:
           assert request['baseline']==2103502
           assert request['review']['approved'] is True
           assert request['review']['reviewer']=='Astra'
+          assert request['selection']=='pip_tail'
+          assert request['retained_prefix']['run']==43837801524
+          retained=json.loads((root/'ANDROID-ATTEMPT6.json').read_text())
+          assert retained['run']==request['retained_prefix']['run']
+          for name,digest in request['retained_prefix']['production_inputs'].items():
+              assert request['inputs'][name]==digest,name
+          assert retained['production_Dialog_sha256']==request['retained_prefix']['production_inputs'][str(root.parent/'java/com/projectinfinity/kodi/InfinityVideoLockDialog.java')]
+          assert retained['production_State_sha256']==request['retained_prefix']['production_inputs'][str(root.parent/'java/com/projectinfinity/kodi/InfinityVideoLockState.java')]
           for name,digest in request['inputs'].items():
               assert hashlib.sha256(Path(name).read_bytes()).hexdigest()==digest,name
           source=request['source_commit']
@@ -72,7 +80,7 @@ jobs:
           avd-name: infinity502-lock-window
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-          script: python repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py --work lock-window-work --sdk "$ANDROID_HOME/build-tools/35.0.0"
+          script: python repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py --work lock-window-work --sdk "$ANDROID_HOME/build-tools/35.0.0" --selection pip_tail
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

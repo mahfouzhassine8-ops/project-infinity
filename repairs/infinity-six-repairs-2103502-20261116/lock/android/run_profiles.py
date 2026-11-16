@@ -3,6 +3,7 @@ import argparse
 import json
 from pathlib import Path
 import re
+import shlex
 import subprocess
 import sys
 
@@ -57,7 +58,7 @@ def restore_education(report):
     commands = [
         ('shell', 'settings', 'delete', 'secure', 'immersive_mode_confirmations')
         if before['immersive'] == 'null' else
-        ('shell', 'settings', 'put', 'secure', 'immersive_mode_confirmations', before['immersive']),
+        ('shell', shlex.join(['settings', 'put', 'secure', 'immersive_mode_confirmations', before['immersive']])),
         ('shell', 'wm', 'set-letterbox-style', '--isEducationEnabled', before['letterbox']),
     ]
     for command in commands:
@@ -80,6 +81,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--work', type=Path, required=True)
     parser.add_argument('--sdk', type=Path, required=True)
+    parser.add_argument('--selection', choices=['full', 'pip_tail'], required=True)
     args = parser.parse_args()
     output = args.work / 'results'
     output.mkdir(parents=True, exist_ok=True)
@@ -88,10 +90,18 @@ def main():
         ('wide-light', '1472x1344', '320', 'no'),
     ]
     report = {'selected': selected, 'physical_Fold': 'NOT_RUN',
-              'scope': 'Synthetic narrow/wide Android windows; both orientations exercised by instrumentation',
+              'scope': ('Synthetic narrow/wide Android windows; remaining PiP/lifecycle tail only'
+                        if args.selection == 'pip_tail' else
+                        'Synthetic narrow/wide Android windows; full input/rotation/lifecycle sequence'),
               'Infinity_shutdown': 'NOT_SELECTED', 'owner_installer': False, 'results': [],
               'education_fixture': {},
-              'excluded': ['First-use immersive tutorial', 'First-use letterbox tutorial']}
+              'excluded': ['First-use immersive tutorial', 'First-use letterbox tutorial'],
+              'selection': args.selection}
+    if args.selection == 'pip_tail':
+        retained = json.loads((HERE / 'ANDROID-ATTEMPT6.json').read_text())
+        report['retained_prefix'] = {'run': retained['run'],
+                                     'receipt_sha256': retained['passed_receipt_sha256'],
+                                     'scope': 'Input/hold/ACK/rotation/Home prefix only; original run remains failed'}
     success = True
     try:
         prepare_education(report['education_fixture'])
@@ -105,7 +115,8 @@ def main():
             result = subprocess.run([sys.executable, str(HERE / 'run_probe.py'),
                                      '--apk', str(args.work / 'build/CI-LOCK-PROBE-DEBUG-NOT-OWNER.apk'),
                                      '--output', str(destination), '--aapt2', str(args.sdk / 'aapt2'),
-                                     '--theme', 'dark' if night == 'yes' else 'light'],
+                                     '--theme', 'dark' if night == 'yes' else 'light',
+                                     '--selection', args.selection],
                                     timeout=220)
             entry = {'profile': name, 'returncode': result.returncode,
                      'display': adb('shell', 'wm', 'size'),

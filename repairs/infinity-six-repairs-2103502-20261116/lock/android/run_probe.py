@@ -47,6 +47,7 @@ def main():
     parser.add_argument('--adb', default='adb')
     parser.add_argument('--aapt2', type=Path, required=True)
     parser.add_argument('--theme', choices=['light', 'dark'], required=True)
+    parser.add_argument('--selection', choices=['full', 'pip_tail'], required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     package = 'com.projectinfinity.lockqa'
@@ -65,7 +66,7 @@ def main():
         print(json.dumps(failure, indent=2))
         raise SystemExit(1)
     command = [args.adb, 'shell', 'am', 'instrument', '-w', '-r', '-e', 'runId', run_id,
-               '-e', 'expectedTheme', args.theme,
+               '-e', 'expectedTheme', args.theme, '-e', 'selection', args.selection,
                package + '/com.projectinfinity.kodi.InfinityLockProbeInstrumentation']
     returncode = None
     timed_out = False
@@ -80,6 +81,9 @@ def main():
         output = decoded(error.stdout) + '\n' + decoded(error.stderr)
     (args.output / 'instrumentation.txt').write_text(output)
     result = completed_result(output, run_id, returncode, timed_out)
+    if result.get('selection') != args.selection:
+        result['pass'] = False
+        result.setdefault('execution_failures', []).append('Executed component selection mismatch')
     result.update(apk_sha256=hashlib.sha256(args.apk.read_bytes()).hexdigest(), package=package,
                   owner_installer=False, Infinity_shutdown='NOT_RUN', native_bridge='NOT_INCLUDED', Kodi_playback='NOT_RUN')
     receipt = args.output / 'ANDROID-LOCK-COMPONENT.json'

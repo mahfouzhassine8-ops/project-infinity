@@ -1,17 +1,19 @@
 {
   "reviewer": "Astra",
   "approved": true,
-  "scope": "PRE_LAUNCH: isolated actual Android State/Dialog component, two selected synthetic viewport/theme profiles only",
+  "scope": "PRE_LAUNCH: isolated actual Android State/Dialog, two synthetic viewport/themes, remaining pip_tail only",
   "inputs": {
-    ".github/workflows/infinity-502-lock-window.yml": "ec0f289ade47d12a5d2e272500a7b012652b224cf7e724eb180accb6d3d1cf0a",
+    ".github/workflows/infinity-502-lock-window.yml": "f798199f4a125a19085736d451ea6ebbc61b2b40ac81ba251240860a50436fa7",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/build_probe.py": "83e6d9414d0c674485bc7cf53d26bc86addfedb46a77b10d214bbe954f45ffa2",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "cadb87837cc613291a3513c6e3d913550086cc2107cf265b3dd6336be839d82f",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "a96740891b112c1e73615a376c350751930119c9285765caf799d00ed1ee5b81",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "736819608d792ea64cc6a8127245d65400e63f703a6cadf7322e453457b5c9cb",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "a7b4b9f4676e5eea2b13bb00b83aaa441681e614a8624a8dde9947fdae62bd37",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "f164f41dd2bfff023e536ad626f8971308ef3ea864ee0c6b6a4d3720589a600b",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "1cf1fd68fcd55e5c0490cee4a5f4c944d05511aeab5a0e5f7eaa6054099b8354",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "f952e3943e602f183e7647c8e2483bedf8a1cd5a164c88585e6facaf613bf99e",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "14eaac7f55b619d0a8c775b59283f95c93c050223fd8a8692cab7e28f9be04d1",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "ac18002ad74496dba198ceedeec974370b61735318bf985f9c9f22e034d33752",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/ANDROID-ATTEMPT6.json": "fad025284ded78f0f872a263bd91dece8fe8ce94227bb78c3ca45a5129818e79",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/PIP-TAIL-COMPILE.json": "971ef4a278c54940d963e05e048e97974a1672b669ff2b320cf43fa48ed17165"
   },
   "review_findings_addressed": [
     "require actual completed instrumentation; no timeout/partial receipt PASS",
@@ -27,16 +29,19 @@
     "owner installer"
   ],
   "correction_review": {
-    "previous_run": 43836876847,
-    "status": "APPROVED_EXACT_TEST_ONLY_HELP_CORRECTION",
+    "previous_run": 43837801524,
+    "status": "APPROVED_EXACT_PIP_TAIL_FIXTURE",
     "changes": [
-      "Capture and validate exact Android wm help, whose documented exit status is255; normal commands remain strict"
+      "Require actual PiP callback and visible smaller rendered owner frame",
+      "Use exact probe PiP SystemUI accessibility ACTION_EXPAND, not premature self-start",
+      "Quote empty original emulator setting as one remote shell command",
+      "Explicit pip_tail selection retains prior prefix without repeating it"
     ],
     "preserved": [
-      "All production sources",
-      "Existing emulator identity, readback and restoration checks",
-      "UID input/READY/hold/ACK assertions"
+      "All production inputs",
+      "UID-restricted injected input",
+      "Strict readiness/hold/ACK/execution gates"
     ],
-    "required": "Same selected Android component profiles; retain setup failures honestly"
+    "required": "Real callback/frame/expansion/exit READY, remaining lifecycle tail and exact fixture restoration; no whole-probe or physical acceptance inference"
   }
 }
