@@ -45,6 +45,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     AtomicReference<T> result=new AtomicReference<>();runOnMainSync(()->result.set(query.get()));return result.get();
   }
   private void action(Runnable action) { runOnMainSync(action); }
+  private void markPhase(String value) { phase=value;android.util.Log.i("InfinityLockProbe","PHASE "+value); }
   private void require(boolean value,String label) {
     if(!value)throw new AssertionError(label);checks.put(label);
   }
@@ -95,12 +96,12 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     up();
   }
   private void noRequestAfter(Runnable gesture,String label) {
-    phase=label;
+    markPhase(label);
     int previous=ui(()->a.requestCount);gesture.run();SystemClock.sleep(2150);
     require(ui(()->a.locked()&&a.requestCount==previous),label);
   }
   private void holdComplete() {
-    phase="continuous hold";
+    markPhase("continuous hold");
     int previous=ui(()->a.requestCount);down();
     waitFor(()->a.requestCount>previous,"continuous two-second request");
     require(ui(()->a.requestAt-downTime>=2000&&a.locked()),"Two-second hold requests without dismissing lock");
@@ -123,7 +124,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     waitFor(()->!a.isInPictureInPictureMode()&&a.dialogFocused(),"foreground lock return");
   }
   private void returnFromPiP(long previousEpoch) throws Exception {
-    phase="PiP system expansion";
+    markPhase("PiP system expansion");
     int exited=ui(()->a.pipExitedCallbacks),task=ui(a::getTaskId);
     AccessibilityServiceInfo info=getUiAutomation().getServiceInfo();
     int originalFlags=info.flags;
@@ -159,13 +160,13 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     } finally {
       info.flags=originalFlags;getUiAutomation().setServiceInfo(info);
     }
-    phase="PiP return READY";
+    markPhase("PiP return READY");
     waitFor(()->a.getTaskId()==task&&a.pipExitedCallbacks>exited&&
         !a.isInPictureInPictureMode()&&a.dialogFocused()&&a.readyEpoch>previousEpoch&&
         a.geometryMatches(),"actual PiP exit callback and fresh focused READY geometry");
   }
   private void rotate(int orientation) {
-    phase="rotation "+orientation;
+    markPhase("rotation "+orientation);
     long epoch=ui(()->a.readyEpoch);
     action(()->a.setRequestedOrientation(orientation));
     int configuration=orientation==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE?
@@ -174,10 +175,40 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     require(ui(()->a.locked()&&a.geometryMatches()),"Rotation preserves lock and exact position");
   }
 
+  private void exerciseReadyDisposal() {
+    for(int selected=1;selected<=3;selected++) {
+      final int mode=selected;
+      markPhase("reentrant READY physical retirement case="+mode);
+      begin();
+      action(a::showFocusFixture);
+      waitFor(()->!a.dialogFocused()&&a.focusFixture!=null&&
+          a.focusFixture.getWindow().getDecorView().hasWindowFocus()&&a.geometryMatches(),
+          "controlled focus loss and preserved viewport before retirement case="+mode);
+      int retired=ui(()->a.retiredCount),ready=ui(()->a.readyCount);
+      action(()->{a.capturedRetiringWindow=null;a.retainedDuringFocusCallback=false;a.capturedFocusDepth=0;
+        a.readyDisposalCase=mode;a.closeFocusFixture();});
+      waitFor(()->a.readyDisposalCase==0&&a.capturedRetiringWindow!=null&&
+          !a.capturedRetiringWindow.isShowing()&&
+          !a.capturedRetiringWindow.getWindow().getDecorView().isAttachedToWindow(),
+          "old window physically removed after focus callback case="+mode);
+      require(ui(()->a.capturedFocusDepth>0&&a.retainedDuringFocusCallback),"Physical window retained until actual focus dispatch returned case="+mode);
+      if(mode==2) {
+        require(ui(()->!a.locked()&&a.retiredCount==retired+1),"Owner destruction retires once without cancelling old window disposal");
+        action(()->{a.replaceDestroyedFixture();a.begin();});
+      } else if(mode==1) {
+        require(ui(()->a.locked()&&!a.dialogFocused()),"Reentrant foreground hide preserves logical lock");
+        action(()->{a.lock.setForeground(true);a.updateViewport();});
+      } else {
+        require(ui(()->a.locked()&&a.currentLockWindow()!=a.capturedRetiringWindow),"Old disposal cannot dismiss replacement owner window");
+      }
+      waitFor(()->a.dialogFocused()&&a.geometryMatches()&&a.readyCount>ready+1,"new focused READY after retirement case="+mode);
+    }
+  }
+
   @Override public void onStart() {
     boolean pass=false;String error="",stack="";
     try {
-      require("full".equals(selection)||"pip_tail".equals(selection),"Explicit valid component selection");
+      require("full".equals(selection)||"pip_tail".equals(selection)||"retirement_pip_tail".equals(selection),"Explicit valid component selection");
       a=(InfinityLockProbeActivity)startActivitySync(new Intent(getTargetContext(),InfinityLockProbeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
       waitFor(()->a.underlay.getWidth()>0&&a.hasWindowFocus(),"owner layout");
       action(()->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
@@ -187,7 +218,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
           ui(()->a.paletteMatches("light".equals(expectedTheme))),"Selected system night mode and actual Dialog palette match Host fixture");
       float[] outside=ui(()->{int[]p=new int[2];a.underlay.getLocationOnScreen(p);return new float[]{p[0]+a.underlay.getWidth()/2f,p[1]+a.underlay.getHeight()/2f};});
       if ("full".equals(selection)) {
-        phase="initial underlay input blocking";
+        markPhase("initial underlay input blocking");
         downTime=SystemClock.uptimeMillis();inject(MotionEvent.ACTION_DOWN,outside[0],outside[1]);
         inject(MotionEvent.ACTION_MOVE,outside[0]+60,outside[1]);inject(MotionEvent.ACTION_UP,outside[0]+60,outside[1]);
         key(KeyEvent.KEYCODE_DPAD_RIGHT);key(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
@@ -217,9 +248,10 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
         long beforeHome=ui(()->a.readyEpoch);shell("input keyevent KEYCODE_HOME");
         waitFor(()->!a.dialogFocused(),"OS Home remains available");foreground();
         require(ui(()->a.locked()&&a.readyEpoch>beforeHome),"Home/background return retains lock with fresh readiness");
-      } else notRun.put("Input/hold/focus/rotation/Home prefix retained from run43837801524; not repeated");
+      } else notRun.put("Input/hold/focus/rotation/Home prefix retained from run43837801524 (previous Dialog bytes); not repeated or claimed current-pass");
+      if("retirement_pip_tail".equals(selection))exerciseReadyDisposal();
       if(a.getPackageManager().hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
-        phase="PiP enter settle";
+        markPhase("PiP enter settle");
         int callbacks=ui(()->a.pipEnteredCallbacks), frames=ui(()->a.pipDraws);
         int initialWidth=ui(()->a.underlay.getWidth()), initialHeight=ui(()->a.underlay.getHeight());
         int requests=ui(()->a.requestCount);long epoch=ui(()->a.readyEpoch);down();SystemClock.sleep(250);
@@ -233,16 +265,16 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
         require(ui(()->a.locked()&&!a.holding()),"Completed PiP entry cancels hold and retains owner");
         returnFromPiP(epoch);require(ui(()->a.locked()&&a.readyEpoch>epoch&&a.requestCount==requests),"Actual PiP cancels hold and retains lock on return");
       } else {
-        require(!"pip_tail".equals(selection),"Selected PiP test requires advertised support");
+        require("full".equals(selection),"Selected PiP test requires advertised support");
         notRun.put("PiP: emulator does not advertise feature");
       }
-      phase="remaining Back, reentrant readiness and retirement";
+      markPhase("remaining Back, reentrant readiness and retirement");
       int nav=getTargetContext().getResources().getIdentifier("config_navBarInteractionMode","integer","android");
       if(nav!=0&&getTargetContext().getResources().getInteger(nav)==2) {
         int screenY=Math.round(outside[1]);shell("input swipe 1 "+screenY+" 250 "+screenY+" 300");
         require(ui(()->a.locked()&&a.dialogFocused()),"Attempted edge swipe under gestural navigation retains locked input window");
       } else notRun.put("System Back gesture: emulator navigation mode is not gestural; "+
-          ("pip_tail".equals(selection)?"Back-key evidence retained from attempt6":"Back keys tested"));
+          (!"full".equals(selection)?"Back-key evidence retained from attempt6 (previous Dialog bytes)":"Back keys tested"));
       int readyBefore=ui(()->a.readyCount),revokeBefore=ui(()->a.revokeCount);
       action(()->{a.lock.playbackStopped(a.session);a.reenterReady=true;a.begin();});
       waitFor(()->a.readyCount>readyBefore&&a.revokeCount>revokeBefore&&a.locked()&&!a.dialogFocused(),"reentrant READY revocation");
@@ -273,7 +305,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     try {
       notRun.put("BadToken/window-show fault injection; explicit callback path compiled, not Android-fault-injected here");
       JSONObject result=new JSONObject().put("pass",pass).put("runId",runId).put("error",error)
-          .put("selection",selection).put("retained_prefix_run", "pip_tail".equals(selection)?43837801524L:0L)
+          .put("selection",selection).put("retained_prefix_run", !"full".equals(selection)?43837801524L:0L)
           .put("phase",phase).put("last_input",lastInput).put("failure_stack",stack).put("pip_windows",pipWindows)
           .put("API",android.os.Build.VERSION.SDK_INT).put("checks",checks).put("not_run",notRun)
           .put("palette",expectedTheme).put("native_skin_theme_resolution","NOT_INCLUDED")

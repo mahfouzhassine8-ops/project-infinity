@@ -1,0 +1,15 @@
+{
+  "reviewer": "Astra",
+  "status": "PASS_NATIVE_BUILD_EVIDENCE_ONLY",
+  "run": 43833259814,
+  "evidence_zip_sha256": "b3b6965f6d749cb2a74392199a357ccadf3b8eb33a189c6abb7dcc4e6cfffc96",
+  "independently_checked": [
+    "Root ZIP entries match extracted receipts; historical provenance excluded",
+    "9414 baseline/9417 candidate/9411 unchanged/zero removed/six exact reviewed deltas",
+    "Current native overlay hashes match resulting source map",
+    "CI request hash/source commit binding",
+    "Private25 exactly match previous failed ABI additions; map/fixture consistent",
+    "ABI receipt zero added/removed;11 same dependencies;136120 interfaces; map appliedonce"
+  ],
+  "qualification": "Separate native artifact/ELF not independently rehashed by reviewer; not Android execution, APK integrity, signing, active-profile compatibility or physical acceptance"
+}

@@ -47,7 +47,7 @@ def main():
     parser.add_argument('--adb', default='adb')
     parser.add_argument('--aapt2', type=Path, required=True)
     parser.add_argument('--theme', choices=['light', 'dark'], required=True)
-    parser.add_argument('--selection', choices=['full', 'pip_tail'], required=True)
+    parser.add_argument('--selection', choices=['full', 'pip_tail', 'retirement_pip_tail'], required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     package = 'com.projectinfinity.lockqa'
@@ -101,7 +101,8 @@ def main():
                 capture_errors.append(name + ': retrieval deadline')
     try:
         logs = subprocess.run([args.adb, 'logcat', '-d', '-v', 'threadtime', 'AndroidRuntime:E',
-                               'InputDispatcher:W', 'InputManager:W', 'WindowManager:W', '*:S'],
+                               'InputDispatcher:W', 'InputManager:W', 'WindowManager:W',
+                               'InfinityLockProbe:I', 'InfinityVideoLock:E', '*:S'],
                               text=True, capture_output=True, timeout=15)
         (args.output / 'android-errors.txt').write_text(logs.stdout)
         if logs.returncode != 0: capture_errors.append('logcat retrieval failed')

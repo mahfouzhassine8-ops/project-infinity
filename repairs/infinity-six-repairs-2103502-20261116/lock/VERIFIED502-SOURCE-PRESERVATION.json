@@ -1,0 +1,44 @@
+{
+  "APK": false,
+  "Android_execution": "NOT_RUN",
+  "baseline_native_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+  "baseline_source_map_sha256": "4ef7607c83dc97291c088de701cfec2456e4cd53f256599151fd3d1b43ba507a",
+  "candidate_source_count": 9417,
+  "changed": {
+    "xbmc/application/Application.cpp": {
+      "after": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
+      "before": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356"
+    },
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": {
+      "after": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
+      "before": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d"
+    },
+    "xbmc/platform/android/activity/CMakeLists.txt": {
+      "after": "411fe175dce6181057dc0c16d0f7a26742e32a533271296cfa93b8281adb3bb4",
+      "before": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07"
+    },
+    "xbmc/platform/android/activity/InfinityVideoLock.cpp": {
+      "after": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef",
+      "before": null
+    },
+    "xbmc/platform/android/activity/InfinityVideoLock.h": {
+      "after": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
+      "before": null
+    },
+    "xbmc/platform/android/activity/InfinityVideoLockGate.h": {
+      "after": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3",
+      "before": null
+    }
+  },
+  "exact_baseline_source_count": 9414,
+  "final_ABI_baseline": "EXACT_SIGNED502",
+  "historical_ELFs": "SEGREGATED_PROVENANCE_COMPARISONS_ONLY",
+  "historical_producer": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+  "historical_receipts": "PROVENANCE_ONLY_NOT_NEW_ACCEPTANCE",
+  "physical_acceptance": false,
+  "request_sha256": "695da2b20a9c180ba549ab9f8fbecc7bd926e6f421a61ff659158acba74ac20b",
+  "signing": false,
+  "source": "d15e0a922d221e18e9eccdbb918ff6a2246f09a5",
+  "status": "PASS_EXACT502_PREIMAGE_AND_SIX_REVIEWED_LOCK_FILES",
+  "unchanged_native_files": 9411
+}

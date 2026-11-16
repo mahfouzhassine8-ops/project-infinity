@@ -26,6 +26,10 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
   int pipEnteredCallbacks, pipExitedCallbacks, pipDraws, pipDrawWidth, pipDrawHeight;
   boolean revokeConfirmRejected = true, reenterReady, alive = true;
   boolean lightPalette;
+  int readyDisposalCase;
+  Dialog capturedRetiringWindow;
+  boolean retainedDuringFocusCallback;
+  int capturedFocusDepth;
   final JSONArray events = new JSONArray();
   final Handler clock = new Handler();
 
@@ -162,7 +166,16 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
     focusFixture = new Dialog(this);
     TextView text = new TextView(this); text.setText("Disposable focus fixture");
     focusFixture.setContentView(text);
+    focusFixture.getWindow().getDecorView().setSystemUiVisibility(getWindow().getDecorView().getSystemUiVisibility());
+    if(android.os.Build.VERSION.SDK_INT>=30)focusFixture.getWindow().setDecorFitsSystemWindows(false);
     focusFixture.show();
+    if(android.os.Build.VERSION.SDK_INT>=30) {
+      android.view.WindowInsetsController controller=focusFixture.getWindow().getInsetsController();
+      if(controller!=null) {
+        controller.hide(android.view.WindowInsets.Type.statusBars()|android.view.WindowInsets.Type.navigationBars());
+        controller.setSystemBarsBehavior(android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+      }
+    }
   }
   void closeFocusFixture() { if (focusFixture != null) { focusFixture.dismiss(); focusFixture = null; } }
 
@@ -192,7 +205,19 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
     } catch(ReflectiveOperationException e) { throw new AssertionError(e); }
   }
 
+  Dialog currentLockWindow() {
+    try {
+      java.lang.reflect.Field field=InfinityVideoLockDialog.class.getDeclaredField("window");
+      field.setAccessible(true);return (Dialog)field.get(lock);
+    } catch(ReflectiveOperationException error) {throw new AssertionError(error);}
+  }
+  void replaceDestroyedFixture() {
+    // Only this disposable Host fixture constructs a new controller after testing destruction.
+    lock=new InfinityVideoLockDialog(this,this);applyPaletteFixture();
+  }
+
   private void record(String kind,long token,long epoch,long heldRequest) {
+    android.util.Log.i("InfinityLockProbe",kind+" session="+token+" epoch="+epoch+" request="+heldRequest);
     try { events.put(new JSONObject().put("event",kind).put("session",token).put("epoch",epoch)
         .put("request",heldRequest).put("uptime",SystemClock.uptimeMillis())); }
     catch(org.json.JSONException error) { throw new AssertionError(error); }
@@ -200,6 +225,23 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
   @Override public void onReady(long token,long epoch) {
     readyCount++; readyEpoch=epoch; record("READY",token,epoch,0);
     if(!dialogFocused())throw new AssertionError("READY without Dialog focus");
+    if(readyDisposalCase!=0) {
+      int selected=readyDisposalCase;readyDisposalCase=0;
+      capturedRetiringWindow=currentLockWindow();
+      try {
+        java.lang.reflect.Field field=capturedRetiringWindow.getClass().getDeclaredField("focusDispatchDepth");
+        field.setAccessible(true);capturedFocusDepth=field.getInt(capturedRetiringWindow);
+      } catch(ReflectiveOperationException error) {throw new AssertionError(error);}
+      android.util.Log.i("InfinityLockProbe","READY_RETIRE case="+selected+" begin depth="+capturedFocusDepth);
+      if(selected==2)lock.ownerDestroyed();
+      else {
+        lock.setForeground(false);
+        if(selected==3)lock.setForeground(true);
+      }
+      retainedDuringFocusCallback=capturedRetiringWindow.isShowing()&&
+          capturedRetiringWindow.getWindow().getDecorView().isAttachedToWindow();
+      android.util.Log.i("InfinityLockProbe","READY_RETIRE case="+selected+" attached="+retainedDuringFocusCallback);
+    }
     if(reenterReady){reenterReady=false;lock.setForeground(false);}
   }
   @Override public void onNotReady(long token,long epoch,long cancelledRequest) {

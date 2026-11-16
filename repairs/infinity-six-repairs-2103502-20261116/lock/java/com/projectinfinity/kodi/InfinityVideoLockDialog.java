@@ -40,6 +40,8 @@ final class InfinityVideoLockDialog {
   private final Activity owner;
   private final Host host;
   private final Handler handler = new Handler(Looper.getMainLooper());
+  // Physical window retirement must survive cancellation of this owner's logical work.
+  private final Handler disposalHandler = new Handler(Looper.getMainLooper());
   private final InfinityVideoLockState state = new InfinityVideoLockState();
   private final Rect playerOnScreen = new Rect();
   private boolean haveViewport;
@@ -229,8 +231,7 @@ final class InfinityVideoLockDialog {
     LockWindow previous = window;
     window = null;
     if (previous != null) {
-      previous.detachBackCallback();
-      previous.dismiss();
+      previous.dispose();
     }
   }
 
@@ -317,6 +318,8 @@ final class InfinityVideoLockDialog {
   private final class LockWindow extends Dialog {
     final LockContent content;
     private Object backCallback;
+    private int focusDispatchDepth;
+    private boolean disposeQueued;
 
     LockWindow() {
       super(owner);
@@ -367,19 +370,39 @@ final class InfinityVideoLockDialog {
       backCallback = null;
     }
 
+    void dispose() {
+      if (disposeQueued) return;
+      detachBackCallback();
+      setOnDismissListener(null);
+      if (focusDispatchDepth == 0) {
+        dismiss();
+        return;
+      }
+      // ViewRootImpl still uses its view after dispatching focus callbacks.
+      // Revoke ownership now, but remove only this old window on the next UI turn.
+      disposeQueued = true;
+      if (!disposalHandler.post(() -> { disposeQueued = false; dismiss(); }))
+        android.util.Log.e("InfinityVideoLock", "Deferred window retirement unavailable");
+    }
+
     @Override public void onWindowFocusChanged(boolean focused) {
-      super.onWindowFocusChanged(focused);
-      if (window != this) return;
-      if (!focused) {
-        revokeReady();
+      focusDispatchDepth++;
+      try {
+        super.onWindowFocusChanged(focused);
         if (window != this) return;
+        if (!focused) {
+          revokeReady();
+          if (window != this) return;
+        }
+        state.setDialogFocused(focused);
+        if (!focused) {
+          stopTick();
+        }
+        content.updateAffordance();
+        readyIfPossible();
+      } finally {
+        focusDispatchDepth--;
       }
-      state.setDialogFocused(focused);
-      if (!focused) {
-        stopTick();
-      }
-      content.updateAffordance();
-      readyIfPossible();
     }
 
     @Override public void onBackPressed() {

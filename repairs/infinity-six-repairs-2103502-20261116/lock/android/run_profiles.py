@@ -81,7 +81,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--work', type=Path, required=True)
     parser.add_argument('--sdk', type=Path, required=True)
-    parser.add_argument('--selection', choices=['full', 'pip_tail'], required=True)
+    parser.add_argument('--selection', choices=['full', 'pip_tail', 'retirement_pip_tail'], required=True)
     args = parser.parse_args()
     output = args.work / 'results'
     output.mkdir(parents=True, exist_ok=True)
@@ -90,18 +90,18 @@ def main():
         ('wide-light', '1472x1344', '320', 'no'),
     ]
     report = {'selected': selected, 'physical_Fold': 'NOT_RUN',
-              'scope': ('Synthetic narrow/wide Android windows; remaining PiP/lifecycle tail only'
-                        if args.selection == 'pip_tail' else
+              'scope': ('Synthetic narrow/wide Android windows; selected retirement/PiP/lifecycle tail only'
+                        if args.selection != 'full' else
                         'Synthetic narrow/wide Android windows; full input/rotation/lifecycle sequence'),
               'Infinity_shutdown': 'NOT_SELECTED', 'owner_installer': False, 'results': [],
               'education_fixture': {},
               'excluded': ['First-use immersive tutorial', 'First-use letterbox tutorial'],
               'selection': args.selection}
-    if args.selection == 'pip_tail':
+    if args.selection != 'full':
         retained = json.loads((HERE / 'ANDROID-ATTEMPT6.json').read_text())
         report['retained_prefix'] = {'run': retained['run'],
                                      'receipt_sha256': retained['passed_receipt_sha256'],
-                                     'scope': 'Input/hold/ACK/rotation/Home prefix only; original run remains failed'}
+                                     'scope': 'Input/hold/ACK/rotation/Home prefix on previous Dialog bytes only; original run remains failed; no current full-pass claim'}
     success = True
     try:
         prepare_education(report['education_fixture'])

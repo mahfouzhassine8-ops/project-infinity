@@ -1,0 +1,17 @@
+{
+  "reviewer": "Astra",
+  "status": "APPROVED_EXACT_SOURCE_AND_TARGETED_VERIFICATION",
+  "before_Dialog_sha256": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+  "after_Dialog_sha256": "1313b716f741503d4ce03d616ffe10d7e2a415928965ab3f012bbd6c47cc2034",
+  "change": "Only focus-reentrant old-window physical disposal is deferred; logical revoke/native protocol immediate",
+  "safety": [
+    "Independent cleanup handler survives ownerDestroyed logical cancellation",
+    "Queued guard prevents premature duplicate disposal",
+    "Captured old window only; detach Back/listener; no replacement state access",
+    "No synchronous fallback when posting fails"
+  ],
+  "selected_runtime": "retirement_pip_tail",
+  "runtime_status": "PENDING",
+  "old_crash_phase": "NOT_CAPTURED; source hazard confirmed separately",
+  "State_Bridge_Main_native": "UNCHANGED"
+}

@@ -1,0 +1,21 @@
+{
+  "run": 43840743398,
+  "source_commit": "77c2053a9f195d71223ee05cbe63fb0825dfd067",
+  "artifact": 14212344000,
+  "artifact_sha256": "f1e0b828c95789b42692037da7bf1c85a8b882785cb389f5b22a7eada8d2370a",
+  "status": "FAIL_ANDROID_PROCESS_CRASH",
+  "selection": "pip_tail",
+  "production_Dialog_sha256": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+  "failure": "ViewRootImpl.handleWindowFocusChanged:4787 mView.getLayoutParams null dereference in both selected profiles",
+  "actual_phase": "NOT_RECORDED: process died before in-memory receipt; do not infer completed PiP or exact fixture step",
+  "confirmed_source_hazard": "Host.onReady can synchronously dismiss the focus-dispatching LockWindow; Android16r1 uses mView after dispatch and Dialog.removeViewImmediate clears it",
+  "reference": "https://android.googlesource.com/platform/frameworks/base/+/refs/tags/android-16.0.0_r1/core/java/android/view/ViewRootImpl.java#4787",
+  "minimal_correction": "Keep logical revoke/detach synchronous; queue exact old physical window once only during focus dispatch on handler independent of logical-owner cancellation",
+  "emulator_education_restoration": "PASS_EXACT_ORIGINAL_VALUES",
+  "selected_followup": [
+    "Changed Dialog DEX compile/reference verification; reuse Main/native/State/Bridge evidence",
+    "Focused READY hide/destruction/replacement disposal plus PiP/lifecycle tail with crash-surviving phase/Host logcat trace"
+  ],
+  "native_rebuild": "NOT_REQUIRED_NATIVE_SOURCES_UNCHANGED",
+  "APK_or_physical_acceptance": false
+}

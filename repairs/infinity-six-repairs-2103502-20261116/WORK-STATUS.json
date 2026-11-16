@@ -31,14 +31,19 @@
         "lock/HOST-RESULT.json",
         "lock/GATE-HOST-RESULT.json",
         "lock/NATIVE-PROTOCOL-HOST.json",
-        "lock/DEX-BUILD-RESULT.json"
+        "lock/DEX-BUILD-DIALOG-RETIREMENT.json",
+        "lock/NATIVE-ATTEMPT2.json",
+        "lock/ASTRA-NATIVE-RESULT-REVIEW.json",
+        "lock/android/ANDROID-ATTEMPT6.json",
+        "lock/android/ANDROID-ATTEMPT8.json"
       ],
       "pending": [
-        "full native ARM64 compile/link",
-        "actual Android lock-window execution",
-        "full application integration",
-        "physical Fold acceptance"
-      ]
+        "Corrected focus-retirement and PiP tail Android checks",
+        "Full application integration",
+        "Physical Fold acceptance"
+      ],
+      "native": "Full ARM64 compilation/link and exact502 ABI PASS",
+      "Android": "Prior Dialog passed input/hold/rotation/Home checks; later tail crashed. Confirmed focus-retirement source hazard corrected; affected verification pending."
     },
     "6": {
       "state": "CURRENT502_CAST_CORRECTIONS_RETAINED",
@@ -48,7 +53,7 @@
   "release_blockers": [
     "Continue Playing original-store preservation prerequisite is unmet",
     "No proven current Empty Shell repair or verified selected Otaku identity supplied",
-    "Native and Android integration gates pending",
+    "Affected Android lock and full application integration gates pending",
     "One consolidated release only after required six-scope gates; no partial or diagnostic APK"
   ],
   "master_instructions": "0358c671bda6ae79a488b8997f7f731d2ba9f014"
