@@ -18,6 +18,8 @@ This is a **tracking record only**, not authorization to modify production sourc
 4. **SEARCH-WATCHLIST-02:** Trace the missing Infinity Trakt action on aggregated Otaku search results into the existing first-party Watchlist menu. Fix universally, not by modifying individual providers or inventing IDs.
 5. **SILENT-POPUP-06:** Verify Silent Mode policy for third-party add-on dialogs after an intrusive Pluto TV/SlyGuy donation prompt appeared with the mode enabled. Restore intended suppression if the policy covers such dialogs, without altering Android system DND or add-on behavior outside the policy.
 
+6. **VIDEO-UI-07:** Infinity 502 **Video Lock redesign + end-to-end functional correction**, requested November 16. Existing lock OSD button 262 → dialog 1199; review the actual user's clip to pin malfunction before coding; verify folded/unfolded and all layout variants, especially unified-only loading actions. [Scoped repair brief](https://github.com/mahfouzhassine8-ops/project-infinity/blob/b785dc3929fca485517c548720144a3265bf8ee0/repairs/infinity-consolidated-2103500-20261115/INFINITY-502-VIDEO-LOCK-REPAIR-BRIEF.md). Cobra, other playback and data untouched.
+
 **Release discipline:** one isolated defect-specific diff at a time; no combined speculative build. Verify frozen production/member hashes and original signing continuity only after a proven fix. Cobra, Cast, UI/skins, personal data, search engines, playback tracking, native engine and everything outside the active defect boundary stay untouched.
 
 ## SHUTDOWN-01 — Exit checkpoint fails with unresolved Python/SQLite persistence
@@ -119,6 +121,15 @@ This is a **tracking record only**, not authorization to modify production sourc
 - **Investigation:** Trace Silent Mode's stored state, active/loaded settings and ownership during the popup; identify the real add-on source/callback of this SlyGuy message and the Kodi GUI dialog type. Compare previously working behavior. If third-party modal suppression is intended, correct only the **existing Infinity policy enforcement seam** with precise scope and lifecycle-safe controls; do not edit Pluto/SlyGuy providers or globally disable essential warnings, permission/security prompts, or user-invoked dialogs.
 - **Acceptance:** With Silent Mode genuinely enabled, only the policy-defined unsolicited modal classes are suppressed, including this promotional case if in scope, while legitimate user-invoked and essential diagnostic/security dialogs still display correctly.
 - **Preservation:** Separate from Resume/Shutdown/Cast. Cobra, providers, add-on playback and settings preserved. No speculative APK or broad dialog interception.
+
+## VIDEO-UI-07 — Infinity player lock redesign and functionality
+
+- **Status:** **AUDIT, DESIGN, AND FIX AUTHORIZED — November 16, 2026; NOT IMPLEMENTED OR PHYSICALLY VERIFIED.**
+- **Owner observation/request:** Video lock needs a visual redesign and its functionality needs correction. The owner asked to examine a video; current available message presented a still image, so the precise recorded failure sequence and target appearance **must be verified before coding**, not invented.
+- **Source-verified current behavior in exact signed502:** Lock OSD button `262` closes VideoOSD and opens custom dialog `1199`. An invisible full-screen button `9900` reveals a small unlock control `9901`, hidden by a three-second alarm. The unified layout injects loading-system notifications on unlock that are absent from the other layouts. These are potential defect surfaces, not proof of the phone failure.
+- **Repair mission:** One polished Infinity-consistent responsive lock/unlock screen that works reliably on front/inner, portrait/landscape, rotation, video playback/end, touchscreen, Android Back and optional motion. Diagnose the actual clip, test the active skin variant and correct verified XML/runtime/input/timer/overlay problems. Do not trap the user or allow accidental player touches/seek/OSD while locked.
+- **Evidence & QA:** Pin initial visual/video symptom and what each tap/back action did; match active installed skin source to exact packaged 502; compare variants and prove full lock → tap → unlock → playback flow, reduced motion, lifecycle and no spurious loading overlay. Require exact source diff, source tests, Android integration and one owner physical Fold test. Review [full 502 Video Lock repair brief](https://github.com/mahfouzhassine8-ops/project-infinity/blob/b785dc3929fca485517c548720144a3265bf8ee0/repairs/infinity-consolidated-2103500-20261115/INFINITY-502-VIDEO-LOCK-REPAIR-BRIEF.md).
+- **Preservation:** Keep signed502 baseline, existing Cast, Cobra, providers, saved playback positions/watchlist, network, shutdown/Silent Mode and every other video screen/control intact. No blind full-skin replacement, profile clear or speculative signed APK. Only verified scoped changes after clip review.
 
 ## Other workstreams
 
