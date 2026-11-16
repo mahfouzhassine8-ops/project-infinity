@@ -1,0 +1,249 @@
+--- a/xbmc/platform/android/activity/JNIMainActivity.cpp
++++ b/xbmc/platform/android/activity/JNIMainActivity.cpp
+@@ -7,6 +7,8 @@
+  */
+ 
+ #include "JNIMainActivity.h"
++#include "InfinityActivityObserver.h"
++#include <android/log.h>
+ #include "InfinityAndroidCheckpoint.h"
+ #include "InfinityResponsiveness.h"
+ #include "AndroidTouch.h"
+@@ -27,6 +29,8 @@
+ 
+ namespace
+ {
++InfinityActivityObserver<CJNIMainActivity> g_infinityObservers;
++
+ std::string CheckpointJniString(JNIEnv* env, jstring value)
+ {
+   if (!value)
+@@ -78,6 +82,17 @@
+ CJNIMainActivity::~CJNIMainActivity()
+ {
+   m_appInstance = NULL;
++}
++
++void CJNIMainActivity::PublishInfinityObservers(CJNIMainActivity* owner)
++{
++  if (!g_infinityObservers.Publish(owner))
++    __android_log_write(ANDROID_LOG_ERROR, "Kodi", "Infinity activity observer publication refused");
++}
++
++void CJNIMainActivity::RetireInfinityObservers(CJNIMainActivity* owner)
++{
++  g_infinityObservers.Retire(owner);
+ }
+ 
+ void CJNIMainActivity::RegisterNatives(JNIEnv* env)
+@@ -241,15 +256,17 @@
+ {
+   (void)env;
+   (void)context;
+-  return m_appInstance ? m_appInstance->infinityHasActiveVideo() : JNI_FALSE;
++  auto owner = g_infinityObservers.Acquire();
++  return owner ? owner->infinityHasActiveVideo() : JNI_FALSE;
+ }
+ 
+ void CJNIMainActivity::_infinitySyncDisplayState(JNIEnv* env, jobject context)
+ {
+   (void)env;
+   (void)context;
+-  if (m_appInstance)
+-    m_appInstance->infinitySyncDisplayStateFromBridge();
++  auto owner = g_infinityObservers.Acquire();
++  if (owner)
++    owner->infinitySyncDisplayStateFromBridge();
+ }
+ 
+ jint CJNIMainActivity::_infinitySystemThemeMode(JNIEnv* env, jobject context)
+@@ -261,14 +278,16 @@
+ {
+   (void)env;
+   (void)context;
+-  return m_appInstance ? m_appInstance->infinityWindowWidth() : -1;
++  auto owner = g_infinityObservers.Acquire();
++  return owner ? owner->infinityWindowWidth() : -1;
+ }
+ 
+ jint CJNIMainActivity::_infinityWindowHeight(JNIEnv* env, jobject context)
+ {
+   (void)env;
+   (void)context;
+-  return m_appInstance ? m_appInstance->infinityWindowHeight() : -1;
++  auto owner = g_infinityObservers.Acquire();
++  return owner ? owner->infinityWindowHeight() : -1;
+ }
+ 
+ jint CJNIMainActivity::_infinityBridgeVersion(JNIEnv* env, jobject context)
+@@ -282,14 +301,16 @@
+ {
+   (void)env;
+   (void)context;
+-  return m_appInstance ? m_appInstance->infinityCanEnterPictureInPicture() : JNI_FALSE;
++  auto owner = g_infinityObservers.Acquire();
++  return owner ? owner->infinityCanEnterPictureInPicture() : JNI_FALSE;
+ }
+ 
+ jfloat CJNIMainActivity::_infinityVideoAspectRatio(JNIEnv* env, jobject context)
+ {
+   (void)env;
+   (void)context;
+-  return m_appInstance ? m_appInstance->infinityVideoAspectRatio() : 16.0f / 9.0f;
++  auto owner = g_infinityObservers.Acquire();
++  return owner ? owner->infinityVideoAspectRatio() : 16.0f / 9.0f;
+ }
+ 
+ jint CJNIMainActivity::_infinityWindowMode(JNIEnv* env, jobject context)
+@@ -301,7 +322,10 @@
+ {
+   (void)context;
+   if (!env) return nullptr;
+-  const auto snapshot = m_appInstance ? m_appInstance->infinityGetState() : std::array<int64_t, 16>{};
++  const auto snapshot = [] {
++    auto owner = g_infinityObservers.Acquire();
++    return owner ? owner->infinityGetState() : std::array<int64_t, 16>{};
++  }();
+   jlong values[16];
+   for (size_t i = 0; i < 16; ++i) values[i] = static_cast<jlong>(snapshot[i]);
+   jlongArray result = env->NewLongArray(16);
+--- a/xbmc/platform/android/activity/JNIMainActivity.h
++++ b/xbmc/platform/android/activity/JNIMainActivity.h
+@@ -73,6 +73,10 @@
+   static CJNIMainActivity *m_appInstance;
+ 
+ protected:
++  // Private factory hooks: no JNI or exported ABI additions.
++  static void PublishInfinityObservers(CJNIMainActivity* owner) __attribute__((visibility("hidden")));
++  static void RetireInfinityObservers(CJNIMainActivity* owner) __attribute__((visibility("hidden")));
++
+   virtual void onNewIntent(CJNIIntent intent)=0;
+   virtual void onActivityResult(int requestCode, int resultCode, CJNIIntent resultData)=0;
+   virtual void onVolumeChanged(int volume)=0;
+--- a/xbmc/platform/android/activity/XBMCApp.h
++++ b/xbmc/platform/android/activity/XBMCApp.h
+@@ -90,11 +90,20 @@
+ public:
+   static CXBMCApp& Create(ANativeActivity* nativeActivity, IInputHandler& inputhandler)
+   {
+-    m_appinstance.reset(new CXBMCApp(nativeActivity, inputhandler));
++    // Preserve construction-before-replacement, but admit observers only once
++    // construction is complete and the previous owner has drained.
++    std::unique_ptr<CXBMCApp> next(new CXBMCApp(nativeActivity, inputhandler));
++    RetireInfinityObservers(m_appinstance.get());
++    m_appinstance = std::move(next);
++    PublishInfinityObservers(m_appinstance.get());
+     return *m_appinstance;
+   }
+   static CXBMCApp& Get() { return *m_appinstance; }
+-  static void Destroy() { m_appinstance.reset(); }
++  static void Destroy()
++  {
++    RetireInfinityObservers(m_appinstance.get());
++    m_appinstance.reset();
++  }
+ 
+   CXBMCApp() = delete;
+   ~CXBMCApp() override;
+--- /dev/null
++++ b/xbmc/platform/android/activity/InfinityActivityObserver.h
+@@ -0,0 +1,99 @@
++/*
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++#pragma once
++
++#include <condition_variable>
++#include <cstdint>
++#include <mutex>
++#include <utility>
++
++namespace
++{
++// Private to the JNI implementation. The factory retains exclusive ownership;
++// these leases only keep that owner alive while an Infinity observer is running.
++template<class Owner>
++class InfinityActivityObserver
++{
++public:
++  class Lease
++  {
++  public:
++    Lease() = default;
++    Lease(const Lease&) = delete;
++    Lease& operator=(const Lease&) = delete;
++    Lease& operator=(Lease&&) = delete;
++    Lease(Lease&& other) noexcept
++      : m_gate(std::exchange(other.m_gate, nullptr)), m_owner(other.m_owner)
++    {
++    }
++    ~Lease()
++    {
++      if (m_gate)
++        m_gate->Release();
++    }
++    Owner* Get() const { return m_owner; }
++    explicit operator bool() const { return m_gate != nullptr; }
++    Owner* operator->() const { return m_owner; }
++
++  private:
++    friend class InfinityActivityObserver;
++    Lease(InfinityActivityObserver* gate, Owner* owner) : m_gate(gate), m_owner(owner) {}
++    InfinityActivityObserver* m_gate{nullptr};
++    Owner* m_owner{nullptr};
++  };
++
++  bool Publish(Owner* owner)
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!owner || m_owner || m_retiring)
++      return false;
++    m_owner = owner;
++    ++m_generation;
++    return true;
++  }
++
++  Lease Acquire()
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (!m_owner || m_retiring)
++      return {};
++    ++m_readers;
++    return Lease(this, m_owner);
++  }
++
++  // Called only by the native factory, before reset/delete, never by an observer
++  // or a destructor. New observer calls fail immediately while readers drain.
++  void Retire(Owner* expected)
++  {
++    std::unique_lock<std::mutex> lock(m_mutex);
++    if (!expected || m_owner != expected)
++      return;
++    const auto generation = m_generation;
++    m_retiring = true;
++    m_drained.wait(lock, [this, generation] {
++      return m_readers == 0 || m_generation != generation;
++    });
++    if (m_owner == expected && m_generation == generation)
++    {
++      m_owner = nullptr;
++      m_retiring = false;
++    }
++  }
++
++private:
++  void Release()
++  {
++    std::lock_guard<std::mutex> lock(m_mutex);
++    if (--m_readers == 0)
++      m_drained.notify_all();
++  }
++
++  std::mutex m_mutex;
++  std::condition_variable m_drained;
++  Owner* m_owner{nullptr};
++  std::size_t m_readers{0};
++  std::uint64_t m_generation{0};
++  bool m_retiring{false};
++};
++} // namespace
