@@ -113,7 +113,7 @@ def prepare():
    metas[owner]=meta
   (components/'catalog.json').write_bytes(inventory.canonical(catalog))
   proposed=copy.deepcopy(prior);proposed.update(generation=prior['generation']+1,candidate_versionCode=ver,last_issued_versionCode=prior['candidate_versionCode'],previous_authority_sha256=inventory.digest(inventory.canonical(prior)),target_owners=['INFINITY','CHOOSER_SHELL'],update_kind='owner_update',payload=payload,bundle_catalog=catalog,experience_version_labels=dict(INFINITY=ver,COBRA=2103445),workflow_sha256=c.sha(ROOT/c.WORKFLOW))
-  for n in proposed['source_files']:proposed['source_files'][n]=c.sha(ROOT/n)
+  policy_path='repairs/dual-experience-isolation-2103420/signer-policy.json';proposed['source_files'][policy_path]=c.sha(ROOT/policy_path)
   for owner in proposed['target_owners']:
    proposed['components'][owner]={k:metas[owner][k] for k in ('version','digest','approved_source','settings_schema')};proposed['components'][owner]['revision']=prior['components'][owner]['revision']+1
    proposed['bundle_sources'][owner]=dict(run_id=int(os.environ['GITHUB_RUN_ID']),build_source=os.environ['GITHUB_SHA'],artifact='Infinity500-FastQA-Registered-Preparation-'+os.environ['GITHUB_RUN_ID'],path=kind+'/components/'+owner+'.zip')
