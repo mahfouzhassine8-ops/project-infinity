@@ -1,0 +1,46 @@
+{
+  "baseline": 2103502,
+  "apk_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "instructions_commit": "0358c671bda6ae79a488b8997f7f731d2ba9f014",
+  "status": "ROOT_CAUSE_UNASSIGNED_ORIGINAL_STATE_NOT_AVAILABLE",
+  "production_changed": false,
+  "record_mutation": false,
+  "new_tests_run": false,
+  "read_only_findings": [
+    {
+      "owner": "plugin.py::_target:167-237; experience.py::_source_contract:90-131",
+      "finding": "Saved route must pass enabled-add-on and exact reviewed version/source contract; updated installed provider can invalidate original route. Current502 installed source/version proof is unavailable; historical500 inventory is not sufficient."
+    },
+    {
+      "owner": "experience.py::on_error:365-395; save_source:298-305; plugin.py::_target:177-190,230-234",
+      "finding": "Two verified preference failures exclude preferred route, but final source fallback may return same route. Source inconsistency not reproduced in this pass and not evidence of initial owner failure."
+    },
+    {
+      "owner": "saved_navigation.py::_provider_current:449-482; navigation_target:485-500; _mark_failed:544-555; confirm_saved:612-618",
+      "finding": "Remembered navigation binds source/manifest pins and failed-route hashes; no automatic failed-hash expiry. Changed proof invokes safe recovery; confirmed success clears matching hash. No progress deletion here."
+    },
+    {
+      "owner": "plugin.py::_list_item:599-603; resume_hub.py::_entries_projection:970-1004; plugin.py::listing:720-735",
+      "finding": "Unavailable source retains entry with safe destination. Visibility independently checks media, explicit resume_hidden, verified identity grouping and20/100 item caps. Route rejection alone does not explain missing cards."
+    },
+    {
+      "owner": "plugin.py::_menu_play_available; provider_inventory.py:225-239,339-350",
+      "finding": "Previously proven wrong operation name is secondary recovery issue, not original route/card root cause. No correction applied under revised order."
+    }
+  ],
+  "remaining_private_evidence": [
+    "Preserved active-profile original continue-watching.json or existing restore point",
+    "Raw/hidden/grouped/displayed counts separately for movies and TV",
+    "Exact identity/progress plus hashed saved/preferred/stable/failed route equality and timestamps",
+    "Current enabled provider versions/source hashes and matching native navigation failure receipts"
+  ],
+  "source_sha256": {
+    "plugin.py": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
+    "experience.py": "c358be6a7aa18e7bc59d048b77911b44c6e6e3a8f5d7c3229fb1da8ae90bb2eb",
+    "saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
+    "resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "provider_inventory.py": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0",
+    "WatchedBridge/PROVIDER-CONTRACTS.json": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e"
+  },
+  "limitations": "No owner-record contents, deletion, current runtime provider rejection, or recovered cards claimed; no fresh owner test requested"
+}

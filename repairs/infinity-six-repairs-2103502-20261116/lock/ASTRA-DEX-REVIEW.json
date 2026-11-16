@@ -1,0 +1,21 @@
+{
+  "reviewer": "Astra",
+  "status": "PASS_ASSEMBLY_PRESERVATION_AND_DECLARED_LINKAGE_REVIEW",
+  "receipt": "lock/DEX-BUILD-RESULT.json",
+  "receipt_sha256": "5dc566a88a328d39ec4bb4382df10b7f55ffbecbd200dc4d48eb01ca89266446",
+  "outputs": {
+    "classes3.dex": "a1c5742aa9a400590c8eb148c86d5b64e76963884a7b712ddb09cfa50668aa15",
+    "classes7.dex": "b108e3b559b55ccf2839a170c190792b0a4c7a68c8701031523ad8b3bc83e7a0"
+  },
+  "findings": [
+    "657 other classes3 definitions identical in canonical disassembly",
+    "Seven Main hooks with original field and method contracts retained",
+    "26 new lock-only definitions, no stubs or collisions",
+    "109 fields and303 methods resolve against exact502 and SDK; XBMCMainView descriptor matches actual Main"
+  ],
+  "limitations": [
+    "ART/native/application execution not established by this audit",
+    "No signing or physical acceptance approval"
+  ],
+  "tests_rerun": false
+}
