@@ -1,0 +1,250 @@
+{
+  "ContinuePlaying": "DEFERRED_NOT_FIXED_UNCHANGED",
+  "accepted_pointer_updated": false,
+  "active_kind": "candidate",
+  "base": {
+    "digest": "sha256:936e9b52a1880d3412bc86ad4a594145f9927a7dba7b2243a88eb3cea26fb9b2",
+    "id": 14189813969,
+    "name": "Infinity500-FastQA-Original-Signed-43785765772",
+    "run": 43785765772,
+    "size_in_bytes": 330750181,
+    "source": "92bef1bcf056abf58d6754354173565e56f907ac",
+    "workflow_id": 397702717
+  },
+  "baseline": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "expected_changes": {
+    "AndroidManifest.xml": {
+      "after": "4cbbf714d5649fdb5ef7177446b117640447ebcb2623d7f3ccd458fa5e15308f",
+      "before": "5752b094cc8415ed67f78882ff0dd3a445a52827ede181234abee8009ba0640a"
+    },
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": {
+      "after": "2e9417232bcd059630c085b5b3ecf09cf8997fdd0150e942f730574992a13506",
+      "before": "df66656d30cc4c6ad3d94866ddd7a09de7f064cd2947026517f4b65db9054b40"
+    },
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": {
+      "after": "889a3f20460831d3ca35b29400e8888c19192ea104e337496bbbf3355fe46a8a",
+      "before": "24c2aa48787a84301717dd70dd86aeb3bbd4a4924198b87e08dfe6cc23694f58"
+    },
+    "assets/addons/script.infinity.commandcenter/addon.xml": {
+      "after": "a39dcece2d2926675019071c506031b6ba10d56a12a31b7766942386dc876b69",
+      "before": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4"
+    },
+    "assets/addons/script.infinity.commandcenter/context.py": {
+      "after": "7fdb3fd781f2eaa3358a4c0d83932c16cc3f8bd064eb99ce6ab20152a5475aef",
+      "before": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050"
+    },
+    "assets/addons/script.kodihealthcenter/addon.xml": {
+      "after": "c3233a9d6d6e5520c0da6903eb55919c57f10b45a87a199b6582481bc9b0ee45",
+      "before": "84759a45b9a7be3989bf8c8cccab26939665bd2e52aaf4e971e167f2640c68d8"
+    },
+    "assets/addons/script.kodihealthcenter/infinity_runtime_identity.py": {
+      "after": "870a7e727bc73207672739cd9f872bc40142167878c2bec01ffd157b8485befa",
+      "before": "9a87d2790f457af7965babce6fa7c45ff1c43b2dc938cc5defec64aa5442853c"
+    },
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": {
+      "after": "e68439c3ea840b2e728edc60c9bf6754175b4e149e2fe279e27faf7ff4f25fef",
+      "before": "8374b6e34b497db6f3f5a60e675e37165f3292d50ebc83e0d95f3140858c1aba"
+    },
+    "assets/addons/skin.infinity.diggz/addon.xml": {
+      "after": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f",
+      "before": "32b3c029d09e2f5d1695f39c1a658759da63e1973a17e99c477a86afbc087400"
+    },
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": {
+      "after": "b1c8c0f095ddb3f699d17373914518c0811690ab220e1a97a13eec7d1cb9c38e",
+      "before": "5ad2f63a5cabb4815ab5cd4e3088a36195cee637a41e881a16f272bc2486eea5"
+    },
+    "assets/addons/skin.infinity.diggz/unified/VideoOSD.xml": {
+      "after": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46",
+      "before": "4c9adac29735c6e53d5647d3381415cc696b39c6a69ec358654500c74ff46af1"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml": {
+      "after": "71f145d07add0ea092ad660d5238cbe92735182bccb5022edb8fec968e85c75d",
+      "before": "38e6fb69b28759ddd567d429664623600ba7c9e2f3e57588f1715bc729be915b"
+    },
+    "assets/experience-component-updates.properties": {
+      "after": "b690bfcbb745924813c2216931fdd0cdfdb9b252535e97ed3fac5a6b853ca87d",
+      "before": "cdad4b5998b1c183caf6897685081b04e1494d2877ba507a95276a42015e453c"
+    },
+    "classes3.dex": {
+      "after": "a1c5742aa9a400590c8eb148c86d5b64e76963884a7b712ddb09cfa50668aa15",
+      "before": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8"
+    },
+    "classes7.dex": {
+      "after": "3bc1c1e766c813caf7818c4e3d66357633a4025ba0b28b6be66fc7cfe03c053f",
+      "before": null
+    },
+    "lib/arm64-v8a/libinfinitycastremux.so": {
+      "after": "86a34a4976813f24280345561170b1dee47e96fb9c3b34642190ced2c2fe9ffd",
+      "before": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a"
+    },
+    "lib/arm64-v8a/libkodi.so": {
+      "after": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+      "before": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7"
+    }
+  },
+  "known_limitations": [
+    "ContinuePlaying deferred unchanged",
+    "Owner EmptyShell cause unresolved; freshPythonstartup engineeringpass",
+    "Owner MarkWatched139cause unresolved; AndroidSetcontentfixtureSIGILL4 beforewatchedactionnotattributed",
+    "ActualLockcorecases passed; postunlockStop focus automationtimedout, actualStopnotdispatched; earliernormalStop passed",
+    "ActualOtakuID provenance/Androidvisibility andproviderWatchlist relaunch remain physicalQA; hostmissingIDno-write/idempotencechecks passed",
+    "ActualTVplayback andpostCastshutdown remain owneracceptance; no claimedphysicalsuccess",
+    "Same-profile shutdown/recovery runtime acceptance pending"
+  ],
+  "new_lock_classes": [
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda10;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda11;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda12;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda1;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda2;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda3;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda4;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda5;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda6;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda7;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda8;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge$$ExternalSyntheticLambda9;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockBridge;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$$ExternalSyntheticLambda1;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$$ExternalSyntheticLambda2;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$1;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$BackApi33$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$BackApi33;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$Host;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$LockContent;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$LockWindow$$ExternalSyntheticLambda0;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$LockWindow$$ExternalSyntheticLambda1;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog$LockWindow;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockDialog;",
+    "Lcom/projectinfinity/kodi/InfinityVideoLockState;"
+  ],
+  "owners": {
+    "digest": "sha256:2b71433dbcf4646d9a8d834326208b5f022f367bf138ac07c5a58d4e54eac2be",
+    "id": 14189977780,
+    "name": "Infinity500-FastQA-Registered-Preparation-43784613251",
+    "run": 43784613251,
+    "size_in_bytes": 1283347645,
+    "source": "bbefb6d1dd514cf0585954d4f197cc1abadf4118",
+    "workflow_id": 397702717
+  },
+  "parent_authority_sha256": "668f31abba47c2f0fd2a8bb8ac6e660f96388608a738eac785d0bdacf4356fd4",
+  "prepared": null,
+  "recovery_module_hashes": {
+    "script.infinity.commandcenter/INFINITY-MODULES.v1": "0a94c9108ec2b376150a6f0c3c9080e76baa7b122bb99982dff1caa80812d91b",
+    "script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "42f60f87371db263430385d044f3c6f60c077a029d1b9d5e0ee395e11f93cce1",
+    "script.infinity.commandcenter/INSTALL-BASELINE.v1": "957e7e3b5666bd9191e9170633d2176b9acd65ce34a3800160eebc18a734c804",
+    "script.infinity.commandcenter/MODE-CLASS-SEARCH-POLICY.json": "e9195747744735e0848b94f26959cea411146b262a7d6865611ab5281fb4b45a",
+    "script.infinity.commandcenter/NAVIGATION-CONTRACTS.json": "fd5b58e3a8a5671ded84c0a91ba57d1bbd03a51c5d08869805d33269d275d76d",
+    "script.infinity.commandcenter/SEARCH-STRUCTURES.json": "d0ced0458371ade4fb3ab73bd378159d5a8a79eca4103e114510ea1e72d4ab30",
+    "script.infinity.commandcenter/action_loading.py": "8b758bba6eabd7a051213834c136a81d52c6af819ff9c6d7d1f456a45be4474f",
+    "script.infinity.commandcenter/addon.xml": "3e2f6a0197fdc29aed992763a771674f4e9faedf8accea30617d98b05f2deddf",
+    "script.infinity.commandcenter/cast_runtime.py": "da2b071f120487dce2f424d98c4f8a0040e11527f9caa0eaf4336c5bb3377690",
+    "script.infinity.commandcenter/checkpoint_runtime.py": "902fbf1a03051efbd39bbd2380c344c0a9942c0e8e43cfcaf0deaddd06fd954e",
+    "script.infinity.commandcenter/common.py": "7cb441cb6db8ba71466afd97de6e786152997a6d4b74c9e9d4536c1807e9ad82",
+    "script.infinity.commandcenter/context.py": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
+    "script.infinity.commandcenter/default.py": "1e671c44c6d0cfbb1e7c372e79843e292958b7f3ad59f06eb6756214169f494c",
+    "script.infinity.commandcenter/experience.py": "c358be6a7aa18e7bc59d048b77911b44c6e6e3a8f5d7c3229fb1da8ae90bb2eb",
+    "script.infinity.commandcenter/infinity_modules/__init__.py": "dd65da30f3d82529011a305293041fabcc63d369f4805a446774996ae9ae5fc3",
+    "script.infinity.commandcenter/infinity_modules/rails/__init__.py": "8798e72d7a93a29641e5368044bd7164b2f1024108791daf4b57c2d3cc7b79ab",
+    "script.infinity.commandcenter/infinity_modules/rails/catalog.py": "7c307a52bf4fef44d9c1b1b910c1f76bd8b689c6de7f4a456205f13b5c1ab457",
+    "script.infinity.commandcenter/infinity_modules/rails/dialog.py": "34dd1815176455278dabc10640627faffe16feabbcaa945578d573bbd8ec66ee",
+    "script.infinity.commandcenter/infinity_modules/rails/input_status.py": "217073f1e9df990aa39215cf29067776612528fd0311b5c2d723e866812db111",
+    "script.infinity.commandcenter/infinity_modules/rails/mocha.py": "b813b5d7a340c697917fa7b2b29b6cee86d97d284da59ce8bc96bde9ad629c96",
+    "script.infinity.commandcenter/infinity_modules/rails/runtime.py": "2cb188fbc6f59da3c2c2bf43e64f1b523921290cd6e4937cf9303743785bcd3f",
+    "script.infinity.commandcenter/infinity_modules/rails/stability_probe.py": "e275668b0638fdffb8810ee6f1cab1d9590a9bc8b9f08f402216a8ae50d754f9",
+    "script.infinity.commandcenter/infinity_modules/rails/store.py": "22fc4b1f4ddb4d18be77acb89cd49e975f65cc9db410df40d17c62f4ad4171e4",
+    "script.infinity.commandcenter/infinity_modules/uirepair/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "script.infinity.commandcenter/infinity_modules/uirepair/controller_access.py": "4160a511efa9e12776db5bba28ab16d5d9d5e1a7825826df16ed76b7430ad826",
+    "script.infinity.commandcenter/infinity_modules/uirepair/default.py": "5bbeb30b76ae9b169c18d2abcdc5a036f8c952ae91cadb317bf4a4576c3bb5c1",
+    "script.infinity.commandcenter/infinity_modules/uirepair/home_option_b.py": "01dbb12c89cbb95d7b28200816a30fb0fbe66fb320928a65bb8be804e3d582f0",
+    "script.infinity.commandcenter/infinity_modules/uirepair/latest_identity.py": "225ac23336701db63715583ca8b6716afa96bb9b738b4b99750d9a5bbd8ab223",
+    "script.infinity.commandcenter/infinity_modules/uirepair/menu_model.py": "eea9605cf7b3712b6029bf49958d470dbc59df6b92e7f394799c1098e58956da",
+    "script.infinity.commandcenter/infinity_modules/uirepair/plugin.py": "a7bcae40488ae5e015372e9538a536e98768b4bbc744582ed5d39b10c87ac593",
+    "script.infinity.commandcenter/infinity_modules/uirepair/popup.py": "230ee5646bf5b73faa9e9bc9988bb29e9a6d238da95efeec06e480a9c6d259de",
+    "script.infinity.commandcenter/infinity_modules/uirepair/runtime.py": "31f7494146e476636e2732bb3a9cd37776d59ee61414335e7a03bb5eb81fee79",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/PROVIDER-CONTRACTS.json": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/bridge_state.py": "babe606965d4e81481ea573dd4ecc7cec82a7d23476364326731eb86ce1eeb1d",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/context.py": "fb9867572530edec876192152c9adca8cb82387323ec26b6cbf7ffdc5a0b22d3",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/controller.py": "a629c46a693f5d025fb8bc6805b7302e7876593d0918f07b45c96cd1bab5b703",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/default.py": "77c65366ed07261992d12357bb284c3f96039452fd393cc0e36e15c2f75d5f9d",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/provider_contracts.py": "5819eec3f7b29f43de164c4739753db0ad48bb5c5d92fe6ae136fa5c9753f804",
+    "script.infinity.commandcenter/infinity_modules/watchedbridge/service.py": "0450559f72dbb1a3894de7075934bdc28d3fea5b91fc0d83f1da34e1ef4c1014",
+    "script.infinity.commandcenter/infinity_search.py": "a5949485c723cd56f727feec40f3be66eb60976af255ede431040511c145dc44",
+    "script.infinity.commandcenter/infinity_settings.py": "a846e6fa285618495e572ff77665b4914eb2438ae3c1d7f38f2e53b150cb8e3d",
+    "script.infinity.commandcenter/infinity_trakt.py": "e2f8b87ed45bea2423b0a12d3b2d30fad822e9435d6115f6b96adf3ffb0778af",
+    "script.infinity.commandcenter/information.py": "9033cc6042eb5349c0f6e53e81564a137853c32190287e2cebe3e654f78f47b1",
+    "script.infinity.commandcenter/library_navigation.py": "7fd5c5a75ba054a92a46914dfbc0348b11b6e4988650d952b7c3c8fad3c505fe",
+    "script.infinity.commandcenter/media_view.py": "0110de2cdc4c8295fdb314df221385f356e0ed0247547cf49c16a4dff2a6b54c",
+    "script.infinity.commandcenter/module_contract.py": "759e60439fae0b1bf0f8a2ff6895209ac848101b9544ac6c0e297b9c73df1267",
+    "script.infinity.commandcenter/native_search_compatibility.py": "1281c379d2dca044d11727ba017e5c6b05e1ce2ce818b8d942d9ecb4771608b9",
+    "script.infinity.commandcenter/persistence_participant.py": "7658db0f21c20853f272f61832e720df02b2b4b9ebaeba83ca1c7ba8758e1b9b",
+    "script.infinity.commandcenter/plugin.py": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
+    "script.infinity.commandcenter/provider_capabilities.py": "7b0fda13e0fb529aa974b1e8ef792afb3adf0f681490784cb7837b715ae1fc44",
+    "script.infinity.commandcenter/provider_inventory.py": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0",
+    "script.infinity.commandcenter/resources/settings.xml": "7cf7649f80c4c3e6c81caa6e80b1f325f470055e7de62fdf37367effe8484451",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityInformation.xml": "b9059729493751dfc0be65801f73e41a06b604f3fdaf099963821b84f2b2e443",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityItemOptions.xml": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinitySearch.xml": "0fb440287b00d6dc4f6c15c99e16be0a4e4e70a62cd4be08b1dd9375595272ad",
+    "script.infinity.commandcenter/resources/skins/Default/1080i/InfinityTraktNotice.xml": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+    "script.infinity.commandcenter/resume_hub.py": "807157626f817dd5375e0e60872b6cd351d33135a23c5a225f26c86a196e7ed5",
+    "script.infinity.commandcenter/runtime_visibility.py": "11a985fc544fdb37c906f2575516b78c6141ed2b68e95b6c390d824f4386560a",
+    "script.infinity.commandcenter/saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f",
+    "script.infinity.commandcenter/saved_playback.py": "ba80dd13b100fbe45ce80af23b7edd8e66abdb748d15a4fa6006d02f68fea209",
+    "script.infinity.commandcenter/selection_contract.py": "31f04371cdf9902e234ef441e11a41bc914daf1a9cc12b1cc435d58285dc46c2",
+    "script.infinity.commandcenter/service.py": "ed0c9a2a1856c7eeae21603fdcd8b2c3f068bf33e53dbbe10d3faf74590a872b",
+    "script.infinity.commandcenter/skin_upgrade.py": "e3aadefa8345a78dc71bb9ab5ee428e947819d6e76576c772bb34e474b3eaedb",
+    "script.infinity.commandcenter/structural_search.py": "dd0b200829fc63372ec88a0ba991bd98a7a3459f597853a5bc991a9e4e6693b3",
+    "script.infinity.commandcenter/title_metadata.py": "115ac88c67e3fc9b3568ede2b3b019e10ab2829c6d0c14bef60d90d6248ad51e",
+    "script.infinity.commandcenter/view_mode.py": "5f5583e9c36e32e970a0341ca353d32dd92e48d41079aaabaf7a113c66ddfc71",
+    "script.infinity.rails/addon.xml": "436b6fdfae5e76ef9b52027ae80e59ade2ff621784f328f96efbb83bdf6ac711",
+    "script.infinity.rails/context_add.py": "8ab29309b62147bbccfe45c92090ffe91e037a209f0e1cefce71fd09acc623f5",
+    "script.infinity.rails/default.py": "9b1030183c36f3b591cc2857588f97d759a48f176b6765ed6906a05378a5c432",
+    "script.infinity.rails/plugin.py": "1f684387061f6507e93c55c96eba9a0832e3255fcac3808efc80ec8af00f2144",
+    "script.infinity.rails/resources/defaults.xml": "bd1c102f0b2bcacb36556c19dbfbdb027c7aac7481af44ba3445edcf84d7c110",
+    "script.infinity.rails/resources/language/resource.language.en_gb/strings.po": "48314b935797774fbac9f78e443ed329737ffb3bc994c945e14bf4bfd3980e5f",
+    "script.infinity.rails/resources/skins/Default/720p/InfinityRailsOptions.xml": "351a03286dd4e5b3d82dcba01974bdc5af082de3fb348bd581c2c0b70586e5ab",
+    "script.infinity.uirepair/addon.xml": "0ae97add7a937568f92ab9ab2b4655741ffb0a12465d76838e1b8dde2286a890",
+    "script.infinity.uirepair/default.py": "cd91adb02e7b57f0c4485968d8c53c55eabe5ff3883f38d2f36f5aea8184adef",
+    "script.infinity.uirepair/plugin.py": "45df6e0886980856f78469209a3a28cb8b9948c68f4b22bcf916400424fa027c",
+    "script.infinity.uirepair/resources/skins/Default/1080i/InfinityHomeOptionB.xml": "b524ebc4bc586ef3642190e43897bd0f9b23e5844fd67c2b02806f9159bc0c6e",
+    "script.infinity.uirepair/resources/skins/Default/1080i/InfinityItemOptions.xml": "201125d0d7bdda987d92523c04882f19e03560d361f70e52508cd4783e071db6",
+    "script.infinity.watchedbridge/PROVIDER-CONTRACTS.json": "c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e",
+    "script.infinity.watchedbridge/addon.xml": "8f3b36fdf00763266b283abec03ab3c65213811669407280e6c11636381e8ae0",
+    "script.infinity.watchedbridge/context.py": "ca373257b2b797c9ddd01c197d946eb43251d7259faf684d53e09e7a28f355a2",
+    "script.infinity.watchedbridge/default.py": "7eb8a980d862bf2469f2bc68129e06f7a695fd206611430861ba563ec9f4908c"
+  },
+  "recovery_modules": {
+    "digest": "sha256:e02a1747b7835c715950f92cebf90b5e0c1a153a990dbc4ba58d72ca6668d78e",
+    "id": 14236736412,
+    "name": "Infinity502-Recovery-OriginalSigned-Modules-43889830261-NOT-APK",
+    "run": 43889830261,
+    "size_in_bytes": 285981,
+    "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
+    "workflow_id": 397702717
+  },
+  "review_sha256": "cc0182ebafc203b5da771fd0069c71381e75d0548771ccb27a6679c618ff8613",
+  "source_bindings": {
+    "repairs/infinity-six-repairs-2103502-20261116/release/ROWS.json": "ed6c24a3181bbe714ef47c2e753a730cf0d527a436513117b13c8f66b6be0f74",
+    "repairs/infinity-six-repairs-2103502-20261116/release/WORKFLOW-CATALOG-REVIEW.json": "df007effba35cbe5b31399cba753475c0496e4cd97eb3c7d2b441e53fcd2ef1a",
+    "repairs/infinity-six-repairs-2103502-20261116/release/owner_bundles.py": "b3c2b1ebb9f94dc2885908669a6549498268b8dccc381361ce9da20f93103698",
+    "repairs/infinity-six-repairs-2103502-20261116/release/recovery_metadata.py": "5dddcf678d0d6f6241c39b04661b1933ccf264ef401bf7087dc57165541e575c",
+    "repairs/infinity-six-repairs-2103502-20261116/release/register_qa.py": "575bd8ea18ee65478f9915ae3fad7f9a2b190d912b20d26bc1cc0c11c39d9099"
+  },
+  "stage": {
+    "digest": "sha256:79bb68fd8cacd4c8adc8d7c756590d68a890f13afbc7f38bcb1db2b1a6a98249",
+    "id": 14235818489,
+    "name": "Infinity502-Consolidated-43889055564-UNSIGNED-NOT-INSTALLABLE",
+    "run": 43889055564,
+    "size_in_bytes": 323328590,
+    "source": "6687500e5f41d0791c851b448fc84a39b4e60584",
+    "workflow_id": 420238273
+  },
+  "version_codes": {
+    "candidate": 2103504,
+    "recovery": 2103505
+  },
+  "workflow_sha256": "b69cfb52d1dbec23bb362a20c17d471ae6458882803fcec3dc0a9922f60581ec"
+}

@@ -256,6 +256,70 @@
       "review_role": "Previously verified500 native/Android/staging CI; no original signing key",
       "source": "185abd6f",
       "workflow_sha256": "6369cc0c5b2570bf2d7046496c6a0ae17e58abccb6d4a95df28e836a96811dde"
+    },
+    {
+      "id": 419772166,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-stage1-static-inventory.yml",
+      "review_role": "Read-only static source/APK inventory and signature verification; no signing operation or key access",
+      "source": "1b4f80896f23c530916ca27e77583be3923e45ad",
+      "workflow_sha256": "da987baf5af00a7475cd8ea6bcbc50b301013504b6b1cf09e75949b20b98dede"
+    },
+    {
+      "id": 419774046,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-stage1-extract-feature-source.yml",
+      "review_role": "Read-only bundled source extraction; no signing operation or key access",
+      "source": "3fc92d6e9e91e57d521bb1609576f4166130c99c",
+      "workflow_sha256": "d8800c36594f329940c8f3579d5f132d27ff7977c01075bcc69e7c874285dfc0"
+    },
+    {
+      "id": 419779909,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-stage1-dex-inventory.yml",
+      "review_role": "Read-only APK DEX/manifest inventory; no signing operation or key access",
+      "source": "1b4f80896f23c530916ca27e77583be3923e45ad",
+      "workflow_sha256": "65c13debdb93336823be694611a29f0bbd27b27df75acca96a8ecfbf809f2c9f"
+    },
+    {
+      "id": 419864300,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-502-lock-integration.yml",
+      "review_role": "Reviewed native ARM64 component build and evidence; no original signing key",
+      "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
+      "workflow_sha256": "106ebfd99dbea9466770f8ee04c6eeec91201a8887d72c394faf65bb90eb0802"
+    },
+    {
+      "id": 419873232,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-502-lock-window.yml",
+      "review_role": "Reviewed isolated disposable Android window probe; no original signing key",
+      "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
+      "workflow_sha256": "97d65ddc9f0dee24c44355063369f0f36e17c238b87f8f3052880fb15534d3ea"
+    },
+    {
+      "id": 420112512,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-502-lock-application.yml",
+      "review_role": "Reviewed disposable application integration and evidence; no original signing key",
+      "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
+      "workflow_sha256": "7ccd1fcde38900d38e5ad9ccef6843c71c7b0df89e952e9193b30b07fd093daf"
+    },
+    {
+      "id": 420159842,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-502-cast-ptl-native.yml",
+      "review_role": "Reviewed standalone Cast ARM64 component; no original signing key",
+      "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
+      "workflow_sha256": "31af9254730b8a1ecda3a59f92d42cbab92cdd5619d1a7c7b20f44b6f343ab4b"
+    },
+    {
+      "id": 420238273,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-502-combined-stage.yml",
+      "review_role": "Reviewed combined unsigned staging; no original signing key",
+      "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
+      "workflow_sha256": "295ef3aa36dd893bebb0e17981d9dca133f518539f2a27b037f5a6bcd4efd749"
     }
   ],
   "audit_workflows": 644,
@@ -3018,7 +3082,15 @@
     415639547,
     419489686,
     419521920,
-    419528653
+    419528653,
+    419772166,
+    419774046,
+    419779909,
+    419864300,
+    419873232,
+    420112512,
+    420159842,
+    420238273
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",
