@@ -147,7 +147,21 @@ def main():
   report['native_identity']=identity;save()
   assert rpc('Player.Open',{'item':{'file':'special://profile/infinity502-lock-fixture.mp4'}})=='OK'
   first=until(lambda:(lambda s:s if s.get('playing') and s.get('time',0)>1 else None)(observer('snapshot')),'actual local playback',45)
-  if not observer('snapshot')['osd']:assert rpc('Input.ExecuteAction',{'action':'showosd'})=='OK'
+  # Prioritize the two crash paths independently of the later lock journey.
+  # This is the original OSD Stop action, never a shutdown or forced stop.
+  if not observer('snapshot')['osd']:assert rpc('Input.ShowOSD')=='OK'
+  until(lambda:observer('snapshot')['osd'],'original OSD before Stop crash case',15)
+  observer('focus_stop');until(lambda:observer('snapshot').get('focused_control')==253,'original Stop focus before lock',10)
+  record('original_Stop_dispatch_before_lock',{'control':253})
+  assert rpc('Input.Select')=='OK'
+  until(lambda:not observer('snapshot')['playing'],'original Stop before lock',10)
+  alive();passed('original_OSD_Stop_before_lock_same_engine_alive',pid=pid,control=253)
+  watched_spec=importlib.util.spec_from_file_location('selected_watched_case',crashes/'watched_case.py')
+  watched=importlib.util.module_from_spec(watched_spec);watched_spec.loader.exec_module(watched)
+  report['watched_case']=watched.run(rpc,observer,until,passed,record,alive,film_directory,film_directory+public['movie_member']);save()
+  assert rpc('Player.Open',{'item':{'file':'special://profile/infinity502-lock-fixture.mp4'}})=='OK'
+  until(lambda:(lambda s:s if s.get('playing') and s.get('time',0)>1 else None)(observer('snapshot')),'local playback for separate lock journey',45)
+  if not observer('snapshot')['osd']:assert rpc('Input.ShowOSD')=='OK'
   until(lambda:observer('snapshot')['osd'],'original video OSD',15)
   observer('focus_lock');until(lambda:observer('snapshot').get('focused_control')==262,'original control262 focus',10)
   assert rpc('Input.Select')=='OK'
@@ -183,16 +197,13 @@ def main():
    return state if state['time']-seek_before['time']>time.monotonic()-seek_clock+3 else None
   seek_after=until(seek_completed,'unlocked positive seek control',10)
   passed('actual_input_barrier_released',before=seek_before,after=seek_after)
-  if not observer('snapshot')['osd']:assert rpc('Input.ExecuteAction',{'action':'showosd'})=='OK'
+  if not observer('snapshot')['osd']:assert rpc('Input.ShowOSD')=='OK'
   until(lambda:observer('snapshot')['osd'],'original OSD for Stop',10)
   observer('focus_stop');until(lambda:observer('snapshot').get('focused_control')==253,'original Stop control253',10)
   record('original_Stop_dispatch',{'control':253})
   assert rpc('Input.Select')=='OK'
   until(lambda:not observer('snapshot')['playing'],'actual original OSD media Stop',10)
   alive();passed('original_OSD_Stop_same_engine_alive',pid=pid,control=253)
-  watched_spec=importlib.util.spec_from_file_location('selected_watched_case',crashes/'watched_case.py')
-  watched=importlib.util.module_from_spec(watched_spec);watched_spec.loader.exec_module(watched)
-  report['watched_case']=watched.run(rpc,observer,until,passed,record,alive,film_directory,film_directory+public['movie_member'])
   identity_after=observer('native_identity');assert identity_after==identity,'MAPPED_ENGINE_OR_PROCESS_CHANGED'
   observer('finish');until(lambda:transport.read_json(QAROOT+'/retired.json').get('normal_completion') is True,'observer retirement',10);alive()
   passed('normal_media_stop_and_observer_retirement',same_pid=pid)
