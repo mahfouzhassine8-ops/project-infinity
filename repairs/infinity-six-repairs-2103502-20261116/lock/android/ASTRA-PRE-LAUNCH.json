@@ -8,12 +8,12 @@
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "f164f41dd2bfff023e536ad626f8971308ef3ea864ee0c6b6a4d3720589a600b",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "1cf1fd68fcd55e5c0490cee4a5f4c944d05511aeab5a0e5f7eaa6054099b8354",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "f952e3943e602f183e7647c8e2483bedf8a1cd5a164c88585e6facaf613bf99e",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "14eaac7f55b619d0a8c775b59283f95c93c050223fd8a8692cab7e28f9be04d1",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "4bf33da50a71051c0215dc0bbf4ac58b2cf17a88f4d4a7eb39c69e4a33ab15e6",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "ac18002ad74496dba198ceedeec974370b61735318bf985f9c9f22e034d33752",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/ANDROID-ATTEMPT6.json": "fad025284ded78f0f872a263bd91dece8fe8ce94227bb78c3ca45a5129818e79",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/PIP-TAIL-COMPILE.json": "971ef4a278c54940d963e05e048e97974a1672b669ff2b320cf43fa48ed17165"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/PIP-TAIL-COMPILE.json": "7c1c96e81c79af4028dacbef8d0da676886591a8c0b37285824ddca05dfec16b"
   },
   "review_findings_addressed": [
     "require actual completed instrumentation; no timeout/partial receipt PASS",
@@ -35,13 +35,15 @@
       "Require actual PiP callback and visible smaller rendered owner frame",
       "Use exact probe PiP SystemUI accessibility ACTION_EXPAND, not premature self-start",
       "Quote empty original emulator setting as one remote shell command",
-      "Explicit pip_tail selection retains prior prefix without repeating it"
+      "Explicit pip_tail selection retains prior prefix without repeating it",
+      "Wait for fresh READY epoch and geometry within existing PiP return deadline; avoid focus-before-layout race"
     ],
     "preserved": [
       "All production inputs",
       "UID-restricted injected input",
       "Strict readiness/hold/ACK/execution gates"
     ],
-    "required": "Real callback/frame/expansion/exit READY, remaining lifecycle tail and exact fixture restoration; no whole-probe or physical acceptance inference"
+    "required": "Real callback/frame/expansion/exit READY, remaining lifecycle tail and exact fixture restoration; no whole-probe or physical acceptance inference",
+    "independent_followup": "Astra and lock502_trace approved exact return-wait correction; changed fixture SDK compile PASS"
   }
 }

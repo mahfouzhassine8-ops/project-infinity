@@ -122,7 +122,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)));
     waitFor(()->!a.isInPictureInPictureMode()&&a.dialogFocused(),"foreground lock return");
   }
-  private void returnFromPiP() throws Exception {
+  private void returnFromPiP(long previousEpoch) throws Exception {
     phase="PiP system expansion";
     int exited=ui(()->a.pipExitedCallbacks),task=ui(a::getTaskId);
     AccessibilityServiceInfo info=getUiAutomation().getServiceInfo();
@@ -161,7 +161,8 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     }
     phase="PiP return READY";
     waitFor(()->a.getTaskId()==task&&a.pipExitedCallbacks>exited&&
-        !a.isInPictureInPictureMode()&&a.dialogFocused(),"actual PiP exit callback and foreground lock return");
+        !a.isInPictureInPictureMode()&&a.dialogFocused()&&a.readyEpoch>previousEpoch&&
+        a.geometryMatches(),"actual PiP exit callback and fresh focused READY geometry");
   }
   private void rotate(int orientation) {
     phase="rotation "+orientation;
@@ -230,7 +231,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
             a.underlay.isShown()&&a.underlay.getWindowVisibility()==android.view.View.VISIBLE,
             "exact owner PiP callback and visible resized frame");
         require(ui(()->a.locked()&&!a.holding()),"Completed PiP entry cancels hold and retains owner");
-        returnFromPiP();require(ui(()->a.locked()&&a.readyEpoch>epoch&&a.requestCount==requests),"Actual PiP cancels hold and retains lock on return");
+        returnFromPiP(epoch);require(ui(()->a.locked()&&a.readyEpoch>epoch&&a.requestCount==requests),"Actual PiP cancels hold and retains lock on return");
       } else {
         require(!"pip_tail".equals(selection),"Selected PiP test requires advertised support");
         notRun.put("PiP: emulator does not advertise feature");

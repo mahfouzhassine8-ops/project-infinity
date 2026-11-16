@@ -1,0 +1,18 @@
+{
+  "status": "PASS_COMPONENT_COMPILE_ONLY",
+  "package": "com.projectinfinity.lockqa",
+  "sources": {
+    "java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+    "java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+    "android/InfinityLockProbeActivity.java": "f952e3943e602f183e7647c8e2483bedf8a1cd5a164c88585e6facaf613bf99e",
+    "android/InfinityLockProbeInstrumentation.java": "14eaac7f55b619d0a8c775b59283f95c93c050223fd8a8692cab7e28f9be04d1"
+  },
+  "android_jar_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "compiler_sha256": "cde026ff966b48b5e5f148b6f041ceff3cf4f85cf75155f4ec0f40e4ee14b545",
+  "compile_output": "----------\n1. WARNING in /dev/shm/infinity502-lock-window-piptail-compile/source/InfinityVideoLockDialog.java (at line 338)\n\tw.getDecorView().setSystemUiVisibility(owner.getWindow().getDecorView().getSystemUiVisibility());\n\t                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nThe method setSystemUiVisibility(int) from the type View is deprecated\n----------\n2. WARNING in /dev/shm/infinity502-lock-window-piptail-compile/source/InfinityVideoLockDialog.java (at line 338)\n\tw.getDecorView().setSystemUiVisibility(owner.getWindow().getDecorView().getSystemUiVisibility());\n\t                                                                        ^^^^^^^^^^^^^^^^^^^^^^^\nThe method getSystemUiVisibility() from the type View is deprecated\n----------\n----------\n3. WARNING in /dev/shm/infinity502-lock-window-piptail-compile/source/InfinityLockProbeActivity.java (at line 30)\n\tfinal Handler clock = new Handler();\n\t                          ^^^^^^^^^\nThe constructor Handler() is deprecated\n----------\n4. WARNING in /dev/shm/infinity502-lock-window-piptail-compile/source/InfinityLockProbeActivity.java (at line 66)\n\t} else getWindow().getDecorView().setSystemUiVisibility(0x1706);\n\t                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nThe method setSystemUiVisibility(int) from the type View is deprecated\n----------\n----------\n5. WARNING in /dev/shm/infinity502-lock-window-piptail-compile/source/InfinityLockProbeInstrumentation.java (at line 153)\n\t} finally {root.recycle();}\n\t                ^^^^^^^^^\nThe method recycle() from the type AccessibilityNodeInfo is deprecated\n----------\n5 problems (5 warnings)\n",
+  "actual_Android": "NOT_RUN",
+  "native_bridge": "NOT_INCLUDED",
+  "production_Main_or_stubs": "NOT_INCLUDED",
+  "Kodi_shutdown": "NOT_RUN",
+  "owner_installer": false
+}
