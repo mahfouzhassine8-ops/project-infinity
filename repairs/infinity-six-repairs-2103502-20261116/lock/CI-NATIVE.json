@@ -47,8 +47,9 @@
     "xbmc/platform/android/activity/XBMCApp.h": "1c37af721e3c3da7cdf4085df6dec826a4d9965acf48acc67e6bda883bee5734"
   },
   "astra_review_sha256": "29d06289522749f30ed024a2dd949dcf568e6fa54bcda409edf634cb08dd055a",
-  "reviewed_source_commit": "00b1c191ec035caf0d301b1b5cff93e85dce5063",
+  "reviewed_source_commit": "4999c4db7f48ef1065004af323c63de7bdfea4af",
   "correction_specific_rerun_of": 43852054709,
   "reason": "New reviewed observer lifetime correction; retain passing lock evidence and original strict exact502 source/ABI/dependency gates",
-  "correction": "Only three evidence-proven private unique_ptr helper symbols added to existing literal linker map; reviewed observer/factory behavior and host receipts unchanged; exact ABI guard required"
+  "correction": "Only three evidence-proven private unique_ptr helper symbols added to existing literal linker map; reviewed observer/factory behavior and host receipts unchanged; exact ABI guard required",
+  "owner_release_policy": "Merged347ddc68/ac460a4c/88cc611e; native-only check, no APK or signing; all six repairs and both incidents required before owner QA release"
 }
