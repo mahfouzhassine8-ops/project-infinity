@@ -108,7 +108,7 @@ def main():
     dex = unique_sha(ROOT / 'fastqa-inputs/cast', CAST_DEX, 'classes.dex')
     sdk = Path(os.environ['ANDROID_HOME']) / 'build-tools/35.0.0'
     verified = subprocess.check_output([str(sdk / 'apksigner'), 'verify', '--verbose', '--print-certs', str(base)], text=True)
-    check('certificate SHA-256 digest: ' + CERT in verified and all(re.search(r'Verified using v' + str(n) + r' scheme[^\\n]*: true', verified) for n in (1, 2, 3)), 'ORIGINAL_CERTIFICATE')
+    check('certificate SHA-256 digest: ' + CERT in verified and all(any(line.startswith('Verified using v' + str(n) + ' scheme') and line.rstrip().endswith(': true') for line in verified.splitlines()) for n in (1, 2, 3)), 'ORIGINAL_CERTIFICATE')
     outdir = ROOT / 'fastqa-output'
     outdir.mkdir(exist_ok=True)
     apk = outdir / 'Infinity-2103502-Fast-QA-UNSIGNED-NOT-INSTALLABLE.apk'
