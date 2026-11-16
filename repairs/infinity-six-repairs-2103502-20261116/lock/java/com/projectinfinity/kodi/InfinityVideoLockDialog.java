@@ -343,7 +343,21 @@ final class InfinityVideoLockDialog {
 
     void fit() {
       Window w = getWindow();
-      if (w != null) w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+      if (w != null) {
+        w.setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+        // This focused window must retain Main's existing modern fullscreen
+        // policy; legacy flags alone leave the approved unlock target inset.
+        if (Build.VERSION.SDK_INT >= 30) {
+          w.setDecorFitsSystemWindows(false);
+          android.view.WindowInsetsController controller = w.getInsetsController();
+          if (controller != null) {
+            controller.hide(android.view.WindowInsets.Type.statusBars() |
+                android.view.WindowInsets.Type.navigationBars());
+            controller.setSystemBarsBehavior(
+                android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+          }
+        }
+      }
       content.requestLayout();
     }
 

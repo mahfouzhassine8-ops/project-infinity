@@ -1,0 +1,30 @@
+{
+  "recorded_before_execution": true,
+  "correction": "Astra-approved LockWindow.fit API30+ dialog-only fullscreen policy after show; no State, Bridge, Main or native changes",
+  "authorization": "Root delegated changed Java/DEX compile and exact-reference audit only; selected in android/ANDROID-ATTEMPT3.json",
+  "android_selection_sha256": "3c1103d36d23f7159d4904b617a6ead688b115edd41dd9a6fadf22bebbddcdfe",
+  "prior_result_copy": "repairs/infinity-six-repairs-2103502-20261116/lock/DEX-BUILD-DIALOG-ATTEMPT1.json",
+  "prior_result_sha256": "5dc566a88a328d39ec4bb4382df10b7f55ffbecbd200dc4d48eb01ca89266446",
+  "classes3_reuse_receipt": "repairs/infinity-six-repairs-2103502-20261116/lock/DEX-CLASSES3-PRESERVATION.json",
+  "classes3_reuse_receipt_sha256": "827550a5f3b305a403d2ec511552d1156f30fb48e8a09cb35635984e79881d2a",
+  "classes3_reassembly": false,
+  "changed_inputs": {
+    "java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": {
+      "before": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+      "after": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe"
+    }
+  },
+  "selected_checks": [
+    "Existing builder hash guards, actual changed Java compilation and D8 lock-only output",
+    "Existing declared-reference audit against exact signed502 DEX and pinned Android framework",
+    "Exact retained classes3 receipt/artifact verification and copy; no reassembly"
+  ],
+  "output": "/dev/shm/infinity502-lock-dex/build-dialog-insets",
+  "receipt": "repairs/infinity-six-repairs-2103502-20261116/lock/DEX-BUILD-DIALOG-ATTEMPT2.json",
+  "not_run": [
+    "native build",
+    "Android runtime tests",
+    "APK assembly/signing/installation",
+    "Repair3 tests or edits"
+  ]
+}

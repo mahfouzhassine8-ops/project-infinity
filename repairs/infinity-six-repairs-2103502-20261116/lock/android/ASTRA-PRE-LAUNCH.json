@@ -11,7 +11,7 @@
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "6f7e142e066efbd38fa327802dd9671956e0a51ca8968b3bafae5d19143e6e4c",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "ac18002ad74496dba198ceedeec974370b61735318bf985f9c9f22e034d33752",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe"
   },
   "review_findings_addressed": [
     "require actual completed instrumentation; no timeout/partial receipt PASS",
@@ -27,16 +27,18 @@
     "owner installer"
   ],
   "correction_review": {
-    "previous_run": 43829676190,
+    "previous_run": 43833209532,
     "status": "APPROVED_CORRECTION_SPECIFIC_RERUN",
     "changes": [
-      "Match exact502 owner onResume modern insets and framework theme",
-      "Require actual hold DOWN delivery before negative cases",
-      "Record every pointer/key injection and failure phase/geometry/stack",
-      "Bind failure screenshots/window dumps to runId",
-      "Save result before best-effort capture retrieval; retain InputDispatcher warnings"
+      "Only production LockWindow.fit applies existing502 modern window insets policy after show"
     ],
-    "production_State_Dialog": "UNCHANGED",
-    "prior_failure": "Android target-UID injection failed; exact rejected window not captured; no production cause claimed"
+    "Dialog_sha256": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+    "preserved": [
+      "geometry",
+      "viewport bounds",
+      "state/readiness/hold/ACK",
+      "Main/native/global policy"
+    ],
+    "required": "Actual corrected READY, usable target and same hold/lifecycle checks; no broader acceptance"
   }
 }

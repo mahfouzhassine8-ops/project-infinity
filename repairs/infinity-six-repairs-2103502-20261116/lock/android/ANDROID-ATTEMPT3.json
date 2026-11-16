@@ -1,0 +1,41 @@
+{
+  "run": 43833209532,
+  "source_commit": "04c6bccb3f7d62d115d4c7b0e2f599874870e17e",
+  "artifact": 14210295954,
+  "artifact_sha256": "1b23a5f7cc0fe895b77099fdac254aa9ac5570624d119018f5ab4e85a25f4c53",
+  "status": "FAIL_CONFIRMED_DIALOG_WINDOW_INSETS",
+  "both_profiles": "Focused window, zero READY events before any input; same precondition failure",
+  "narrow_window_geometry": {
+    "owner": [
+      0,
+      0,
+      720,
+      1680
+    ],
+    "dialog": [
+      0,
+      48,
+      720,
+      1632
+    ],
+    "target_global_top": 37.8,
+    "target_local_top": -10.2
+  },
+  "cause": "Modern Main owner requests hidden status/navigation bars; Dialog copies only legacy flags and retains default inset/bar behavior. Valid existing bounds guard refuses the clipped target.",
+  "previous_Dialog_sha256": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+  "approved_correction": "Only LockWindow.fit after show applies the existing Main API30+ hidden status/nav, transient-by-swipe and decorFits=false policy to its own window",
+  "preserve": [
+    "target geometry",
+    "viewport bounds guard",
+    "readiness epochs",
+    "hold/ACK logic",
+    "Main/native/global policy",
+    "pre30 behavior"
+  ],
+  "Astra": "PRE_EDIT_APPROVED against actual screenshots/window dumps/receipts",
+  "selected_verification": [
+    "changed Java/DEX compile and exact references",
+    "same two actual Android window profiles"
+  ],
+  "physical_Fold": "NOT_RUN"
+}

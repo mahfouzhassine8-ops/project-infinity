@@ -113,7 +113,9 @@
       "repair": 5,
       "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
       "final_independent_review": "PENDING integrated review",
-      "candidate_source_sha256": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361"
+      "window_correction_preimage": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+      "window_correction": "Astra approved Dialog-only post-show API30+ policy parity; no geometry or input-safety change",
+      "candidate_source_sha256": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe"
     },
     {
       "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockBridge.java",
@@ -162,7 +164,7 @@
     }
   ],
   "original_repository_production_files": "UNCHANGED; candidate inputs isolated in this repair directory",
-  "DEX_preservation": "lock/DEX-BUILD-RESULT.json",
+  "DEX_preservation": "lock/DEX-BUILD-DIALOG-ATTEMPT2.json; unchanged classes3 reused, changed Dialog references resolved",
   "OSD_preservation": "OSD-PRESERVATION-TEST.json",
   "native_full_source_and_ABI": "First full compile/link passed; ABI rejected25 new internal weak exports; narrowly corrected map pending new full gate",
   "Cobra": "No source edits; all657 non-Main classes3 classes identical; remaining baseline APK members retained pending assembly audit",
