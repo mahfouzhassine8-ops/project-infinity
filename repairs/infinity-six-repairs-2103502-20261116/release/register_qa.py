@@ -42,6 +42,14 @@ def reviewed_tools():
     expected['reviewed_workflow_ids']=sorted(set(previous['reviewed_workflow_ids'])|{row['id'] for row in rows})
     assert c.load(ROOT/path)==expected,'SIGNER_POLICY_ONLY_REVIEWED_UNSIGNED_CATALOG'
     assert expected['sole_original_key_workflow_id']==397702717
+    path='repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json'
+    previous=json.loads(c.git('show',PARENT+':'+path));expected=copy.deepcopy(previous)
+    roots=('InfinityVideoLockBridge','InfinityVideoLockDialog','InfinityVideoLockState')
+    assert not set(roots)&set(previous['project_roots'])
+    expected['project_roots'].update({name:'INFINITY' for name in roots})
+    assert c.load(ROOT/path)==expected,'ONLY_THREE_REVIEWED_LOCK_ROOTS_MAY_BE_ADDED'
+    correction=c.load(TASK/'OWNERSHIP-POLICY-RECONCILIATION.json')
+    assert c.sha(ROOT/path)==correction['new_policy_sha256']
     return result
 c.tools=reviewed_tools
 
@@ -51,7 +59,8 @@ def request():
     assert r['ContinuePlaying']=='DEFERRED_NOT_FIXED_UNCHANGED' and r['accepted_pointer_updated'] is False
     assert c.sha(ROOT/c.WORKFLOW)==r['workflow_sha256']
     required={str((TASK/name).relative_to(ROOT)) for name in
-              ('register_qa.py','owner_bundles.py','recovery_metadata.py','ROWS.json','WORKFLOW-CATALOG-REVIEW.json')}
+              ('register_qa.py','owner_bundles.py','recovery_metadata.py','ROWS.json',
+               'WORKFLOW-CATALOG-REVIEW.json','OWNERSHIP-POLICY-RECONCILIATION.json')}
     assert set(r['source_bindings'])==required,'EXACT_RELEASE_ADAPTER_SOURCES_REQUIRED'
     for name,digest in r['source_bindings'].items():assert c.sha(ROOT/name)==digest,name
     raw=(TASK/'OWNER-QA-REVIEW.json').read_bytes();assert c.digest(raw)==r['review_sha256']
@@ -153,7 +162,9 @@ def prepare():
             last_issued_versionCode=prior['candidate_versionCode'],previous_authority_sha256=inventory.digest(inventory.canonical(prior)),
             target_owners=['INFINITY','CHOOSER_SHELL'],update_kind='owner_update',payload=selected_payload,
             bundle_catalog=catalog,experience_version_labels=dict(INFINITY=number,COBRA=2103445),workflow_sha256=c.sha(ROOT/c.WORKFLOW))
-        policy='repairs/dual-experience-isolation-2103420/signer-policy.json';proposed['source_files'][policy]=c.sha(ROOT/policy)
+        for policy in ('repairs/dual-experience-isolation-2103420/signer-policy.json',
+                       'repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json'):
+            proposed['source_files'][policy]=c.sha(ROOT/policy)
         for owner in proposed['target_owners']:
             proposed['components'][owner]={k:metas[owner][k] for k in ('version','digest','approved_source','settings_schema')}
             proposed['components'][owner]['revision']=prior['components'][owner]['revision']+1
@@ -177,7 +188,15 @@ def selected():
     assert authority['candidate_versionCode']==VERSIONS[kind]
     assert authority['owner_update_evidence']['owner']=='INFINITY_SIX502_QA_'+kind.upper()
     root=c.obtain(r['prepared'],'six502-frozen-preparation')/kind
-    assert (root/'AUTHORITY-PROPOSAL.json').read_bytes()==(ROOT/c.AUTHORITY).read_bytes()
+    original=(root/'AUTHORITY-PROPOSAL.json').read_bytes()
+    correction=c.load(TASK/'OWNERSHIP-POLICY-RECONCILIATION.json')
+    assert c.digest(original)==correction[kind]['original_sha256']
+    derived=json.loads(original)
+    derived['source_files'][correction['policy_path']]=correction['new_policy_sha256']
+    if kind=='recovery':derived['previous_authority_sha256']=correction['candidate']['derived_sha256']
+    inventory=c.tools()[0];derived_raw=inventory.canonical(derived)
+    assert c.digest(derived_raw)==correction[kind]['derived_sha256']
+    assert derived_raw==(ROOT/c.AUTHORITY).read_bytes(),'EXACT_REVIEWED_DERIVED_REGISTERED_AUTHORITY'
     apk=c.unique(root,'Infinity-'+str(VERSIONS[kind])+'-UNSIGNED.apk');base,_,_=inputs(r)
     preservation(base,apk,kind,r);assert c.sha(apk)==authority['owner_update_evidence']['unsigned_sha256']
     with Path(os.environ['GITHUB_OUTPUT']).open('a') as output:output.write('apk='+str(apk)+'\ngeneration='+str(authority['generation'])+'\n')

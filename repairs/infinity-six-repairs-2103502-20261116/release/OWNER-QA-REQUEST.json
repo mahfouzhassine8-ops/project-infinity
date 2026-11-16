@@ -130,7 +130,15 @@
     "workflow_id": 397702717
   },
   "parent_authority_sha256": "668f31abba47c2f0fd2a8bb8ac6e660f96388608a738eac785d0bdacf4356fd4",
-  "prepared": null,
+  "prepared": {
+    "digest": "sha256:e3435df559ba84773e052ac67a2f83d7d51cf058e7fecafb70d4abca44f88011",
+    "id": 14238856037,
+    "name": "Infinity502-Consolidated-Registered-Preparation-43893471436",
+    "run": 43893471436,
+    "size_in_bytes": 1290609725,
+    "source": "be61d96110d52b9a58ce9771c72be6c0ba9040cc",
+    "workflow_id": 397702717
+  },
   "recovery_module_hashes": {
     "script.infinity.commandcenter/INFINITY-MODULES.v1": "0a94c9108ec2b376150a6f0c3c9080e76baa7b122bb99982dff1caa80812d91b",
     "script.infinity.commandcenter/INFINITY-MODULES.v1.sig": "42f60f87371db263430385d044f3c6f60c077a029d1b9d5e0ee395e11f93cce1",
@@ -225,13 +233,14 @@
     "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
     "workflow_id": 397702717
   },
-  "review_sha256": "cc0182ebafc203b5da771fd0069c71381e75d0548771ccb27a6679c618ff8613",
+  "review_sha256": "0950fbdef3ba6af3a5fcbbb10c29ae2ba374cc7caa3d15e3e828d22d9c1ecab8",
   "source_bindings": {
+    "repairs/infinity-six-repairs-2103502-20261116/release/OWNERSHIP-POLICY-RECONCILIATION.json": "8fd0cfe1b70cd5407467202cc707517488625726b342403a1094e422116bed28",
     "repairs/infinity-six-repairs-2103502-20261116/release/ROWS.json": "ed6c24a3181bbe714ef47c2e753a730cf0d527a436513117b13c8f66b6be0f74",
     "repairs/infinity-six-repairs-2103502-20261116/release/WORKFLOW-CATALOG-REVIEW.json": "df007effba35cbe5b31399cba753475c0496e4cd97eb3c7d2b441e53fcd2ef1a",
     "repairs/infinity-six-repairs-2103502-20261116/release/owner_bundles.py": "b3c2b1ebb9f94dc2885908669a6549498268b8dccc381361ce9da20f93103698",
     "repairs/infinity-six-repairs-2103502-20261116/release/recovery_metadata.py": "5dddcf678d0d6f6241c39b04661b1933ccf264ef401bf7087dc57165541e575c",
-    "repairs/infinity-six-repairs-2103502-20261116/release/register_qa.py": "575bd8ea18ee65478f9915ae3fad7f9a2b190d912b20d26bc1cc0c11c39d9099"
+    "repairs/infinity-six-repairs-2103502-20261116/release/register_qa.py": "b5b6e13e8ac098e11a47312baf43a2d1e81ecd35e5bc76749b8e88c80b28d9f6"
   },
   "stage": {
     "digest": "sha256:79bb68fd8cacd4c8adc8d7c756590d68a890f13afbc7f38bcb1db2b1a6a98249",

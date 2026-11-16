@@ -1,0 +1,27 @@
+{
+  "policy_path": "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json",
+  "prior_source": "4c6bc0b4a06828f43639761e481c1d42d2fcbc34",
+  "old_policy_sha256": "ad1f8c7335f19132eb8020f2fd95e22638c7589dd1e3929ea426c67886af53d7",
+  "new_policy_sha256": "8a6b0f7bbccff51a0561c31751cf9a2fdcf3f9c16aa38dddcccb799ba19b8c1c",
+  "exact_roots": {
+    "InfinityVideoLockBridge": "INFINITY",
+    "InfinityVideoLockDialog": "INFINITY",
+    "InfinityVideoLockState": "INFINITY"
+  },
+  "review_required": "ExactJSONpointerdelta/sourcehashonly; preparedAPKs/bundles/producer/allpayloaddataunchanged",
+  "candidate": {
+    "original_sha256": "39de690690c2523359188f103aa1d6a6eecbb488258d669cb1cd932216287206",
+    "derived_sha256": "57db3ee5208b1444cf0224cff293420967eae9ca8c69278ce0f6fa550be09361",
+    "allowed_JSON_pointers": [
+      "/source_files/repairs~1dual-experience-isolation-2103420~1ownership-reviewed-roots.json"
+    ]
+  },
+  "recovery": {
+    "original_sha256": "b81eec5d64de21ab523ca81da19e24d7dca716cc3bc017f03b4d1465f82d8f3b",
+    "derived_sha256": "73b85029a01ea0faa7543439f25dec66504a1c9bbe423e9dea87f0a569b6429a",
+    "allowed_JSON_pointers": [
+      "/source_files/repairs~1dual-experience-isolation-2103420~1ownership-reviewed-roots.json",
+      "/previous_authority_sha256"
+    ]
+  }
+}
