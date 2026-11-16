@@ -1,0 +1,53 @@
+{
+  "status": "PASS_INDEPENDENT_ORIGINAL_SIGNED_PAIR_PACKAGING",
+  "reviewer": "/root/astra_500_review (gpt-6-astra)",
+  "baseline": 2103500,
+  "candidate": {
+    "version": 2103502,
+    "run": 43785765772,
+    "source": "92bef1bcf056abf58d6754354173565e56f907ac",
+    "artifact": 14189813969,
+    "artifact_sha256": "936e9b52a1880d3412bc86ad4a594145f9927a7dba7b2243a88eb3cea26fb9b2",
+    "APK_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+    "unchanged_members": 7772,
+    "changed_members": [
+      "lib/arm64-v8a/libkodi.so",
+      "classes6.dex",
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties"
+    ]
+  },
+  "recovery": {
+    "version": 2103503,
+    "run": 43786312699,
+    "source": "4c6bc0b4a06828f43639761e481c1d42d2fcbc34",
+    "artifact": 14189769692,
+    "artifact_sha256": "ba2125f899ec4cfa6a5e1327b89abdb420704cec7ceb45ba92855b12bfef91bd",
+    "APK_sha256": "5d4b9435b3df094878fd99629f0a365fafb628af72e9e98ac751a95e021cab76",
+    "unchanged_members": 7774,
+    "changed_members": [
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties"
+    ],
+    "functional_baseline": 2103500
+  },
+  "signature_schemes": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "independent_checks": [
+    "actual archives and APK hashes",
+    "actual apksig signature verification",
+    "all7776 payload member comparisons",
+    "manifest version-only normalization",
+    "exact registered authority bytes",
+    "Cobra/provider/profile packaged assets unchanged",
+    "publication empty draft checked before upload and asset digests checked before publish"
+  ],
+  "accepted_pointer_updated": false,
+  "physical_acceptance": "PENDING_OWNER",
+  "install_over": "PASS_RUN43786801531 (independent receipt review pending)",
+  "tests_rerun_by_reviewer": false
+}

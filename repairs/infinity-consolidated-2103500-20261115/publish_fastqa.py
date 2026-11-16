@@ -21,6 +21,8 @@ for index,kind in enumerate(('baseline','candidate','recovery')):
 sha=out/'SHA256SUMS';sha.write_text(''.join(c.sha(p)+'  '+p.name+'\n' for p in assets));assets.append(sha)
 instructions=out/'INSTALL-AND-RECOVERY.md';instructions.write_text('Install 2103502 over the existing Infinity app. Do not uninstall or clear data.\n\n2103503 is forward recovery restoring signed2103500 functionality; use it only if recovery is needed. Its higher version code permits installation over2103502.\n\nIncludes only shutdown observer, narrow Silent Mode promotion filtering and Cast discovery. Continue Playing, Otaku Watchlist and Empty Shell remain deferred and unchanged. Physical Fold/TV acceptance remains pending. Cobra2103445 is preserved.\n')
 assets.append(instructions)
+for name in ('QA-ASTRA-REGISTRATION-REVIEW.json','QA-ASTRA-SIGNED-PAIR-REVIEW.json'):
+ (evidence/name).write_bytes((HERE/name).read_bytes())
 archive=out/'INFINITY-2103502-QA-VERIFICATION.zip'
 with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
  for p in evidence.rglob('*'):
