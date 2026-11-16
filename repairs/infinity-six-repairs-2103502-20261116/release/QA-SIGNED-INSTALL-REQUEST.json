@@ -1,0 +1,43 @@
+{
+  "operation": "actual-signed502-consolidated-QA-install-over-forward-recovery",
+  "baseline": 2103502,
+  "versions": {
+    "candidate": 2103504,
+    "recovery": 2103505
+  },
+  "shutdown": false,
+  "application_startup": false,
+  "inputs": {
+    "baseline": {
+      "id": 14189813969,
+      "name": "Infinity500-FastQA-Original-Signed-43785765772",
+      "digest": "sha256:936e9b52a1880d3412bc86ad4a594145f9927a7dba7b2243a88eb3cea26fb9b2",
+      "size_in_bytes": 330750181,
+      "run": 43785765772,
+      "source": "92bef1bcf056abf58d6754354173565e56f907ac",
+      "workflow_id": 397702717,
+      "APK_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28"
+    },
+    "candidate": {
+      "id": 14239746699,
+      "name": "Infinity502-Consolidated-OriginalSigned-43895603388",
+      "digest": "sha256:e3fae14dc9321ad1d380856e557e10fc33b37c71abb82ad0ce6f4d241350166e",
+      "size_in_bytes": 330961493,
+      "run": 43895603388,
+      "source": "80506277145dcd4bbd66da3eaa02d9c085c1b437",
+      "workflow_id": 397702717,
+      "APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234"
+    },
+    "recovery": {
+      "id": 14240523762,
+      "name": "Infinity502-Consolidated-OriginalSigned-43898932669",
+      "digest": "sha256:32feb42d30898814b89d202895a67bc40ac0a62e71c9bd04ea4ca68aa4c37ade",
+      "size_in_bytes": 330750972,
+      "run": 43898932669,
+      "source": "7755b1ecb959492599c2ffab25e230fe2aebe7a2",
+      "workflow_id": 397702717,
+      "APK_sha256": "947648ad136a6f607eb63074575f7bf5b1071bad8883dab117826d00466ab407"
+    }
+  },
+  "review_sha256": "bb7878b83f7b1e2e32d8e4c8cac4da8ff451818ead1eccce45a0bfee3cc2b227"
+}
