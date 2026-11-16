@@ -3,11 +3,12 @@
   "agent": "/root/astra_cast502",
   "status": "PASS_STANDALONE_COMPONENT_BUILD_REVIEW",
   "builder_sha256": "25a1c94c0ea1370e0bd1311a55f29fe08a9246d724316947c95fba90af8021a0",
-  "workflow_sha256": "2f21b6e18b422deb3c1640736c4dac90d291e83e369a6550d4e973525f569c7c",
+  "workflow_sha256": "31af9254730b8a1ecda3a59f92d42cbab92cdd5619d1a7c7b20f44b6f343ab4b",
   "source_sha256": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
   "finding_corrected": "Preserve original libinfinitycastremux.so filename for exact502 baseline, output, proof and upload; unchanged Java load identity.",
   "boundary": "Authenticated exact502 input, retained pinnedNDK21/FFmpeg6 standalone native() only, exactengine unchanged, exportedABI/dependencies equal. No Kodi or APK build.",
   "tests_by_reviewer": false,
   "Android": "PENDING",
-  "physical_TV": "PENDING_OWNER_ACCEPTANCE"
+  "physical_TV": "PENDING_OWNER_ACCEPTANCE",
+  "tooling_review": "Astra confirmed soleaddition of pinnedTemurin17 before SDKsetup; builder andPTL unchanged. Earlierlicenseinitialization failure retained; Java cause notproven."
 }
