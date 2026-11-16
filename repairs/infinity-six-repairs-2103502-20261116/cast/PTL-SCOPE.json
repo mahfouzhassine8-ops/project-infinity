@@ -23,7 +23,8 @@
     "all Java Cast/discovery/session behavior",
     "all packet data, timestamps, audio and display/HDR side metadata"
   ],
-  "status": "HOST_REVIEW_AND_SELECTED_CHECKS_PASS_ARM64_PENDING",
+  "status": "HOST_AND_STANDALONE_ARM64_ABI_REVIEW_PASS_ANDROID_PENDING",
   "source_after_sha256": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
-  "delta": "44 added lines: array include, bounded PTL reconciler, one inspect call; old historical source unmodified."
+  "delta": "44 added lines: array include, bounded PTL reconciler, one inspect call; old historical source unmodified.",
+  "compiled_library": "libinfinitycastremux.so"
 }

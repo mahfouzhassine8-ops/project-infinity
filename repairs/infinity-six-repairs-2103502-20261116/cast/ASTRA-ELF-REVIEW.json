@@ -1,0 +1,67 @@
+{
+  "status": "PASS_INDEPENDENT_ACTUAL_ELF_AND_RECEIPT_REVIEW",
+  "candidate_sha256": "86a34a4976813f24280345561170b1dee47e96fb9c3b34642190ced2c2fe9ffd",
+  "baseline_cast_sha256": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a",
+  "baseline_engine_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+  "source": "f420b5519d440abef841e7215634b52a5e9839d8",
+  "PTL_source_sha256": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
+  "actual_ELF": "ELF64 DYN AArch64",
+  "actual_ABI": {
+    "exports": [
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_open"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment"
+      ]
+    ],
+    "dependencies": [
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libm.so"
+    ]
+  },
+  "reviewed_inputs_at_source_all_match": true,
+  "build_boundary": "Reviewed standalone builder calls native() only; receipt says Kodi_compiled=false/APK_built=false; uploaded component supplies no libkodi or APK",
+  "Android_execution": "NOT_RUN",
+  "physical_TV": "NOT_RUN",
+  "source_specific_root_cause": "UNPROVEN",
+  "tests_rerun": false
+}

@@ -1,0 +1,147 @@
+{
+  "ABI_preserved": {
+    "dependencies": [
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libm.so"
+    ],
+    "exports": [
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_open"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment"
+      ]
+    ]
+  },
+  "APK_built": false,
+  "Android_execution": "NOT_RUN",
+  "FFmpeg_source_sha512": "945e34840092dc0fd3824eb1af2be79868af2afb4fe13159b19a9bcfc464cc4d53243c13ff065199290e9393ddbf4b1c5c8abccf83a31a31d6c7490e499fd1fc",
+  "Kodi_compiled": false,
+  "actual_library": "libinfinitycastremux.so",
+  "baseline": 2103502,
+  "baseline_APK_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "baseline_artifact": {
+    "archive_sha256": "936e9b52a1880d3412bc86ad4a594145f9927a7dba7b2243a88eb3cea26fb9b2",
+    "artifact": 14189813969,
+    "member": "Infinity-2103502-Combined-Original-Signer.apk",
+    "member_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+    "run": 43785765772,
+    "source": "92bef1bcf056abf58d6754354173565e56f907ac"
+  },
+  "dependencies": [
+    "libc++_shared.so",
+    "libc.so",
+    "libdl.so",
+    "libm.so"
+  ],
+  "engine_changed": false,
+  "existing_engine_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+  "existing_native_libraries_replaced": false,
+  "exports": [
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_open",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel"
+  ],
+  "global_FFmpeg_callbacks_or_init_changed": false,
+  "new_library_sha256": "86a34a4976813f24280345561170b1dee47e96fb9c3b34642190ced2c2fe9ffd",
+  "physical_TV": "NOT_RUN",
+  "prior_library_sha256": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a",
+  "required_FFmpeg_symbols": [
+    "av_version_info",
+    "avutil_version",
+    "av_malloc",
+    "av_free",
+    "av_freep",
+    "av_dict_set",
+    "av_dict_get",
+    "av_dict_free",
+    "av_rescale_q",
+    "av_find_input_format",
+    "avformat_alloc_context",
+    "avformat_open_input",
+    "avformat_find_stream_info",
+    "avformat_close_input",
+    "avio_alloc_context",
+    "avio_context_free",
+    "avio_flush",
+    "avformat_index_get_entries_count",
+    "avformat_index_get_entry",
+    "av_seek_frame",
+    "avformat_alloc_output_context2",
+    "av_stream_new_side_data",
+    "avformat_new_stream",
+    "avformat_free_context",
+    "avcodec_parameters_copy",
+    "avcodec_get_name",
+    "av_ac3_parse_header",
+    "avformat_query_codec",
+    "avformat_write_header",
+    "av_interleaved_write_frame",
+    "av_write_frame",
+    "av_write_trailer",
+    "av_packet_alloc",
+    "av_packet_free",
+    "av_packet_unref",
+    "av_packet_rescale_ts",
+    "av_read_frame"
+  ],
+  "reviewed_inputs": {
+    ".github/workflows/infinity-502-cast-ptl-native.yml": "31af9254730b8a1ecda3a59f92d42cbab92cdd5619d1a7c7b20f44b6f343ab4b",
+    "repairs/infinity-cast-mkv-2103494-20261113/build.py": "f365c32cfcbba5d7b80b56a4ee928f3d9acb479fc45c393410be89ecbcc26e5b",
+    "repairs/infinity-six-repairs-2103502-20261116/BASELINE.json": "0e6676c15a29e51cd5db445e6692deb5fce4bef68f93a54766b49e7c8f59ed6b",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/ASTRA-PTL-REVIEW.json": "624e2a10775775441d1012323def3ee163dab66dd4355032454ba814657e0860",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/PTL-SCOPE.json": "447c704447e981e6a70cbdba1f5c88fcd828788c15b01f67fd335d1312d86ee3",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/build.py": "25a1c94c0ea1370e0bd1311a55f29fe08a9246d724316947c95fba90af8021a0",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/NATIVE.json": "fc8012452caaca67e96ec9336dc20b98771c59da4d3cf94a436188e96111c94b",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/stage.py": "3b6eb5872ee9d75831677197585eecf03ec980ae107242bfe5379dca70d59e70"
+  },
+  "source": "f420b5519d440abef841e7215634b52a5e9839d8",
+  "source_hashes": {
+    "repairs/infinity-six-repairs-2103502-20261116/cast/build.py": "25a1c94c0ea1370e0bd1311a55f29fe08a9246d724316947c95fba90af8021a0",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8"
+  },
+  "status": "PASS_SELECTED_CAST_PTL_ARM64_ONLY"
+}
