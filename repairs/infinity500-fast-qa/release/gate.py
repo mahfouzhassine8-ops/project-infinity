@@ -7,6 +7,27 @@ sys.path.insert(0,str(ROOT/'repairs/infinity-movies-continue-cast-2103486-202611
 import common_release as c
 import prepare_release as old
 TASK=Path(__file__).resolve().parent
+# Preserve the original tool pins. The sole permitted policy-data evolution is
+# the exact audit catalog for three already reviewed unsigned500 CI workflows.
+def reviewed_tools():
+ for name in ('assemble.py','component_bundles.py','release_gate.py','inventory.py','review_ownership.py','signer_policy.py'):
+  path='repairs/dual-experience-isolation-2103420/'+name
+  c.require((ROOT/path).read_bytes()==c.git('show','e1ef672a6f24aed6c19a14ab96d2df6fe3380460:'+path),'UNCHANGED_ORIGINAL_TOOL:'+name)
+ path='repairs/dual-experience-isolation-2103420/signer-policy.json'
+ old=json.loads(c.git('show','5cdb593a:'+path));current=c.load(ROOT/path);review=c.load(TASK/'WORKFLOW-CATALOG-REVIEW.json');expected=copy.deepcopy(old)
+ c.require({r['id'] for r in review['rows']}=={419489686,419528653,419521920},'EXACT_UNSIGNED_WORKFLOW_CATALOG')
+ for row in review['rows']:
+  c.require(row['original_key_access'] is False,'NO_ADDITIONAL_KEY_ROUTE')
+  raw=c.git('show',row['source']+':'+row['path']);c.require(datahash(raw)==row['workflow_sha256'] and b'secrets.INFINITY_' not in raw and b'assemble.py sign' not in raw,'AUDITED_UNSIGNED_DEFINITION')
+  expected['additional_unsigned_owner_workflows'].append(row)
+ expected['reviewed_workflow_ids']=sorted(set(old['reviewed_workflow_ids'])|{r['id'] for r in review['rows']})
+ c.require(current==expected and current['sole_original_key_workflow_id']==397702717,'POLICY_ONLY_EXACT_CATALOG_DELTA')
+ for path in ('repairs/infinity-final-closure-2103407/p0/manifest.py','repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem','repairs/universal-persistence-2103401/RECEIPT-TOOL-PINS.json'):
+  c.require((ROOT/path).read_bytes()==c.git('show','e1ef672a6f24aed6c19a14ab96d2df6fe3380460:'+path),'ORIGINAL_TOOL_INPUT')
+ sys.path.insert(0,str(c.CORE))
+ import inventory,component_bundles,release_authority,release_gate,review_ownership
+ return inventory,component_bundles,release_authority,release_gate,review_ownership
+c.tools=reviewed_tools
 BASE='224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40'
 ENGINE='ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7'
 DEX='4360efcdf3af08a8388f18846c79353517ab3d7ee6a3c026838b7748c0914c98'
@@ -92,6 +113,7 @@ def prepare():
    metas[owner]=meta
   (components/'catalog.json').write_bytes(inventory.canonical(catalog))
   proposed=copy.deepcopy(prior);proposed.update(generation=prior['generation']+1,candidate_versionCode=ver,last_issued_versionCode=prior['candidate_versionCode'],previous_authority_sha256=inventory.digest(inventory.canonical(prior)),target_owners=['INFINITY','CHOOSER_SHELL'],update_kind='owner_update',payload=payload,bundle_catalog=catalog,experience_version_labels=dict(INFINITY=ver,COBRA=2103445),workflow_sha256=c.sha(ROOT/c.WORKFLOW))
+  for n in proposed['source_files']:proposed['source_files'][n]=c.sha(ROOT/n)
   for owner in proposed['target_owners']:
    proposed['components'][owner]={k:metas[owner][k] for k in ('version','digest','approved_source','settings_schema')};proposed['components'][owner]['revision']=prior['components'][owner]['revision']+1
    proposed['bundle_sources'][owner]=dict(run_id=int(os.environ['GITHUB_RUN_ID']),build_source=os.environ['GITHUB_SHA'],artifact='Infinity500-FastQA-Registered-Preparation-'+os.environ['GITHUB_RUN_ID'],path=kind+'/components/'+owner+'.zip')
