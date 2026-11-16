@@ -1,0 +1,40 @@
+{
+  "status": "PASS_EXACT_FAST_QA_REGISTRATION_AND_PACKAGING_SCOPE",
+  "reviewer": "/root/astra_500_review (gpt-6-astra)",
+  "scope": [
+    "shutdown observer",
+    "Silent Mode promotion extension",
+    "bounded Cast discovery"
+  ],
+  "deferred_unchanged": [
+    "Continue Playing",
+    "Otaku Watchlist",
+    "Empty Shell"
+  ],
+  "preparation_run": 43784613251,
+  "preparation_source": "bbefb6d1dd514cf0585954d4f197cc1abadf4118",
+  "preparation_artifact": 14189977780,
+  "preparation_digest": "sha256:2b71433dbcf4646d9a8d834326208b5f022f367bf138ac07c5a58d4e54eac2be",
+  "receipts_export_run": 43785199836,
+  "receipts_artifact": 14190310699,
+  "receipts_digest": "sha256:6a4eeb8250c4edc66536349896a874b1384647c26c68725e86ff53cbec064926",
+  "candidate_proposal_sha256": "e9dcb2c3a42bb819236250db3434e1c9edcbc982c2e059a90921fc077f4b458d",
+  "candidate_generation": 87,
+  "candidate_version": 2103502,
+  "recovery_generation": 88,
+  "recovery_version": 2103503,
+  "verified": [
+    "exact proposal parent lineage",
+    "protected owner payloads/components and durability contract unchanged",
+    "accepted pointer unchanged",
+    "only three existing unsigned workflows catalogued; sole signer397702717",
+    "other authority source pins retained",
+    "producer request retained exactly; prepared transport explicit",
+    "install-only adapter has no reset/uninstall/launch/forced-stop path"
+  ],
+  "core_signer_changed": false,
+  "registration_commit": "92bef1bcf056abf58d6754354173565e56f907ac",
+  "signed_APK_independent_review": "PENDING",
+  "physical_acceptance": "PENDING_OWNER",
+  "no_tests_rerun_by_reviewer": true
+}

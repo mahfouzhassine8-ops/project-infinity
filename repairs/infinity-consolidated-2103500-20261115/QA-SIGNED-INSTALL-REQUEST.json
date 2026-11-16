@@ -1,1 +1,37 @@
-{"operation":"export-existing-prepared-receipts","run":43784613251,"artifact":14189977780,"APK_changed":false}
+{
+  "operation": "actual-signed500-fastqa-install-over-forward-recovery",
+  "shutdown": false,
+  "application_startup": false,
+  "inputs": {
+    "baseline": {
+      "run": 43632329510,
+      "id": 14128448982,
+      "name": "Infinity498-HLS-OriginalSigned-43632329510-QA-Fold-Pending",
+      "digest": "sha256:891c587de989319883ed453a7a2fcd583626a0436f363db62021aa3fa779c0dd",
+      "size_in_bytes": 347909108,
+      "source": "ccc30a77e07c2cf0abc3800ea60f4a68dc6bd9a3",
+      "workflow_id": 397702717,
+      "APK_sha256": "224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40"
+    },
+    "candidate": {
+      "run": 43785765772,
+      "id": 14189813969,
+      "name": "Infinity500-FastQA-Original-Signed-43785765772",
+      "digest": "sha256:936e9b52a1880d3412bc86ad4a594145f9927a7dba7b2243a88eb3cea26fb9b2",
+      "size_in_bytes": 330750181,
+      "source": "92bef1bcf056abf58d6754354173565e56f907ac",
+      "workflow_id": 397702717,
+      "APK_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28"
+    },
+    "recovery": {
+      "run": 43786312699,
+      "id": 14189769692,
+      "name": "Infinity500-FastQA-Original-Signed-43786312699",
+      "digest": "sha256:ba2125f899ec4cfa6a5e1327b89abdb420704cec7ceb45ba92855b12bfef91bd",
+      "size_in_bytes": 330704549,
+      "source": "4c6bc0b4a06828f43639761e481c1d42d2fcbc34",
+      "workflow_id": 397702717,
+      "APK_sha256": "5d4b9435b3df094878fd99629f0a365fafb628af72e9e98ac751a95e021cab76"
+    }
+  }
+}
