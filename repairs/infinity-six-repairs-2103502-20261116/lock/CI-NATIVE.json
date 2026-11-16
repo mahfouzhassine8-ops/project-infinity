@@ -16,23 +16,25 @@
   "reviewed_files": {
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/application/Application.cpp": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/interfaces/builtins/AndroidBuiltins.cpp": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/CMakeLists.txt": "3f1a81c5825c42234e0d4e4279059123a334b366043eb012d85b60d0dae1a839",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/CMakeLists.txt": "411fe175dce6181057dc0c16d0f7a26742e32a533271296cfa93b8281adb3bb4",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/InfinityVideoLock.cpp": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/InfinityVideoLock.h": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/InfinityVideoLockGate.h": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py": "5bf3a9819f00b361c9201ab9d6c00718b0051f78efa039ee26fd1448451490b1",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py": "6b398bb107b9fcaf5df4d868b9e1fe8fd2b22259d76f210a7e04815742a1f656",
     ".github/workflows/infinity-502-lock-integration.yml": "cce8f3cba8231026cb869811b79ad6e8f2f7834840e751df869e90d08484cb77",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json": "422f2d767020d984d615013aa4f605af9539cf29ef3e0fefd8f65edb128c6031",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-TEST-SELECTION.json": "71f9516be2f786cd8be84ef8b2e92a05bdbdd25beb2ce3bd6fce0cbea4b1bbea"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json": "566d030681a6c6cc7f0f80dba37f7710d117679d0c7f83ba9bd930e2a9480cbe",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-TEST-SELECTION.json": "173999ba21d65d058f7dbd1e9d299ba6a271e972901466114d77b7acd8b5f8e3"
   },
   "native_sources": {
     "xbmc/application/Application.cpp": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
     "xbmc/interfaces/builtins/AndroidBuiltins.cpp": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
-    "xbmc/platform/android/activity/CMakeLists.txt": "3f1a81c5825c42234e0d4e4279059123a334b366043eb012d85b60d0dae1a839",
+    "xbmc/platform/android/activity/CMakeLists.txt": "411fe175dce6181057dc0c16d0f7a26742e32a533271296cfa93b8281adb3bb4",
     "xbmc/platform/android/activity/InfinityVideoLock.cpp": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef",
     "xbmc/platform/android/activity/InfinityVideoLock.h": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
     "xbmc/platform/android/activity/InfinityVideoLockGate.h": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3"
   },
-  "astra_review_sha256": "291e90d46d781a172c19731af9fb599cd94b14ec403d359db7bea5697cddf022",
-  "reviewed_source_commit": "d62faa760075f883e92340a8515178d9b90ae3f3"
+  "astra_review_sha256": "40f8ade836cffb0eb5ca96b77bbba07dbccd93edceb33cfc6e4ee3275c815bea",
+  "reviewed_source_commit": "04c6bccb3f7d62d115d4c7b0e2f599874870e17e",
+  "correction_specific_rerun_of": 43827256925,
+  "reason": "Private map for25 new lock-only weak helpers; unchanged strict baseline ABI/dependency gate; pinned selective-link fixture before full compile"
 }
