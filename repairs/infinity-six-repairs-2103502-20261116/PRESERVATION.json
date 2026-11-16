@@ -1,0 +1,135 @@
+{
+  "status": "SOURCE_OVERLAY_ACCOUNTING_FINAL_APK_NOT_ASSEMBLED",
+  "baseline_apk_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "baseline_member_inventory": "SIGNED502-APK-MEMBER-HASHES.json",
+  "authorized_source_overlays": [
+    {
+      "path": "overlay/script.kodihealthcenter/infinity_runtime_identity.py",
+      "APK_member": "assets/addons/script.kodihealthcenter/infinity_runtime_identity.py",
+      "before_sha256": "9a87d2790f457af7965babce6fa7c45ff1c43b2dc938cc5defec64aa5442853c",
+      "repair": 4,
+      "reason": "Inventory hardcodes nonexistent compat runtime_service.py and omits all three actual declared startup services; dynamic safe declarations preserve newer runtime_service implementations without downgrade.",
+      "independent_review": "/root/astra_502_review PRE_EDIT_APPROVED",
+      "limitations": "Declaration and observed code inventory only; no Empty Shell root-cause or active execution claim.",
+      "candidate_source_sha256": "870a7e727bc73207672739cd9f872bc40142167878c2bec01ffd157b8485befa"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/unified/VideoOSD.xml",
+      "APK_member": "assets/addons/skin.infinity.diggz/unified/VideoOSD.xml",
+      "before_sha256": "4c9adac29735c6e53d5647d3381415cc696b39c6a69ec358654500c74ff46af1",
+      "repair": 5,
+      "reason": "Owner-approved icon styling: enlarge only fourteen noninteractive icon images from40x40 to64x64 centered at48,48 inside original96x96 button groups. All buttons,actions,order,focus,scroll and other content preserved.",
+      "independent_review": "/root/astra_502_review PRE_EDIT_APPROVED exact14images 2026-11-16",
+      "limitations": "Only unified is declared by exact502skinmanifest; legacy XML unchanged. Physicalvisualacceptance pending.",
+      "candidate_source_sha256": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46"
+    },
+    {
+      "path": "lock/native/xbmc/application/Application.cpp",
+      "native_path": "xbmc/application/Application.cpp",
+      "before_sha256": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
+      "repair": 5,
+      "reason": "One Android-only input barrier after existing checkpoint guard closes native input gaps while the lock Dialog rotates or loses focus; original shutdown guard unchanged.",
+      "independent_review": "Astra PRE_EDIT_APPROVED 2026-11-16",
+      "candidate_source_sha256": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb"
+    },
+    {
+      "path": "lock/native/xbmc/interfaces/builtins/AndroidBuiltins.cpp",
+      "native_path": "xbmc/interfaces/builtins/AndroidBuiltins.cpp",
+      "before_sha256": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d",
+      "repair": 5,
+      "reason": "Register only InfinityVideoLock builtin; existing Cast entry and all operations unchanged.",
+      "independent_review": "Astra PRE_EDIT_APPROVED 2026-11-16",
+      "candidate_source_sha256": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/CMakeLists.txt",
+      "native_path": "xbmc/platform/android/activity/CMakeLists.txt",
+      "before_sha256": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07",
+      "repair": 5,
+      "reason": "Compile dedicated lock owner, without other source changes.",
+      "independent_review": "Astra PRE_EDIT_APPROVED 2026-11-16",
+      "candidate_source_sha256": "3f1a81c5825c42234e0d4e4279059123a334b366043eb012d85b60d0dae1a839"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/InfinityVideoLock.cpp",
+      "native_path": "xbmc/platform/android/activity/InfinityVideoLock.cpp",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Private lock owner and single atomic unlock authority; no storage, network, playback or shutdown changes.",
+      "independent_review": "Astra approved private lock owner boundary; concrete final review required",
+      "candidate_source_sha256": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/InfinityVideoLock.h",
+      "native_path": "xbmc/platform/android/activity/InfinityVideoLock.h",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Private lock owner and single atomic unlock authority; no storage, network, playback or shutdown changes.",
+      "independent_review": "Astra approved private lock owner boundary; concrete final review required",
+      "candidate_source_sha256": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/InfinityVideoLockGate.h",
+      "native_path": "xbmc/platform/android/activity/InfinityVideoLockGate.h",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Private lock owner and single atomic unlock authority; no storage, network, playback or shutdown changes.",
+      "independent_review": "Astra approved private lock owner boundary; concrete final review required",
+      "candidate_source_sha256": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml",
+      "APK_member": "assets/addons/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml",
+      "before_sha256": "38e6fb69b28759ddd567d429664623600ba7c9e2f3e57588f1715bc729be915b",
+      "repair": 5,
+      "reason": "Replace vulnerable singleclick unlock with entry to reviewed lifetime-owned two-second lock; existing player button262 unchanged.",
+      "independent_review": "Private lock UI integration; final Astra review required",
+      "candidate_source_sha256": "71f145d07add0ea092ad660d5238cbe92735182bccb5022edb8fec968e85c75d"
+    },
+    {
+      "path": "lock/smali/com/projectinfinity/kodi/Main.smali",
+      "APK_member": "classes3.dex",
+      "class": "Lcom/projectinfinity/kodi/Main;",
+      "before_dex_sha256": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8",
+      "before_smali_sha256": "484c40e499c3d1c2109297486b7c2bbde86bb6223279cad27d04070ee818f9dc",
+      "repair": 5,
+      "reason": "Seven additive lock-only lifecycle/playback hooks; exact original method bodies/fields retained. No replacement Main source template.",
+      "final_independent_review": "PENDING concrete seven-hook review",
+      "candidate_source_sha256": "7da26733b05df5ab8aeab67493ba0698221f594a1fd62478c042f7c9be5c3761"
+    },
+    {
+      "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java",
+      "class": "Lcom/projectinfinity/kodi/InfinityVideoLockState;",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
+      "final_independent_review": "PENDING integrated review",
+      "candidate_source_sha256": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150"
+    },
+    {
+      "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java",
+      "class": "Lcom/projectinfinity/kodi/InfinityVideoLockDialog;",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
+      "final_independent_review": "PENDING integrated review",
+      "candidate_source_sha256": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361"
+    },
+    {
+      "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockBridge.java",
+      "class": "Lcom/projectinfinity/kodi/InfinityVideoLockBridge;",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
+      "final_independent_review": "PENDING integrated review",
+      "candidate_source_sha256": "c59a1b1d64f5033d32b8f55290915e458ba24e1be81ad861d403e86d529221d3"
+    }
+  ],
+  "original_repository_production_files": "UNCHANGED; candidate inputs isolated in this repair directory",
+  "DEX_preservation": "lock/DEX-BUILD-RESULT.json",
+  "OSD_preservation": "OSD-PRESERVATION-TEST.json",
+  "native_full_source_and_ABI": "PENDING selected GitHub Actions build",
+  "Cobra": "No source edits; all657 non-Main classes3 classes identical; remaining baseline APK members retained pending assembly audit",
+  "user_data": "No store/profile/database mutation or restore",
+  "release": "NOT_SIGNED_NOT_PACKAGED_NOT_ACCEPTED"
+}

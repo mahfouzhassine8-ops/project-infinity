@@ -1,0 +1,124 @@
+{
+  "status": "PASS_ISOLATED_STATE_HOST_CHECKS_AND_ANDROID_COMPILATION_ONLY",
+  "baseline": 2103502,
+  "source_sha256": {
+    "LOCK-SCOPE.json": "57f01d622638e52d1071a3313a84b47070bd9e4dc376b457487cadfbbffce8bb",
+    "java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+    "java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+    "tests/com/projectinfinity/kodi/InfinityVideoLockStateTest.java": "90cd352130f130190a5b3cff7d833120219c875b99099a09e4d90f450479931f"
+  },
+  "compiler": {
+    "path": "/workspace/scratch/network-baseline-2103477/ecj-3.37.0.jar",
+    "sha256": "cde026ff966b48b5e5f148b6f041ceff3cf4f85cf75155f4ec0f40e4ee14b545"
+  },
+  "host_test": {
+    "class": "com.projectinfinity.kodi.InfinityVideoLockStateTest",
+    "command": "java -cp /tmp/infinity502-lock-host-epoch com.projectinfinity.kodi.InfinityVideoLockStateTest",
+    "exit_code": 0,
+    "output": "PASS InfinityVideoLockStateTest 128 assertions",
+    "original_assertions_preserved": 106,
+    "new_focused_assertions": 22,
+    "attempts_for_this_revision": 1
+  },
+  "android_compilation": {
+    "result": "PASS_ACTUAL_THREE_CLASSES",
+    "receipt": "BRIDGE-COMPILE.json",
+    "source": "Current actual State/Dialog/Bridge snapshots against pinned Android jar and compile-only owner shape",
+    "warnings": "Two unchanged deprecated system-UI visibility warnings",
+    "execution": "NOT_RUN"
+  },
+  "host_contract": {
+    "thread": "Main Looper only",
+    "entry": "lock(nativeSession), setForeground, setPictureInPicture, and actual player screen bounds via setPlayerViewport",
+    "ready": "onReady(session, windowEpoch) only after Dialog focus and valid exact-position affordance; each genuine renewed readiness has a monotonic epoch",
+    "hold": "One continuous pointer for 2000 uptime milliseconds requests unlock exactly once; interruption invalidates the request generation",
+    "unlock": "onUnlockRequested(session, windowEpoch, request) remains locked. Root Bridge validates canConfirmUnlocked(tuple), attempts atomic nativeCommit(session,grant), then confirmUnlocked(tuple) in the same UI turn. Native refusal keeps lock and invokes rejectUnlock for retry.",
+    "retirement": "Only playbackStopped(exactSession) or ownerDestroyed retires without successful unlock; unknown player state is not a stop",
+    "background_and_pip": "Dialog is hidden while session remains locked; native enforcement and root lifecycle integration must protect reentry until onReady",
+    "geometry": "Entire existing top-left hit region is used; no minimum 48dp promise because exact bounds can be smaller on cover/landscape",
+    "revocation": "onNotReady(session, windowEpoch, cancelledRequest) before state clear/hide/reflow, with the old request token; reentrant confirmation is blocked while revocation is delivered",
+    "reentrancy": "Readiness announcement is published before callback and guarded against nested announcements; callbacks are revalidated afterward. Revocation clears the published lease before callback and blocks confirm. These Android callback paths were compiled and source-reviewed, not Android-executed.",
+    "window_unavailable": "Host.onWindowUnavailable(session) after candidate cleanup for BadToken/IllegalState during show, only while exact session remains owned. Bridge differentiates never-ready entry failure from established-session window loss."
+  },
+  "integration_status": "NOT_IMPLEMENTED",
+  "native_Main_XML_manifest_edits": "NONE",
+  "Cobra_media_engine_provider_storage_preferences_tracking_network": "UNCHANGED",
+  "not_run": [
+    "Android application behavior",
+    "shutdown",
+    "reopen",
+    "full regression sweep",
+    "APK packaging",
+    "signing",
+    "physical Fold acceptance"
+  ],
+  "prior_evidence": [
+    {
+      "revision": "initial_isolated_state",
+      "source_sha256": {
+        "LOCK-SCOPE.json": "030097da5c836a9726c128d557e91b2db214575a567b7e21757a7adbdd34a777",
+        "java/com/projectinfinity/kodi/InfinityVideoLockState.java": "c6dee2f05fe83291463c378d06358748bc61ff0d22b326d1cc018f2511bd80e3",
+        "java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "15ad72582225318193a8879fbdb8b1d78054cc378bb62f786ed7143b7d97e958",
+        "tests/com/projectinfinity/kodi/InfinityVideoLockStateTest.java": "0e1a4ad85e6df4c2362b660666c19d900a9f4a5eaae02ed15f39d04f3cd428d2"
+      },
+      "host_test": {
+        "class": "com.projectinfinity.kodi.InfinityVideoLockStateTest",
+        "command": "java -cp /tmp/infinity502-lock-host com.projectinfinity.kodi.InfinityVideoLockStateTest",
+        "exit_code": 0,
+        "output": "PASS InfinityVideoLockStateTest 106 assertions",
+        "attempts": 1
+      },
+      "android_compilation": {
+        "result": "PASS",
+        "target": "Java 8",
+        "sdk_jar": "/workspace/scratch/cast-sdk86/tools/android.jar",
+        "sdk_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+        "warnings": "Two deprecation warnings for copying existing owner system-UI visibility; no compilation errors",
+        "execution": "NOT_RUN"
+      }
+    },
+    {
+      "revision": "readiness_revocation_window_epoch_and_two_phase_commit_validation",
+      "source_sha256": {
+        "LOCK-SCOPE.json": "eef22ccc7a50ff4a7968db59b1c57e6ad8ef9bf7942bf09aaa4f7ddeb8ffdeed",
+        "java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+        "java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "ec23c65788af87f0743ca665b8b8b3321cbb5290542841800de67d4afa9bc4bd",
+        "tests/com/projectinfinity/kodi/InfinityVideoLockStateTest.java": "90cd352130f130190a5b3cff7d833120219c875b99099a09e4d90f450479931f"
+      },
+      "host_test": {
+        "class": "com.projectinfinity.kodi.InfinityVideoLockStateTest",
+        "command": "java -cp /tmp/infinity502-lock-host-epoch com.projectinfinity.kodi.InfinityVideoLockStateTest",
+        "exit_code": 0,
+        "output": "PASS InfinityVideoLockStateTest 128 assertions",
+        "original_assertions_preserved": 106,
+        "new_focused_assertions": 22,
+        "attempts_for_this_revision": 1
+      },
+      "android_compilation": {
+        "result": "PASS",
+        "target": "Java 8",
+        "sdk_jar": "/workspace/scratch/cast-sdk86/tools/android.jar",
+        "sdk_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+        "warnings": "Two deprecation warnings for copying existing owner system-UI visibility; no compilation errors",
+        "execution": "NOT_RUN"
+      }
+    }
+  ],
+  "revision": "explicit_window_unavailable_callback_and_actual_bridge_ack_checks",
+  "revision_reason": "Root authorized explicit show-failure callback and focused actual Bridge.restored checks after correcting its stale-ACK timeout ordering",
+  "state_evidence_reuse": "Exact State/test sources unchanged; prior 128 assertions retained, NOT RERUN for this interface-only correction",
+  "additional_focused_evidence": {
+    "actual_restored_method": "BRIDGE-ACK-TEST.json; 16 host assertions PASS",
+    "Android_probe": "android/PROBE-COMPILE.json; compiled and unsigned separate-package APK built; Android execution NOT RUN",
+    "actual_open_method": "BRIDGE-OPEN-TEST.json; 9 assertions PASS",
+    "exact_owner_compile": "BRIDGE-COMPILE.json; exact Main.mMainView XBMCMainView and Plan.pending descriptors verified; full DEX cross-reference audit remains separate",
+    "restored_method_reuse": {
+      "status": "BODY_BYTE_IDENTICAL_NO_RERUN",
+      "method_sha256": "62938b09267546b28ab03dda6d13f06f459d960784b57291aa344c82b37c0fee"
+    }
+  },
+  "scope_receipt_history": [
+    "d808f72de2d3c1e627317a544ae5145dc23460bedd020f25cd565049365c6f9e"
+  ],
+  "compile_linkage_correction": "Prior SurfaceView owner stub compile is retained as syntax-only, insufficient for runtime linkage. Latest compile uses exact XBMCMainView field descriptor and verifies emitted owner references."
+}

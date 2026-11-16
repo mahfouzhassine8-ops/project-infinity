@@ -1,0 +1,26 @@
+{
+  "status": "BASELINE_FAIL_EXPECTED",
+  "selected_test": "SavedMenuOperation.test_verified_navigation_capability_remains_available_in_saved_popup",
+  "tests_run": 1,
+  "failures": 1,
+  "errors": 0,
+  "apk_member_binding": "Exact source member SHA-256 verified directly from retained signed502 APK",
+  "source_hashes": {
+    "plugin.py": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
+    "provider_inventory.py": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0",
+    "saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f"
+  },
+  "observations": {
+    "recovery_available": 1,
+    "popup_available": false,
+    "inventory_snapshot_calls": 1,
+    "popup_requested_operation": "navigation",
+    "recovery_requested_operation": "title_navigation"
+  },
+  "output": "test_verified_navigation_capability_remains_available_in_saved_popup (__main__.SavedMenuOperation.test_verified_navigation_capability_remains_available_in_saved_popup) ... FAIL\n\n======================================================================\nFAIL: test_verified_navigation_capability_remains_available_in_saved_popup (__main__.SavedMenuOperation.test_verified_navigation_capability_remains_available_in_saved_popup)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"/workspace/infinity-cast96-root-cause/repairs/infinity-six-repairs-2103502-20261116/test_saved_menu_operation.py\", line 69, in test_verified_navigation_capability_remains_available_in_saved_popup\n    self.assertTrue(result, \"Saved recovery has a verified title_navigation capability, but the popup rejects it\")\nAssertionError: False is not true : Saved recovery has a verified title_navigation capability, but the popup rejects it\n\n----------------------------------------------------------------------\nRan 1 test in 0.039s\n\nFAILED (failures=1)\n",
+  "production_changed": false,
+  "owner_store_accessed": false,
+  "provider_executed": false,
+  "candidate_tested": false,
+  "runtime_incident_attributed": false
+}

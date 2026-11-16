@@ -1,0 +1,135 @@
+{
+  "development_branch": "work/infinity-2103502-six-repairs-20261116",
+  "baseline": "BASELINE.json",
+  "user_authorized_scopes": {
+    "1": "Shutdown genuine write lifecycle/durability and same-profile relaunch",
+    "2": "Universal Search typed identity and first-party Trakt context routing",
+    "3": "Continue Playing saved-state-preserving destinations and eligibility",
+    "4": "Empty Shell and actual component compatibility defects",
+    "5": "Session-owned top-left2sec video lock and approved icon-only OSD styling",
+    "6": "Existing Cast actual playback and lifecycle"
+  },
+  "production_allowlist": [
+    {
+      "path": "overlay/script.kodihealthcenter/infinity_runtime_identity.py",
+      "APK_member": "assets/addons/script.kodihealthcenter/infinity_runtime_identity.py",
+      "before_sha256": "9a87d2790f457af7965babce6fa7c45ff1c43b2dc938cc5defec64aa5442853c",
+      "repair": 4,
+      "reason": "Inventory hardcodes nonexistent compat runtime_service.py and omits all three actual declared startup services; dynamic safe declarations preserve newer runtime_service implementations without downgrade.",
+      "independent_review": "/root/astra_502_review PRE_EDIT_APPROVED",
+      "limitations": "Declaration and observed code inventory only; no Empty Shell root-cause or active execution claim."
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/unified/VideoOSD.xml",
+      "APK_member": "assets/addons/skin.infinity.diggz/unified/VideoOSD.xml",
+      "before_sha256": "4c9adac29735c6e53d5647d3381415cc696b39c6a69ec358654500c74ff46af1",
+      "repair": 5,
+      "reason": "Owner-approved icon styling: enlarge only fourteen noninteractive icon images from40x40 to64x64 centered at48,48 inside original96x96 button groups. All buttons,actions,order,focus,scroll and other content preserved.",
+      "independent_review": "/root/astra_502_review PRE_EDIT_APPROVED exact14images 2026-11-16",
+      "limitations": "Only unified is declared by exact502skinmanifest; legacy XML unchanged. Physicalvisualacceptance pending."
+    },
+    {
+      "path": "lock/native/xbmc/application/Application.cpp",
+      "native_path": "xbmc/application/Application.cpp",
+      "before_sha256": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
+      "repair": 5,
+      "reason": "One Android-only input barrier after existing checkpoint guard closes native input gaps while the lock Dialog rotates or loses focus; original shutdown guard unchanged.",
+      "independent_review": "Astra PRE_EDIT_APPROVED 2026-11-16"
+    },
+    {
+      "path": "lock/native/xbmc/interfaces/builtins/AndroidBuiltins.cpp",
+      "native_path": "xbmc/interfaces/builtins/AndroidBuiltins.cpp",
+      "before_sha256": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d",
+      "repair": 5,
+      "reason": "Register only InfinityVideoLock builtin; existing Cast entry and all operations unchanged.",
+      "independent_review": "Astra PRE_EDIT_APPROVED 2026-11-16"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/CMakeLists.txt",
+      "native_path": "xbmc/platform/android/activity/CMakeLists.txt",
+      "before_sha256": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07",
+      "repair": 5,
+      "reason": "Compile dedicated lock owner, without other source changes.",
+      "independent_review": "Astra PRE_EDIT_APPROVED 2026-11-16"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/InfinityVideoLock.cpp",
+      "native_path": "xbmc/platform/android/activity/InfinityVideoLock.cpp",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Private lock owner and single atomic unlock authority; no storage, network, playback or shutdown changes.",
+      "independent_review": "Astra approved private lock owner boundary; concrete final review required"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/InfinityVideoLock.h",
+      "native_path": "xbmc/platform/android/activity/InfinityVideoLock.h",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Private lock owner and single atomic unlock authority; no storage, network, playback or shutdown changes.",
+      "independent_review": "Astra approved private lock owner boundary; concrete final review required"
+    },
+    {
+      "path": "lock/native/xbmc/platform/android/activity/InfinityVideoLockGate.h",
+      "native_path": "xbmc/platform/android/activity/InfinityVideoLockGate.h",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Private lock owner and single atomic unlock authority; no storage, network, playback or shutdown changes.",
+      "independent_review": "Astra approved private lock owner boundary; concrete final review required"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml",
+      "APK_member": "assets/addons/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml",
+      "before_sha256": "38e6fb69b28759ddd567d429664623600ba7c9e2f3e57588f1715bc729be915b",
+      "repair": 5,
+      "reason": "Replace vulnerable singleclick unlock with entry to reviewed lifetime-owned two-second lock; existing player button262 unchanged.",
+      "independent_review": "Private lock UI integration; final Astra review required"
+    },
+    {
+      "path": "lock/smali/com/projectinfinity/kodi/Main.smali",
+      "APK_member": "classes3.dex",
+      "class": "Lcom/projectinfinity/kodi/Main;",
+      "before_dex_sha256": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8",
+      "before_smali_sha256": "484c40e499c3d1c2109297486b7c2bbde86bb6223279cad27d04070ee818f9dc",
+      "repair": 5,
+      "reason": "Seven additive lock-only lifecycle/playback hooks; exact original method bodies/fields retained. No replacement Main source template.",
+      "final_independent_review": "PENDING concrete seven-hook review"
+    },
+    {
+      "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java",
+      "class": "Lcom/projectinfinity/kodi/InfinityVideoLockState;",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
+      "final_independent_review": "PENDING integrated review"
+    },
+    {
+      "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java",
+      "class": "Lcom/projectinfinity/kodi/InfinityVideoLockDialog;",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
+      "final_independent_review": "PENDING integrated review"
+    },
+    {
+      "path": "lock/java/com/projectinfinity/kodi/InfinityVideoLockBridge.java",
+      "class": "Lcom/projectinfinity/kodi/InfinityVideoLockBridge;",
+      "before_sha256": null,
+      "repair": 5,
+      "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
+      "final_independent_review": "PENDING integrated review"
+    }
+  ],
+  "production_allowlist_rule": "Add exact source/preimage only after proven defect and independent Astra review; no broad directory allowance. No production edits before approval.",
+  "protected": [
+    "Cobra entire experience and shared-runtime effects",
+    "all unrelated functionality",
+    "all user profiles/settings/databases/history",
+    "502 observer/GIL/Silent/discovery fixes",
+    "every existing provider engine",
+    "ordinary OSD control actions/order/geometry/scroll/focus",
+    "original signer and existing signed artifacts"
+  ],
+  "data_precondition": "Original continue-watching.json must be preserved privately before Repair3 production correction; currently absent, no data mutation authorized.",
+  "test_policy": "Select focused positive/negative tests per correction before execution; retain existing evidence without reruns; shutdown/relaunch now explicitly selected by owner but must retain separate genuine result.",
+  "release_gate": "All six required engineering gates and independent review before one consolidated APK; no partial or diagnostic release; physical acceptance never inferred."
+}

@@ -1,0 +1,95 @@
+name: Infinity502 reviewed video lock - full ARM64 integration
+on:
+  push:
+    branches: [work/infinity-2103502-six-repairs-20261116]
+    paths: [repairs/infinity-six-repairs-2103502-20261116/lock/CI-NATIVE.json]
+  workflow_dispatch:
+    inputs:
+      request_sha256:
+        description: SHA-256 of the reviewed checked-in lock/CI-NATIVE.json
+        required: true
+        type: string
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity502-lock-native-integration, cancel-in-progress: false}
+jobs:
+  arm64:
+    if: github.ref == 'refs/heads/work/infinity-2103502-six-repairs-20261116'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 180
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      REQUEST_SHA256: '${{ inputs.request_sha256 }}'
+      NDK_VER: '21.4.7075529'
+      DEPENDS: '${{ github.workspace }}/android-tools/xbmc-depends'
+      TARBALLS: '${{ github.workspace }}/android-tools/xbmc-tarballs'
+      BUILD_DIR: '${{ github.workspace }}/kodi-build'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Exact request, independent review, selected check and retained artifact gate
+        run: python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py gate
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 platforms;android-34', log-accepted-android-sdk-licenses: false}
+      - name: Retained authenticated source reconstruction input
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13274901825', run-id: '41726452356', merge-multiple: true, github-token: '${{ github.token }}', path: verified-inputs}
+      - name: Retained intermediate source map
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13571276665', run-id: '42364232328', merge-multiple: true, github-token: '${{ github.token }}', path: previous-review}
+      - name: Historical comparison input required by unchanged reconstruction machinery
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13595626273', run-id: '42425522122', merge-multiple: true, github-token: '${{ github.token }}', path: exact464}
+      - name: Historical source-chain comparison only - never candidate or ABI baseline
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13771187253', run-id: '42830516841', merge-multiple: true, github-token: '${{ github.token }}', path: signed80}
+      - name: Frozen producer intermediate source-map and comparison input
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '13990558917', run-id: '43314732573', merge-multiple: true, github-token: '${{ github.token }}', path: baseline500-native}
+      - name: Exact ELF shipped in signed502 and its complete 9414-file source map
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with: {artifact-ids: '14187138056', run-id: '43774504911', merge-multiple: true, github-token: '${{ github.token }}', path: baseline502-native}
+      - name: Reconstruct and require exact502 source equality before six lock overlays
+        run: python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py prepare
+      - name: Official Ubuntu dependency tooling with signature verification
+        run: python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py tooling
+      - uses: actions/cache@0400d5f644dc74513175e3cd8d07132dd4860809
+        with: {path: /usr/local/lib/android/sdk/ndk/21.4.7075529, key: infinity-pinned-ndk-linux-21.4.7075529-v1}
+      - name: Unchanged verified NDK and dependency recipe
+        run: |
+          bash native502-lock-provenance/native500-frozen-tools/repairs/android-checkpoint-shutdown/install_ndk.sh
+          python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py dependencies
+      - name: Full real ARM64 compile/link and exact502 ABI comparison
+        run: python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py compile
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: Infinity502-Lock-Native-ARM64-${{ github.run_id }}-NO-INSTALLER
+          path: |
+            native502-lock-output/libkodi.so
+            native502-lock-output/ARM64.json
+            native502-lock-output/ABI-COMPARISON.json
+            native502-lock-output/SOURCE-PRESERVATION.json
+            native502-lock-output/NATIVE-SOURCE-MAP.json
+            native502-lock-output/BASE502-NATIVE-SOURCE-MAP.json
+            native502-lock-output/INPUT-AUTHENTICATION.json
+          if-no-files-found: error
+          compression-level: 1
+          retention-days: 90
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity502-Lock-Native-Evidence-${{ github.run_id }}-NO-INSTALLER
+          path: |
+            native502-lock-output/*.json
+            native502-lock-output/*.log
+            native502-lock-output/*.txt
+            native502-lock-output/provenance/*.json
+            native502-lock-output/provenance/*.log
+            native502-lock-output/provenance/*.txt
+          if-no-files-found: warn
+          retention-days: 90

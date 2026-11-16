@@ -1,0 +1,124 @@
+{
+  "status": "EXECUTABLE_COMPONENT_IMPLEMENTED_COMPILED_UNSIGNED_BUILD_NOT_RUN",
+  "scope": "Repair 5 actual Android Dialog input-window routing and hold/readiness lifecycle; native bridge, Kodi playback continuity and owner Fold acceptance require their separate focused integration evidence",
+  "source_binding": {
+    "InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+    "InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+    "reviewed_bridge_sha256": "699c9ab05dc85ddd46f990459d8ee12d288f8d495fd0a295556975bab6775160",
+    "source_rule": "Compile the actual unchanged State/Dialog sources. Record any subsequent source change and its correction-specific probe selection before execution. Do not ship compile-only Main/ExitPlan stubs."
+  },
+  "reuse_assessment": {
+    "feasible": true,
+    "references": [
+      "repairs/infinity-consolidated-2103500-20261115/build_discovery.py",
+      "repairs/infinity-consolidated-2103500-20261115/run_discovery_probe.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/cast/build_probe.py",
+      "repairs/infinity-movies-continue-cast-2103486-20261112/cast/run_probe.py"
+    ],
+    "reuse_only": "Pinned android.jar, ECJ/JDK compilation, D8, aapt2 manifest link, disposable CI package signing, adb launch and bounded structured-logcat receipt capture",
+    "do_not_reuse": "The Cast Activity, Cast SDK dependencies, original APK DEX/resource copying, Cast hardcoded package/runner assertions, receiver tests, or shutdown-capable runners",
+    "new_component_package": "com.projectinfinity.lockqa",
+    "owner_activity_class": "com.projectinfinity.kodi.InfinityVideoLockProbeActivity",
+    "permissions": "No network, storage or owner-profile permission; only disposable instrumentation facilities needed for input injection",
+    "execution_device": "Fresh disposable API 36 CI emulator with system gesture navigation; a second older API run is not implicitly selected"
+  },
+  "fixture": {
+    "owner": "A real Activity with a full-size underlay input recorder View and an independent advancing UI clock; it owns the actual InfinityVideoLockDialog",
+    "viewport": "Read underlay getLocationOnScreen/width/height on the main Looper and pass exact bounds through setPlayerViewport",
+    "host": "Record ordered READY, NOT_READY, UNLOCK_REQUEST, WINDOW_UNAVAILABLE and RETIRED callbacks including session/epoch/request/time; hold native restoration acknowledgement under explicit test control",
+    "entry": "Set actual foreground/PiP facts, pass native-session fixture token, lock, and wait for genuine focused-window READY before injecting input",
+    "input_path": "Use Instrumentation.sendPointerSync or UiAutomation.injectInputEvent from the instrumentation thread, plus real Android Back key/gesture. Events must pass through Android window dispatch; direct State calls or calling private consume() are not routing evidence.",
+    "observation": "Use Host callback records, isLocked(session), current focused window, target screen bounds and underlay counters. Reflection may inspect state for diagnosis but must not synthesize a passing callback.",
+    "timing": "Use uptime for all touch timestamps. Never block the main Looper to wait for a hold. Record DOWN handling and unlock-request times; request must occur after at least 2000ms. Use bounded per-case waits and an overall deadline with failure receipts."
+  },
+  "cases": [
+    {
+      "id": "lock_entry_and_input_window",
+      "action": "Open lock over the recorder, then inject ordinary taps, seek-like swipes, keyboard/DPAD/gamepad events outside the exact lock rectangle",
+      "assert": "One focused-window READY; session locked; underlying input counters unchanged; no unlock request. Main Activity focus loss caused by its own Dialog must not retire lock."
+    },
+    {
+      "id": "exact_two_second_hold_and_delayed_ack",
+      "action": "Inject one DOWN inside the actual target, retain it beyond two seconds, send ordinary small in-target MOVE then UP; deliberately delay Host acknowledgement",
+      "assert": "Exactly one unlock request at >=2000ms, matching session/epoch; lock and Dialog remain visible until matching acknowledgement; ordinary post-completion MOVE/UP do not revoke the genuine request; matching acknowledgement then releases once."
+    },
+    {
+      "id": "cancelled_touch_sequences",
+      "action": "Independently inject early UP, outside MOVE then reentry, ACTION_CANCEL, duplicate DOWN, second pointer and pointer replacement before the deadline",
+      "assert": "Each interruption leaves locked, emits no unlock request, and invalidates its queued completion. A fresh uninterrupted hold remains possible afterward. Include historical batched MOVE samples that leave/reenter the target."
+    },
+    {
+      "id": "back_and_system_navigation",
+      "action": "Repeat real Android Back key and gesture both idle and while holding; then use OS Home and return",
+      "assert": "Back never dismisses or unlocks and cancels the partial hold; Home remains usable. Background emits exact NOT_READY and hides the Dialog without retiring session. Foreground returns with a higher readiness epoch. Component evidence does not claim the native input barrier covered the transition."
+    },
+    {
+      "id": "focus_loss_and_permissions",
+      "action": "While holding, display a real higher-priority Android permission/system surface or a separate focusable test window; dismiss it",
+      "assert": "System UI remains usable. The Dialog's own focus loss emits NOT_READY before state/request clear; partial hold cannot complete. Regained Dialog focus renews epoch without unlocking."
+    },
+    {
+      "id": "rotation_and_layout",
+      "action": "Perform five portrait/landscape cycles while locked, including an interrupted hold, forwarding actual configuration callbacks and settled underlay bounds",
+      "assert": "Same session remains locked, interrupted hold never completes, every renewed READY has actual Dialog focus and new verified viewport, and target equals x=3.7037%, y=2.25%, width=8.51851%, height=92/2400 of the actual player rectangle. No center relocation or larger implicit hitbox."
+    },
+    {
+      "id": "pip_and_return",
+      "action": "Enter actual Android PiP during a partial hold, forward both platform callback overloads idempotently, then return to the owner",
+      "assert": "NOT_READY cancels the hold; Dialog does not cover/intercept the PiP or OS surfaces; session remains locked. Return requires fresh focused-window READY and a new complete hold. Duplicate callbacks neither unlock nor emit duplicate readiness for one lease."
+    },
+    {
+      "id": "stale_restore_ack_and_commit_rejection",
+      "action": "Complete a hold, revoke readiness, renew focus/viewport, begin a new request and deliver old epoch/request acknowledgement; separately deny restoration/COMMIT",
+      "assert": "Stale acknowledgement cannot dismiss current Dialog or cancel the newer retry timer. Negative acknowledgement leaves locked and allows an explicit fresh hold. Current matching acknowledgement is accepted only after successful native COMMIT in the real bridge integration; component uses a clearly labelled Host acknowledgement fixture."
+    },
+    {
+      "id": "ready_callback_reentrancy",
+      "action": "Have Host.onReady synchronously trigger foreground loss, configuration invalidation or verified retirement; attempt confirmation from inside onNotReady",
+      "assert": "No stale READY survives the callback, no recursive duplicate announcement, no reentrant confirmation during revocation, no stale window use, and any subsequent readiness uses the current session/epoch."
+    },
+    {
+      "id": "dialog_show_failure",
+      "action": "Supply a deliberately invalid/disposed test owner window token only in the disposable fixture; observe actual BadToken/IllegalState show failure",
+      "assert": "Candidate listener/window cleanup finishes before onWindowUnavailable(session); no false READY/unlock/retirement. Root Bridge initial-entry failure reports ENTRY_FAILED only before any genuine READY; an established session remains protected and retries only on a legitimate later lifecycle event."
+    },
+    {
+      "id": "verified_stop_and_destroy",
+      "action": "Deliver stale session stop followed by exact-session stop; separately destroy the actual test owner",
+      "assert": "Stale stop has no effect, exact stop/destroy retires once, pending holds/ACKs cannot act afterward, and no Dialog/listener/timer outlives the owner. This is component lifecycle verification, not Infinity shutdown acceptance."
+    }
+  ],
+  "required_receipt": [
+    "Exact tested source/APK/tool hashes and emulator API",
+    "Per-case PASS/FAIL/NOT_RUN with ordered callback tuples and uptime timestamps",
+    "Actual focused window and exact target/viewport bounds",
+    "Underlay touch/key counters before and after each selected case",
+    "Structured logcat plus failure screenshot, without owner media URLs/profile data",
+    "Explicit separation of component Dialog evidence from actual native bridge/Kodi playback/Fold acceptance"
+  ],
+  "remaining_full_integration": [
+    "Actual signed-successor native input barrier + direct JNI entry + targeted 1199 close + original VideoOSD restore",
+    "Same playback item, PID and advancing playback time during lock, rotations, hold/cancel/unlock; no pause/reseek",
+    "Owner Fold cover/inner/fold-unfold acceptance; emulator window resizing must not be reported as physical Fold acceptance",
+    "Existing ordinary VideoOSD action/order/position/scroll/focus preservation"
+  ],
+  "excluded": [
+    "Infinity shutdown",
+    "reopen durability",
+    "Cobra",
+    "Cast receiver tests",
+    "provider/search tests",
+    "owner-profile writes",
+    "global settings reset",
+    "owner installer/release signing"
+  ],
+  "execution": "NOT_RUN",
+  "implementation": [
+    "android/InfinityLockProbeActivity.java",
+    "android/InfinityLockProbeInstrumentation.java",
+    "android/AndroidManifest.xml",
+    "android/build_probe.py",
+    "android/run_probe.py"
+  ],
+  "execution_gate": "Root review required before CI dispatch; no CI launched by this subtask"
+}

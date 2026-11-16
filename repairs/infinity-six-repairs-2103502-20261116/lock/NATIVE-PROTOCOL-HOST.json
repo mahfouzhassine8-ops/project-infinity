@@ -1,0 +1,35 @@
+{
+  "status": "PASS_HOST_ACTUAL_OWNER_FUNCTIONS_ONLY",
+  "output": "PASS native lock protocol 39 assertions",
+  "source_sha256": "17021848e3cdd228ecd0c1507985c6e99067b9bfbe3f8efdb60fda261ec65887",
+  "function_sha256": {
+    "bool ConsumeOwnerGone(std::uint32_t token)": "9d9a6d158cd5c7b48e7636cb8656500f6bc81445349ca782e0ef5572e7af1691",
+    "void ClearMetadata()": "38f737fb0ae44bbf48b2ee2da3b870b1e35c4125df4458b6595142a97f45b82b",
+    "bool Active()": "308eaa575d0e6e5019b922892515597277e81e054fc3bed7429b9173c230175c",
+    "void Retire(bool notifyJava)": "8652e858b5486ac3ffc8b7194fe6d593dc9b84304847b7a9128cf86d4e215178",
+    "Context Current()": "d13049e4df1c350b6254f0b932ce37c969b17facdf85290ef3a2c84bd61fc28d",
+    "void Handle(const Event& event)": "05f745a28a5664b382b67310378e7ee9dc909236187d64bd8477e103b1cd8251",
+    "jboolean JNICALL OwnerGone(JNIEnv*, jclass, jlong token)": "180e6e6e437f001172c07f30beb0b3ec39ab44085d5725119c59d91c854b6d9e"
+  },
+  "selected": [
+    "initial failure versus established readiness revocation",
+    "stale and duplicate unlock request preserve current grant/pending ownership",
+    "current shared-item control block distinguishes replay and stop",
+    "unknown transient playing state does not retire a lock",
+    "skin switch retires only the existing lock",
+    "committed lock metadata cleanup does not hide restored OSD",
+    "confirmed owner destruction clears input even when callback is delayed and preserves GUI cleanup",
+    "owner destruction wins bounded queue space without retiring newer session or successful commit"
+  ],
+  "adapters": [
+    "Kodi GUI/window opens",
+    "JNI callback dispatch",
+    "current application item/player"
+  ],
+  "not_verified": [
+    "real Android threading/JNI",
+    "actual Kodi render",
+    "ARM64 link",
+    "Fold acceptance"
+  ]
+}

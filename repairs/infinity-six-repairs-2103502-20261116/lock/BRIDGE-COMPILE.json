@@ -1,0 +1,79 @@
+{
+  "status": "PASS_COMPILE_AND_EXACT_OWNER_FIELD_DESCRIPTORS",
+  "source_sha256": {
+    "InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+    "InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+    "InfinityVideoLockBridge.java": "699c9ab05dc85ddd46f990459d8ee12d288f8d495fd0a295556975bab6775160"
+  },
+  "compile_only_stubs": {
+    "/tmp/infinity502-lock-bridge-compile-stubs/com/projectinfinity/kodi/Main.java": "1efa43af18955ac521dbab75e0996bd0a522a44c8063124fa91a9b41aed8aa1a",
+    "/tmp/infinity502-lock-bridge-compile-stubs/com/projectinfinity/kodi/XBMCMainView.java": "e0cd821b2789333da78dc8497d33242b2da0e5e6375a6d5d3760e1dbffea9e5b"
+  },
+  "emitted_exact502_owner_references": [
+    [
+      "com/projectinfinity/kodi/Main",
+      "mInfinityExitPlan",
+      "Lcom/projectinfinity/kodi/InfinityExitCompletion$Plan;"
+    ],
+    [
+      "com/projectinfinity/kodi/InfinityExitCompletion$Plan",
+      "pending",
+      "()Z"
+    ],
+    [
+      "com/projectinfinity/kodi/Main",
+      "mMainView",
+      "Lcom/projectinfinity/kodi/XBMCMainView;"
+    ],
+    [
+      "com/projectinfinity/kodi/Main",
+      "MainActivity",
+      "Lcom/projectinfinity/kodi/Main;"
+    ]
+  ],
+  "full_DEX_framework_xref_audit": "SEPARATE_DATA_AGENT_REQUIRED",
+  "exit_code": 0,
+  "compiler_output": "----------\n1. WARNING in /tmp/infinity502-lock-bridge-exact-owner/InfinityVideoLockDialog.java (at line 338)\n\tw.getDecorView().setSystemUiVisibility(owner.getWindow().getDecorView().getSystemUiVisibility());\n\t                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nThe method setSystemUiVisibility(int) from the type View is deprecated\n----------\n2. WARNING in /tmp/infinity502-lock-bridge-exact-owner/InfinityVideoLockDialog.java (at line 338)\n\tw.getDecorView().setSystemUiVisibility(owner.getWindow().getDecorView().getSystemUiVisibility());\n\t                                                                        ^^^^^^^^^^^^^^^^^^^^^^^\nThe method getSystemUiVisibility() from the type View is deprecated\n----------\n2 problems (2 warnings)\n",
+  "sdk_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+  "compiler_sha256": "cde026ff966b48b5e5f148b6f041ceff3cf4f85cf75155f4ec0f40e4ee14b545",
+  "prior_evidence": [
+    {
+      "status": "PASS_ACTUAL_THREE_JAVA_CLASSES_COMPILE_ONLY",
+      "source_sha256": {
+        "InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+        "InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
+        "InfinityVideoLockBridge.java": "e3ddfe4d0f0f2403dabe4b5c5b87450cf0d96faa32aab621ef5254bcf41d3d08"
+      },
+      "source_unchanged_during_compile": true,
+      "stub_path": "/tmp/infinity502-lock-bridge-compile-stubs/com/projectinfinity/kodi/Main.java",
+      "stub_sha256": "8ecb46a5df5976b029a0a056df122e6297b0c0bfede0e8cfb09e95a1d2595f4f",
+      "stub_contract": "Compile-only Main extends NativeActivity with public SurfaceView mMainView and package-final InfinityExitCompletion.Plan mInfinityExitPlan.pending(); never package stub",
+      "compiler_sha256": "cde026ff966b48b5e5f148b6f041ceff3cf4f85cf75155f4ec0f40e4ee14b545",
+      "sdk_sha256": "6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad",
+      "command": [
+        "java",
+        "-jar",
+        "/workspace/scratch/network-baseline-2103477/ecj-3.37.0.jar",
+        "-1.8",
+        "-classpath",
+        "/workspace/scratch/cast-sdk86/tools/android.jar",
+        "-d",
+        "/tmp/infinity502-lock-bridge-window-failure/classes",
+        "/tmp/infinity502-lock-bridge-compile-stubs/com/projectinfinity/kodi/Main.java",
+        "/tmp/infinity502-lock-bridge-window-failure/InfinityVideoLockState.java",
+        "/tmp/infinity502-lock-bridge-window-failure/InfinityVideoLockDialog.java",
+        "/tmp/infinity502-lock-bridge-window-failure/InfinityVideoLockBridge.java"
+      ],
+      "exit_code": 0,
+      "compiler_output": "----------\n1. WARNING in /tmp/infinity502-lock-bridge-window-failure/InfinityVideoLockDialog.java (at line 338)\n\tw.getDecorView().setSystemUiVisibility(owner.getWindow().getDecorView().getSystemUiVisibility());\n\t                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nThe method setSystemUiVisibility(int) from the type View is deprecated\n----------\n2. WARNING in /tmp/infinity502-lock-bridge-window-failure/InfinityVideoLockDialog.java (at line 338)\n\tw.getDecorView().setSystemUiVisibility(owner.getWindow().getDecorView().getSystemUiVisibility());\n\t                                                                        ^^^^^^^^^^^^^^^^^^^^^^^\nThe method getSystemUiVisibility() from the type View is deprecated\n----------\n2 problems (2 warnings)\n",
+      "Host_onWindowUnavailable": "Compiled with root implementation; callback follows failed Dialog show cleanup and revalidates session",
+      "actual_Android": "NOT_RUN",
+      "state_suite_128": "NOT_RERUN",
+      "shutdown": "NOT_RUN",
+      "runtime_linkage_limitation": "Prior Main.mMainView compile stub used incorrect SurfaceView descriptor; syntax compilation only, not valid runtime linkage evidence"
+    }
+  ],
+  "actual_Android": "NOT_RUN",
+  "state_128_and_ACK_16": "NOT_RERUN",
+  "shutdown": "NOT_RUN"
+}

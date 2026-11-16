@@ -1,0 +1,148 @@
+{
+  "ABI_rule": "Final linked ELF must be ELF64 AArch64 DYN, preserve every GLOBAL and WEAK DEFAULT/PROTECTED export tuple and every DT_NEEDED dependency of exact502 ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7, and contain the actual compiled lock bridge/object.",
+  "artifact_metadata_read_only_observation": {
+    "all_six_retained_artifacts_expired": false,
+    "date_utc": "2026-11-16",
+    "source": "GitHub Actions artifact metadata; no artifact downloads or build execution performed by this preparation"
+  },
+  "baseline_apk_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "baseline_native_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+  "baseline_source_count": 9414,
+  "baseline_source_map_sha256": "4ef7607c83dc97291c088de701cfec2456e4cd53f256599151fd3d1b43ba507a",
+  "baseline_version_code": 2103502,
+  "branch": "work/infinity-2103502-six-repairs-20261116",
+  "candidate_source_count": 9417,
+  "correction": "Repair 5 native video-lock integration only",
+  "engineering_files": [
+    "repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py",
+    ".github/workflows/infinity-502-lock-integration.yml",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json"
+  ],
+  "existing_native_changes": {
+    "xbmc/application/Application.cpp": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d",
+    "xbmc/platform/android/activity/CMakeLists.txt": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07"
+  },
+  "historical_material_role": "Historical source archives and temporary ELF comparison files are permitted only inside the unchanged reconstruction chain. They are not the application base, candidate engine, final ABI baseline, or new acceptance evidence. Provenance receipts remain under native502-lock-output/provenance; historical ELF files are never uploaded as candidate artifacts.",
+  "input_artifacts": [
+    {
+      "digest": "sha256:89646188945e35032c8eb5977882923b3293de4111421fbb32adfb0b77595bfc",
+      "download_path": "verified-inputs",
+      "id": 13274901825,
+      "name": "Infinity-Kodi451-P0-Verified-Input-Evidence-41726452356",
+      "role": "Retained authenticated source reconstruction archive",
+      "run_id": 41726452356,
+      "size_in_bytes": 51385496,
+      "source_commit": "63789a3fe9c0b53007969e51d6145835dd04a75a"
+    },
+    {
+      "digest": "sha256:9cd229acfcf0c8bd30b52ed083fa77ab640888fc04950a1e85f11465c79999c7",
+      "download_path": "previous-review",
+      "id": 13571276665,
+      "name": "Infinity462-Native-Ownership-Source-Review-42364232328-NO-APK",
+      "role": "Historical source-map comparison required by unchanged reconstruction",
+      "run_id": 42364232328,
+      "size_in_bytes": 886694,
+      "source_commit": "a6902706d6db77335516990956791c128acb07fc"
+    },
+    {
+      "digest": "sha256:fd350c9806d9314401c0ce932d3eb2f93424bfd903b6258bcac970b3d474299f",
+      "download_path": "exact464",
+      "id": 13595626273,
+      "name": "Infinity2103464-Prepared-42425522122",
+      "role": "Historical prepared comparison only; never candidate engine or final ABI baseline",
+      "run_id": 42425522122,
+      "size_in_bytes": 316024607,
+      "source_commit": "de5bf4643a647659d772f96ebc28680a8cf7a58c"
+    },
+    {
+      "digest": "sha256:d5d6cfe8ac40649a4c022cf4b9db5946e42a8c1a34bdc2d8db484e0f33cb7f4a",
+      "download_path": "signed80",
+      "id": 13771187253,
+      "name": "Infinity-Performance-Original-Signed-2103480-42830516841-INTERNAL-QA-NOT-ACCEPTED",
+      "role": "Historical comparison extraction required by unchanged reconstruction only",
+      "run_id": 42830516841,
+      "size_in_bytes": 328346247,
+      "source_commit": "80e8fd3399d2d3ce1b8ede6a618ff4ad9bc244e7"
+    },
+    {
+      "digest": "sha256:b24251f2c8eaba625fd155bff69fbc7a117e8c20e37b9628aeed95c372d5ae2f",
+      "download_path": "baseline500-native",
+      "id": 13990558917,
+      "name": "Infinity86-Cast-Native-ARM64-43314732573-NO-INSTALLER",
+      "role": "Frozen producer intermediate source-map/ELF comparison, not signed502 baseline",
+      "run_id": 43314732573,
+      "size_in_bytes": 202779192,
+      "source_commit": "16df356f0acffbf9ca28ab7095f3a21233998d6d"
+    },
+    {
+      "digest": "sha256:532fbbae52e334e367e8582e6427757b7943965ca04338012877bb4098d96b26",
+      "download_path": "baseline502-native",
+      "id": 14187138056,
+      "name": "Infinity500-Native-ARM64-43774504911-NO-INSTALLER",
+      "role": "Exact ELF actually shipped in signed502 and complete 9414-file source map; sole final ABI baseline despite historical artifact naming",
+      "run_id": 43774504911,
+      "size_in_bytes": 202815297,
+      "source_commit": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9"
+    }
+  ],
+  "launch_status": "NOT_REQUESTED; do not create lock/CI-NATIVE.json until root and Astra review the exact source/build inputs",
+  "new_native_files": [
+    "xbmc/platform/android/activity/InfinityVideoLock.cpp",
+    "xbmc/platform/android/activity/InfinityVideoLock.h",
+    "xbmc/platform/android/activity/InfinityVideoLockGate.h"
+  ],
+  "not_run": [
+    "source reconstruction",
+    "native compilation",
+    "native link",
+    "ABI comparison of a candidate",
+    "Android execution",
+    "shutdown or reopen",
+    "APK packaging",
+    "signing",
+    "physical acceptance"
+  ],
+  "protected": "No previous builder, preservation guard, signer, provider, Cobra, user-data, shutdown, APK or signing changes. Only the selected native compilation/link check runs; Android behavior is NOT_RUN.",
+  "request_contract": {
+    "astra_review_sha256": "SHA256 of lock/ASTRA-NATIVE-BUILD-REVIEW.json; its reviewer must be Astra, status PASS_SOURCE_REVIEW, and files must equal reviewed_files.",
+    "dispatch": "workflow_dispatch requires request_sha256 equal to SHA256 of the checked-in request; push trigger is restricted to the new branch and this request path.",
+    "native_sources": "Exact native-relative-path-to-SHA256 map of all six native overlay files.",
+    "operation": "exact502-lock-full-arm64-compile-link",
+    "path": "repairs/infinity-six-repairs-2103502-20261116/lock/CI-NATIVE.json",
+    "required_values": {
+      "APK": false,
+      "application_execution": false,
+      "baseline_apk_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+      "baseline_native_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+      "baseline_source_map_sha256": "4ef7607c83dc97291c088de701cfec2456e4cd53f256599151fd3d1b43ba507a",
+      "baseline_version_code": 2103502,
+      "branch": "work/infinity-2103502-six-repairs-20261116",
+      "installation": false,
+      "root_approved": true,
+      "selected_test": "lock_full_arm64_compile_link_exact502_abi",
+      "shutdown_testing": false,
+      "signing": false
+    },
+    "reviewed_files": "Exact path-to-SHA256 map of the six native overlay files, native_build502.py, this scope file, the new workflow, and NATIVE-TEST-SELECTION.json. Paths are repository-relative.",
+    "reviewed_source_commit": "Commit containing all reviewed source/build inputs and the independent review. Only CI-NATIVE.json may differ between that ancestor and the workflow checkout.",
+    "schema": 1
+  },
+  "retained_reconstruction_tools": "9ce852ebb044a82853ef93af24e34a07ed96daff",
+  "schema": 1,
+  "selected_test": "lock_full_arm64_compile_link_exact502_abi",
+  "selection_document": "NATIVE-TEST-SELECTION.json",
+  "source_preservation_rule": "Run the exact frozen producer source reconstruction with all existing content checks. Compare the resulting complete map and every source hash with the authenticated 9414-file signed502 map before writing any lock overlay. Then require exactly three original-source changes plus three new files and 9411 unchanged original hashes.",
+  "source_producer": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+  "status": "ENGINEERING_PREPARATION_ONLY_NOT_EXECUTED",
+  "toolchain": {
+    "NDK": "21.4.7075529",
+    "android_build_tools": "35.0.0",
+    "android_platform": "34",
+    "dependency_recipe": "Unchanged frozen scripts/infinity_live_app_ci_2.sh; regenerated with original dependency verifier",
+    "java": "Temurin 17",
+    "python": "3.11.7",
+    "runner": "ubuntu-22.04"
+  },
+  "unchanged_original_source_count": 9411
+}

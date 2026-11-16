@@ -1,0 +1,31 @@
+{
+  "status": "PASS_HOST_ACTUAL_OWNER_FUNCTIONS_ONLY",
+  "output": "PASS native lock protocol 26 assertions",
+  "source_sha256": "452455d1abf9f3baa4083f8cbd9e76dcfe514427db1642052a0fe90053e0b13b",
+  "function_sha256": {
+    "void ClearMetadata()": "38f737fb0ae44bbf48b2ee2da3b870b1e35c4125df4458b6595142a97f45b82b",
+    "bool Active()": "e9db3045a48cca7b19bdb19e0ccfc58568097ec24e51911d7e7f4146733073de",
+    "void Retire(bool notifyJava)": "1c9cbe5ad527ddc1fa26d0ab20e59100bd71fb288b6a9683a3d708545c5f70d1",
+    "Context Current()": "d13049e4df1c350b6254f0b932ce37c969b17facdf85290ef3a2c84bd61fc28d",
+    "void Handle(const Event& event)": "c031b8eb5a8f602a2f9f4f318f4e45ea749226c813b7066792d07dcd18e40899"
+  },
+  "selected": [
+    "initial failure versus established readiness revocation",
+    "stale and duplicate unlock request preserve current grant/pending ownership",
+    "current shared-item control block distinguishes replay and stop",
+    "unknown transient playing state does not retire a lock",
+    "skin switch retires only the existing lock",
+    "committed lock metadata cleanup does not hide restored OSD"
+  ],
+  "adapters": [
+    "Kodi GUI/window opens",
+    "JNI callback dispatch",
+    "current application item/player"
+  ],
+  "not_verified": [
+    "real Android threading/JNI",
+    "actual Kodi render",
+    "ARM64 link",
+    "Fold acceptance"
+  ]
+}

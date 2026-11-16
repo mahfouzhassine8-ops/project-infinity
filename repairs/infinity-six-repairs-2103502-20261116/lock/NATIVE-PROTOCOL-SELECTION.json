@@ -1,0 +1,13 @@
+{
+  "selected_before_execution": [
+    "initial failure versus established readiness revocation",
+    "stale and duplicate unlock request preserve current grant/pending ownership",
+    "current shared-item control block distinguishes replay and stop",
+    "unknown transient playing state does not retire a lock",
+    "skin switch retires only the existing lock",
+    "committed lock metadata cleanup does not hide restored OSD",
+    "confirmed owner destruction clears input even when callback is delayed and preserves GUI cleanup",
+    "owner destruction wins bounded queue space without retiring newer session or successful commit"
+  ],
+  "scope": "Actual extracted source functions; fake GUI/JNI adapters, not Android acceptance"
+}

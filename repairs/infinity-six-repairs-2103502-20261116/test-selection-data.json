@@ -1,0 +1,29 @@
+{
+  "recorded_before_execution": true,
+  "date_utc": "2026-11-16",
+  "scope": "Exact signed502 saved-item popup availability operation contract only",
+  "selected_test": "SavedMenuOperation.test_verified_navigation_capability_remains_available_in_saved_popup",
+  "test_file": "test_saved_menu_operation.py",
+  "baseline_expected_result": "FAIL_EXPECTED",
+  "baseline_member_sha256": {
+    "plugin.py": "3a739deefeb4a8b78bf62333b6c43bf9fab9430e91f3e53f90ede45f5d508659",
+    "provider_inventory.py": "fc0e9aa3d1592c720a2fcd1ce9fdc3fe1b2ec8619c5a117cf92df273f5a262d0",
+    "saved_navigation.py": "36061dae60e4787131c6e333da4f1036b34ea3baa68d962b3e1a879ed192c19f"
+  },
+  "authorization": "Root coordinator authorized this single host baseline reproduction after source-only contract defect was reported; production navigation changes remain blocked until original continue-watching.json is safeguarded.",
+  "method": "Execute unmodified exact APK functions _menu_play_available, eligible and available; replace only inventory snapshot with an opaque verified-capability host fixture, without a title, media ID, provider route or user store.",
+  "limitations": [
+    "Not an Android or installed-provider test",
+    "Does not attribute the owner's runtime incident or missing movie projection",
+    "Does not verify current provider source compatibility",
+    "No candidate production correction is applied or tested"
+  ],
+  "forbidden": [
+    "production source edits",
+    "provider execution or source modification",
+    "profile or store access",
+    "fabricated media identity or saved provider URL",
+    "application startup, shutdown or reopen tests",
+    "repeating retained completed tests"
+  ]
+}

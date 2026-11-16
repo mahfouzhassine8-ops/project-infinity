@@ -1,0 +1,252 @@
+{
+  "apk": {
+    "bytes": 783881938,
+    "filename": "Infinity-2103502-Combined-Original-Signer.apk",
+    "sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+    "version_code": 2103502
+  },
+  "date_utc": "2026-11-16",
+  "dex": {
+    "bytes": 835984,
+    "member": "classes3.dex",
+    "selected_methods": [
+      {
+        "code_item_offset": "0x83670",
+        "descriptor": "()V",
+        "instruction_code_units": 35,
+        "instructions_sha256": "2a5582117bce6c4fe6149144369fba66ccdf179e6b8f8b24a598b441fac40914",
+        "name": "<clinit>",
+        "owner": "Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer;"
+      },
+      {
+        "code_item_offset": "0x836e0",
+        "descriptor": "(Landroid/content/Context;)Z",
+        "instruction_code_units": 115,
+        "instructions_sha256": "6dfb1cf6033bfaf781b59153187e565b5b94ce18adedcf09456e72354cb88f77",
+        "name": "applyBeforeNative",
+        "owner": "Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer;"
+      },
+      {
+        "code_item_offset": "0x83844",
+        "descriptor": "(Landroid/content/Context;)Z",
+        "instruction_code_units": 667,
+        "instructions_sha256": "87614f987124fdeea64044896c2341b4d118707c2fe9f9449ad493ac23a5d818",
+        "name": "applyLocked",
+        "owner": "Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer;"
+      },
+      {
+        "code_item_offset": "0x84070",
+        "descriptor": "(Landroid/content/Context;)Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer$Payload;",
+        "instruction_code_units": 484,
+        "instructions_sha256": "42f0a154622d0800ace8e4219c29e61b79dd346185bd16c17cdf6c6d3b39b761",
+        "name": "loadPayload",
+        "owner": "Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer;"
+      },
+      {
+        "code_item_offset": "0x849a0",
+        "descriptor": "(Ljava/io/File;Ljava/lang/String;)Ljava/io/File;",
+        "instruction_code_units": 74,
+        "instructions_sha256": "9f0101e58dfc1e9df96150ce5577d4138c1ad048e30b4889820c105b032b1b2f",
+        "name": "target",
+        "owner": "Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer;"
+      },
+      {
+        "code_item_offset": "0x84c54",
+        "descriptor": "(Ljava/io/File;Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer$Payload;)V",
+        "instruction_code_units": 72,
+        "instructions_sha256": "ee4cbe63cee4ded431c0d06b7f8155c80b7c9d1400a31ccc82f352f63bf65e39",
+        "name": "verifyInstalled",
+        "owner": "Lcom/projectinfinity/kodi/InfinityCheckpointCompat82Installer;"
+      },
+      {
+        "code_item_offset": "0x9c010",
+        "descriptor": "(Landroid/content/Context;)Z",
+        "instruction_code_units": 367,
+        "instructions_sha256": "f14a433433d52a68676da74e667875f597c9c812e0b756668ac4e56aa9bce268",
+        "name": "applyBeforeNative",
+        "owner": "Lcom/projectinfinity/kodi/InfinityInstalledCheckpointInstaller;"
+      },
+      {
+        "code_item_offset": "0xbbc58",
+        "descriptor": "()Z",
+        "instruction_code_units": 113,
+        "instructions_sha256": "393af1ffcc61de6a3713013b91b0122a74ac3f2be4e502c92135d2b4c5de44c7",
+        "name": "infinityPrepareNativeTask",
+        "owner": "Lcom/projectinfinity/kodi/Main;"
+      },
+      {
+        "code_item_offset": "0xbbe98",
+        "descriptor": "(Landroid/os/Bundle;)V",
+        "instruction_code_units": 469,
+        "instructions_sha256": "bc263fe6e42edf81d5c9aaf679896097a72796617bedd061ba88a9d5fc5c0cdb",
+        "name": "onCreate",
+        "owner": "Lcom/projectinfinity/kodi/Main;"
+      }
+    ],
+    "sha256": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8"
+  },
+  "disassembler": {
+    "jar_sha256": "1ed236266d7dc4907aade0b19a34f77efac25342b63c8ace52e579039941b389",
+    "name": "baksmali",
+    "offset_units": "DEX 16-bit code units, relative to each method instruction array",
+    "selected_classes_only": true,
+    "version": "2.5.2"
+  },
+  "findings": [
+    {
+      "code_units": [
+        "0x91",
+        "0x98",
+        "0x9a",
+        "0x9e",
+        "0xa2",
+        "0xa4",
+        "0xa6"
+      ],
+      "id": "explicit_compat82_routing",
+      "meaning": "The installed compat addon.xml SHA-256 must equal 6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720. This branch records version 0.8.2 and invokes InfinityCheckpointCompat82Installer.applyBeforeNative.",
+      "method": "InfinityInstalledCheckpointInstaller.applyBeforeNative(Context)Z"
+    },
+    {
+      "code_units": [
+        "0xab",
+        "0xaf",
+        "0xb1",
+        "0xb3",
+        "0xb5",
+        "0x124",
+        "0x126",
+        "0x12a"
+      ],
+      "id": "builtin_and_other_marker_routing",
+      "meaning": "When the installed marker is absent, compat_version is built_in and compat_applied is true. An existing different marker leaves compat_applied false. The method writes installer evidence and returns controller_applied AND compat_applied; this result alone does not establish which Python service executes.",
+      "method": "InfinityInstalledCheckpointInstaller.applyBeforeNative(Context)Z"
+    },
+    {
+      "code_units": [
+        "0x13",
+        "0x17",
+        "0x1b",
+        "0x30",
+        "0x34",
+        "0x3a",
+        "0x3c",
+        "0x3f",
+        "0x6e",
+        "0x70"
+      ],
+      "id": "false_result_is_breadcrumb_only",
+      "meaning": "InfinityNativeTaskEntry.admit is the earlier refusal boundary. After admission, the installed-checkpoint installer boolean only controls the checkpoint.addonParticipant.installUnconfirmed breadcrumb. Both installer-result branches continue to checkpoint-owner registration, set mInfinityNativeEntryAdmitted=true, and return true. No direct Empty Shell admission refusal is established by an installer false result.",
+      "method": "Main.infinityPrepareNativeTask()Z"
+    },
+    {
+      "code_units": [
+        "0x1f",
+        "0x30",
+        "0x33",
+        "0x37",
+        "0x4e"
+      ],
+      "id": "native_entry_placement",
+      "meaning": "Main loads the kodi library, invokes NativeActivity.onCreate, and then inspects mInfinityNativeEntryAdmitted; an unadmitted entry returns to the chooser. The native-to-Java callback invoking infinityPrepareNativeTask is outside this DEX-only proof.",
+      "method": "Main.onCreate(Bundle)V"
+    },
+    {
+      "code_units": [
+        "loadPayload:0x4",
+        "loadPayload:0x17",
+        "loadPayload:0x1f",
+        "loadPayload:0x27",
+        "loadPayload:0xd4",
+        "loadPayload:0xe2",
+        "loadPayload:0xe8",
+        "applyLocked:0x3f",
+        "applyLocked:0x43",
+        "applyLocked:0x4b"
+      ],
+      "id": "exact_payload_and_parent",
+      "meaning": "The bundled archive hash is pinned; payload addon_id and version must be service.infinity.compat and 0.8.2. applyLocked requires the exact original addon.xml marker before attempting the transaction.",
+      "method": "InfinityCheckpointCompat82Installer.loadPayload(Context) / applyLocked(Context)Z"
+    },
+    {
+      "code_units": [
+        "<clinit>:0x2",
+        "<clinit>:0x4",
+        "<clinit>:0x11",
+        "<clinit>:0x20",
+        "applyLocked:0xb5",
+        "applyLocked:0xbe",
+        "applyLocked:0xca",
+        "verifyInstalled:0x10"
+      ],
+      "id": "preimage_and_version_preservation",
+      "meaning": "Only runtime_service.py and checkpoint_runtime.py are payload targets; only checkpoint_runtime.py is a new file. Already-matching output is skipped; any unexpected existing source preimage refuses the overlay. Final verification rechecks the unchanged addon.xml hash and both output hashes. This is an intentional existing-0.8.2 source overlay, not an add-on version downgrade or restoration of obsolete standalone first-party modules.",
+      "method": "InfinityCheckpointCompat82Installer.<clinit> / applyLocked / verifyInstalled"
+    }
+  ],
+  "inspection": "READ_ONLY_DEX_AND_BUNDLED_OVERLAY",
+  "limitations": [
+    "No current user 502 process or same-PID failure was observed.",
+    "Historical 500 marker and runtime_service hashes match the intentional 0.8.2 overlay; this does not prove current 502 activation or full compatibility-source identity.",
+    "Native 0.7.2/0.8.2 contract acceptance was not independently revalidated in this DEX receipt.",
+    "No installer patch or downgrade is justified by the inspected routing."
+  ],
+  "overlay": {
+    "manifest": {
+      "addon_id": "service.infinity.compat",
+      "addon_version": "0.8.2",
+      "addon_xml_sha256": "6105af7bbb1d179f32326c82c323c9b2a6d2f7935b4f82f91f06614041bb3720",
+      "files": [
+        {
+          "after": "eb07f7cac8e773b5edc770d853618ca12a21c6279224fcfb04e23801c90077be",
+          "before": null,
+          "path": "checkpoint_runtime.py"
+        },
+        {
+          "after": "657d75dee8f04d5cbdb1307893eed55efe05f32a1cefc0fa11c5213395080dca",
+          "before": "0e4c348bbd1bdc60d158d224e1287927a779c90956c32b813bba1eecba9b72ec",
+          "path": "runtime_service.py"
+        }
+      ],
+      "schema": 1
+    },
+    "member": "assets/infinity/checkpoint-compat-82.zip",
+    "member_sha256": {
+      "manifest.json": "71c84887d425bfa57791017506d90ca45dd082ec21b26fee310cc82e30b965b4",
+      "payload/checkpoint_runtime.py": "eb07f7cac8e773b5edc770d853618ca12a21c6279224fcfb04e23801c90077be",
+      "payload/runtime_service.py": "657d75dee8f04d5cbdb1307893eed55efe05f32a1cefc0fa11c5213395080dca"
+    },
+    "sha256": "15b95f6db13ba7e83ec9a689bc55676a905bd511dfba7f7098f31d032aa1e926"
+  },
+  "retained_diagnostic_comparison": {
+    "active_502_service": "UNKNOWN",
+    "component": "service.infinity.compat",
+    "disk_locations_are_not_runtime_resolution": true,
+    "document_sha256": "1bc7b2c35f650b7b360b69fe7a9e6a2269557eeb8eeba34bce1804c86e1c8588",
+    "evidence": "retained private integration/installed-code.json; raw paths and user contents omitted",
+    "file_comparisons": {
+      "addon.xml": {
+        "comparison": "MATCH",
+        "sampled": true
+      },
+      "checkpoint_runtime.py": {
+        "comparison": "UNKNOWN",
+        "sampled": false
+      },
+      "runtime_service.py": {
+        "comparison": "MATCH",
+        "sampled": true
+      }
+    },
+    "observed_version": "0.8.2",
+    "reported_app_version_code": 2103500
+  },
+  "schema": 1,
+  "scope": {
+    "application_tests": "NOT_RUN",
+    "installer_executed": false,
+    "new_receipt_only": true,
+    "production_changes": false,
+    "shutdown_or_relaunch_tests": "NOT_RUN"
+  }
+}

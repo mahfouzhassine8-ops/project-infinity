@@ -1,0 +1,39 @@
+{
+  "status": "PASS_SOURCE_PRESERVATION_ONLY",
+  "checks": 4,
+  "failures": 0,
+  "errors": 0,
+  "member": "assets/addons/skin.infinity.diggz/unified/VideoOSD.xml",
+  "before_sha256": "4c9adac29735c6e53d5647d3381415cc696b39c6a69ec358654500c74ff46af1",
+  "after_sha256": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46",
+  "permitted_edits": "Only 56 coordinate values in fourteen noninteractive icons; no XML reserialization",
+  "legacy_osd_members_unchanged": {
+    "assets/addons/skin.infinity.diggz/16x9/VideoOSD.xml": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e",
+    "assets/addons/skin.infinity.diggz/20x9/VideoOSD.xml": "2db244cb6d965a33bb0c931bdab15ef0e16dcaf072b0227848998f52ac432b8e",
+    "assets/addons/skin.infinity.diggz/5x6/VideoOSD.xml": "900d3787b74e1be65e942449a1868acc6f022f5d3d2e8526203f855519e4842b",
+    "assets/addons/skin.infinity.diggz/6x5/VideoOSD.xml": "210572e9a828c666eed9824ab58d0ecf9faa2809812cb8bb7ecd6d327e34abcc",
+    "assets/addons/skin.infinity.diggz/fallback/VideoOSD.xml": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e",
+    "assets/addons/skin.infinity.diggz/portrait/VideoOSD.xml": "3f980272eacb1f1ce9e224cbf3e5342a73b98d196b12a2f67d3ea0b2c676f69c",
+    "assets/addons/skin.infinity.diggz/responsive/base/VideoOSD.xml": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb",
+    "assets/addons/skin.infinity.diggz/responsive/landscape/VideoOSD.xml": "4948593a00110f515c2117241a0e7e689a49f5270ea6e9daf65cb3add3b2e1ca",
+    "assets/addons/skin.infinity.diggz/responsive/portrait/VideoOSD.xml": "1ae9d01ee11083c25b2140c65e6466dd3b0cdfd588f8a5383191811fe79e8289",
+    "assets/addons/skin.infinity.diggz/responsive/square/VideoOSD.xml": "b1e88299556a8f92955880d02dea6040276de4ca4a3cb9643e4ed1ed61758f5d",
+    "assets/addons/skin.infinity.diggz/responsive/tall/VideoOSD.xml": "7da8ed4ce0db52d60ef52240150e21f9d3e1cd1f09f893528ffefd8d7cbaee27",
+    "assets/addons/skin.infinity.diggz/responsive/ultrawide/VideoOSD.xml": "7ca19c1a7991243aa3de3cc88a025459d204a5bd988262f3f79894195dd88bc4",
+    "assets/addons/skin.infinity.diggz/responsive/wide/VideoOSD.xml": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb"
+  },
+  "packaged_skin_resolution_declarations": [
+    {
+      "width": "1080",
+      "height": "2400",
+      "aspect": "9:20",
+      "default": "true",
+      "folder": "unified"
+    }
+  ],
+  "not_verified": [
+    "active owner profile skin root",
+    "Android render",
+    "physical Fold visual acceptance"
+  ]
+}

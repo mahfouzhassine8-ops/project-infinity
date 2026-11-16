@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST_ATOMIC_GATE_ONLY",
+  "assertions": 414,
+  "command": "g++ -std=c++17 -Wall -Wextra -Werror -pthread -I lock/native/xbmc/platform/android/activity lock/tests/VideoLockGateTest.cpp; execute resulting binary",
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "gate_sha256": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3",
+  "test_sha256": "2a9cf9fc1c9267c1768acc7b76f85b881611bd08570245ab1dabd5a34f175f1d",
+  "not_verified": [
+    "full ARM64 native integration",
+    "actual Android JNI/input/GUI",
+    "Fold acceptance"
+  ]
+}

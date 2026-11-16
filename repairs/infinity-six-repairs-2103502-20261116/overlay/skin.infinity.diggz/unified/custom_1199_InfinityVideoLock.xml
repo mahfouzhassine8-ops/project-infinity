@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='utf-8'?>
+<window type="dialog" id="1199">
+  <defaultcontrol always="true">9900</defaultcontrol>
+  <backgroundcolor>00000000</backgroundcolor>
+  <onload>InfinityVideoLock()</onload>
+  <controls>
+    <!-- The native lock barrier remains active across Android window transitions.
+         This entry surface has no single-click or Back unlock action. -->
+    <control type="button" id="9900">
+      <left>0%</left>
+      <top>0%</top>
+      <width>100%</width>
+      <height>100%</height>
+      <texturefocus colordiffuse="00FFFFFF">infinity_reference/white.png</texturefocus>
+      <texturenofocus colordiffuse="00FFFFFF">infinity_reference/white.png</texturenofocus>
+      <label />
+      <onclick>Noop</onclick>
+      <onback>Noop</onback>
+    </control>
+    <control type="image">
+      <left>3.7037%</left>
+      <top>2.25%</top>
+      <width>8.51851%</width>
+      <height>92</height>
+      <texture>infinity_player/infinity-lock.png</texture>
+    </control>
+  </controls>
+</window>

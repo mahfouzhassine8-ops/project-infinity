@@ -1,0 +1,45 @@
+{
+  "status": "PASS_SEVEN_HOOK_SOURCE_PRESERVATION_ONLY",
+  "baseline_dex_member": "classes3.dex",
+  "baseline_dex_sha256": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8",
+  "before_smali_sha256": "484c40e499c3d1c2109297486b7c2bbde86bb6223279cad27d04070ee818f9dc",
+  "after_smali_sha256": "7da26733b05df5ab8aeab67493ba0698221f594a1fd62478c042f7c9be5c3761",
+  "changed_methods": {
+    "infinityOnPlaybackStateChanged()V": {
+      "before": "0344c078081ee6fc9e8bfc36a3d0ef8352c5ed933e5b29b638a5748bd7501df9",
+      "after": "0166c5dad7f4afc74a3a025fd2f01249184dd0a34b76693251337a1551e4c122"
+    },
+    "onConfigurationChanged(Landroid/content/res/Configuration;)V": {
+      "before": "a55441104b681ec039b6e84b2ca956c1604ad724f40fb927593950e4a0fd8c9f",
+      "after": "50758f303d8057d0161cbfb5681992c2b5fb5a3325ef28ea7ab385a66c2348af"
+    },
+    "onDestroy()V": {
+      "before": "1c3c01687f19f2f2e6171b947fda6b69c56695704c28d09dc1f9f140a260c801",
+      "after": "22c3c552d05d52cfdbb34329a5fcc157d95311b96479e9b19911e41d414ae895"
+    },
+    "onPause()V": {
+      "before": "d6eeb04fb6ab81744ca6668b18be21feba9e6f0a551cf78a31a0c77b0356e31f",
+      "after": "109347d3011cd655957acacef085fda51c37fcc4988bd74d7d27070bdd05045a"
+    },
+    "onPictureInPictureModeChanged(Z)V": {
+      "before": "c8178823c476f97ce3f4fbee2a6b198643e9f29f82cf8f1e3bf5533dcc745bfe",
+      "after": "3119641bcf83667995d4c32f844dd864fbb11b05fa5f31dadd2ba7f7af41140c"
+    },
+    "onPictureInPictureModeChanged(ZLandroid/content/res/Configuration;)V": {
+      "before": "4274069c037215b3c508ddf77eafca43bf3677e59b72c16bd345f62153133b01",
+      "after": "9817e714bbaa90d3c7905842b3a782c1bf06fdd1a435c48275e006a2583c0e42"
+    },
+    "onResume()V": {
+      "before": "eda8e54a376dac2c3e0c37ffcf38e00067d1ce221a7f061f6b72f7efd3d513bc",
+      "after": "3cc0c5885c68d60d162a9b7cab5ed342f27bd0042664cf1128a92736be0ffa9b"
+    }
+  },
+  "unchanged_Main_methods": 69,
+  "original_fields_and_method_bodies": "BYTE_IDENTICAL_AFTER_REMOVING_ONLY_SEVEN_STATIC_CALLS",
+  "manifest_or_other_class_changes": "NONE_IN_THIS_STAGE",
+  "not_verified": [
+    "assembled DEX",
+    "Android runtime linkage",
+    "physical lock behavior"
+  ]
+}

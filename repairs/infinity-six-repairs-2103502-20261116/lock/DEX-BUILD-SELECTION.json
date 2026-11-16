@@ -1,0 +1,20 @@
+{
+  "recorded_before_execution": true,
+  "date_utc": "2026-11-16",
+  "authorization": "Root delegated the isolated lock DEX assembly and preservation audit; no APK assembly, signing, installation or application execution. Root additionally authorized one compile-only XBMCMainView shape to preserve the actual Main.mMainView field descriptor.",
+  "selected_checks": [
+    "Authenticate signed502 APK, six original DEX members, exact original Main, seven-hook Main input and build tools",
+    "Disassemble and reassemble classes3.dex with only the reviewed Main smali replacement",
+    "Compare every original class using normalized smali; remove only the seven exact inserted static calls for Main and require all original methods, fields and code to remain equivalent",
+    "Compile actual three lock Java sources using isolated compile-only Main, InfinityExitCompletion.Plan and XBMCMainView dependencies",
+    "D8 only InfinityVideoLockState/Dialog/Bridge program classes and their nested or generated classes into a new classes7.dex",
+    "Reject original-class collisions, packaged stubs, unrelated new classes, changed input sources and any field or method reference unresolved against exact502 plus the pinned Android framework",
+    "Auditor correction only: one normalization fixture accepts repeated packed-switch target references, rejects duplicate actual label definitions, and preserves quoted constants; retain the initial guarded failure"
+  ],
+  "normalization": "Trim blank/comment lines, omit only .line debug directives, and rename branch/debug labels by definition order within each method. Preserve opcodes, operands, registers, exception regions, local-variable debug directives, annotations, fields and method signatures. Removing hooks is restricted to the seven exact original methods and call signatures.",
+  "known_integration_issue": "Earlier compile-only Main used SurfaceView for mMainView, but exact502 declares XBMCMainView. Successful Java compilation with the old shape did not prove field linkage. This builder uses the exact field descriptor and audits DEX references; existing Main/XBMCMainView are never replaced.",
+  "outputs": "/dev/shm/infinity502-lock-dex/build-assembled",
+  "auditor_revision_reason": "First assembly audit stopped at Duplicate method label: eight-space packed-switch references were incorrectly counted as four-space definitions. Root authorized correcting that parser distinction with an explicit positive/negative fixture, without excluding any original class.",
+  "phase_split": "Main preservation may finish independently while root updates Bridge; final Java compilation waits for root's source-stable message. A hash-bound passed classes3 audit may be reused by the final builder.",
+  "not_run": ["state-suite rerun", "Android behavioral tests", "application startup", "shutdown", "reopen", "APK assembly", "signing", "installation", "owner profile access", "Continue Playing changes"]
+}

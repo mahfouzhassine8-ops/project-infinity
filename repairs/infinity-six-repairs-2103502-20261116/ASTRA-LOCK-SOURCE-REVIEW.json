@@ -1,0 +1,40 @@
+{
+  "status": "APPROVED_FOR_FOCUSED_CI_COMPILATION_NOT_RELEASE",
+  "reviewer": "astra_502_review",
+  "resolved_findings": [
+    "Established readiness now distinct from current focus; failed re-entry cannot authorize unlock",
+    "Explicit initial window failure reporting; no timeout-based release of an established lock",
+    "Stale Java ACK checked before pending timeout cancellation",
+    "Native stale/duplicate UNLOCK cannot change current pending ownership",
+    "Single atomic generation-bound commit, no GUI call or cross-thread wait from JNI commit"
+  ],
+  "source_preservation": "Application onlyinclude+postcheckpointguard; AndroidBuiltins onlyinclude+newentry; CMake onlynewsource; exactsigned502 preimages verified",
+  "test_evidence": [
+    "lock/GATE-HOST-RESULT.json",
+    "lock/NATIVE-PROTOCOL-HOST.json"
+  ],
+  "not_approved": [
+    "fullARM64 outcome pending",
+    "actualAndroid outcome pending",
+    "assembledDEX outcome pending",
+    "signing/release",
+    "physicalFoldacceptance"
+  ],
+  "previous_reviewed_native_sha256": {
+    "xbmc/application/Application.cpp": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
+    "xbmc/platform/android/activity/CMakeLists.txt": "3f1a81c5825c42234e0d4e4279059123a334b366043eb012d85b60d0dae1a839",
+    "xbmc/platform/android/activity/InfinityVideoLock.cpp": "452455d1abf9f3baa4083f8cbd9e76dcfe514427db1642052a0fe90053e0b13b",
+    "xbmc/platform/android/activity/InfinityVideoLock.h": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
+    "xbmc/platform/android/activity/InfinityVideoLockGate.h": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3"
+  },
+  "reviewed_native_sha256": {
+    "xbmc/application/Application.cpp": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
+    "xbmc/platform/android/activity/CMakeLists.txt": "3f1a81c5825c42234e0d4e4279059123a334b366043eb012d85b60d0dae1a839",
+    "xbmc/platform/android/activity/InfinityVideoLock.cpp": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef",
+    "xbmc/platform/android/activity/InfinityVideoLock.h": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
+    "xbmc/platform/android/activity/InfinityVideoLockGate.h": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3"
+  },
+  "latest_review": "Astra approved captured messenger ownership, exact owner cleanup and actual build pipeline."
+}
