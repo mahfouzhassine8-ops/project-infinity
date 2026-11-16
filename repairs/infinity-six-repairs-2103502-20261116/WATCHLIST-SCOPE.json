@@ -1,0 +1,23 @@
+{
+  "baseline": 2103502,
+  "repair": 2,
+  "owner_policy": "Menu visibility independent from verifiedidentity; existing no-identitynotice/no-write behavior retained",
+  "allowlist": {
+    "addon.xml": {
+      "before": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4",
+      "after": "a39dcece2d2926675019071c506031b6ba10d56a12a31b7766942386dc876b69"
+    },
+    "context.py": {
+      "before": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
+      "after": "7fdb3fd781f2eaa3358a4c0d83932c16cc3f8bd064eb99ce6ab20152a5475aef"
+    }
+  },
+  "module_version": "0.3.5.84",
+  "required_packaging": [
+    "Original-key re-sign authenticatedmodulemanifest after exactly2filedelta",
+    "Preserve79unchangedmanifestfiles, including63CC files and all7Rails/5UIRepair/4WatchedBridge files byte-for-byte"
+  ],
+  "review": "/root/data502_trace approved exact2fileboundary beforeedit",
+  "no_data_mutation": true,
+  "ContinuePlaying": "DEFERRED_UNCHANGED"
+}

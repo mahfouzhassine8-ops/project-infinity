@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa, sign-core-outcomes-qa, prepare-core-forward-recovery, sign-core-forward-recovery, prepare-essential-repair, sign-essential-repair, prepare-essential-recovery, sign-essential-recovery, prepare-movies-cast-modules, prepare-movies-cast-release, review-movies-cast-release, sign-movies-cast, prepare-cast-final, review-cast-final, sign-cast-final, prepare-cast-repair90, review-cast-repair90, sign-cast-repair90, prepare-cast-repair92, review-cast-repair92, sign-cast-repair92, prepare-cast-mkv94, review-cast-mkv94, sign-cast-mkv94, prepare-cast96-dolby, review-cast96-dolby, sign-cast96-dolby, prepare-cast98-hls, review-cast98-hls, sign-cast98-hls]
+        options: [final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa, sign-core-outcomes-qa, prepare-core-forward-recovery, sign-core-forward-recovery, prepare-essential-repair, sign-essential-repair, prepare-essential-recovery, sign-essential-recovery, prepare-movies-cast-modules, prepare-movies-cast-release, review-movies-cast-release, sign-movies-cast, prepare-cast-final, review-cast-final, sign-cast-final, prepare-cast-repair90, review-cast-repair90, sign-cast-repair90, prepare-cast-repair92, review-cast-repair92, sign-cast-repair92, prepare-cast-mkv94, review-cast-mkv94, sign-cast-mkv94, prepare-cast96-dolby, review-cast96-dolby, sign-cast96-dolby, prepare-cast98-hls, review-cast98-hls, sign-cast98-hls, prepare-six502-modules]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -4463,4 +4463,46 @@ jobs:
             cast-final-original-signed/SIGNATURE.txt
             cast-final-original-signed/SHA256SUMS
           if-no-files-found: warn
+          retention-days: 90
+
+  prepare-six502-modules:
+    name: Original-key502 Watchlist menu modules only - no APK
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103502-six-repairs-20261116' && inputs.operation == 'prepare-six502-modules'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - name: Authenticate502 and exact two-source module generation before keys
+        run: python repairs/infinity-six-repairs-2103502-20261116/release/modules.py prepare
+      - name: Original module signer after exact frozen-input readback
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: |
+          set -euo pipefail
+          python repairs/infinity-six-repairs-2103502-20261116/release/modules.py readback
+          umask 077
+          key="$(mktemp)"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$INFINITY_KEYSTORE_B64" | base64 -d > "$key"
+          javac --release 8 -g:none -d "$RUNNER_TEMP" repairs/infinity-final-closure-2103407/SignInfinityModules.java
+          java -cp "$RUNNER_TEMP" SignInfinityModules "$key" six502-module-work/modules/script.infinity.commandcenter/INFINITY-MODULES.v1
+      - name: Verify original public key and complete source readback
+        run: python repairs/infinity-six-repairs-2103502-20261116/release/modules.py verify
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: Infinity502-Watchlist-OriginalSigned-Modules-${{ github.run_id }}-NOT-APK
+          path: |
+            six502-module-work/modules/
+            six502-module-work/PREPARATION.json
+            six502-module-work/ORIGINAL-SIGNATURE-VERIFICATION.json
+          if-no-files-found: error
           retention-days: 90
