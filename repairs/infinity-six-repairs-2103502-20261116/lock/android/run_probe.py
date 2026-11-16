@@ -3,8 +3,41 @@ from pathlib import Path
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import uuid
+
+
+def completed_result(output, run_id, returncode, timed_out):
+    """A receipt is not success unless the Android instrumentation actually completed."""
+    receipts = []
+    for line in output.splitlines():
+        prefix = 'INSTRUMENTATION_RESULT: lock_result='
+        if line.startswith(prefix):
+            try:
+                receipts.append(json.loads(line[len(prefix):]))
+            except ValueError:
+                receipts.append(None)
+    terminal = re.findall(r'^INSTRUMENTATION_CODE: (-?\d+)\s*$', output, re.MULTILINE)
+    result = receipts[0] if len(receipts) == 1 and isinstance(receipts[0], dict) else None
+    failures = []
+    if timed_out: failures.append('Instrumentation process timed out')
+    if returncode != 0: failures.append('Instrumentation command did not exit successfully')
+    if terminal != ['-1']: failures.append('Missing or unsuccessful instrumentation terminal code')
+    if result is None:
+        result = {'runId': run_id}
+        failures.append('Expected exactly one complete instrumentation receipt')
+    elif result.get('runId') != run_id:
+        failures.append('Stale instrumentation receipt')
+    if result.get('pass') is not True: failures.append('Component checks did not pass')
+    if failures:
+        result['reported_pass_before_process_gate'] = result.get('pass')
+        result['pass'] = False
+        result['execution_failures'] = failures
+    result['command_returncode'] = returncode
+    result['command_timed_out'] = timed_out
+    result['terminal_codes'] = terminal
+    return result
 
 
 def main():
@@ -13,6 +46,7 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--adb', default='adb')
     parser.add_argument('--aapt2', type=Path, required=True)
+    parser.add_argument('--theme', choices=['light', 'dark'], required=True)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=True)
     package = 'com.projectinfinity.lockqa'
@@ -21,20 +55,21 @@ def main():
     run_id = uuid.uuid4().hex
     subprocess.run([args.adb, 'install', '-r', str(args.apk)], check=True, capture_output=True, text=True, timeout=60)
     command = [args.adb, 'shell', 'am', 'instrument', '-w', '-r', '-e', 'runId', run_id,
+               '-e', 'expectedTheme', args.theme,
                package + '/com.projectinfinity.kodi.InfinityLockProbeInstrumentation']
+    returncode = None
+    timed_out = False
     try:
         run = subprocess.run(command, text=True, capture_output=True, timeout=180)
         output = run.stdout + run.stderr
+        returncode = run.returncode
     except subprocess.TimeoutExpired as error:
-        output = str(error.stdout or '') + '\n' + str(error.stderr or '')
+        timed_out = True
+        def decoded(value):
+            return value.decode(errors='replace') if isinstance(value, bytes) else (value or '')
+        output = decoded(error.stdout) + '\n' + decoded(error.stderr)
     (args.output / 'instrumentation.txt').write_text(output)
-    result = None
-    for line in output.splitlines():
-        prefix = 'INSTRUMENTATION_RESULT: lock_result='
-        if line.startswith(prefix): result = json.loads(line[len(prefix):])
-    if result is None:
-        result = {'pass': False, 'runId': run_id, 'error': 'No complete instrumentation receipt before deadline'}
-    assert result.get('runId') == run_id, 'Stale instrumentation receipt'
+    result = completed_result(output, run_id, returncode, timed_out)
     result.update(apk_sha256=hashlib.sha256(args.apk.read_bytes()).hexdigest(), package=package,
                   owner_installer=False, Infinity_shutdown='NOT_RUN', native_bridge='NOT_INCLUDED', Kodi_playback='NOT_RUN')
     (args.output / 'ANDROID-LOCK-COMPONENT.json').write_text(json.dumps(result, indent=2) + '\n')

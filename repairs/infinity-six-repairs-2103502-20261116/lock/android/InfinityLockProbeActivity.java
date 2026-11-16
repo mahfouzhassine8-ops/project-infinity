@@ -24,6 +24,7 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
   int readyCount, revokeCount, requestCount, retiredCount, unavailableCount;
   int touches, keys, configurations, heartbeat;
   boolean revokeConfirmRejected = true, reenterReady, alive = true;
+  boolean lightPalette;
   final JSONArray events = new JSONArray();
   final Handler clock = new Handler();
 
@@ -40,6 +41,7 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
     underlay.setFocusableInTouchMode(true);
     setContentView(underlay);
     lock = new InfinityVideoLockDialog(this, this);
+    applyPaletteFixture();
     underlay.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob) -> updateViewport());
     clock.post(new Runnable() {
       @Override public void run() { if (alive) { heartbeat++; clock.postDelayed(this, 16); } }
@@ -80,8 +82,30 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
 
   void updateViewport() {
     if (lock == null || underlay.getWidth() <= 0 || underlay.getHeight() <= 0) return;
+    applyPaletteFixture();
     int[] p = new int[2]; underlay.getLocationOnScreen(p);
     lock.setPlayerViewport(p[0], p[1], underlay.getWidth(), underlay.getHeight());
+  }
+  /** Explicit Host palette fixture; native skin-theme resolution is not included. */
+  void applyPaletteFixture() {
+    lightPalette = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK)
+        == Configuration.UI_MODE_NIGHT_NO;
+    lock.setColors(lightPalette ? 0xeef5f9fc : 0xee0a1117,
+        lightPalette ? 0xff0f191f : 0xffebf3f8, 0xff00c1e0);
+  }
+  boolean paletteMatches(boolean expectedLight) {
+    if (lightPalette != expectedLight) return false;
+    try {
+      String[] names = {"surfaceColor", "foregroundColor", "accentColor"};
+      int[] expected = {expectedLight ? 0xeef5f9fc : 0xee0a1117,
+          expectedLight ? 0xff0f191f : 0xffebf3f8, 0xff00c1e0};
+      for (int i = 0; i < names.length; ++i) {
+        java.lang.reflect.Field field = InfinityVideoLockDialog.class.getDeclaredField(names[i]);
+        field.setAccessible(true);
+        if (field.getInt(lock) != expected[i]) return false;
+      }
+      return true;
+    } catch (ReflectiveOperationException error) { throw new AssertionError(error); }
   }
   void begin() {
     if (lock.isLocked(session)) lock.playbackStopped(session);

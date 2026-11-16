@@ -1,0 +1,29 @@
+{
+  "reviewer": "Astra",
+  "approved": true,
+  "scope": "PRE_LAUNCH: isolated actual Android State/Dialog component, two selected synthetic viewport/theme profiles only",
+  "inputs": {
+    ".github/workflows/infinity-502-lock-window.yml": "e096298404af12e0435135ca73d801f10c22fb4dbe630bcec2439ca3a84bba81",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/build_probe.py": "da1c896b724e5e45d5ad2120918682d47c8743cc11d43e39a998cf29bb1d6d88",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "36d64d3249dc9bebdab6702117f78f5bd37fd51cd18de31320fe144d09665988",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "b5952507c367f3e83ae20069ace04d4692ba2fabd4d56fd212d8b1a9b88dce82",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "6f8d7cdd492db00c4668e0e34d2c134deb9df7e236aaf7b0acf05d6cb26a7472",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "109a91a7522c3b3341eda4b2833241db9f5de97a70ace977c965e9f73934133c",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "c5972caaebc606c10b08a4d2fc7c33d3aab25c1eb5264c0c2c67b5aaf07303e1",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361"
+  },
+  "review_findings_addressed": [
+    "require actual completed instrumentation; no timeout/partial receipt PASS",
+    "fresh output directory, no stale compiled class reuse",
+    "explicit Host palette fixture and actual Dialog field assertions",
+    "edge-swipe result does not prove Back callback dispatch"
+  ],
+  "exclusions": [
+    "Infinity application",
+    "native Bridge or Kodi engine",
+    "shutdown",
+    "physical Fold acceptance",
+    "owner installer"
+  ]
+}

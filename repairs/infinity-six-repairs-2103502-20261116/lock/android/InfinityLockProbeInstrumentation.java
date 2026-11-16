@@ -26,11 +26,13 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
   private final JSONArray checks = new JSONArray();
   private final JSONArray notRun = new JSONArray();
   private String runId;
+  private String expectedTheme;
   private long downTime;
   private float x,y;
 
   @Override public void onCreate(Bundle args) {
-    super.onCreate(args);runId=args==null?"missing":args.getString("runId","missing");start();
+    super.onCreate(args);runId=args==null?"missing":args.getString("runId","missing");
+    expectedTheme=args==null?"missing":args.getString("expectedTheme","missing");start();
   }
   private <T> T ui(Supplier<T> query) {
     AtomicReference<T> result=new AtomicReference<>();runOnMainSync(()->result.set(query.get()));return result.get();
@@ -111,6 +113,8 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       action(()->a.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT));
       waitFor(()->a.getResources().getConfiguration().orientation==Configuration.ORIENTATION_PORTRAIT,"portrait entry");
       begin();int touches=ui(()->a.touches),keys=ui(()->a.keys),heartbeat=ui(()->a.heartbeat);
+      require(("light".equals(expectedTheme)||"dark".equals(expectedTheme))&&
+          ui(()->a.paletteMatches("light".equals(expectedTheme))),"Selected system night mode and actual Dialog palette match Host fixture");
       float[] outside=ui(()->{int[]p=new int[2];a.underlay.getLocationOnScreen(p);return new float[]{p[0]+a.underlay.getWidth()/2f,p[1]+a.underlay.getHeight()/2f};});
       downTime=SystemClock.uptimeMillis();inject(MotionEvent.ACTION_DOWN,outside[0],outside[1]);
       inject(MotionEvent.ACTION_MOVE,outside[0]+60,outside[1]);inject(MotionEvent.ACTION_UP,outside[0]+60,outside[1]);
@@ -150,7 +154,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       int nav=getTargetContext().getResources().getIdentifier("config_navBarInteractionMode","integer","android");
       if(nav!=0&&getTargetContext().getResources().getInteger(nav)==2) {
         int screenY=Math.round(outside[1]);shell("input swipe 1 "+screenY+" 250 "+screenY+" 300");
-        require(ui(()->a.locked()&&a.dialogFocused()),"Actual system Back gesture retains locked input window");
+        require(ui(()->a.locked()&&a.dialogFocused()),"Attempted edge swipe under gestural navigation retains locked input window");
       } else notRun.put("System Back gesture: emulator navigation mode is not gestural; Back keys tested");
       int readyBefore=ui(()->a.readyCount),revokeBefore=ui(()->a.revokeCount);
       action(()->{a.lock.playbackStopped(a.session);a.reenterReady=true;a.begin();});
@@ -159,6 +163,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       require(ui(a::locked),"Synchronous Host READY revocation does not unlock or strand subsequent readiness");
       action(()->a.lock.playbackStopped(a.session-1));require(ui(a::locked),"Stale session stop cannot retire owner");
       require(ui(()->a.heartbeat>heartbeat&&a.touches==touches&&a.keys==keys),"Main Looper advanced and locked events never reached underlay");
+      require(ui(()->a.paletteMatches("light".equals(expectedTheme))),"Selected Dialog palette retained through lifecycle checks");
       holdComplete();confirmFixture();begin();int retired=ui(()->a.retiredCount);action(a::finish);
       waitFor(()->!a.alive,"actual owner destruction");require(ui(()->a.retiredCount==retired+1),"Owner destruction retires once");
       pass=true;
@@ -169,6 +174,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       notRun.put("BadToken/window-show fault injection; explicit callback path compiled, not Android-fault-injected here");
       JSONObject result=new JSONObject().put("pass",pass).put("runId",runId).put("error",error)
           .put("API",android.os.Build.VERSION.SDK_INT).put("checks",checks).put("not_run",notRun)
+          .put("palette",expectedTheme).put("native_skin_theme_resolution","NOT_INCLUDED")
           .put("scope","Actual unchanged State/Dialog with Android window-injected input; Host ACK is explicit test fixture")
           .put("native_bridge","NOT_INCLUDED").put("Kodi_playback","NOT_RUN").put("physical_Fold","NOT_RUN")
           .put("Infinity_shutdown","NOT_RUN").put("owner_installer",false);

@@ -36,6 +36,8 @@ def main():
     parser.add_argument('--debug-sign', action='store_true')
     parser.add_argument('--receipt', type=Path)
     args = parser.parse_args()
+    if args.work.exists() and any(args.work.iterdir()):
+        raise ValueError('Probe output directory must be fresh; compiled classes are never reused')
     args.work.mkdir(parents=True, exist_ok=True)
     manifest = HERE / 'AndroidManifest.xml'
     assert ET.parse(manifest).getroot().get('package') == PACKAGE
@@ -56,6 +58,7 @@ def main():
               'compile_output': compile_log, 'actual_Android': 'NOT_RUN', 'native_bridge': 'NOT_INCLUDED',
               'production_Main_or_stubs': 'NOT_INCLUDED', 'Kodi_shutdown': 'NOT_RUN', 'owner_installer': False}
     if not args.compile_only:
+        report['packaging_tools'] = {'d8': digest(args.d8), 'aapt2': digest(args.aapt2)}
         jar = args.work / 'probe.jar'
         with ZipFile(jar, 'w', ZIP_DEFLATED) as archive:
             for source in sorted(classes.rglob('*.class')):
@@ -72,6 +75,7 @@ def main():
         report['status'] = 'PASS_DISPOSABLE_UNSIGNED_PROBE_BUILD'
         if args.debug_sign:
             if args.apksigner is None: raise ValueError('--apksigner jar is required for disposable debug signing')
+            report['packaging_tools']['apksigner'] = digest(args.apksigner)
             key = args.work / 'DISPOSABLE-LOCK-PROBE-ONLY.jks'
             if not key.exists():
                 run(['java', 'sun.security.tools.keytool.Main', '-genkeypair', '-keystore', key,

@@ -1,0 +1,59 @@
+{
+  "status": "PASS_RESULT_GATE_ONLY",
+  "source_sha256": "64f1af5fa6bbb69fdd6acacbca801b070c9565ba4018e3c87dde9a91b32f8a4d",
+  "cases": [
+    {
+      "case": "complete",
+      "expected_execution_pass": true,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "nonzero_exit",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "timeout_after_receipt",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "missing_terminal",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "wrong_terminal",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "stale_id",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "duplicate_receipt",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "explicit_failure",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "nonboolean_pass",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    },
+    {
+      "case": "bad_json",
+      "expected_execution_pass": false,
+      "gate_check": "PASS"
+    }
+  ],
+  "Android": "NOT_RUN",
+  "tested_function_ast_sha256": "2992702555e6ae933d3a76709a4a50ab6724d8de36ef4842e7bd8e9ba70c37b9",
+  "subsequent_change": "Added expectedTheme argument outside tested completed_result; no gate function change or rerun"
+}
