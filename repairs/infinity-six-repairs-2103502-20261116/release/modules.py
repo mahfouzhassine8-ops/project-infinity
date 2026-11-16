@@ -4,7 +4,7 @@ No APK, registry mutation, native build, profile or provider execution.
 """
 from pathlib import Path
 from zipfile import ZipFile
-import argparse, hashlib, importlib.util, json, os, subprocess
+import argparse, hashlib, importlib.util, json, os, subprocess, sys
 
 HERE=Path(__file__).resolve().parent
 TASK=HERE.parent
@@ -14,7 +14,12 @@ IDS=(CC,'script.infinity.rails','script.infinity.uirepair','script.infinity.watc
 MANIFEST=CC+'/INFINITY-MODULES.v1'
 SIGNATURE=MANIFEST+'.sig'
 BASE='f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28'
-WORK=ROOT/'six502-module-work'
+RECOVERY=len(sys.argv)==2 and sys.argv[1] in ('prepare-recovery','readback-recovery','verify-recovery')
+VERSION='0.3.5.85' if RECOVERY else '0.3.5.84'
+REQUEST='RECOVERY-MODULE-REQUEST.json' if RECOVERY else 'MODULE-REQUEST.json'
+REVIEW='RECOVERY-MODULE-REVIEW.json' if RECOVERY else 'MODULE-REVIEW.json'
+JOB='prepare-six502-recovery-modules' if RECOVERY else 'prepare-six502-modules'
+WORK=ROOT/('six502-recovery-module-work' if RECOVERY else 'six502-module-work')
 WORKFLOW='.github/workflows/infinity-combined-release.yml'
 
 def sha(raw): return hashlib.sha256(raw).hexdigest()
@@ -23,8 +28,8 @@ def hashes(root): return {p.relative_to(root).as_posix():sha(p.read_bytes()) for
 def git(*args): return subprocess.check_output(['git',*args],cwd=ROOT)
 
 def gate():
-    r=load(HERE/'MODULE-REQUEST.json')
-    assert r['operation']=='prepare-six502-modules' and r['APK'] is False
+    r=load(HERE/REQUEST)
+    assert r['operation']==JOB and r['APK'] is False
     assert r['registry_mutation'] is False and r['owner_data']=='NOT_ACCESSED'
     assert os.environ['GITHUB_REPOSITORY']=='mahfouzhassine8-ops/project-infinity'
     assert os.environ['GITHUB_REF']=='refs/heads/work/infinity-2103502-six-repairs-20261116'
@@ -32,7 +37,7 @@ def gate():
     assert run['workflow_id']==397702717 and run['head_sha']==os.environ['GITHUB_SHA']
     assert not git('status','--porcelain','--untracked-files=no').strip()
     assert git('diff','--name-only',r['source_commit'],os.environ['GITHUB_SHA']).decode().splitlines()==[
-        str((HERE/'MODULE-REQUEST.json').relative_to(ROOT))],'UNREVIEWED_SOURCE_AFTER_REQUEST'
+        str((HERE/REQUEST).relative_to(ROOT))],'UNREVIEWED_SOURCE_AFTER_REQUEST'
     names=[str((TASK/name).relative_to(ROOT)) for name in (
         'release/modules.py','WATCHLIST-SCOPE.json','WATCHLIST-REVIEW.json','test_watchlist_menu.py',
         'overlay/script.infinity.commandcenter/addon.xml','overlay/script.infinity.commandcenter/context.py',
@@ -40,7 +45,7 @@ def gate():
     names.extend((WORKFLOW,'repairs/infinity-final-closure-2103407/SignInfinityModules.java',
                   'repairs/infinity-final-closure-2103407/ORIGINAL-INFINITY-PUBLIC-KEY.pem'))
     assert set(r['inputs'])==set(names),'EXACT_REVIEWED_INPUT_SET_REQUIRED'
-    review_raw=(HERE/'MODULE-REVIEW.json').read_bytes()
+    review_raw=(HERE/REVIEW).read_bytes()
     assert sha(review_raw)==r['independent_review_sha256']
     review=json.loads(review_raw)
     canonical=lambda value:json.dumps(value,sort_keys=True,separators=(',',':')).encode()
@@ -49,8 +54,10 @@ def gate():
     assert review['expected_modules_sha256']==sha(canonical(r['expected_modules']))
     for name,expected in r['inputs'].items(): assert sha((ROOT/name).read_bytes())==expected,name
     before=git('show',r['workflow_before_commit']+':'+WORKFLOW).decode()
-    expected=before.replace('sign-cast98-hls]','sign-cast98-hls, prepare-six502-modules]',1)
-    assert (ROOT/WORKFLOW).read_text().split('\n  prepare-six502-modules:\n')[0].rstrip()==expected.rstrip(),'EXISTING_SIGNER_JOBS_CHANGED'
+    if RECOVERY:
+        expected=before.replace('prepare-six502-modules]','prepare-six502-modules, prepare-six502-recovery-modules]',1)
+    else:expected=before.replace('sign-cast98-hls]','sign-cast98-hls, prepare-six502-modules]',1)
+    assert (ROOT/WORKFLOW).read_text().split('\n  '+JOB+':\n')[0].rstrip()==expected.rstrip(),'EXISTING_SIGNER_JOBS_CHANGED'
     signer='repairs/infinity-final-closure-2103407/SignInfinityModules.java'
     assert (ROOT/signer).read_bytes()==git('show',r['workflow_before_commit']+':'+signer)
     return r
@@ -74,29 +81,38 @@ def prepare():
     scope=load(TASK/'WATCHLIST-SCOPE.json')
     assert set(scope['allowlist'])=={'addon.xml','context.py'}
     assert scope['baseline']==2103502 and scope['module_version']=='0.3.5.84'
-    for name,row in scope['allowlist'].items():
-        key=CC+'/'+name;raw=(TASK/'overlay'/key).read_bytes()
-        assert sha(baseline[key])==row['before'] and sha(raw)==row['after']
-        candidate[key]=raw
+    if RECOVERY:
+        original=baseline[CC+'/addon.xml']
+        assert original.count(b'version="0.3.5.83"')==1
+        candidate[CC+'/addon.xml']=original.replace(b'version="0.3.5.83"',b'version="0.3.5.85"',1)
+    else:
+        for name,row in scope['allowlist'].items():
+            key=CC+'/'+name;raw=(TASK/'overlay'/key).read_bytes()
+            assert sha(baseline[key])==row['before'] and sha(raw)==row['after']
+            candidate[key]=raw
     original=baseline[MANIFEST].decode('ascii').splitlines()
     assert original[:3]==['INFINITY-MODULES/1','package\t0.3.5.83','protocol\t1']
     lines=[]
     for line in original:
-        if line.startswith('package\t'):line='package\t0.3.5.84'
+        if line.startswith('package\t'):line='package\t'+VERSION
         elif line.startswith('file\t'):
             _,digest,name=line.split('\t');assert sha(baseline[name])==digest
             line='file\t'+sha(candidate[name])+'\t'+name
         lines.append(line)
     candidate[MANIFEST]=('\n'.join(lines)+'\n').encode('ascii')
     del candidate[SIGNATURE]
-    assert {n for n in candidate if candidate[n]!=baseline[n]}=={CC+'/addon.xml',CC+'/context.py',MANIFEST}
+    changed={CC+'/addon.xml',MANIFEST} if RECOVERY else {CC+'/addon.xml',CC+'/context.py',MANIFEST}
+    assert {n for n in candidate if candidate[n]!=baseline[n]}==changed
     assert {n:sha(raw) for n,raw in candidate.items()}==r['expected_modules']
     modules=WORK/'modules'
     for n,raw in candidate.items():
         out=modules/n;out.parent.mkdir(parents=True,exist_ok=True);out.write_bytes(raw)
     (WORK/'PREPARATION.json').write_text(json.dumps(dict(baseline=2103502,baseline_artifact=binding,
-        source=os.environ['GITHUB_SHA'],modules=hashes(modules),modified_sources=scope['allowlist'],
-        original_key_signature='PENDING',APK=False,registry_mutated=False,owner_data='NOT_ACCESSED'),indent=2)+'\n')
+        source=os.environ['GITHUB_SHA'],modules=hashes(modules),modified_sources={
+            name:{'before':sha(baseline[CC+'/'+name]),'after':sha(candidate[CC+'/'+name])}
+            for name in ('addon.xml','context.py') if baseline[CC+'/'+name]!=candidate[CC+'/'+name]},
+        original_key_signature='PENDING',recovery=RECOVERY,module_version=VERSION,
+        code_restores_exact502=RECOVERY,APK=False,registry_mutated=False,owner_data='NOT_ACCESSED'),indent=2)+'\n')
     print('PASS_EXACT502_MENU_MODULE_PREPARATION_ONLY')
 
 def readback(signed=False):
@@ -109,10 +125,11 @@ def readback(signed=False):
         subprocess.run(['openssl','dgst','-sha256','-verify',str(public),'-signature',str(root/SIGNATURE),str(root/MANIFEST)],check=True,capture_output=True)
         (WORK/'ORIGINAL-SIGNATURE-VERIFICATION.json').write_text(json.dumps(dict(
             status='PASS_ORIGINAL_SIGNED_MODULES_ONLY',source=os.environ['GITHUB_SHA'],baseline=2103502,
-            module_version='0.3.5.84',modules=hashes(root),APK=False,Android='NOT_RUN',owner_acceptance=False),indent=2)+'\n')
+            module_version=VERSION,recovery=RECOVERY,code_restores_exact502=RECOVERY,
+            modules=hashes(root),APK=False,Android='NOT_RUN',owner_acceptance=False),indent=2)+'\n')
     print('PASS_EXACT_MODULE_'+('ORIGINAL_SIGNATURE' if signed else 'READBACK'))
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser();parser.add_argument('operation',choices=['prepare','readback','verify'])
+    parser=argparse.ArgumentParser();parser.add_argument('operation',choices=['prepare','readback','verify','prepare-recovery','readback-recovery','verify-recovery'])
     op=parser.parse_args().operation
-    prepare() if op=='prepare' else readback(op=='verify')
+    prepare() if op.startswith('prepare') else readback(op.startswith('verify'))
