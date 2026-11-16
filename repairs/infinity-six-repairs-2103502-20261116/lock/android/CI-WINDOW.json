@@ -1,6 +1,6 @@
 {
   "baseline": 2103502,
-  "source_commit": "0a1e208d6628212ea69b04de72848cc256916586",
+  "source_commit": "bc27cf65945577a84e10b9c8e6a3d63bac85a8ef",
   "selected_check": "isolated_android_video_lock_window",
   "Infinity_application_execution": false,
   "Infinity_shutdown": "NOT_SELECTED",
@@ -8,25 +8,25 @@
   "review": {
     "reviewer": "Astra",
     "approved": true,
-    "receipt_sha256": "a56b7e590890978a81c93cee4a173dbe0231703b8ac591a1bd4c5133293ff0a8"
+    "receipt_sha256": "2ac7ae85febeb664bc8abfdd753d7d75d538b6360e757d396afae1028bfb47b7"
   },
   "inputs": {
     ".github/workflows/infinity-502-lock-window.yml": "ec0f289ade47d12a5d2e272500a7b012652b224cf7e724eb180accb6d3d1cf0a",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/build_probe.py": "83e6d9414d0c674485bc7cf53d26bc86addfedb46a77b10d214bbe954f45ffa2",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "6ac5a1fc467209c5768ba22983ccd6eccea03e110af2270b3ae5f921573d0537",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "cadb87837cc613291a3513c6e3d913550086cc2107cf265b3dd6336be839d82f",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "f8081985c713ba99e2230ff75e51cd322b96e3b3b55b1b14a3d129daf65d54ab",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "6f8d7cdd492db00c4668e0e34d2c134deb9df7e236aaf7b0acf05d6cb26a7472",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "109a91a7522c3b3341eda4b2833241db9f5de97a70ace977c965e9f73934133c",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "c5972caaebc606c10b08a4d2fc7c33d3aab25c1eb5264c0c2c67b5aaf07303e1",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "736819608d792ea64cc6a8127245d65400e63f703a6cadf7322e453457b5c9cb",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "6f7e142e066efbd38fa327802dd9671956e0a51ca8968b3bafae5d19143e6e4c",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "ac18002ad74496dba198ceedeec974370b61735318bf985f9c9f22e034d33752",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1b5b4f4e05eeee9e058ae6f748fed8fd9a0b92a672511f64bd830f426286a361",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/ASTRA-PRE-LAUNCH.json": "a56b7e590890978a81c93cee4a173dbe0231703b8ac591a1bd4c5133293ff0a8"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/ASTRA-PRE-LAUNCH.json": "2ac7ae85febeb664bc8abfdd753d7d75d538b6360e757d396afae1028bfb47b7"
   },
   "selected_profiles": [
     "narrow-dark",
     "wide-light"
   ],
   "physical_Fold": "NOT_RUN",
-  "correction_specific_rerun_of": 43828772992,
-  "reason": "Probe package ARSC storage/alignment and install error retention corrected; production State/Dialog unchanged"
+  "correction_specific_rerun_of": 43829676190,
+  "reason": "Match exact502 owner window policy; require hold input delivery and retain attempt-bound Android input failure evidence; production lock unchanged"
 }
