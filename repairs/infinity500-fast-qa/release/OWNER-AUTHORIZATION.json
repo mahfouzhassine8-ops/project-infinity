@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "status": "AUTHORIZED_QA_ORIGINAL_SIGNING_REQUEST_NOT_YET_SIGNED",
+  "owner_request": "Fast installable QA APK from authenticated signed500. Native engine already passed. Do not rebuild native or redo passing source checks.",
+  "purpose": "ONE_SIGNED_IN_PLACE_TEST_APK_PLUS_FORWARD_RECOVERY",
+  "baseline": {
+    "versionCode": 2103500,
+    "apk_sha256": "224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40",
+    "package": "com.projectinfinity.kodi",
+    "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7"
+  },
+  "staged_input": {
+    "run": 43781637786,
+    "artifact": 14188846231,
+    "artifact_digest": "sha256:17ba59fb0618489e75c523bf2446c8bfbeedcc014025c39b658d3873290c6dd3",
+    "status": "PASSED_UNSIGNED_STAGING_ONLY",
+    "unchanged_apk_members": 7772,
+    "changed_apk_members": [
+      "lib/arm64-v8a/libkodi.so",
+      "classes6.dex",
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties"
+    ],
+    "disallow_unsigned_user_install": true
+  },
+  "reused_engine": {
+    "run": 43774504911,
+    "sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+    "source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+    "repeat_native_build": false
+  },
+  "reused_cast": {
+    "run": 43762472390,
+    "classes6_dex_sha256": "4360efcdf3af08a8388f18846c79353517ab3d7ee6a3c026838b7748c0914c98",
+    "only_changed_cast_class_roots": [
+      "InfinityCastDialog",
+      "InfinityCastSession"
+    ],
+    "same_other_cast_classes": 1035
+  },
+  "QA_scope": [
+    "closed-file shutdown observer",
+    "narrowly scoped Silent Mode promotional dialog filtering",
+    "bounded Cast receiver discovery"
+  ],
+  "explicitly_deferred_unchanged": [
+    "Continue Playing (Movies and TV Shows)",
+    "Otaku Watchlist context",
+    "Empty Shell"
+  ],
+  "original_signing": {
+    "sole_workflow_id": 397702717,
+    "unchanged_signer_script": "repairs/dual-experience-isolation-2103420/assemble.py",
+    "must_first_reserve_new_qa_version_with_existing_release_authority": true,
+    "already_allocated_2103501": "prior original-signed forward recovery",
+    "provisional_2103502": "NOT_RESERVED_CHECK_LIVE_REGISTRY",
+    "require_same_original_certificate": true,
+    "require_v1_v2_v3": true,
+    "require_actual_install_over_500": true,
+    "require_higher_version_forward_recovery": true,
+    "do_not_promote_accepted_baseline": true
+  },
+  "preservation": {
+    "Cobra": "2103445 UNCHANGED",
+    "user_profiles_databases_settings": "UNTOUCHED",
+    "other_experience_search_and_addons": "UNTOUCHED",
+    "no_uninstall_reset_downgrade": true,
+    "physical_Fold_TV_acceptance": "PENDING_OWNER"
+  },
+  "next_required_stage": "Extend/review existing original-key signing pipeline for exact500 QA scope; reconcile and reserve actual next available version; run pre-sign payload/owner registry checks; only then sign and verify install-over; publish artifact URL+SHA256. Do not claim ready before signed APK artifact exists."
+}
