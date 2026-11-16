@@ -176,8 +176,23 @@
     "_ZNKSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEE4lockEv",
     "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEC2IS3_EERKNS_10shared_ptrIT_EENS_9enable_ifIXsr14is_convertibleIPS7_PS3_EE5valueEPNS_5__natEE4typeE",
     "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev",
-    "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEaSIS3_EENS_9enable_ifIXsr14is_convertibleIPT_PS3_EE5valueERS4_E4typeERKNS_10shared_ptrIS7_EE"
+    "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEaSIS3_EENS_9enable_ifIXsr14is_convertibleIPT_PS3_EE5valueERS4_E4typeERKNS_10shared_ptrIS7_EE",
+    "_ZNSt6__ndk110unique_ptrI8CXBMCAppNS_14default_deleteIS1_EEEC2ILb1EvEEPS1_",
+    "_ZNSt6__ndk117__compressed_pairIP8CXBMCAppNS_14default_deleteIS1_EEEC2IRS2_Lb1EEEOT_",
+    "_ZNSt6__ndk122__compressed_pair_elemIP8CXBMCAppLi0ELb0EEC2IRS2_vEEOT_"
   ],
-  "private_link_rule": "Anonymous literal local-only script, no wildcard/named version; exactly25 symbols absent from502; exact existing ABI/dependency comparison unchanged",
-  "retained_successful_lock_build": 43833259814
+  "private_link_rule": "Anonymous literal local-only script, no wildcard/named version; exactly28 symbols absent from502 (retained25 lock helpers plus3 observer unique_ptr helpers proven by failed43852054709 ABI); exact ABI/dependency comparison unchanged",
+  "retained_successful_lock_build": 43833259814,
+  "visibility_correction_evidence": {
+    "run": 43852054709,
+    "artifact": 14222449186,
+    "archive_sha256": "ec0191954eef3aa3d801a51589eb2964471de700c668200ee57b0090ec14788f",
+    "ABI": "crashes/NATIVE-OBSERVER-ABI-ATTEMPT1.json",
+    "new_private_names": [
+      "_ZNSt6__ndk110unique_ptrI8CXBMCAppNS_14default_deleteIS1_EEEC2ILb1EvEEPS1_",
+      "_ZNSt6__ndk117__compressed_pairIP8CXBMCAppNS_14default_deleteIS1_EEEC2IRS2_Lb1EEEOT_",
+      "_ZNSt6__ndk122__compressed_pair_elemIP8CXBMCAppLi0ELb0EEC2IRS2_vEEOT_"
+    ],
+    "observer_logic": "UNCHANGED"
+  }
 }

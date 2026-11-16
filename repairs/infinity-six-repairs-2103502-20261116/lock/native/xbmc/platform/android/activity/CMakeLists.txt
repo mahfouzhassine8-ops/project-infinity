@@ -73,7 +73,7 @@ target_include_directories(${CORE_LIBRARY} SYSTEM
                            PRIVATE ${NDKROOT}/sources/android/native_app_glue
                                    ${NDKROOT}/sources/android/cpufeatures)
 
-# Keep only this lock's newly emitted helpers private. Do not change compiler
+# Keep only the lock and observer correction's newly emitted helpers private. Do not change compiler
 # visibility: shared COMDAT definitions may also supply existing Kodi exports.
 set(infinity_lock_exports "${CMAKE_CURRENT_BINARY_DIR}/InfinityVideoLock.exports.map")
 file(WRITE "${infinity_lock_exports}" [=[
@@ -104,6 +104,9 @@ file(WRITE "${infinity_lock_exports}" [=[
     _ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEC2IS3_EERKNS_10shared_ptrIT_EENS_9enable_ifIXsr14is_convertibleIPS7_PS3_EE5valueEPNS_5__natEE4typeE;
     _ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev;
     _ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEaSIS3_EENS_9enable_ifIXsr14is_convertibleIPT_PS3_EE5valueERS4_E4typeERKNS_10shared_ptrIS7_EE;
+    _ZNSt6__ndk110unique_ptrI8CXBMCAppNS_14default_deleteIS1_EEEC2ILb1EvEEPS1_;
+    _ZNSt6__ndk117__compressed_pairIP8CXBMCAppNS_14default_deleteIS1_EEEC2IRS2_Lb1EEEOT_;
+    _ZNSt6__ndk122__compressed_pair_elemIP8CXBMCAppLi0ELb0EEC2IRS2_vEEOT_;
 };
 ]=])
 # lib${APP_NAME_LC} already exists; its interface reaches the final Android

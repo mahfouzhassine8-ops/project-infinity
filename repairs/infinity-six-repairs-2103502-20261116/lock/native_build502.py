@@ -336,7 +336,7 @@ def private_link_fixture():
     """Selected NDK visibility check before the full engine build; no runtime substitute."""
     scope = json.loads(SCOPE.read_bytes())
     names = scope['private_link_symbols']
-    require(len(names) == 25 and len(set(names)) == 25 and
+    require(len(names) == 28 and len(set(names)) == 28 and
             all(re.fullmatch(r'_Z[A-Za-z0-9_]+', name) for name in names), 'Unexpected private helper list')
     cmake = (NATIVE / 'xbmc/platform/android/activity/CMakeLists.txt').read_text()
     blocks = re.findall(r'file\(WRITE "\$\{infinity_lock_exports\}" \[=\[\n(.*?)\]=\]\)', cmake, re.S)

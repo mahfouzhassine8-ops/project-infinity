@@ -5,7 +5,7 @@
   "files": {
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/application/Application.cpp": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/interfaces/builtins/AndroidBuiltins.cpp": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/CMakeLists.txt": "411fe175dce6181057dc0c16d0f7a26742e32a533271296cfa93b8281adb3bb4",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/CMakeLists.txt": "0d4ea2095ee4f723428ba917055ea8ae32bf70e47126804e20af71a4f6b67b69",
     "repairs/infinity-six-repairs-2103502-20261116/crashes/native/xbmc/platform/android/activity/InfinityActivityObserver.h": "ef185b4145742051b5e82236849211ce437a3e621b2a572975813f02c43416a6",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/InfinityVideoLock.cpp": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef",
     "repairs/infinity-six-repairs-2103502-20261116/lock/native/xbmc/platform/android/activity/InfinityVideoLock.h": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
@@ -13,9 +13,9 @@
     "repairs/infinity-six-repairs-2103502-20261116/crashes/native/xbmc/platform/android/activity/JNIMainActivity.cpp": "483a8f1298aaa6073b9a3f36c00fe47176d4857f7d3de0253b1b17832e0d788f",
     "repairs/infinity-six-repairs-2103502-20261116/crashes/native/xbmc/platform/android/activity/JNIMainActivity.h": "b81b04feb5b6ffcff8176bb89720f0039af21622ca1447222ae421bf4c3a5ff7",
     "repairs/infinity-six-repairs-2103502-20261116/crashes/native/xbmc/platform/android/activity/XBMCApp.h": "1c37af721e3c3da7cdf4085df6dec826a4d9965acf48acc67e6bda883bee5734",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py": "09d4ed6e857b041d79fe464386fd2ac21a35db600e04a0ae74b7b45e65717fdc",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py": "025ef5e6002c3ea07fef7ec5cc7a12301c46580e58c50b4d7a87a062de897fd4",
     ".github/workflows/infinity-502-lock-integration.yml": "106ebfd99dbea9466770f8ee04c6eeec91201a8887d72c394faf65bb90eb0802",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json": "6eeb60a61ab6f4e61c499cd2f653d44c2ae54a854f9a0458dc5583bffebbe51b",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json": "4b5b9f5bbc239936c6d7191e828f6cd10839d16dc8de9a21face5e17d7408717",
     "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-TEST-SELECTION.json": "4647d2251e3c23ca969269b7ed0b82d8520c1e363e299988ec5e5ca1df61ff91",
     "repairs/infinity-six-repairs-2103502-20261116/crashes/OBSERVER-SCOPE.json": "86a4a12a5ece1dcf15580a6a927d96eeb012071219f17463af20931a9afa447e",
     "repairs/infinity-six-repairs-2103502-20261116/crashes/OBSERVER-SOURCE.json": "213d2cda2e8f5a5d8a7703e06c8dbb6c89f24953bdea39c3db31be1510e44194",
@@ -39,5 +39,15 @@
     "Android and owner crash attribution pending",
     "Mark Watched fault not identified",
     "No APK/signing/release acceptance"
-  ]
+  ],
+  "private_visibility_correction": {
+    "reviewer": "Astra /root/astra_502_review",
+    "status": "PASS_SOURCE_REVIEW",
+    "previous_run": 43852054709,
+    "canonical_pins_sha256": "359a39d495d8d963aceda759ccad071400ea58e8906c25b430daabb7fcbb8589",
+    "input_count": 19,
+    "finding": "Exactly3 added helper names match failed ABI additions; all25 prior map names and all4 observer source files unchanged; exact final ABI/dependency/version and baseline-export exclusion retained",
+    "host_rerun": "NOT_NEEDED: observer logic byte-identical",
+    "approval": "One corrected full native compile/link and strictABI verification; no application or signing implied"
+  }
 }

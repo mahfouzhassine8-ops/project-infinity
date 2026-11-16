@@ -1,0 +1,13 @@
+{
+  "run": 43852054709,
+  "source": "73d5c7b4dd214bf2597e5af14e93fea3e54155e6",
+  "job": 133246819170,
+  "status": "FAIL_STRICT_ABI_AFTER_SUCCESSFUL_COMPILE_LINK",
+  "artifact": 14222449186,
+  "archive_sha256": "ec0191954eef3aa3d801a51589eb2964471de700c668200ee57b0090ec14788f",
+  "exact_failure": "Three newly emitted WEAK DEFAULT unique_ptr<CXBMCApp> constructor helpers; zero removals or dependency/version differences",
+  "selected_correction": "Append only the three proven names to existing private local-only map; all four observer source files and prior host receipts unchanged",
+  "Astra_pre_edit_review": "Approved exact3-only map boundary; no wildcard or ABI guard relaxation",
+  "Android": "NOT_RUN",
+  "APK": false
+}
