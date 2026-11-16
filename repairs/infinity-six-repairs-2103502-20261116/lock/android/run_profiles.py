@@ -29,8 +29,16 @@ def prepare_education(report):
     report['packages'] = adb('shell', 'pm', 'list', 'packages', 'com.projectinfinity')
     if report['emulator'] != '1' or 'package:com.projectinfinity.kodi' in report['packages'].splitlines():
         raise RuntimeError('Education fixture requires disposable emulator without Infinity installed')
-    help_text = adb('shell', 'wm', 'help')
-    if 'set-letterbox-style' not in help_text or '--isEducationEnabled' not in help_text:
+    # Android BasicShellCommandHandler returns -1 (adb 255) after normal onHelp().
+    # Validate the actual help, not a zero exit status; mutations still require success.
+    help_result = subprocess.run(['adb', 'shell', 'wm', 'help'], text=True,
+                                 capture_output=True, timeout=30)
+    help_text = help_result.stdout
+    report['cli_help'] = {'returncode': help_result.returncode,
+                          'stdout': help_text, 'stderr': help_result.stderr}
+    if (help_result.returncode not in (0, 255) or help_result.stderr.strip() or
+            not help_text.startswith('Window manager (window) commands:') or
+            'set-letterbox-style' not in help_text or '--isEducationEnabled' not in help_text):
         raise RuntimeError('Exact selected letterbox education CLI unsupported')
     report['cli_supported'] = True
     report['before'] = education_state()

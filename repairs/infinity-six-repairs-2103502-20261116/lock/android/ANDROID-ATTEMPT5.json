@@ -1,0 +1,17 @@
+{
+  "run": 43836876847,
+  "source_commit": "996050633095989871003442a4e517be6812d918",
+  "artifact": 14210659679,
+  "artifact_sha256": "7283ccb4b02639dc55391084b60103476ffd31f0ea231c881e5979debc7ae484",
+  "status": "FAIL_TEST_SETUP_ONLY",
+  "executed_profiles": [],
+  "settings_mutated": false,
+  "cause": "Harness check_output rejected normal wm help return255 before reading CLI capability or original settings",
+  "reference": {
+    "url": "https://android.googlesource.com/platform/frameworks/libs/modules-utils/+/refs/tags/android-16.0.0_r4/java/com/android/modules/utils/BasicShellCommandHandler.java",
+    "sha256": "f56b4ac8f89b0361e31d63790357fc108e6d3d65b4b0338c67ca6c62e8f48bf9",
+    "function": "handleDefaultCommands: onHelp then return -1"
+  },
+  "selected_correction": "Capture help return/stdout/stderr; accept only0/255 with exact header, command/flag and no stderr; mutation and runtime gates unchanged",
+  "production_changes": "NONE"
+}
