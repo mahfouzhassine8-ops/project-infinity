@@ -55,13 +55,30 @@
     }
   },
   "release": {
-    "APK": "NOT_BUILT",
-    "signing": "NOT_STARTED",
-    "new_version": "NOT_RESERVED",
-    "forward_recovery": "NOT_BUILT",
+    "scope": "OWNER_AUTHORIZED_FAST_QA_ONLY",
+    "APK": "ORIGINAL_SIGNED_2103502",
+    "APK_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+    "signing": "PASS_ORIGINAL_CERTIFICATE_V1_V2_V3",
+    "signing_run": 43785765772,
+    "new_version": 2103502,
+    "forward_recovery": "ORIGINAL_SIGNED_2103503_RESTORES_500",
+    "recovery_sha256": "5d4b9435b3df094878fd99629f0a365fafb628af72e9e98ac751a95e021cab76",
+    "recovery_signing_run": 43786312699,
+    "install_over": "PASS_ACTUAL_ANDROID_500_502_503",
+    "install_run": 43786801531,
+    "Astra": "PASS_SIGNED_PAIR_AND_INSTALL_RECEIPT_REVIEW",
+    "publication": "PUBLISHED_QA_PRERELEASE",
     "accepted_baseline_advanced": false,
-    "blocker": "The original continue-watching store, exact saved destinations and selected Otaku identifiers are absent; the empty-shell failure mechanism is not established. Full-application and policy GUI verification remain incomplete. No record reset, relaxed eligibility, guessed identity or partial release is authorized.",
-    "next_engineering_gate": "Actual full-application GUI verification remains pending. Original progress-record, saved-route, selected Search-identity and startup-failure evidence gaps remain open; no consolidated installer can be represented as complete."
+    "deferred_unchanged": [
+      "Continue Playing",
+      "Otaku Watchlist",
+      "Empty Shell"
+    ],
+    "physical_Fold_and_TV_acceptance": "PENDING_OWNER",
+    "runtime_limitations": "Final QA APK full application startup/shutdown, installed SlyGuy source coverage and real Cast receivers/playback are not proved by install-only verification.",
+    "publication_run": 43787698779,
+    "release_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/tag/infinity-2103502-fast-qa",
+    "direct_downloads": "HTTP200_EXACT_SIZE_AND_SERVER_SHA256_PASS"
   },
   "Cobra": "UNCHANGED",
   "user_data": "NO_PROFILE_STORE_OR_DATABASE_READ_OR_MODIFIED",
