@@ -1,0 +1,19 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_SELECTED_PACKAGE_INSTALL_SOURCE",
+  "signed_inputs_sha256": "568f28576f325d108226b3f319a8b3819e669118c6ed88bbd716a02c78d3ceee",
+  "driver_sha256": "2c8fe18dc6128fdad87176707b8777d5e99e78b878ce4460a9a6b8ec4e264ec6",
+  "workflow_sha256": "014d9c12ec7915f968411525e291b7ba32801737cff50fc0df34f07b04919282",
+  "selected": "ONEfreshdisposablePackageManager502\u2192504\u2192505, norminstall/-r, originalcert/version/package/UID/dataDir/firstInstallTime checks unchanged",
+  "not_selected": [
+    "appstartup",
+    "shutdown",
+    "reset",
+    "uninstall",
+    "engine/DEXbuild",
+    "physicalacceptance"
+  ],
+  "actual_signed_pair_review": "PASS originalcert v1/v2/v3, exact17/9membervectors and registeredauthorities89/90; sourceboundactualsignedreceipts and archivehashes verified",
+  "install_result": "PENDING"
+}
