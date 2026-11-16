@@ -3,7 +3,7 @@
   "agent": "/root/astra_502_review",
   "status": "PASS_SELECTED_APPLICATION_SOURCE_REVIEW",
   "selected_case": "actual_502_lock_stop_and_watched_actions",
-  "reviewed_inputs_sha256": "a9f46b8119c52bb03ddd17c4b5bbde0528231173b67a0a55c349c6347bd29de9",
+  "reviewed_inputs_sha256": "47c22c1d80219d5f5f762b982ee7d853866ea35060f7c29270acfb43f8910842",
   "input_count": 52,
   "native": 43861331996,
   "findings": [
@@ -23,5 +23,6 @@
     "IncidentB root-cause claim"
   ],
   "tests_rerun": false,
-  "packaging_correction": "Astra verified exact two-member archive, original receipt unchanged, supported reuse option and both finalDEX hashguards; one pending Android application execution only, no native rebuild or host-suite repeat"
+  "packaging_correction": "Astra verified exact two-member archive, original receipt unchanged, supported reuse option and both finalDEX hashguards; one pending Android application execution only, no native rebuild or host-suite repeat",
+  "test_harness_correction": "Astra approved exacttwo-file harness delta: identity-only120s bounded verification, fullSHA/mappedidentity retained, phase/bytecount/PID/sequence evidence, processloss detection and guarded failure captures. Timeout cause still unproven. No product changes, native rebuild or host-suite repeat."
 }

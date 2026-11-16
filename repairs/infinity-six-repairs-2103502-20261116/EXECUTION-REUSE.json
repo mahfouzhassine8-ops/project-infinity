@@ -1,0 +1,12 @@
+{
+  "owner_instruction": "Reuse completed artifacts and tests; do not repeat expensive full-engine builds when no relevant native code changed.",
+  "verified_native_run": 43861331996,
+  "engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+  "native_artifact": 14226277189,
+  "classes3_sha256": "a1c5742aa9a400590c8eb148c86d5b64e76963884a7b712ddb09cfa50668aa15",
+  "classes7_sha256": "3bc1c1e766c813caf7818c4e3d66357633a4025ba0b28b6be66fc7cfe03c053f",
+  "full_engine_rebuild_rule": "Only if a necessary reviewed change alters its actual compiled native inputs; record exact changedinputs and reason first. Harness, metadata, Python, Java, skin and standalone Cast changes do not authorize fullengine rebuilding.",
+  "test_rule": "Reuse passing evidence bound to unchanged code. Run only affected missing/failed gates. No duplicate audits or broad sweeps.",
+  "current_selected_application": "One still-pending lock/Stop/watched journey; reuse exactengine/DEX, no shutdown or ownerdata.",
+  "Cast": "Focused PTL host checks retained. Any required native verification builds standaloneCast library only; Kodi unchanged."
+}

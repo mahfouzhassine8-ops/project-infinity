@@ -1,0 +1,50 @@
+["g++", "-std=c++17", "-O2", "-Wno-deprecated-declarations", "-I/dev/shm/infinity-cast-mkv-local/ffmpeg-6.0.1", "-I/dev/shm/infinity-cast-mkv-local/host-ffmpeg", "/dev/shm/infinity502-cast-ptl-correction/driver.cpp", "-ldl", "-o", "/dev/shm/infinity502-cast-ptl-correction/driver"]
+
+
+["/dev/shm/infinity502-cast-ptl-correction/driver", "/dev/shm/infinity502-cast-ptl-repro/control.mkv", "/dev/shm/infinity502-cast-ptl-correction/control"]
+{"video":"hevc","audio":"eac3","codecs":"hev1.1.6.L30.90,ec-3","origin_us":0,"duration_us":4037000,"starts_us":[0,2026000,4037000]}
+PASS_NATIVE_STREAM_COPY_RANDOM_SEGMENTS
+
+[mp4 @ 0x556a25a0b080] track 1: codec frame size is not set
+[mp4 @ 0x556a25a0b080] track 1: codec frame size is not set
+[mp4 @ 0x556a25a0b080] Timestamps are unset in a packet for stream 0. This is deprecated and will stop working in the future. Fix your code to set the timestamps properly
+
+["/dev/shm/infinity502-cast-ptl-correction/driver", "/dev/shm/infinity502-cast-ptl-repro/ptl01.mkv", "/dev/shm/infinity502-cast-ptl-correction/ptl01"]
+{"video":"hevc","audio":"eac3","codecs":"hev1.1.6.L30.90,ec-3","origin_us":0,"duration_us":4037000,"starts_us":[0,2026000,4037000]}
+PASS_NATIVE_STREAM_COPY_RANDOM_SEGMENTS
+
+[mp4 @ 0x5579a524f080] track 1: codec frame size is not set
+[mp4 @ 0x5579a524f080] track 1: codec frame size is not set
+[mp4 @ 0x5579a524f080] Timestamps are unset in a packet for stream 0. This is deprecated and will stop working in the future. Fix your code to set the timestamps properly
+
+["g++", "-std=c++17", "-O2", "-Wno-deprecated-declarations", "-I/dev/shm/infinity-cast-mkv-local/ffmpeg-6.0.1", "-I/dev/shm/infinity-cast-mkv-local/host-ffmpeg", "/dev/shm/infinity502-cast-ptl-correction/helper.cpp", "-ldl", "-o", "/dev/shm/infinity502-cast-ptl-correction/helper"]
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "success"]
+SUCCESS_EXACT_EXPECTED_BYTES
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/repair.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "success"]
+SUCCESS_EXACT_EXPECTED_BYTES
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/truncated.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "mkv_hevc_ptl_unverified"]
+mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/conflicting.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "mkv_hevc_ptl_conflict"]
+mkv_hevc_ptl_conflict NO_PARTIAL_MUTATION
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/layered.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "mkv_hevc_ptl_unverified"]
+mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/noVPS.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "mkv_hevc_ptl_unverified"]
+mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION
+
+
+["/dev/shm/infinity502-cast-ptl-correction/helper", "/dev/shm/infinity502-cast-ptl-correction/invalidescape.hvcc", "/dev/shm/infinity502-cast-ptl-correction/good.hvcc", "mkv_hevc_ptl_unverified"]
+mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION
+
+

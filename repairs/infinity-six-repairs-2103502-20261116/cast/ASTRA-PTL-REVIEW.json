@@ -1,0 +1,66 @@
+{
+  "status": "PASS_FOCUSED_PTL_CORRECTION",
+  "source_sha256": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
+  "baseline_source_sha256": "8d6db252f299f2da738e8842046c6082a4e3294b2defc992c1ba9f3247ef403d",
+  "native_cases": [
+    {
+      "case": "control",
+      "metadata_equals_retained_control": true,
+      "init_equals_retained_control": true,
+      "fragment_equals_retained_control": true,
+      "codecs": "hev1.1.6.L30.90,ec-3"
+    },
+    {
+      "case": "ptl01",
+      "metadata_equals_retained_control": true,
+      "init_equals_retained_control": true,
+      "fragment_equals_retained_control": true,
+      "codecs": "hev1.1.6.L30.90,ec-3"
+    }
+  ],
+  "helper_cases": [
+    {
+      "case": "good",
+      "result": "SUCCESS_EXACT_EXPECTED_BYTES"
+    },
+    {
+      "case": "repair",
+      "result": "SUCCESS_EXACT_EXPECTED_BYTES"
+    },
+    {
+      "case": "truncated",
+      "result": "mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION"
+    },
+    {
+      "case": "conflicting",
+      "result": "mkv_hevc_ptl_conflict NO_PARTIAL_MUTATION"
+    },
+    {
+      "case": "layered",
+      "result": "mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION"
+    },
+    {
+      "case": "noVPS",
+      "result": "mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION"
+    },
+    {
+      "case": "invalidescape",
+      "result": "mkv_hevc_ptl_unverified NO_PARTIAL_MUTATION"
+    }
+  ],
+  "source_review": "No blocker in selected bounded PTL reconciliation",
+  "source_review_limits": "PTL-only parser; deliberately refuses disagreements and layered VPS/SPS. Existing level>=30 configurations pass through unchanged.",
+  "physical_root_cause": "NOT_PROVEN",
+  "physical_receiver": "NOT_TESTED",
+  "Android": "NOT_RUN",
+  "production_edits_by_reviewer": false,
+  "Java_changes": false,
+  "broader_tests": false,
+  "files": {
+    "check.py": "bac49fea1921ed8eadc1cc6cc2254feb50f24a46ffea8a1ced90cd66dbd62f70",
+    "driver.cpp": "8eb2017697da828455c0db87669c64b42fd5e9b72ac150f514617f503da891a6",
+    "driver": "2ef44b9de3d34b1349ef335097962158feeb1de08f5f9b779650a6cb5b4eae21",
+    "helper.cpp": "ed1c5d7e0d2c08763b665ed983c5e3758a12403b5c33d5fa56a181c695c44e61",
+    "helper": "f215fc03d0ded9955b30233cfc3760c55f8c9bb067e008d4d60786b85e8fc7b9"
+  }
+}

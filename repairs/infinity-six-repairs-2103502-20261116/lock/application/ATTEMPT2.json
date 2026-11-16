@@ -1,0 +1,71 @@
+{
+  "run": 43870192122,
+  "source": "d98f8c8b9d4594b6c07d38927c74f9a4916e6c5f",
+  "artifact": 14228226593,
+  "artifact_sha256": "2597864ae08865a0ef0de891c592803580f6f3cc0a364e1f48822a0480554fdf",
+  "packaging": "PASS_EXACT_REUSED_NATIVE_AND_DEX",
+  "application": {
+    "status": "FAIL_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES",
+    "shutdown": "NOT_SELECTED",
+    "physical_Fold": "NOT_RUN",
+    "owner_installer": false,
+    "cases": [
+      {
+        "case": "normal_entry_native_and_Python_ready",
+        "pass": true,
+        "UTC": "2026-11-16T12:58:17.944892+00:00",
+        "monotonic": 551.32687639,
+        "engine_pid": 4634,
+        "pid": 4634,
+        "snapshot": {
+          "pid": 4634,
+          "skin": "skin.infinity.diggz",
+          "window": 10000,
+          "dialog": 9999,
+          "playing": false,
+          "osd": false,
+          "lock_entry": false,
+          "script.infinity.commandcenter": {
+            "version": "0.3.5.83",
+            "files": {
+              "addon.xml": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4",
+              "INFINITY-MODULES.v1": "df66656d30cc4c6ad3d94866ddd7a09de7f064cd2947026517f4b65db9054b40",
+              "INFINITY-MODULES.v1.sig": "24c2aa48787a84301717dd70dd86aeb3bbd4a4924198b87e08dfe6cc23694f58"
+            }
+          },
+          "skin.infinity.diggz": {
+            "version": "1.0.5.275",
+            "files": {
+              "addon.xml": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f",
+              "unified/VideoOSD.xml": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46",
+              "unified/custom_1199_InfinityVideoLock.xml": "71f145d07add0ea092ad660d5238cbe92735182bccb5022edb8fec968e85c75d"
+            }
+          }
+        }
+      }
+    ],
+    "environment": {
+      "ro.build.version.sdk": "36",
+      "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+      "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys"
+    },
+    "fixture": {
+      "fresh_profile_only": true,
+      "clip_sha256": "549b586e602d81ea0cb38be1e9330433cab1e8c34dc04117661ad1da5fe43d58",
+      "owner_data": "NOT_ACCESSED",
+      "application_UID": 10216
+    },
+    "education_before": "",
+    "error": "RuntimeError: Timed out exact observer reply native_identity; None",
+    "failure_time": {
+      "UTC": "2026-11-16T12:58:33.074256+00:00",
+      "monotonic": 566.456237642,
+      "engine_pid": 4634
+    },
+    "education_restored": ""
+  },
+  "matching_crash_frames": [],
+  "interpretation": "Actual Kodi and Python readiness passed. First native_identity observer timed out after15s; its exact internal stage was not recorded. Hashing cost is a hypothesis, not proven. Lock/Stop/watched not reached.",
+  "next_correction": "Test-only staged progress plus bounded120s full-engine provenance check; normal actions15s and exactidentity assertions unchanged. No production changes or full engine rebuild."
+}

@@ -1,0 +1,29 @@
+{
+  "baseline": 2103502,
+  "library_sha256": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a",
+  "source_before_sha256": "8d6db252f299f2da738e8842046c6082a4e3294b2defc992c1ba9f3247ef403d",
+  "production_allowlist": [
+    "standalone Cast InfinityCastRemux.cpp only"
+  ],
+  "pre_edit_review": "Astra /root/astra_cast502 reviewed exact two-fixture reproduction and proposed bounded12-byte PTL reconciliation from agreeing VPS/SPS",
+  "defect": "Reserved below-minimum HEVC general_level_idc can propagate unchanged into init and master despite actual parameter-set PTL",
+  "correction": "Only below30 hvcC level declarations; repair only when all bounded, base-layer VPS/SPS general PTLs agree and reference available VPS; preserve all other bytes and packets; fail preparation on insufficient or conflicting evidence",
+  "not_proven": "Actual phone parameter sets and physical receiver cause unavailable; synthetic defect only proven",
+  "selected_checks": [
+    "Affected exact native inspection/init/first-fragment control and two-byte-mutated fixture; unchanged good outputs and repaired metadata",
+    "Focused malformed/truncated/conflicting/layered parameter-set negatives with no partial mutation",
+    "Standalone Cast ARM64 compile/link and ABI only after source review; NO Kodi engine rebuild"
+  ],
+  "protected": [
+    "Cobra",
+    "Kodi engine",
+    "shutdown",
+    "providers",
+    "all playback records",
+    "all Java Cast/discovery/session behavior",
+    "all packet data, timestamps, audio and display/HDR side metadata"
+  ],
+  "status": "HOST_REVIEW_AND_SELECTED_CHECKS_PASS_ARM64_PENDING",
+  "source_after_sha256": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
+  "delta": "44 added lines: array include, bounded PTL reconciler, one inspect call; old historical source unmodified."
+}

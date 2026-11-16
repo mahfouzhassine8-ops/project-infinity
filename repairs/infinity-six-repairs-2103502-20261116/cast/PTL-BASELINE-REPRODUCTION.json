@@ -1,0 +1,113 @@
+{
+  "status": "NATIVE_REPRODUCED",
+  "native_source_sha256": "8d6db252f299f2da738e8842046c6082a4e3294b2defc992c1ba9f3247ef403d",
+  "artifact_receipt_sha256": "23410da92da621d1e2e5ee7a689d1e00564067055170d202f58dc328d9b3c17b",
+  "exact502_native_library_sha256": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a",
+  "synthetic_only": true,
+  "actual_phone_VPS_SPS": "UNAVAILABLE",
+  "fixture_diff_offsets": [
+    402,
+    413
+  ],
+  "fixture_diff_bytes": [
+    {
+      "offset": 402,
+      "before": 1,
+      "after": 0
+    },
+    {
+      "offset": 413,
+      "before": 30,
+      "after": 1
+    }
+  ],
+  "NAL_arrays_identical": true,
+  "all_other_MKV_bytes_including_cues_identical": true,
+  "all_packets_with_hashes_timestamps_positions_identical": true,
+  "first_fragments_identical": true,
+  "rows": [
+    {
+      "name": "control",
+      "fixture_sha256": "2e9a5767a927e22659a57bec4dd3937e0bab806556c842d7c40661db52242278",
+      "inspection": {
+        "video": "hevc",
+        "audio": "eac3",
+        "codecs": "hev1.1.6.L30.90,ec-3",
+        "origin_us": 0,
+        "duration_us": 4037000,
+        "starts_us": [
+          0,
+          2026000,
+          4037000
+        ]
+      },
+      "hvcC_profile": 1,
+      "hvcC_level": 30,
+      "hvcC_sha256": "f1954336b14acbb7c12b9217222e3bdcabe7f63b606d75e6ab4ace5daa97f4c5",
+      "init_sha256": "f47e4f1ced24c17387da3339176ccbbe9476b97c94a43e70d4fa57ff1c6dd06e",
+      "first_fragment_sha256": "7d416844f18bd023400e297f4c2870d91cc5e88fd1a2892feff91cfa8fbf80d4",
+      "parsed_streams": [
+        {
+          "codec_name": "hevc",
+          "profile": "Main",
+          "level": 30,
+          "codec_type": "video"
+        },
+        {
+          "codec_name": "eac3",
+          "profile": null,
+          "level": null,
+          "codec_type": "audio"
+        }
+      ]
+    },
+    {
+      "name": "ptl01",
+      "fixture_sha256": "a7e210b70e7f3bc8f775f0b9151d63c5f57f5e167a92eac4633e73a9a92cbb3f",
+      "inspection": {
+        "video": "hevc",
+        "audio": "eac3",
+        "codecs": "hev1.0.6.L1.90,ec-3",
+        "origin_us": 0,
+        "duration_us": 4037000,
+        "starts_us": [
+          0,
+          2026000,
+          4037000
+        ]
+      },
+      "hvcC_profile": 0,
+      "hvcC_level": 1,
+      "hvcC_sha256": "4daf6fc614d7a15123c09db1c267925e6bea84724974fbd23d8985b0ae94949b",
+      "init_sha256": "b18364b0b6ee5c2d893266c155a8a8671f881f15762ac7c1fbffb3898336bf38",
+      "first_fragment_sha256": "7d416844f18bd023400e297f4c2870d91cc5e88fd1a2892feff91cfa8fbf80d4",
+      "parsed_streams": [
+        {
+          "codec_name": "hevc",
+          "profile": "Main",
+          "level": 30,
+          "codec_type": "video"
+        },
+        {
+          "codec_name": "eac3",
+          "profile": null,
+          "level": null,
+          "codec_type": "audio"
+        }
+      ]
+    }
+  ],
+  "host_libraries": {
+    "libavformat": "70ec2152396ea03825dead6aa4971a2eeea2d0cb6cb5ad30815d45961f7d9266",
+    "libavcodec": "50ecec5bcca56ff82553118f450d8ffa81ba8aadb7a336999b41e440c61a58b2",
+    "libavutil": "6b5f05df4f779801e528cd2e5e142d8b376e39f2b5a83c6218288aace5aa92e5"
+  },
+  "tools": {
+    "/usr/bin/ffmpeg": "e8a8d46f5225f3062cec7c07fb145d58ae73c603cb740dcd5bad34bfb54e455a",
+    "/usr/bin/ffprobe": "cefc5f81c0b18429cdbf8fa5a89e1e9c759235e10f93f9b329ff1b2fdff26f46",
+    "/usr/bin/g++": "6b3696e4dcb85e1c949c732a02befa50e3983ecf94ce7e8e58d9d503b954b79d",
+    "/usr/lib/jvm/java-21-openjdk-amd64/bin/java": "1a7e0b17c39003c75b457d686775ccb032e56fa9c8afe3c492d8eb3715e8951a"
+  },
+  "driver_sha256": "b05b140ef4fa59c9258c28f438efda1621491b5c8f8b56dc7d987e6f8e4b39cf",
+  "driver_source_sha256": "ddfb3cc7de619515bbcacafc3efac05714c10cdf66d7ab0af79e27ded8ae7596"
+}

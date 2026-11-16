@@ -47,9 +47,13 @@ def main():
           **{k:arguments[k] for k in ('window','dialog','control','label','input') if k in arguments}})
   path=work/'request.json';path.write_text(json.dumps({'pid':pid,'sequence':sequence,'action':action,**arguments}));adb('push',path,QAROOT+'/request.json')
   def read():
+   alive()
    value=transport.read_json(QAROOT+'/reply.json')
    return value if value.get('pid')==pid and value.get('sequence')==sequence else None
-  reply=until(read,'exact observer reply '+action,15);assert reply['pass'],reply
+  # Full-file provenance of the 613 MB engine is read through ARM64 translation.
+  # This is a verification workload, not an application responsiveness deadline.
+  # All ordinary actions retain their existing 15-second bound.
+  reply=until(read,'exact observer reply '+action,120 if action=='native_identity' else 15);assert reply['pass'],reply
   alive();return reply['result']
  def lock_node(label):
   found=[n for n in nodes(label).iter('node') if n.get('content-desc','')=='Video locked. Hold the top-left lock continuously for two seconds to unlock.']
@@ -181,6 +185,12 @@ def main():
  except Exception as error:
   report['status']='FAIL_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES';report['error']=type(error).__name__+': '+str(error);report['failure_time']=stamp();raise
  finally:
+  if pid is not None:
+   try:report['observer_final_process']={'expected_pid':pid,'observed_pid':shell('pidof',PACKAGE+':kodi',check=False).strip(),'request_sequence':sequence,'UTC':datetime.now(timezone.utc).isoformat()}
+   except Exception as error:report.setdefault('capture_errors',[]).append('final process observation: '+str(error))
+   for name in ('request.json','native-identity-progress.json','reply.json'):
+    try:(out/('observer-'+name)).write_text(json.dumps(transport.read_json(QAROOT+'/'+name),indent=2)+'\n')
+    except Exception as error:report.setdefault('capture_errors',[]).append(name+': '+str(error))
   if 'original_education' in locals():
    try:
     shell('settings','delete','secure','immersive_mode_confirmations') if original_education=='null' else shell('settings','put','secure','immersive_mode_confirmations',original_education)

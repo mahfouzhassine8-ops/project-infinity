@@ -10,6 +10,11 @@ def write(name,value):
  temporary=ROOT/(name+'.tmp');temporary.write_text(json.dumps(value));os.replace(temporary,ROOT/name)
 
 def native_identity():
+ started=time.monotonic()
+ def progress(stage,**details):
+  write('native-identity-progress.json',{'pid':os.getpid(),'sequence':last,'stage':stage,
+        'elapsed_seconds':time.monotonic()-started,**details})
+ progress('locating_mapped_engine')
  root=Path(os.environ['KODI_ANDROID_LIBS']);assert root.is_absolute()
  target=(root/'libkodi.so').resolve();assert target.is_file()
  rows=[line.split(None,5) for line in Path('/proc/self/maps').read_text().splitlines() if 'libkodi.so' in line]
@@ -19,6 +24,7 @@ def native_identity():
   opened=os.fstat(stream.fileno())
   assert all(int(row[4])==opened.st_ino and tuple(int(n,16) for n in row[3].split(':'))==
              (os.major(opened.st_dev),os.minor(opened.st_dev)) for row in rows),'MAPPED_FILE_IDENTITY_DIFFERS'
+  progress('mapped_file_identity_verified',bytes_total=opened.st_size)
   header=stream.read(64);assert header[:6]==b'\x7fELF\x02\x01'
   phoff=struct.unpack_from('<Q',header,32)[0];phsize,phcount=struct.unpack_from('<HH',header,54)
   assert phsize==56 and 0<phcount<256
@@ -32,7 +38,16 @@ def native_identity():
     assert position+((n+3)&~3)+((d+3)&~3)<=len(notes)
     name=notes[position:position+n];position+=(n+3)&~3;desc=notes[position:position+d];position+=(d+3)&~3
     if name.rstrip(b'\0')==b'GNU' and t==3:build_id=desc.hex()
-  stream.seek(0);digest=hashlib.file_digest(stream,'sha256').hexdigest()
+  progress('ELF_notes_verified',bytes_total=opened.st_size)
+  progress('hashing_verified_mapped_file',bytes_total=opened.st_size,bytes_hashed=0)
+  stream.seek(0);hasher=hashlib.sha256();hashed=0
+  while chunk:=stream.read(4*1024*1024):
+   hasher.update(chunk);hashed+=len(chunk)
+   if hashed%(64*1024*1024)==0:
+    progress('hashing_verified_mapped_file',bytes_total=opened.st_size,bytes_hashed=hashed)
+  assert hashed==opened.st_size,'MAPPED_FILE_SIZE_CHANGED_DURING_HASH'
+  digest=hasher.hexdigest()
+  progress('complete',bytes_total=opened.st_size,bytes_hashed=hashed)
  return {'pid':os.getpid(),'engine_sha256':digest,'build_id':build_id,
          'build_id_status':'PRESENT_IN_VERIFIED_ELF' if build_id else 'ABSENT_IN_VERIFIED_ELF',
          'mapped_segments':len(rows),'inode':opened.st_ino,
