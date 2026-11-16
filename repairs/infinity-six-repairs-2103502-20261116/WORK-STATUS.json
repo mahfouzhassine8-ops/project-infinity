@@ -57,10 +57,19 @@
     "One consolidated release only after required six-scope gates; no partial or diagnostic APK",
     "New incidentA native and Android integration pending; incidentB root cause remains unestablished"
   ],
-  "master_instructions": "0358c671bda6ae79a488b8997f7f731d2ba9f014",
+  "master_instructions": "ac460a4ce0e53745fc683651709e8fd55d596cab",
   "crash_amendment": "b0d9aa31 with master update411f8c8e",
   "incidents": {
     "A": "MINIMAL_SOURCE_CORRECTION_HOST_AND_ASTRA_PASS_ARM64_PENDING",
     "B": "FAULT_STACK_UNAVAILABLE_NO_SPECULATIVE_CORRECTION"
+  },
+  "latest_owner_release_policy": {
+    "instruction": "Complete all six repairs plus both owner-reported crashes before assembling one combined original-signed QA APK; no partial test APK immediately after native pass.",
+    "authority": "OWNER-FINAL-COMPLETE-SCOPE-BEFORE-QA-20261116.md",
+    "supersedes": "Proposed partial fast QA APK after updated native ARM64 PASS",
+    "status": "ACTIVE_RELEASE_GATE_NOT_PROOF_OF_COMPLETION",
+    "pending": "Source-verified end-to-end repair #1-6 plus both incident-specific crash fixes, preservation, signing and Android install-over",
+    "acceptance_caveat": "Physical Fold owner acceptance naturally occurs only once an installable signed QA APK exists",
+    "evidence_caveat": "Do not label user-only unknowns fixed; request minimum evidence for blockers"
   }
 }
