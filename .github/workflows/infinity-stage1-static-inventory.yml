@@ -1,0 +1,51 @@
+name: Infinity Stage 1 - STATIC inventory only
+on:
+  push:
+    branches: [infinity-stage1-inventory-20261116]
+    paths: ['.github/workflows/infinity-stage1-static-inventory.yml', 'audits/infinity-stage1/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-and-package-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - name: Acquire published QA and recovery artifacts without launching them
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/infinity-release /tmp/infinity-stage1-output
+          gh release download infinity-2103502-fast-qa \
+            --repo "$GITHUB_REPOSITORY" --dir /tmp/infinity-release \
+            --pattern 'Infinity-2103502-Combined-Original-Signer.apk' \
+            --pattern 'Infinity-2103503-Combined-Original-Signer.apk' \
+            --pattern 'INFINITY-2103502-QA-VERIFICATION.zip' \
+            --pattern 'INSTALL-AND-RECOVERY.md' \
+            --pattern 'SHA256SUMS'
+          ls -lah /tmp/infinity-release
+      - name: Read-only source and APK inventory (no device/emulator/behavior tests)
+        run: |
+          set -euo pipefail
+          python3 audits/infinity-stage1/apk_inventory.py \
+            /tmp/infinity-release /tmp/infinity-stage1-output
+          ls -lah /tmp/infinity-stage1-output
+      - name: Capture Android package identity without installing or executing APK
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/infinity-stage1-output/android-package-metadata
+          for apk in /tmp/infinity-release/*.apk; do
+            n=$(basename "$apk" .apk)
+            tools=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)
+            "$tools/aapt" dump badging "$apk" > "/tmp/infinity-stage1-output/android-package-metadata/$n-badging.txt" || true
+            "$tools/apksigner" verify --verbose --print-certs "$apk" > "/tmp/infinity-stage1-output/android-package-metadata/$n-signatures.txt" || true
+          done
+      - name: Upload static inventory evidence only
+        uses: actions/upload-artifact@v4
+        with:
+          name: infinity-stage1-static-apk-and-source-inventory
+          path: /tmp/infinity-stage1-output
+          if-no-files-found: error
+          retention-days: 30
