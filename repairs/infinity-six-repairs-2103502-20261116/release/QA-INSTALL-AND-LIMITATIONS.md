@@ -1,6 +1,6 @@
 # Infinity 2103504 — consolidated internal QA
 
-Install the original-signed 2103504 APK over Infinity. Do not uninstall or clear
+Close Infinity normally, then install the original-signed 2103504 APK over Infinity. Do not uninstall or clear
 data. Signed502 remains the protected baseline; this candidate is not accepted
 until the owner completes the consolidated Fold/TV session.
 
