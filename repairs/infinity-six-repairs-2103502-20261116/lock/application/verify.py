@@ -12,7 +12,11 @@ QA='script.infinity.lockapplicationqa';QAROOT=HOME+'/userdata/addon_data/'+QA
 
 def main():
  work=ROOT/'lock-app-work';out=work/'evidence';apk=work/'INTERNAL-LOCK-QA-NOT-FOR-OWNER.apk'
- report={'status':'RUNNING_SELECTED_LOCK_APPLICATION_CASE','shutdown':'NOT_SELECTED','physical_Fold':'NOT_RUN','owner_installer':False,'cases':[]}
+ case=json.loads((HERE/'CI-APPLICATION.json').read_bytes())['selected_case']
+ assert case in ('actual_502_lock_stop_and_watched_actions','actual_502_lock_application_only')
+ watched_selected=case=='actual_502_lock_stop_and_watched_actions'
+ success='PASS_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES' if watched_selected else 'PASS_SELECTED_ACTUAL_APPLICATION_LOCK_ONLY'
+ report={'selected_case':case,'watched':'SELECTED' if watched_selected else 'NOT_SELECTED_RETAINED_ATTEMPT6_FAILURE','status':'RUNNING_SELECTED_LOCK_APPLICATION_CASE','shutdown':'NOT_SELECTED','physical_Fold':'NOT_RUN','owner_installer':False,'cases':[]}
  def save():(out/'APPLICATION.json').write_text(json.dumps(report,indent=2)+'\n')
  def stamp():return {'UTC':datetime.now(timezone.utc).isoformat(),'monotonic':time.monotonic(),'engine_pid':pid}
  def passed(name,**data):report['cases'].append({'case':name,'pass':True,**stamp(),**data});save()
@@ -79,18 +83,19 @@ def main():
   (profile/'guisettings.xml').write_text('<settings version="2"><setting id="lookandfeel.skin">skin.infinity.diggz</setting><setting id="services.esenabled">true</setting><setting id="services.esallinterfaces">false</setting></settings>')
   clip=profile/'infinity502-lock-fixture.mp4'
   subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-f','lavfi','-i','testsrc2=size=640x360:rate=24','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','180','-c:v','libx264','-preset','ultrafast','-pix_fmt','yuv420p','-c:a','aac','-movflags','+faststart',str(clip)],check=True,timeout=120)
-  public=json.loads((crashes/'WATCHED-PUBLIC-FIXTURE.json').read_bytes());archive=work/'public-film.zip'
-  with urllib.request.urlopen(public['original_media'],timeout=90) as source,archive.open('wb') as dest:shutil.copyfileobj(source,dest,1024*1024)
-  assert archive.stat().st_size==public['archive_size']
-  with archive.open('rb') as stream:assert hashlib.file_digest(stream,'sha256').hexdigest()==public['archive_sha256']
-  film_dir=profile/'infinity502-watched-fixture';film_dir.mkdir();film=film_dir/public['movie_member']
-  with ZipFile(archive) as source:
-   assert source.namelist()==[public['movie_member']] and source.getinfo(public['movie_member']).file_size==public['movie_size']
-   with source.open(public['movie_member']) as inp,film.open('wb') as dest:shutil.copyfileobj(inp,dest,1024*1024)
-  with film.open('rb') as stream:assert hashlib.file_digest(stream,'sha256').hexdigest()==public['movie_sha256']
-  film.with_suffix('.nfo').write_text('<movie><title>Big Buck Bunny</title><year>2008</year><uniqueid type="imdb" default="true">tt1254207</uniqueid></movie>')
-  film_directory=HOME+'/userdata/infinity502-watched-fixture/'
-  (profile/'sources.xml').write_text('<sources><video><source><name>Infinity502 engineering movie</name><path pathversion="1">'+film_directory+'</path><allowsharing>false</allowsharing></source></video></sources>')
+  if watched_selected:
+   public=json.loads((crashes/'WATCHED-PUBLIC-FIXTURE.json').read_bytes());archive=work/'public-film.zip'
+   with urllib.request.urlopen(public['original_media'],timeout=90) as source,archive.open('wb') as dest:shutil.copyfileobj(source,dest,1024*1024)
+   assert archive.stat().st_size==public['archive_size']
+   with archive.open('rb') as stream:assert hashlib.file_digest(stream,'sha256').hexdigest()==public['archive_sha256']
+   film_dir=profile/'infinity502-watched-fixture';film_dir.mkdir();film=film_dir/public['movie_member']
+   with ZipFile(archive) as source:
+    assert source.namelist()==[public['movie_member']] and source.getinfo(public['movie_member']).file_size==public['movie_size']
+    with source.open(public['movie_member']) as inp,film.open('wb') as dest:shutil.copyfileobj(inp,dest,1024*1024)
+   with film.open('rb') as stream:assert hashlib.file_digest(stream,'sha256').hexdigest()==public['movie_sha256']
+   film.with_suffix('.nfo').write_text('<movie><title>Big Buck Bunny</title><year>2008</year><uniqueid type="imdb" default="true">tt1254207</uniqueid></movie>')
+   film_directory=HOME+'/userdata/infinity502-watched-fixture/'
+   (profile/'sources.xml').write_text('<sources><video><source><name>Infinity502 engineering movie</name><path pathversion="1">'+film_directory+'</path><allowsharing>false</allowsharing></source></video></sources>')
   # adbd may close its transport while enabling root. Accept only that observed
   # transport result, then prove actual root on the reconnected disposable device.
   root_started=time.monotonic();root_args=['adb','root'];transport.guard(root_args)
@@ -147,9 +152,10 @@ def main():
   report['native_identity']=identity;save()
   # Normal original-OSD Stop passed run43878757171 on this exact engine/DEX.
   # Reuse that result; execute the still-pending watched case before lock work.
-  watched_spec=importlib.util.spec_from_file_location('selected_watched_case',crashes/'watched_case.py')
-  watched=importlib.util.module_from_spec(watched_spec);watched_spec.loader.exec_module(watched)
-  report['watched_case']=watched.run(rpc,observer,until,passed,record,alive,film_directory,film_directory+public['movie_member']);save()
+  if watched_selected:
+   watched_spec=importlib.util.spec_from_file_location('selected_watched_case',crashes/'watched_case.py')
+   watched=importlib.util.module_from_spec(watched_spec);watched_spec.loader.exec_module(watched)
+   report['watched_case']=watched.run(rpc,observer,until,passed,record,alive,film_directory,film_directory+public['movie_member']);save()
   assert rpc('Player.Open',{'item':{'file':'special://profile/infinity502-lock-fixture.mp4'}})=='OK'
   until(lambda:(lambda s:s if s.get('playing') and s.get('time',0)>1 else None)(observer('snapshot')),'local playback for separate lock journey',45)
   if not observer('snapshot')['osd']:assert rpc('Input.ShowOSD')=='OK'
@@ -198,7 +204,7 @@ def main():
   identity_after=observer('native_identity');assert identity_after==identity,'MAPPED_ENGINE_OR_PROCESS_CHANGED'
   observer('finish');until(lambda:transport.read_json(QAROOT+'/retired.json').get('normal_completion') is True,'observer retirement',10);alive()
   passed('normal_media_stop_and_observer_retirement',same_pid=pid)
-  report['status']='PASS_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES'
+  report['status']=success
  except Exception as error:
   report['status']='FAIL_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES';report['error']=type(error).__name__+': '+str(error);report['failure_time']=stamp();raise
  finally:
@@ -233,6 +239,6 @@ def main():
     (out/'MATCHING-CRASH-FRAMES.json').write_text(json.dumps({'selected_pid':pid,'matches':matching,'raw_tombstones_uploaded':False},indent=2)+'\n')
    except Exception as error:report.setdefault('capture_errors',[]).append('matching tombstone: '+str(error))
   save()
- if report['status']!='PASS_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES':raise RuntimeError(report['status'])
+ if report['status']!=success:raise RuntimeError(report['status'])
 
 if __name__=='__main__':main()

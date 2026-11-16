@@ -5,7 +5,7 @@ import hashlib,json,os,subprocess
 HERE=Path(__file__).resolve().parent
 REPAIR=HERE.parent.parent
 ROOT=REPAIR.parents[1]
-CASE='actual_502_lock_stop_and_watched_actions'
+CASES=('actual_502_lock_stop_and_watched_actions','actual_502_lock_application_only')
 REQUEST=HERE/'CI-APPLICATION.json'
 REVIEW=HERE/'ASTRA-APPLICATION-REVIEW.json'
 
@@ -39,7 +39,7 @@ def input_paths():
  return {str(path.relative_to(ROOT)) for path in paths}
 
 def validate(request):
- assert request['selected_case']==CASE and request['baseline']==2103502
+ assert request['selected_case'] in CASES and request['baseline']==2103502
  assert request['shutdown']=='NOT_SELECTED'
  assert request['original_signing'] is False and request['owner_installer'] is False
  assert set(request['inputs'])==input_paths(),'EXACT_REVIEWED_INPUT_SET_REQUIRED'
@@ -49,12 +49,12 @@ def validate(request):
  review=json.loads(REVIEW.read_bytes())
  assert digest(REVIEW.read_bytes())==request['independent_review_sha256']
  assert review['reviewer']=='Astra' and review['status']=='PASS_SELECTED_APPLICATION_SOURCE_REVIEW'
- assert review['reviewed_inputs_sha256']==pins and review['selected_case']==CASE
+ assert review['reviewed_inputs_sha256']==pins and review['selected_case']==request['selected_case']
  native=json.loads((HERE/'NATIVE.json').read_bytes())
  assert native['status']=='VERIFIED_FULL_ARM64_SOURCE_AND_ABI'
  assert request['native']==native
  scope=json.loads((HERE/'SCOPE.json').read_bytes())
- assert scope['selected_case']==CASE and scope['shutdown']=='NOT_SELECTED'
+ assert scope['selected_case']==request['selected_case'] and scope['shutdown']=='NOT_SELECTED'
  assert scope['original_signing'] is False and scope['owner_installer'] is False
  assert scope['native_build']==native['run']
  changed=subprocess.check_output(['git','diff','--name-only',request['source_commit'],os.environ['GITHUB_SHA']],cwd=ROOT,text=True).splitlines()
