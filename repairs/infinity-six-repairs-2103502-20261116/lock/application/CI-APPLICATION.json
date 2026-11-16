@@ -1,10 +1,10 @@
 {
-  "selected_case": "actual_502_lock_stop_and_watched_actions",
+  "selected_case": "actual_502_lock_application_only",
   "baseline": 2103502,
   "shutdown": "NOT_SELECTED",
   "original_signing": false,
   "owner_installer": false,
-  "source_commit": "3d02f2217685bf13776d3df40ae5dff6fe0bdd78",
+  "source_commit": "2e3d27d874ba91536997d26055cf18952e2bc328",
   "inputs": {
     ".github/workflows/infinity-502-lock-application.yml": "7ccd1fcde38900d38e5ad9ccef6843c71c7b0df89e952e9193b30b07fd093daf",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
@@ -32,11 +32,11 @@
     "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json": "4b5b9f5bbc239936c6d7191e828f6cd10839d16dc8de9a21face5e17d7408717",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/ASTRA-ATTEMPT9-REVIEW.json": "75eed42394bc753a010cbaa543e4495b90187412b1cc8fe6f0af11e124ae65d6",
     "repairs/infinity-six-repairs-2103502-20261116/lock/application/NATIVE.json": "fc8012452caaca67e96ec9336dc20b98771c59da4d3cf94a436188e96111c94b",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/SCOPE.json": "95932779c6aa5638df9ecd084b66048e00719a6e16e7bf145d4d4412f75cda23",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/gate.py": "ae51a6d80c57d2f64f81dbb1e298ae981d8c9f56c25ce98e0cf69b4085a91c08",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/SCOPE.json": "7242f94b2f7ca1f5033e08eb6aed89b0ae7b5aecfacb0aa2828c13dc359cd54f",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/gate.py": "994fcdbd6adeaedf620e5f3452fef1c4cc5570c06a36108a1d5de35820befbcc",
     "repairs/infinity-six-repairs-2103502-20261116/lock/application/qa.py": "815d5b87222a60bf350d71fcec42d5130e7c82163d87311c31485a326e6aa33c",
     "repairs/infinity-six-repairs-2103502-20261116/lock/application/stage.py": "3b6eb5872ee9d75831677197585eecf03ec980ae107242bfe5379dca70d59e70",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/verify.py": "7dd34f2c39c745c02758084954f4c71486870521813df29852362f48981c9702",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/verify.py": "1c67d833d83586730cab858e7396372dc932980ccc49326a92f18c1cf50eec13",
     "repairs/infinity-six-repairs-2103502-20261116/lock/build_dex.py": "6613e1ee362b4600728b61d2080fefee598b62cde1f0c8770c7a87850505596b",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockBridge.java": "c59a1b1d64f5033d32b8f55290915e458ba24e1be81ad861d403e86d529221d3",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1313b716f741503d4ce03d616ffe10d7e2a415928965ab3f012bbd6c47cc2034",
@@ -51,6 +51,8 @@
     "repairs/infinity-six-repairs-2103502-20261116/lock/smali/com/projectinfinity/kodi/Main.smali": "7da26733b05df5ab8aeab67493ba0698221f594a1fd62478c042f7c9be5c3761",
     "repairs/infinity-six-repairs-2103502-20261116/lock/verified-classes3.zip": "3e2be6a8fbb323f9e664985a2a10421aeb9c61ff1c8bf0030c47dd6f6173d6f1",
     "repairs/infinity-six-repairs-2103502-20261116/lock/verified-classes7.zip": "04124f0ecc0cf029d2e8a5798b36fee97dda0c162391da5799f3c8810ca73a9e",
+    "repairs/infinity-six-repairs-2103502-20261116/overlay/script.infinity.commandcenter/addon.xml": "a39dcece2d2926675019071c506031b6ba10d56a12a31b7766942386dc876b69",
+    "repairs/infinity-six-repairs-2103502-20261116/overlay/script.infinity.commandcenter/context.py": "7fdb3fd781f2eaa3358a4c0d83932c16cc3f8bd064eb99ce6ab20152a5475aef",
     "repairs/infinity-six-repairs-2103502-20261116/overlay/script.kodihealthcenter/addon.xml": "c3233a9d6d6e5520c0da6903eb55919c57f10b45a87a199b6582481bc9b0ee45",
     "repairs/infinity-six-repairs-2103502-20261116/overlay/script.kodihealthcenter/infinity_runtime_identity.py": "870a7e727bc73207672739cd9f872bc40142167878c2bec01ffd157b8485befa",
     "repairs/infinity-six-repairs-2103502-20261116/overlay/skin.infinity.diggz/Infinity-Protected-Manifest.json": "e68439c3ea840b2e728edc60c9bf6754175b4e149e2fe279e27faf7ff4f25fef",
@@ -77,8 +79,8 @@
     "independent_review": "crashes/ASTRA-NATIVE-RESULT-REVIEW.json",
     "retained_failed_attempt": 43852054709
   },
-  "independent_review_sha256": "e449c38dcab8054ff3603ed47a0ac9da79f7d7defe2d41abaeffee476b484d0f",
+  "independent_review_sha256": "7720fa6c43d895037bb5e3ff67ba91b2d362ae17ff2389b53b334da746254469",
   "selected_by": "Root Codex under six-repair5 and owner two-crash amendment b0d9aa31; one bounded engineering execution, no owner installer",
-  "previous_attempt": 43878757171,
-  "correction": "RetaincompletednormalStopPASS; actualnativeUIadmitsscraper before realNFOscan. PendingWatchedthenlock/postunlockStop; no production/native/DEXchange orrebuild."
+  "previous_attempt": 43881820154,
+  "correction": "OnlypendingLockappcase, noSetcontentlibrary/Watchedfixture; previousSIGILLretained. Exactengine/bothDEXreuse, no heavybuild."
 }
