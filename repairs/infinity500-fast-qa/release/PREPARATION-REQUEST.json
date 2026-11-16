@@ -1,0 +1,43 @@
+{
+  "baseline": "224d5f808587ce4004a96a003331abe7c71cbe7bd08ec6b1d3ec288c6c75cf40",
+  "version_codes": {
+    "candidate": 2103502,
+    "recovery": 2103503
+  },
+  "active_kind": "candidate",
+  "accepted_pointer_updated": false,
+  "parent_authority_sha256": "4c44f46ddf54b9f027d4c6df3001520b6e63d3e76af5f602bfc443bd5acc6638",
+  "base": {
+    "run": 43632329510,
+    "id": 14128448982,
+    "name": "Infinity498-HLS-OriginalSigned-43632329510-QA-Fold-Pending",
+    "digest": "sha256:891c587de989319883ed453a7a2fcd583626a0436f363db62021aa3fa779c0dd",
+    "size_in_bytes": 347909108,
+    "source": "ccc30a77e07c2cf0abc3800ea60f4a68dc6bd9a3",
+    "workflow_id": 397702717
+  },
+  "stage": {
+    "run": 43781637786,
+    "id": 14188846231,
+    "name": "Infinity500-FastQA-43781637786-UNSIGNED-NOT-INSTALLABLE",
+    "digest": "sha256:17ba59fb0618489e75c523bf2446c8bfbeedcc014025c39b658d3873290c6dd3",
+    "size_in_bytes": 341145394,
+    "source": "537c9d7f72ccd2b3f39b30419f5490c8cd9fbaf3",
+    "workflow_id": 419521920
+  },
+  "owners": {
+    "run": 43631621888,
+    "id": 14128750881,
+    "name": "Infinity498-HLS-Prepared-43631621888-UNSIGNED-NOT-INSTALLABLE",
+    "digest": "sha256:a52fa7f5471dc25defc069e0ec564b8f7a0b5953142b4babf7bd220ef6237af2",
+    "size_in_bytes": 1317836101,
+    "source": "afb694316adccac9cbd543e588f5592100069773",
+    "workflow_id": 397702717
+  },
+  "source_bindings": {
+    "repairs/infinity500-fast-qa/release/gate.py": "7efa66663cdbd2b496c91e775ea6db9f8cf3defe6d798bb9db7c981e1439e530",
+    "repairs/infinity500-fast-qa/release/OWNER-AUTHORIZATION.json": "dd8f7b299286b22dd0a4ff3471aef64532b7eb6c295dfd9c039f2c070277994f",
+    "repairs/infinity500-fast-qa/release/WORKFLOW-CATALOG-REVIEW.json": "00d2b1a94c3bb98f242829857067351003023868c5bc2ebb1e429e6e39bd5896"
+  },
+  "workflow_sha256": "77defa80d3c41bb5f92de37f531db72f12e7858ef5b5e82c293464e2e18548e2"
+}
