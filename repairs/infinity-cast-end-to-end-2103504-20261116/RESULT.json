@@ -1,0 +1,180 @@
+{
+  "status": "SOFTWARE_DECODE_COMPLETED_WITH_TIMESTAMP_WARNINGS",
+  "source_sha256": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8",
+  "cases": [
+    {
+      "name": "h264-aac",
+      "native_inspection": {
+        "video": "h264",
+        "audio": "aac",
+        "codecs": "avc1.4D400C,mp4a.40.2",
+        "origin_us": -21000,
+        "duration_us": 8021000,
+        "starts_us": [
+          0,
+          2021000,
+          4021000,
+          6021000,
+          8021000
+        ]
+      },
+      "software_decode": "PASS_VIDEO_AND_AUDIO",
+      "streams": [
+        {
+          "codec_name": "h264",
+          "profile": "Main",
+          "level": 12,
+          "codec_tag_string": "avc1",
+          "pix_fmt": "yuv420p",
+          "start_time": "10.021000",
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "codec_name": "aac",
+          "profile": "LC",
+          "level": null,
+          "codec_tag_string": "mp4a",
+          "pix_fmt": null,
+          "start_time": "10.000000",
+          "sample_rate": "48000",
+          "channels": 1
+        }
+      ],
+      "init_bytes": 1231,
+      "fragment_bytes": 157318,
+      "fixture_sha256": "d0a6fda254370f25b774489c3ab5e6f240f038ef3e718fa121ad2f54982bf52f"
+    },
+    {
+      "name": "h264-eac3",
+      "native_inspection": {
+        "video": "h264",
+        "audio": "eac3",
+        "codecs": "avc1.4D400C,ec-3",
+        "origin_us": -5000,
+        "duration_us": 8021000,
+        "starts_us": [
+          0,
+          2026000,
+          4026000,
+          6026000,
+          8021000
+        ]
+      },
+      "software_decode": "PASS_VIDEO_AND_AUDIO",
+      "streams": [
+        {
+          "codec_name": "h264",
+          "profile": "Main",
+          "level": 12,
+          "codec_tag_string": "avc1",
+          "pix_fmt": "yuv420p",
+          "start_time": "10.026000",
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "codec_name": "eac3",
+          "profile": null,
+          "level": null,
+          "codec_tag_string": "ec-3",
+          "pix_fmt": null,
+          "start_time": "10.000000",
+          "sample_rate": "48000",
+          "channels": 1
+        }
+      ],
+      "init_bytes": 1215,
+      "fragment_bytes": 156601,
+      "fixture_sha256": "2edd3c70fc4608aa01c7b09bdd2990e85841ed31c0c8e9cd844a290a70ca7509"
+    },
+    {
+      "name": "main10-aac",
+      "native_inspection": {
+        "video": "hevc",
+        "audio": "aac",
+        "codecs": "hev1.2.4.L153.90,mp4a.40.2",
+        "origin_us": 0,
+        "duration_us": 4031000,
+        "starts_us": [
+          0,
+          2042000,
+          4031000
+        ]
+      },
+      "software_decode": "PASS_VIDEO_AND_AUDIO",
+      "streams": [
+        {
+          "codec_name": "hevc",
+          "profile": "Main 10",
+          "level": 153,
+          "codec_tag_string": "hev1",
+          "pix_fmt": "yuv420p10le",
+          "start_time": "10.042000",
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "codec_name": "aac",
+          "profile": "LC",
+          "level": null,
+          "codec_tag_string": "mp4a",
+          "pix_fmt": null,
+          "start_time": "10.000000",
+          "sample_rate": "48000",
+          "channels": 1
+        }
+      ],
+      "init_bytes": 3800,
+      "fragment_bytes": 70679,
+      "fixture_sha256": "744951a5139ec1e5d1506562ef1719e64c244435e0f88a298a6cf22df7e14331"
+    },
+    {
+      "name": "main10-eac3",
+      "native_inspection": {
+        "video": "hevc",
+        "audio": "eac3",
+        "codecs": "hev1.2.4.L153.90,ec-3",
+        "origin_us": -5000,
+        "duration_us": 4011000,
+        "starts_us": [
+          0,
+          2047000,
+          4011000
+        ]
+      },
+      "software_decode": "PASS_VIDEO_AND_AUDIO",
+      "streams": [
+        {
+          "codec_name": "hevc",
+          "profile": "Main 10",
+          "level": 153,
+          "codec_tag_string": "hev1",
+          "pix_fmt": "yuv420p10le",
+          "start_time": "10.047000",
+          "sample_rate": null,
+          "channels": null
+        },
+        {
+          "codec_name": "eac3",
+          "profile": null,
+          "level": null,
+          "codec_tag_string": "ec-3",
+          "pix_fmt": null,
+          "start_time": "10.000000",
+          "sample_rate": "48000",
+          "channels": 1
+        }
+      ],
+      "init_bytes": 3784,
+      "fragment_bytes": 69713,
+      "fixture_sha256": "8d3d24b5cee79462c0676446efd05563f5e3b394e5466548f8decd58f01f5d3f"
+    }
+  ],
+  "limits": "Synthetic low-resolution fixtures with real Main10 level5.1 signaling; software decode is not receiver MSE/decoder compatibility. No physical TV tested.",
+  "warnings": [
+    "Actual native muxer reports unset video timestamps in all four selected fixtures",
+    "H264/AAC ffmpeg null-output sink reports non-monotonic DTS; needs packet-level attribution, not yet established receiver cause"
+  ],
+  "timestamp_acceptance": "NOT_PASS"
+}
