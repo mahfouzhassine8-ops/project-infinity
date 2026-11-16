@@ -2,15 +2,15 @@
   "baseline": 2103502,
   "branch": "work/infinity-2103502-six-repairs-20261116",
   "accepted_baseline_changed": false,
-  "new_APK_signed": false,
+  "new_APK_signed": true,
   "repairs": {
     "1": {
-      "state": "EXISTING_OBSERVER_RETAINED_NO_NEW_PROVEN_CORRECTION",
-      "limitation": "No new same-profile502 writer/runtime evidence. Prior500 complete shutdown is not verification of this repair."
+      "state": "BASELINE_SHUTDOWN_OBSERVER_AND_GIL_CORRECTIONS_RETAINED",
+      "limitation": "No additional genuine SQLite/service-retirement correction was established. New candidate Close and same-profile relaunch remain physical QA; install-over PASS does not test shutdown."
     },
     "2": {
-      "state": "MENU_RESTORED_HOST_AND_ORIGINAL_SIGNED_MODULE_REVIEW_PASS",
-      "limitation": "Actual selected Otaku item verified typed identifiers unavailable; historical3402 fallback does not establish identity regression.",
+      "state": "MENU_CONNECTION_RESTORED_HOST_AND_ORIGINAL_SIGNED_MODULE_PASS_INCLUDED_IN_QA",
+      "limitation": "Live selected Otaku metadata, Android menu behavior and Watchlist persistence after relaunch remain owner QA. No-ID notice/no-write behavior is retained.",
       "latest_trace": "Exact502 native andaggregate paths preserve validtypedIDs; screenshotdoesnotidentifyactivecontextpath. Need actualselecteditem andcomponentidentity to attribute missingaction.",
       "implemented": "Restoreglobaltypedmenuvisibility withoutIDs; fallbackpassesexactselecteditem toexistingInfinityTrakt; originalidentity/writersunchanged",
       "pending": "ActualAndroidOtakuresult/Watchlistrelaunch remainsQAacceptance; missingIDs retainsnotice/no-write"
@@ -31,7 +31,7 @@
       "latest_trace": "Exact502 Rails/UIRepair/WatchedBridge\u2192CC contracts agree. Freshderivedapp43870192122 passednormalPythonready. Failedshutdownadmissionclosureprotectsunresolvedwrites; nojustifiedreset. OwnerfailingPID evidence absent."
     },
     "5": {
-      "state": "OSD_SOURCE_PRESERVED_LOCK_INTEGRATION_IN_PROGRESS",
+      "state": "INTEGRATED_HOST_ARM64_ABI_DEX_AND_SELECTED_ANDROID_SUBCASES_PASS",
       "implemented": "14 centered inner icons enlarged; lifetime-owned two-second lock with native input barrier, focused Android window and acknowledged restoration.",
       "evidence": [
         "OSD-PRESERVATION-TEST.json",
@@ -46,23 +46,20 @@
         "lock/android/ANDROID-ATTEMPT9.json"
       ],
       "pending": [
-        "Full application integration",
-        "Physical Fold acceptance"
+        "Physical Fold acceptance",
+        "Post-unlock Stop: overall application automation timed out before dispatch; separate ordinary OSD Stop passed"
       ],
       "native": "FullARM64 engine plus observer correction PASS43861331996; reuse exact artifact14226277189",
       "Android": "Selected focus-retirement and PiP tail PASS on two synthetic display/theme profiles run43844640475; prior input/hold/rotation/Home evidence retained, fullapp/Fold pending",
       "application": "RealnativeLockentry/inputbarrier/holdunlock/OSDrestoration/continuousplayback/seekrelease passed43887424917. PostunlockStopfocusautomationtimedout; overallfailurepreserved. EarliernormalStoppassedseparately."
     },
     "6": {
-      "state": "FOCUSED_PTL_CORRECTION_IMPLEMENTED_HOST_REVIEW_PASS",
-      "limitation": "Owner502 receiverERROR4 physical failure confirmed; actualphone parameter sets unavailable. Reproduced source propagation of invalidHEVC PTL. Conservative VPS/SPS-verified header correction passes unchangedvalidoutput and malformedinput checks. StandaloneARM64 andAndroid pending; physicalplayback notclaimed.",
+      "state": "CONSERVATIVE_HEVC_HEADER_CORRECTION_HOST_AND_STANDALONE_ARM64_ABI_PASS_INCLUDED",
+      "limitation": "Actual owner HEVC parameter sets unavailable. The bounded VPS/SPS-supported correction fixes a reproduced invalid-header source path; it does not establish the owner ERROR4 cause. Real TV playback, phone return and post-Cast shutdown remain physical QA.",
       "native": "StandaloneCast ARM64+ABI PASS43876785995, AstraactualELFreview PASS; no Kodi build"
     }
   },
-  "release_blockers": [
-    "Canonicalownerbundle/authoritypreparation43893471436 inprogress; actualproposalsnotreviewed/reserved",
-    "OriginalAPKsigning andAndroidinstallover/recovery checks pending"
-  ],
+  "release_blockers": [],
   "master_instructions": "ac460a4ce0e53745fc683651709e8fd55d596cab",
   "crash_amendment": "b0d9aa31 with master update411f8c8e",
   "incidents": {
@@ -91,5 +88,23 @@
     "PostunlockStopautomationfocusfailure; mainLockcasespassed",
     "ActualOtakuprovideridentity/TVcastphysicalacceptance pending",
     "Sameprofileshutdown/recoveryruntime notclaimed"
-  ]
+  ],
+  "release": {
+    "candidate": 2103504,
+    "recovery": 2103505,
+    "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "candidate_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+    "recovery_APK_sha256": "947648ad136a6f607eb63074575f7bf5b1071bad8883dab117826d00466ab407",
+    "signing_runs": [
+      43895603388,
+      43898932669
+    ],
+    "install_over_run": 43901737822,
+    "install_over": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+    "publication_run": 43903230920,
+    "publication": "PASS_ORIGINAL_SIGNED_QA_PAIR_PUBLICATION",
+    "physical_acceptance": "PENDING_OWNER",
+    "accepted_pointer_updated": false,
+    "release_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/tag/infinity-2103504-fast-qa"
+  }
 }
