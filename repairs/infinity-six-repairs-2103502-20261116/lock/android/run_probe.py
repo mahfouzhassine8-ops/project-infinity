@@ -53,7 +53,17 @@ def main():
     badging = subprocess.check_output([str(args.aapt2), 'dump', 'badging', str(args.apk)], text=True)
     assert "package: name='" + package + "'" in badging, 'Only the disposable lock package may be installed'
     run_id = uuid.uuid4().hex
-    subprocess.run([args.adb, 'install', '-r', str(args.apk)], check=True, capture_output=True, text=True, timeout=60)
+    install = subprocess.run([args.adb, 'install', '-r', str(args.apk)], capture_output=True, text=True, timeout=60)
+    install_output = install.stdout + install.stderr
+    (args.output / 'install.txt').write_text(install_output)
+    if install.returncode != 0:
+        failure = {'pass': False, 'runId': run_id, 'phase': 'install',
+                   'returncode': install.returncode, 'error': install_output,
+                   'apk_sha256': hashlib.sha256(args.apk.read_bytes()).hexdigest(),
+                   'instrumentation': 'NOT_RUN', 'package': package, 'owner_installer': False}
+        (args.output / 'ANDROID-LOCK-COMPONENT.json').write_text(json.dumps(failure, indent=2) + '\n')
+        print(json.dumps(failure, indent=2))
+        raise SystemExit(1)
     command = [args.adb, 'shell', 'am', 'instrument', '-w', '-r', '-e', 'runId', run_id,
                '-e', 'expectedTheme', args.theme,
                package + '/com.projectinfinity.kodi.InfinityLockProbeInstrumentation']

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<addon id="script.kodihealthcenter" name="Kodi Health Center" version="2.5.28" provider-name="OpenAI">
+  <requires><import addon="xbmc.python" version="3.0.0" /></requires>
+  <extension point="xbmc.python.script" library="default.py" />
+  <extension point="xbmc.service" library="service.py" start="startup" />
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Kodi diagnostics, Add-on Doctor, install history and crash correlation</summary>
+    <description lang="en_GB">Standalone RC3-based Health Center candidate: fresh unified local health reporting; scoped authorization recovery; verified bounded Auto Repair; required dependency checks and verified Kodi install outcomes; preserved cached inventory, repository review/disable/restore/history, grouped logs, Android/native exit explanations, Crash Center, recorder and diagnostic exports. Skin Export uses skin.infinity.diggz. Individually checked backup snapshots and archive integrity verification; not globally atomic. Complete Restore, shared cache cleanup and direct repository file maintenance are explicitly unavailable without a separately approved compatible maintenance controller. Health Orb remains the protected Command Center UIHealth/Guardian/StartupWatchdog scope. Physical Galaxy Fold acceptance is pending. No native/APK, skin or Command Center changes.</description>
+    <platform>all</platform><license>MIT</license>
+  </extension>
+</addon>

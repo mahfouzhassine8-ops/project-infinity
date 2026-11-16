@@ -1,0 +1,17 @@
+{
+  "run": 43828772992,
+  "source_commit": "3a28ca4304d8b7266067525953b43d31f2f79a6e",
+  "status": "FAIL_INSTALL_BEFORE_INSTRUMENTATION",
+  "artifact": 14207443947,
+  "artifact_digest": "8c90c2ef68f2c2a27892c732960be319653419490df4e86f0d45da12c0cc1822",
+  "actual_lock_tests": "NOT_RUN",
+  "exact_OS_install_error": "NOT_RETAINED: prior runner discarded captured stderr",
+  "confirmed_packaging_defect": "Builder deflated resources.arsc instead of retaining AAPT stored table and did not zipalign; target35 requires stored aligned table",
+  "correction_selected": [
+    "Store resources.arsc; official SDK zipalign before signing and verify after signing",
+    "Persist actual install result/error before abort",
+    "Stop second geometry if common installation fails"
+  ],
+  "production_delta": "NONE; unchanged State/Dialog",
+  "fold_acceptance": "NOT_RUN"
+}

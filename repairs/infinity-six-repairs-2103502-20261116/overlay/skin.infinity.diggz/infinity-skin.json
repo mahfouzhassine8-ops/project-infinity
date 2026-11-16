@@ -1,0 +1,1141 @@
+{
+  "adaptive_layout_api": "1.3",
+  "architecture": "one canonical profile; native in-place control and item reflow",
+  "baseline": "Candidate 31 locked",
+  "brand_cinema_tagline": "BIGGER STORIES. DEEPER IMMERSION.",
+  "brand_primary_tagline": "ENTERTAINMENT WITHOUT LIMITS.",
+  "brand_revision": "Change 33 Unified Brand System",
+  "brand_system": "1.0",
+  "browser_contract": {
+    "addon_browser_native_container": 50,
+    "device_verification_required": true,
+    "file_browser_controls": [
+      411,
+      412,
+      413,
+      414,
+      415,
+      450,
+      451
+    ],
+    "page_control": 61
+  },
+  "candidate": 275,
+  "candidate_locked": false,
+  "candidate_name": "Infinity P0 completion",
+  "canonical_home_class": "tall",
+  "canonical_home_source": "portrait/Home.xml",
+  "canonical_home_trial": false,
+  "canonical_profile": "unified",
+  "capability_api": "1.2",
+  "cinema_browse": {
+    "apk_version_code": 2103126,
+    "base_sha256": "aa81b4fa18664ea74c0f01d2d9b4a0976950129e21423ce88f7ef2626c23f029",
+    "base_user_locked": true,
+    "base_version": "1.0.5.102",
+    "command_center_version": "0.3.5.12",
+    "recovery_restores": "exact locked .102 merged Cinema Home plus player hotfix",
+    "recovery_version": "1.0.5.105",
+    "runtime_tested": false,
+    "scope": "Video list view 50 in manual Cinema; no provider-link changes.",
+    "status": "candidate_not_locked",
+    "version": "1.0.5.104"
+  },
+  "cinema_source_provenance": {
+    "base_sha256": "236c73db90370949914f3c7c47a6b1fa15bc43014d59f6390f8b1296b66436cd",
+    "base_user_locked": true,
+    "base_version": "1.0.5.98",
+    "motion": "400/440ms sheets; no sheet squash; optional animations respect OptionalMotionAllowed=false",
+    "palette": {
+      "accent": "FFD8BA88",
+      "background": "FF000000",
+      "secondary": "FFBEB7AC",
+      "text": "FFF4EFE7"
+    },
+    "recovery_restores_runtime": "1.0.5.98",
+    "recovery_skin_version": "1.0.5.101",
+    "runtime_tested": false,
+    "scope": "Only Home.xml Cinema group 19590 in all five profiles, plus release metadata.",
+    "status": "candidate_not_locked",
+    "technical_references": [
+      "https://kodi.wiki/view/Animating_your_skin",
+      "https://kodi.wiki/view/Label_control"
+    ],
+    "unchanged_backend_version_code": 2103126,
+    "unchanged_command_center": "0.3.5.12",
+    "version": "1.0.5.100"
+  },
+  "collective_overhaul": {
+    "dark_board_sha256": "8f47818862605e5affc5bc12d1828eb235961f974816637cffe45b2f86a89126",
+    "design_baseline": "locked-light-dark-board-2026-09-11",
+    "light_board_sha256": "f4adc88db8a68fd675cd6a7c9dec9fd5c00c6cc403480d94691497715d7a8b7e",
+    "player_visual": "protected-candidate-31-byte-preserved",
+    "scope": [
+      "home",
+      "navigation",
+      "view-modes",
+      "browse-details",
+      "settings",
+      "dialogs",
+      "palette",
+      "motion",
+      "responsive-shell"
+    ],
+    "status": "Candidate 33 exact-board implementation; NOT LOCKED; on-device acceptance required"
+  },
+  "compact_continue_watching": {
+    "base": "1.0.5.116",
+    "playback_source_bound": false,
+    "progress_broker": "script.infinity.commandcenter 0.3.5.13",
+    "requires_specific_source_addon": false,
+    "requires_trakt": false,
+    "scope": "compact-only",
+    "sections": [
+      "movies",
+      "tvshows"
+    ],
+    "shared_cards": "16x9/Includes_InfinityHomeUnified.xml",
+    "status": "candidate_not_locked",
+    "tracking_owner": "Kodi player callbacks + local Infinity history",
+    "version": "1.0.5.118"
+  },
+  "compact_stack_alignment_116": {
+    "base_version": "1.0.5.115",
+    "continue_watching_provider_neutral": true,
+    "no_overlap_required": true,
+    "order": [
+      "primary widget",
+      "category row",
+      "submenu row",
+      "section heading",
+      "add-on cards",
+      "continue watching heading",
+      "continue watching cards"
+    ],
+    "profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "portrait",
+      "5x6"
+    ],
+    "runtime_tested": false,
+    "scope": "compact-only responsive vertical stack correction"
+  },
+  "consumes_properties": [
+    "Infinity.SystemTheme",
+    "Infinity.ThemeRevision",
+    "Infinity.DeviceMode",
+    "Infinity.Orientation",
+    "Infinity.WindowWidth",
+    "Infinity.WindowHeight",
+    "Infinity.AspectClass",
+    "Infinity.SafeInsetTop",
+    "Infinity.SafeInsetBottom",
+    "Infinity.SafeInsetLeft",
+    "Infinity.SafeInsetRight",
+    "Infinity.TouchClass",
+    "Infinity.MotionPolicy",
+    "Infinity.RefreshPolicy",
+    "Infinity.PowerPolicy",
+    "Infinity.NativeReady",
+    "Infinity.NativeDeviceMode",
+    "Infinity.NativeLayout",
+    "Infinity.NativeOrientation",
+    "Infinity.NativeWidthDp",
+    "Infinity.NativeHeightDp",
+    "Infinity.NativeTouchClass",
+    "Infinity.NativeDisplayRevision",
+    "Infinity.NativeFoldHint",
+    "Infinity.EffectiveDeviceMode",
+    "Infinity.EffectiveLayout",
+    "Infinity.EffectiveOrientation",
+    "Infinity.EffectiveWidthDp",
+    "Infinity.EffectiveHeightDp",
+    "Infinity.EffectiveViewMode",
+    "Infinity.EffectivePaneMode",
+    "Infinity.SafeAreaClass",
+    "Infinity.RuntimeDisplayProfile",
+    "Infinity.RefreshSelectionConfirmed",
+    "Infinity.RefreshPending",
+    "Infinity.RefreshUserMode",
+    "Infinity.RefreshMaxHz",
+    "Infinity.RefreshHookActive",
+    "Infinity.RefreshRuntimePresent",
+    "Infinity.RefreshRuntimeMode",
+    "Infinity.RefreshRequestedHz",
+    "Infinity.RefreshActiveHz",
+    "Infinity.RefreshRequestedLabel",
+    "Infinity.RefreshActiveLabel",
+    "Infinity.RefreshGranted",
+    "Infinity.RefreshStatus",
+    "Infinity.RefreshBatterySaver",
+    "Infinity.RefreshThermalLimited",
+    "Infinity.RefreshRuntimeUpdatedMs",
+    "Infinity.RefreshSummary",
+    "Infinity.MotionModeUser",
+    "Infinity.MotionModeEffective",
+    "Infinity.OptionalMotionAllowed",
+    "Infinity.RuntimeBadgesVisible",
+    "Infinity.BaselineIntegrityStatus",
+    "Infinity.BaselineCheckedFiles",
+    "Infinity.BaselineMismatchCount",
+    "Infinity.BaselineMismatchFiles",
+    "Infinity.BaselineCandidate",
+    "Infinity.RuntimeBadgeLine",
+    "Infinity.RuntimeCapabilitiesReady",
+    "Infinity.CommandCenter.Ready",
+    "Infinity.CommandCenter.Version",
+    "Infinity.UIFrameBudgetMs",
+    "Infinity.HighRefreshUI",
+    "Infinity.StabilityMode",
+    "Infinity.UIHealth.Status",
+    "Infinity.StartupWatchdog.Status"
+  ],
+  "continuity_189": {
+    "native_marker_bridge": "only when Infinity.InPlaceReflow=true",
+    "no_provider_or_player_mutations": true,
+    "process_death_widget_cache": false,
+    "removed_display_only_widget_revision": true,
+    "trace_contains_content": false
+  },
+  "contract_fallbacks": true,
+  "core_reflow_only": true,
+  "core_reflow_only_trial": false,
+  "corrective_231": {
+    "obsolete_ui_ids": [
+      252,
+      265
+    ],
+    "physical_fold_verified": false,
+    "retained_audio_subtitles_id": 272,
+    "self_heal_performed": false
+  },
+  "critical_232": {
+    "compact_header_only": true,
+    "final_lock": false,
+    "physical_fold_verified": false,
+    "source_parent_commit": "4e4ca79f134ce9b0ac22c66cd13e246a11207de8"
+  },
+  "current_release": {
+    "baseline": "exact locked 1.0.5.200",
+    "baseline_sha256": "576f74c262bf2d28b09a1174ca96d81505d27b7933a07a009917184b4b114a87",
+    "physical_device_verified": false,
+    "requires_apk": 2103306,
+    "scope": [
+      "all settings categories",
+      "nested selector/color/view/widget forms",
+      "Kodi settings templates",
+      "native automatic switch placement",
+      "per-page scrolling",
+      "theme and reduced-motion consistency"
+    ],
+    "screensaver_candidate": "421",
+    "screensaver_id": "screensaver.arctic.mirage",
+    "status": "candidate; device acceptance pending",
+    "title": "Complete Settings Audit and Polish RC1",
+    "version": "1.0.5.201"
+  },
+  "custom_addon_rails_218": {
+    "apk_changed": false,
+    "base_sha256": "486aa86c8f8dcda31d80c6d058f4b96154dcb2b3f1a18cfa464c65e280ec7e70",
+    "base_version": "1.0.5.215",
+    "baseline_record_commit": "85b1305ef7a220dd23aaeb40c7d38150b8da4a92",
+    "full_skin_zip": true,
+    "helper_version": "0.2.0",
+    "locked": false,
+    "menu_owner": "DialogContextMenu.xml, scoped Rails/add-on branch; original non-add-on branch retained",
+    "modes": [
+      "normal",
+      "cinema",
+      "compact",
+      "twopane"
+    ],
+    "physical_device_verified": false,
+    "rails_source_record_commit": "faae58d7594b8be1e423e119ddd1e1c9839767fd",
+    "rc2_helper_sha256": "b0d0b293cc66d937cb82dd6c8ac9e97956e67f88efec10e764d4631540f7a9da"
+  },
+  "custom_addon_rails_220_context_repair": {
+    "apk_modified": false,
+    "base_218_sha256": "271c323f049696cbb7f539be75a662f8ae8ab23f322c4ccd731d3e65cec96a5f",
+    "chooser": "helper .0.2.2 uses Kodi-native DialogSelect instead of missing helper-owned XML",
+    "device_acceptance_required": true,
+    "foundation_version": "1.0.5.215",
+    "helper_required": "0.2.2",
+    "native_context_menu": "all 14 DialogContextMenu.xml restored BYTE IDENTICAL to verified .215",
+    "parent_version": "1.0.5.218",
+    "status": "host candidate, device not tested, NOT LOCKED",
+    "unchanged_approved_rails": "all Home.xml, all rail includes, saved card schema and layout"
+  },
+  "custom_addon_rails_221_input_fix": {
+    "android_apk_modified": false,
+    "change": "14 rail static fallbacks shown only if helper absent or listing failed; 14 Cinema menus split dynamic vs legacy",
+    "global_input_keymap_modified": false,
+    "helper_required": "0.2.3",
+    "parent_skin_sha256": "4595d5294cf9858897e1d100e2b8604527c5ef944e84a1b40dc50d5748b5ff1f",
+    "parent_version": "1.0.5.220",
+    "physical_fold_acceptance_required": true,
+    "protected_foundation": "1.0.5.215",
+    "status": "test_candidate\u2014not device verified\u2014not locked",
+    "userdata_schema_changed": false
+  },
+  "deep_cleanup": {
+    "backend_build_commit": "69305d740317753c863994516709cef85be56f62",
+    "backend_run": 34778736661,
+    "backend_version_code": 2103126,
+    "backend_version_name": "1.0.9-Deep-Cleanup-1",
+    "background_integrity_interval_seconds": 30,
+    "base_sha256": "dddcb621acfee4f287efb87adc53aaf227a7bb58f44a177b2724447a15d4fc64",
+    "base_user_locked": true,
+    "base_version": "1.0.5.96",
+    "command_center_version": "0.3.5.12",
+    "install_surfaces": [
+      "native APK",
+      "Command Center add-on",
+      "skin add-on"
+    ],
+    "lock_control": 262,
+    "manual_integrity": "immediate",
+    "player_static_structure": "unchanged from locked .96",
+    "protected_policy": "retain every prior protected path; add packaged XML/JSON except the hash manifest and runtime-generated shortcut/view-type includes",
+    "recovery_restores_skin_runtime": "1.0.5.96",
+    "recovery_skin_version": "1.0.5.99",
+    "rotation_control": 263,
+    "runtime_generated_exclusions": [
+      "16x9/script-skinshortcuts-includes.xml",
+      "16x9/script-skinviewtypes-includes.xml"
+    ],
+    "runtime_tested": false,
+    "status": "candidate_not_locked",
+    "version": "1.0.5.98"
+  },
+  "delivery_195_previous_release": {
+    "baseline": "1.0.5.190 / APK 2103302",
+    "command_center": "0.3.5.20",
+    "native_responsive_marker_enabled": false,
+    "profiles": [
+      "unified"
+    ],
+    "requires_apk": 2103303,
+    "runtime_tested": false,
+    "status": "source candidate; physical acceptance pending; historical crash and takeover ownership unproven",
+    "title": "Mobile repair candidate",
+    "version": "1.0.5.194"
+  },
+  "delivery_196_previous_release": {
+    "baseline": "1.0.5.194 / APK 2103303",
+    "command_center": "0.3.5.20",
+    "deferred_movie_video_framing_changed": false,
+    "locked_baseline_zip_sha256": "7e20256adb34354cea6eb9cc1ec696885c2f9c6625ba4667a1210bbe14e4782a",
+    "native_responsive_marker_enabled": false,
+    "profiles": [
+      "unified"
+    ],
+    "repair_xml": {
+      "unified/Custom_1197_InfinityDisplayMode.xml": {
+        "after": "6627fc3b7ee5b4cf50b0d819c0a21cb7bad3d739d024712a8745f8b24f83e8f8",
+        "before": "cd2f3abc4ec595e552199d7312afd921f58aaed5d559923e16629324f91942a9"
+      },
+      "unified/Custom_1198_InfinityNav.xml": {
+        "after": "437fd869facc7c35b2f32e3fd229c81eed65ee6ec5bfeb41730e3e5b48bb9651",
+        "before": "cbee0b0c739662cb258036905c81810fdf985f2217df637dec1a49192a9bad87"
+      },
+      "unified/DialogButtonMenu.xml": {
+        "after": "245676178d6d750537769f83215cd706a536fbc497568ec0a43c4306bb06caad",
+        "before": "b86a41f19199cea67249b4fdedd55bdf1f3116e4f66f56f4a490cb7eccee27a9"
+      },
+      "unified/DialogMediaSource.xml": {
+        "after": "8f246e30631f89953c93be433131cdf46e346597b09eaa61e6118629b34d92ba",
+        "before": "fc8f792fcd428ed77107180c4e158e0e8f5098d728b9dff315210dc340445ca4"
+      },
+      "unified/Home.xml": {
+        "after": "11ef0072eec4c117e0b02a3ede9f8f592cb1956ed8433e19f249efddb4d598ac",
+        "before": "21567d1041551fed8ef3ca5abf6380b43df653af161a1967c6db164a1401aab2"
+      },
+      "unified/IncludesVariables.xml": {
+        "after": "65511e4e198a68255f8d104c66afd9541c911086555c7f761513f5491749ebc9",
+        "before": "c173a8a3782102bf55de215ced4b81269bd2b36a9a46ba878f81a540f698dff5"
+      },
+      "unified/VideoOSD.xml": {
+        "after": "d427fa90f3089a9d2e4ed18eac220a4fd96ee126b55f3340e0c3704c3b1c546d",
+        "before": "6dbca06ae078b399ca0f0beccd086afd942c445e2aa699893d2571267082b2b2"
+      }
+    },
+    "requires_apk": 2103304,
+    "runtime_tested": false,
+    "status": "package/source verified; physical acceptance pending",
+    "title": "Responsive Repair RC1",
+    "version": "1.0.5.195"
+  },
+  "delivery_197_previous_release": {
+    "baseline": "exact locked 1.0.5.195 / APK 2103304",
+    "command_center": "0.3.5.20",
+    "deferred_movie_video_framing_changed": false,
+    "locked_baseline_zip_sha256": "c5290ee4352ba8b0b60af9222b4e7b032c40c2d1ccef4d1a4387699f9a5c83f9",
+    "native_responsive_marker_enabled": false,
+    "open_runtime_gates": [
+      "native graceful-exit completion",
+      "Umbrella source/resolver sizing and Back freeze",
+      "idle screensaver takeover ownership",
+      "physical fold/orientation/theme/touch matrix"
+    ],
+    "physical_device_verified": false,
+    "profiles": [
+      "unified"
+    ],
+    "repair_xml": {
+      "unified/Custom_1198_InfinityNav.xml": {
+        "after": "25b60eaca60f927ab364b733604fa1a740d5834922dbfb1e7e71fa24428add0b",
+        "before": "437fd869facc7c35b2f32e3fd229c81eed65ee6ec5bfeb41730e3e5b48bb9651"
+      },
+      "unified/Home.xml": {
+        "after": "e621925860065cc631070a0b28653e9ff323e7974c1f1cf0fc8a8c3d4375e90a",
+        "before": "11ef0072eec4c117e0b02a3ede9f8f592cb1956ed8433e19f249efddb4d598ac"
+      }
+    },
+    "requires_apk": 2103305,
+    "runtime_tested": false,
+    "scope": [
+      "Power-ended initial drawer viewport",
+      "outline-only hamburger focus",
+      "unique UI Theme control ID and focus marker"
+    ],
+    "status": "package/source verified; physical acceptance pending",
+    "title": "Drawer Follow-up RC1",
+    "version": "1.0.5.196"
+  },
+  "delivery_198_previous_release": {
+    "back_freeze_resolved": false,
+    "baseline": "exact locked skin 1.0.5.196 / APK 2103305",
+    "deferred_movie_video_framing_changed": false,
+    "native_responsive_marker_enabled": false,
+    "physical_device_verified": false,
+    "profiles": [
+      "unified"
+    ],
+    "requires_apk": 2103305,
+    "scope": [
+      "stable focused Add-on Browser typography",
+      "palette-following focused text and surface",
+      "existing cyan focus rim"
+    ],
+    "shutdown_changed": false,
+    "source_select_repaired_by_skin": false,
+    "status": "source/package verified; physical acceptance pending",
+    "title": "Browser Focus RC1",
+    "version": "1.0.5.197"
+  },
+  "delivery_199_previous_release": {
+    "baseline": "exact skin 1.0.5.197 Browser Focus RC1",
+    "physical_device_verified": false,
+    "requires_apk": 2103305,
+    "scope": [
+      "responsive add-on screensaver override",
+      "existing Infinity fonts",
+      "opaque full-window saver backdrop"
+    ],
+    "screensaver_candidate": "421",
+    "screensaver_id": "screensaver.arctic.mirage",
+    "status": "source/package verified; device acceptance pending",
+    "title": "Arctic Mirage Integration RC1",
+    "version": "1.0.5.198"
+  },
+  "delivery_200_previous_release": {
+    "apk_rebuild": false,
+    "baseline": "exact skin 1.0.5.198",
+    "baseline_sha256": "27f1b69b00af77b40539fb59e1175bcb98971d63ca66cb24e67315d403cf0363",
+    "physical_device_verified": false,
+    "requires_apk": 2103306,
+    "scope": [
+      "shared native control defaults",
+      "nested settings and dialogs",
+      "theme-aware stock icon mapping",
+      "notification icon contrast",
+      "motion-policy completion"
+    ],
+    "screensaver_candidate": "421",
+    "screensaver_id": "screensaver.arctic.mirage",
+    "status": "source/package verified; device acceptance pending",
+    "title": "Whole Interface Polish RC1",
+    "version": "1.0.5.199"
+  },
+  "delivery_201_previous_release": {
+    "baseline": "exact user-accepted 1.0.5.199",
+    "baseline_sha256": "f77b8461d9e36d036f25d7e82fdfd007d9a80139533e2b1b4f57ffea11754424",
+    "physical_device_verified": false,
+    "requires_apk": 2103306,
+    "scope": [
+      "responsive Infinity Settings radio text and switch placement",
+      "consistent unfocused settings rows",
+      "category label hierarchy"
+    ],
+    "screensaver_candidate": "421",
+    "screensaver_id": "screensaver.arctic.mirage",
+    "status": "source/package verified; phone acceptance pending",
+    "title": "Settings Drawer Polish RC1",
+    "version": "1.0.5.200"
+  },
+  "edge_fit_repair": true,
+  "exact_board_match": {
+    "base": "Candidate 31 protected player + Candidate 32 collective tokens",
+    "dark_board_sha256": "8f47818862605e5affc5bc12d1828eb235961f974816637cffe45b2f86a89126",
+    "light_board_sha256": "f4adc88db8a68fd675cd6a7c9dec9fd5c00c6cc403480d94691497715d7a8b7e",
+    "player_visual": "Candidate 31 byte protected",
+    "rule": "boards are layout specification, not loose inspiration"
+  },
+  "experience_api": "1.0",
+  "functional_header_actions": {
+    "Auto_primary": "VIEW ALL -> exact current primary widget source",
+    "Auto_secondary": "VIEW ALL for real Trakt secondary sources; ALL ADD-ONS for Movies/TV/Add-ons; hidden elsewhere",
+    "Cinema": "EXPLORE FEATURED -> exact current Featured source",
+    "Compact_primary": "VIEW ALL -> exact current primary source",
+    "Compact_secondary": "VIEW ALL for Trakt; ALL ADD-ONS for Movies/TV/Add-ons; hidden elsewhere",
+    "TwoPane": "MORE LIKE THIS only when a real Trakt recommendation/secondary source exists; hidden otherwise",
+    "return_behavior": "Custom dialog overlay closes back to the same Home selection and View Mode",
+    "window_id": 1193
+  },
+  "home_component_system": {
+    "addon_card_scope": [
+      "normal",
+      "compact",
+      "two-pane"
+    ],
+    "base_sha256": "e3c6b221f4df1caf9353cf158917efc442129310313cb09ffde2300ab25a1d98",
+    "base_user_locked": true,
+    "base_version": "1.0.5.112",
+    "behavior_changed": false,
+    "header_hierarchy": [
+      "date",
+      "weather",
+      "time-dominant"
+    ],
+    "responsive_profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "shared_include": "16x9/Includes_InfinityHomeUnified.xml",
+    "status": "candidate_not_locked",
+    "version": "1.0.5.113",
+    "weather_line": "location + temperature + conditions"
+  },
+  "home_view_behavior": {
+    "Auto": "Locked-board responsive Home: wide/inner uses permanent sidebar + cinematic hero + Continue Watching + Recommended rails; narrow/cover keeps an overlay navigation model while preserving the same hierarchy.",
+    "Cinema": "Dedicated hero-first composition. The selected item owns a full-width fanart hero with title/plot/action, followed by a full-width Featured rail. No scale-only reuse of Auto geometry.",
+    "Compact": "Dedicated dense composition using a two-row primary grid, full-size category/submenu controls, and a lower secondary rail. Geometry is authored per responsive profile instead of whole-page zoom.",
+    "TwoPane": "Dedicated details + content composition. Wide/fold/tablet profiles use a true details pane plus live primary rail and full-width Recommended rail; portrait stacks the same hierarchy to consume vertical real estate."
+  },
+  "home_view_modes": [
+    "Auto",
+    "Cinema",
+    "Compact",
+    "TwoPane"
+  ],
+  "home_views": [
+    "Auto",
+    "Cinema",
+    "Compact",
+    "TwoPane"
+  ],
+  "install_from_zip_window": "native-kodi-addonbrowser-filebrowser-flow",
+  "interaction_contract": {
+    "audited": true,
+    "motion_profile": "restrained-high-refresh",
+    "performance_refresh_owner": "script.infinity.commandcenter -> service.infinity.refresh -> native InfinityRefreshController",
+    "performance_state_source": "confirmed readback from service.infinity.refresh",
+    "player_lock_control_id": 273,
+    "player_lock_window_id": 1199,
+    "visible_custom_controls_require_actions": true
+  },
+  "legacy_xenon_settings_shell": false,
+  "lock_in_overhaul": {
+    "browser_locked": true,
+    "cards": "standard + compact poster/add-on trim and bottom focus accent",
+    "footer": "live View/Perf/Refresh/Theme status + subtle divider",
+    "home": "Auto/Cinema/Compact/TwoPane remain distinct",
+    "menus": "trim-based premium focus, no flat blue slabs",
+    "narrow_header": "portrait/5x6 time/weather geometry corrected",
+    "notifications": "Candidate 29 Infinity toast/progress treatment retained",
+    "oled": "true-black OLED-first dark retained",
+    "performance": "Command Center 0.3.2 + service.infinity.refresh retained; no engine rebuild",
+    "player_locked": true,
+    "settings": "professional Skin Settings retained; Kodi Settings trim aligned",
+    "status": "RC pending on-device acceptance",
+    "submenus": "secondary navigation rail with focused accent edge"
+  },
+  "locked_parent": "Candidate 31 Locked Visual / Motion / Player Lock",
+  "locked_template_contract": {
+    "home": "locked-board layout preserved; Auto presentation is selected by normalized Infinity.EffectiveViewMode while manual View Modes remain hard overrides",
+    "player": "approved cinematic OSD + full-height left player drawer + integrated volume in control cluster + corrected compact transport rows + scrim-based chrome",
+    "responsive_authority": "Responsive Bridge v5 + Infinity Runtime Capability API 1.2 / Command Center 0.3.5 normalized effective state",
+    "themes": [
+      "light",
+      "dark",
+      "OLED"
+    ]
+  },
+  "merged_cinema_drawer": {
+    "apk_modified": false,
+    "apk_version_code": 2103126,
+    "command_center_modified": false,
+    "command_center_version": "0.3.5.12",
+    "method": "Locked hotfix plus exact five Cinema Home files; metadata/hashes regenerated.",
+    "recovery_restores": "Exact locked 1.0.5.100 Drawer Contrast runtime; not .98",
+    "recovery_version": "1.0.5.103",
+    "runtime_tested": false,
+    "sources": {
+      "cinema_presentation": {
+        "library_file_id": "libfile_e05ad8d5378c81918d25fea91974d83c",
+        "sha256": "afd02f5fac591bf2da136aa67f6ddfec32c7ef1c3a2983f4de10266be9be23b0",
+        "user_locked": false,
+        "version": "1.0.5.100"
+      },
+      "locked_hotfix": {
+        "library_file_id": "libfile_01f556d3e75881918ac4b369f5319ca9",
+        "sha256": "0fcc32728f103aff1cbb245c814efd8a0d96ff1fa67662e473deb292f8b0ffcc",
+        "user_locked": true,
+        "version": "1.0.5.100"
+      }
+    },
+    "status": "candidate_not_locked",
+    "supersedes_for_install": "Standalone Cinema .100 must not replace the locked drawer-hotfix .100.",
+    "version": "1.0.5.102"
+  },
+  "merged_cleanup": {
+    "apk_modified": false,
+    "backend_apk_version_code": 2103125,
+    "backend_apk_version_name": "1.0.9-Player-Rotation-1",
+    "backend_commit": "1925438aac2391911fe7f0ac352b2762a7d29096",
+    "backend_run": 34755876464,
+    "base_known_integrity_mismatches": [
+      "addon.xml"
+    ],
+    "base_version": "1.0.5.94",
+    "command_center_modified": false,
+    "intentional_added_files": [
+      "INFINITY_MERGED_CLEANUP_1_0_5_96.txt",
+      "media/infinity_reference/outline.png",
+      "media/infinity_reference/rotate.png",
+      "media/infinity_ui/icons/back.png",
+      "media/infinity_ui/icons/gear.png",
+      "media/infinity_ui/icons/grid.png"
+    ],
+    "intentional_edited_files": [
+      "16x9/DialogContextMenu.xml",
+      "16x9/Includes.xml",
+      "16x9/Variables.xml",
+      "16x9/VideoOSD.xml",
+      "20x9/VideoOSD.xml",
+      "5x6/VideoOSD.xml",
+      "6x5/VideoOSD.xml",
+      "Infinity-Protected-Manifest.json",
+      "addon.xml",
+      "infinity-skin.json",
+      "portrait/VideoOSD.xml"
+    ],
+    "rotation_control": 263,
+    "rotation_setting": "Infinity.PlayerRotationUnlocked",
+    "rotation_state_meaning": "selected UI policy; not native delivery, preference or grant confirmation",
+    "runtime_tested": false,
+    "source_sha256": {
+      "ancestor": "95a4ca496cb0f1b98f79881032bfcbcca4729cc8f8ad09b19c289b3d7a2281c3",
+      "base": "7f928d749fa79c02589c40a8ef50779b6076291fb5049d2483b88a695bd7a510",
+      "rotation": "6c4cc9d780a69b7e963958b3e0525f5a6ed53a6cb52fb10af87ecf7d7d0bc3ed"
+    },
+    "status": "candidate_not_locked",
+    "version": "1.0.5.96"
+  },
+  "mobile_badge_glass_polish_169": {
+    "base_version": "1.0.5.167",
+    "behavior": "Shows only when RuntimeBadgesVisible=true and RuntimeBadgeLine is non-empty. 20x9 Compact plain-text fallback yields to the glass badge; fallback remains when no runtime badge exists.",
+    "candidate_version": "1.0.5.169",
+    "motion": "180ms fade and 98-to-100% settle, gated by Infinity.OptionalMotionAllowed when runtime capability state is available.",
+    "oled": "Uses existing InfinityGlassSurfaceElevated, InfinityGlassBorderSoft, InfinityGlassBorder, and InfinityGlassTextPrimary tokens; OLED remains true-black beneath the translucent pill.",
+    "runtime_tested": false,
+    "scope": "Mobile Home runtime badge visibility and Liquid Glass presentation across 16x9, 20x9, 6x5, 5x6, and portrait profiles.",
+    "status": "candidate_not_locked"
+  },
+  "mobile_glass_172": {
+    "base_sha256": "fa6e100b0338f637013e7c5b54d7429e1cea57526d087f210fdafb4613355d18",
+    "base_version": "1.0.5.171",
+    "counts": {
+      "motion_gates": 584,
+      "rims": 355,
+      "textures": 7017,
+      "theme_values": 16
+    },
+    "fixes": "Reduced-motion gates for timed decorative dialog/player animations and busy pulses; OLED legacy surfaces/fields use black rather than blue-gray fills.",
+    "glass": "Layered translucent surfaces and static specular rims, not live backdrop blur/refraction. Four tiny nine-slice RGBA maps; no shaders, added decoders or continuous glass animations.",
+    "limits": "Source and package checks only; Kodi runtime unavailable. All modes, theme contrast, fold/rotation, playback, GPU load and native FD_SET crash still require device acceptance.",
+    "preservation": "Existing control IDs, actions, providers, navigation, visibility and geometry unchanged. Native-controlled background IDs receive no extra rim overlay. Static placement/zoom and state animations retained.",
+    "runtime_tested": false,
+    "scope": "Mobile skin materials: drawer, toasts, shared legacy dialogs/settings, loading, context menus and Home playback dock. Existing fullscreen player OLED adapters retained.",
+    "status": "candidate_not_locked"
+  },
+  "mobile_home_playback_171": {
+    "base_sha256": "1c9882087103339f6ec410fcb7fb010f54a2adca4d99d31393497d8146e72041",
+    "base_version": "1.0.5.170",
+    "controls": "Seek -10/+10 when supported; play/pause, stop, fullscreen. Dock yields to focus in intersecting lower rows; explicit player shortcut opens/focuses the dock. Cinema drawers suppress the dock.",
+    "limits": "Candidate source/static checks only. Android device playback, fold/rotation, and native crash acceptance still required. Unknown 16:9 device facts fail closed.",
+    "mobile": "Android only, rejects reported TV/television device modes. Shared 16:9 profile requires positive phone/tablet/fold/mobile device classification. Dedicated TV packages remain untouched.",
+    "playback": "One Kodi videowindow displays the active video session; no new decoder, playback start/stop on Home load, or provider changes. Live title/time/progress and pause state come from Kodi.",
+    "preservation": "Menu/submenu geometry, full-screen OSD, native engine, provider actions, and locked .170 package are unchanged. Existing hide-now-playing preferences are respected.",
+    "runtime_tested": false,
+    "scope": "Portrait Normal Continue Watching reuses Compact containers 8830/8831. All four view modes in five mobile responsive Home profiles receive native background video and a shared Liquid Glass transport dock.",
+    "status": "candidate_not_locked"
+  },
+  "mobile_normal_view_spacing_170": {
+    "base_sha256": "5ce64886ac6dc8d22cdaef08f23060ea74ac4aae6f5acf5a73e610e0bf585b9e",
+    "base_version": "1.0.5.169",
+    "method": "Shift the normal and focused add-on itemlayout vertical parameters together; preserve card dimensions, assets, focus styling, actions, and panel navigation.",
+    "runtime_tested": false,
+    "scope": "Mobile Normal view only; portrait Home add-on cards move directly below the existing section heading. Category and submenu geometry, other responsive profiles, and non-Normal modes are unchanged.",
+    "status": "candidate_not_locked"
+  },
+  "mobile_weather_revision": {
+    "artwork_policy": "bounded keep; no poster/fanart fill",
+    "condition": "ListItem.Label2",
+    "day": "ListItem.Label",
+    "high_low": [
+      "ListItem.Property(Label3)",
+      "ListItem.Property(Label4)"
+    ],
+    "icon": "ListItem.Icon",
+    "modes": [
+      "normal",
+      "compact",
+      "cinema",
+      "twopane"
+    ],
+    "panel_ids": [
+      8111,
+      8811,
+      8611,
+      8711
+    ],
+    "profiles": [
+      "16x9",
+      "20x9",
+      "5x6",
+      "6x5",
+      "portrait"
+    ],
+    "version": "1.0.5.155"
+  },
+  "motion_contract": {
+    "lock_unlock": "90 ms fade + 110 ms reveal zoom; unlock affordance timeout about 3 seconds",
+    "navigation_drawer_close": "130 ms left slide + 100 ms fade",
+    "navigation_drawer_open": "170 ms left slide + 120 ms fade",
+    "player_drawer_focus": "102% lift / 90 ms",
+    "player_osd_open_close": "110 ms fade in / 90 ms fade out",
+    "player_transport_focus": "102% lift / 85 ms; static geometry unchanged",
+    "refresh_ownership": "animations never force display mode; service.infinity.refresh owns physical refresh requests",
+    "view_performance_refresh_focus": "102% lift / 90 ms"
+  },
+  "name": "Infinity",
+  "native_responsive_marker_enabled": false,
+  "native_video_ambient": {
+    "apk_parent": 2103282,
+    "capture": "Existing Kodi XBMCVideoView PixelCopy; RenderCapture for non-Surface renderers",
+    "command_center_unchanged": "0.3.5.17",
+    "device_verified": false,
+    "parent": "4263de3906ea0dc6e24f3c6f04c2f779b0c7a8bbdd31656b82e221402063d1c9",
+    "requires_apk": 2103284,
+    "surface_api": 1
+  },
+  "native_video_ambient_settings_drawer": {
+    "action": "RunScript(script.infinity.commandcenter,ambient-home)",
+    "command_center_unchanged": "0.3.5.17",
+    "entry": "AMBIENT HOME",
+    "location": "Infinity drawer / SYSTEM / directly below SETTINGS",
+    "modes": [
+      "off",
+      "subtle",
+      "immersive"
+    ]
+  },
+  "navigation_drawer": true,
+  "notes": "Current release is described by current_release. Other release fields are historical.",
+  "oled_dark_policy": "Dark and OLED modes share true-black OLED-first background/surface foundations; Light remains a separate bright palette.",
+  "palette_tokens": [
+    "Background",
+    "Surface",
+    "SurfaceElevated",
+    "TextPrimary",
+    "TextSecondary",
+    "Border",
+    "Focus",
+    "Accent",
+    "Danger",
+    "Scrim"
+  ],
+  "patch_revision": 1,
+  "performance_controls": {
+    "bridge": "script.infinity.commandcenter >= 0.3.4 confirmed-refresh-state compatible",
+    "engine_rebuild_required": false,
+    "owner": "service.infinity.refresh",
+    "presets": [
+      "Auto",
+      "Performance",
+      "Balanced",
+      "System"
+    ],
+    "refresh_caps": [
+      "Auto",
+      "Smooth (120 Hz target)",
+      "Max (highest available)"
+    ],
+    "state_confirmation": "Command Center writes service.infinity.refresh, reads it back, then publishes skin state only after owner confirmation"
+  },
+  "physical_device_verified": false,
+  "playback_performance_window": 1192,
+  "player": {
+    "allowed_changes": [
+      "Lock Controls button/window",
+      "animation-only motion on existing controls",
+      "User-authorized in-player rotation control 263 and its adjacent navigation"
+    ],
+    "drawer": "Visible Lock Controls id 262 opens window 1199 with its original actions; legacy hidden id 273 retained. Rotation id 263 is between Audio 252 and Lock 262.",
+    "layout": "Candidate 25: Kodi-native OSD foundation with translucent reference header/footer/buttons, nine-button transport, integrated volume/audio/fullscreen row, and restored Infinity playback drawer",
+    "owner": "Infinity",
+    "replaceable": false,
+    "video_surface": "Kodi-owned full playback viewport; OSD overlay only; never resize/reposition the video surface",
+    "visual_contract": "LOCKED: static player geometry/textures/icons/scrubber/volume/control placement are not redesignable without explicit user approval"
+  },
+  "player_drawer_contrast": {
+    "apk_modified": false,
+    "base_sha256": "236c73db90370949914f3c7c47a6b1fa15bc43014d59f6390f8b1296b66436cd",
+    "base_user_locked": true,
+    "base_version": "1.0.5.98",
+    "cause": "The player retains a dark surface in Light mode, but drawer foregrounds used general light-theme dark ink.",
+    "cinema_home_modified": false,
+    "command_center_modified": false,
+    "device_acceptance": "Open drawer in Light, Dark and OLED; inspect all rows; focus and open Audio/Video settings; Back/close; rotate/fold.",
+    "disabled": "FFA9BDCC",
+    "focus_background": "FF075F8C",
+    "geometry_actions_navigation_motion": "byte-preserved outside color-only drawer delta",
+    "primary": "FFFFFFFF",
+    "runtime_tested": false,
+    "scope": "Playback drawer contrast only in all five VideoOSD profiles",
+    "secondary": "FFD2E2EE",
+    "shared_palette_modified": false,
+    "status": "candidate_not_locked",
+    "version": "1.0.5.100"
+  },
+  "player_lock": {
+    "behavior": "full-screen input interception; tap/back reveal unlock affordance; unlock closes lock surface",
+    "control_id": 273,
+    "enabled": true,
+    "profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "window_id": 1199
+  },
+  "player_panel_window": 1197,
+  "player_patch_scope": [
+    "player drawer",
+    "Audio & Subtitles hub",
+    "Video/Audio/Subtitle settings",
+    "Playback Speed",
+    "Chapters & Bookmarks",
+    "Display Mode",
+    "Playback Diagnostics"
+  ],
+  "previous_release_metadata": {
+    "baseline": "1.0.5.184",
+    "command_center": "0.3.5.19",
+    "generic_android_adaptive_canvas": true,
+    "native_engine": "locked 2103291 In-Place Responsive Reflow",
+    "native_responsive_marker_enabled": false,
+    "requires_apk": 2103292,
+    "runtime_tested": false,
+    "scope": "Horizontal edge-fit only; no native/player/provider redesign",
+    "status": "device_acceptance_pending",
+    "title": "Core Reflow Edge-Fit RC1",
+    "view_modes_audited": [
+      "Normal",
+      "Cinema",
+      "Compact",
+      "Two-Pane"
+    ]
+  },
+  "professional_settings_restored": true,
+  "protected_zone_policy": "yield_to_infinity",
+  "refinement_pass": {
+    "notifications": "top-right Infinity card with theme-aware surface, artwork, title/detail hierarchy, accent edge",
+    "oled_trim": "purposeful blue/cyan trim on Home rail, drawer boundary, and Skin Settings shell",
+    "player_locked": true,
+    "progress": "matching compact progress card outside fullscreen playback",
+    "refresh_help": "drawer explains Auto / Smooth 120 Hz / Max without adding a second refresh controller",
+    "settings": "professional Skin Settings functionality preserved; legacy shell chrome replaced with Infinity materials"
+  },
+  "release": "Arctic Mirage Integration RC1",
+  "release_186_metadata": {
+    "baseline": "1.0.5.185",
+    "canonical_home_source": "portrait/Home.xml",
+    "canonicalized_legacy_profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait",
+      "fallback"
+    ],
+    "command_center": "0.3.5.19",
+    "generic_android_adaptive_canvas": true,
+    "native_engine": "locked 2103291 In-Place Responsive Reflow",
+    "native_responsive_marker_enabled": false,
+    "non_home_windows_changed": false,
+    "requires_apk": 2103292,
+    "runtime_tested": false,
+    "status": "device_acceptance_pending",
+    "title": "Canonical Home Trial RC1",
+    "view_modes": [
+      "Normal",
+      "Cinema",
+      "Compact",
+      "Two-Pane"
+    ]
+  },
+  "requires_apk": 2103305,
+  "responsive_bridge": {
+    "authority": "Infinity native responsive state via effective layout contract",
+    "auto_mode": "follow-device",
+    "minimum_native_bridge": 5,
+    "native_properties": [
+      "Infinity.NativeDeviceMode",
+      "Infinity.NativeLayout",
+      "Infinity.NativeOrientation",
+      "Infinity.NativeWidthDp",
+      "Infinity.NativeHeightDp",
+      "Infinity.NativeTouchClass",
+      "Infinity.NativeDisplayRevision"
+    ]
+  },
+  "responsive_compact_recovery_118": {
+    "base_version": "1.0.5.116",
+    "cinema_visual_contract_changed": false,
+    "new_compact_width": 2276,
+    "old_compact_width": 2040,
+    "parent_content_width": 2280,
+    "portrait_geometry_changed": false,
+    "profile": "20x9",
+    "runtime_tested": false,
+    "status": "candidate_not_locked",
+    "widget_reflow_revision": "Infinity.WidgetReloadRevision"
+  },
+  "responsive_folders_retained": true,
+  "responsive_profiles": [
+    {
+      "folder": "unified",
+      "height": 2400,
+      "width": 1080
+    }
+  ],
+  "responsive_reflow_contract": "2103291 plus 2103293 native container/item reflow",
+  "responsive_reflow_geometry_repaired": true,
+  "responsive_settings": true,
+  "resume_hub_api": "2.0",
+  "retained_reflow_190": {
+    "ambient_yields_to_screensaver": true,
+    "continue_fixed_upward_offset_removed": true,
+    "native_text_repair_apk": 2103294,
+    "no_reload_bridge_preserved": true,
+    "provider_or_player_mutations": false,
+    "screensaver_freeze_fixed": false,
+    "screensaver_read_only_diagnostics": true
+  },
+  "runtime_capability_api": {
+    "command_center_minimum": "0.3.5",
+    "contract": "Infinity-Runtime-Capability-API.json",
+    "helpers": "16x9/Includes_InfinityRuntime.xml",
+    "native_bridge_minimum": 5,
+    "reference_implementation": "Infinity 30.7",
+    "version": "1.2"
+  },
+  "runtime_corrections": {
+    "drawer": "c20: View Mode labels normalized to AUTO / CINEMA / COMPACT / TWO-PANE across all adaptive profiles",
+    "drawer_close": "Home navigation drawer close affordance uses explicit close.png X in all five profiles.",
+    "home": "C30.4: approved concept board treated as layout specification; dedicated full-real-estate Cinema/Compact/Two-Pane compositions authored per profile.",
+    "packaging": "Candidate 20 had an incorrect c20work/skin.infinity.diggz archive root; Candidate 21 restores the required skin.infinity.diggz/ root.",
+    "player": "c20: cinematic scrim textures, smaller top/bottom chrome, cleaner button chips, integrated volume retained, player drawer preserved",
+    "player_runtime_ownership": "Approved C21 cinematic VideoOSD retained; C22 prevents stale Command Center UI restoration from replacing it.",
+    "self_heal_compatibility": "C22 includes invisible legacy validator aliases so Command Center 0.3.0 cannot roll the modern Home/VideoOSD back while 0.3.1 is installed.",
+    "theme": "global v5-aware Light/Dark/OLED palette with sharper OLED and reusable frames",
+    "view_mode": "icon-above-label four-card layout; no label/icon collision"
+  },
+  "runtime_dashboard_window": 1194,
+  "runtime_integration": {
+    "auto_layout": "Home content consumes Infinity.EffectiveViewMode with saved-mode fallback; manual Cinema/Compact/Two-Pane remain hard overrides.",
+    "diagnostics": "Window 1194 displays normalized display/view/refresh/power/motion/baseline/UI-health state.",
+    "focus": "Drawer stores/restores Infinity.LastDrawerFocus.",
+    "motion": "Non-player optional focus zoom is gated by Infinity.OptionalMotionAllowed; player remains locked Candidate 31.",
+    "refresh_proof": "Playback & Performance and Runtime Dashboard show requested vs active Hz/status; selector fills require confirmed owner state.",
+    "runtime_badges": "Home footer and drawer consume Infinity.RuntimeBadgeLine when enabled.",
+    "safe_area": "Wide drawer scrim/pane behavior consumes Infinity.SafeAreaClass and Infinity.EffectiveLayout; narrow/cover remains overlay by locked-board design."
+  },
+  "screen_adaptation_163": {
+    "coordinate_policy": "Each alias keeps the target folder's authored logical width/height; only aspect matching expands. This preserves full-screen edge/footer geometry while Kodi scales the profile to the physical output.",
+    "landscape_fold_tablet_routes_to": "6x5",
+    "landscape_standard_routes_to": "16x9",
+    "landscape_wide_routes_to": "20x9",
+    "portrait_fold_tablet_routes_to": "5x6",
+    "portrait_phone_routes_to": "portrait",
+    "preserved": "1.0.5.162 direct view-mode activation, 1.0.5.161 glass handle, Home compositions, navigation, player, providers, Command Center and native engine",
+    "rotation_behavior": "Kodi may select the nearest explicit paired aspect profile after Android orientation/display changes, reducing fallback to the 16x9 default on non-exact ratios",
+    "scope": "addon skin resolution/aspect routing + release metadata only",
+    "source": "locked Infinity Mobile 1.0.5.162 Direct View Runtime Activation Fix",
+    "strategy": "reuse the five accepted authored geometry families instead of scaling or redesigning individual screens"
+  },
+  "settings_access": {
+    "drawer_skin_settings": "ActivateWindow(SkinSettings)",
+    "home_kodi_settings": "ActivateWindow(Settings)",
+    "responsive_settings_preserved": true,
+    "settings_level_control_preserved": true
+  },
+  "side_invoke_handle_glass_161": {
+    "focus_feedback": "100ms glass zoom 100->104, edge intensity increase, and accent bloom",
+    "preserved": "all onclick/onleft/onright actions, MediaMenu semantics, panel contents/layout, providers, player and native/runtime contracts",
+    "scope": "SideBlade invoke handle visual finish only",
+    "source": "1.0.5.160",
+    "theme_adaptation": "existing InfinityPaletteGlassSurface/Focus/Shadow and InfinityLegacy Surface/Accent/Scrim tokens",
+    "touch_target": "preserved at left 394 / top 372 / width 126 / height 228",
+    "visible_glass": "left 416 / top 372 / width 78 / height 228"
+  },
+  "sidebar_revision": {
+    "action_order_changed": false,
+    "control_geometry_changed": false,
+    "forensic_rejected_version": "1.0.5.156",
+    "home_weather_changed": false,
+    "native_crash_fix_verified": false,
+    "new_controls": 0,
+    "new_shared_includes": 0,
+    "removed_controls": 0,
+    "source": "locked mobile 1.0.5.155",
+    "version": "1.0.5.159",
+    "view_selector_behavior": "Static window 1130 closes before Container.SetViewMode so the command targets the underlying media window; no script.skinvariables buildviews reload.",
+    "view_selector_reload_bypass": true
+  },
+  "skin_api": "1.0",
+  "skin_id": "skin.infinity.diggz",
+  "skin_version": "1.0.5.275",
+  "supports": [
+    "light",
+    "dark",
+    "OLED",
+    "adaptive_layout",
+    "safe_insets",
+    "performance_motion",
+    "high_refresh"
+  ],
+  "system_dialog_style": "Infinity Glass / responsive notifications",
+  "system_hub_authorization_polish_167": {
+    "authorization_icon": "infinity_ui/icons/lock.png",
+    "authorization_route": "RunAddon(script.infinity.authsurface)",
+    "authorization_subtitle": "Trakt, Debrid and connected service authorization",
+    "player_provider_native_changed": false,
+    "power_options_restored": true,
+    "profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "source": "locked Infinity Mobile 1.0.5.166"
+  },
+  "theme_contract": "1.0",
+  "theme_revision_property": "Infinity.ThemeRevision",
+  "theme_source": "Infinity",
+  "ui_health": {
+    "backup_policy": "same-skin-version-only; restore-only-unhealthy-files; never auto-restore during active playback",
+    "compatibility_ids": {
+      "Home.xml": [
+        9081,
+        9082,
+        9083
+      ],
+      "VideoOSD.xml": []
+    },
+    "critical_files": [
+      "Home.xml",
+      "FileBrowser.xml",
+      "AddonBrowser.xml",
+      "VideoOSD.xml",
+      "DialogSeekBar.xml",
+      "DialogButtonMenu.xml"
+    ],
+    "required_ids": {
+      "AddonBrowser.xml": [
+        50
+      ],
+      "FileBrowser.xml": [
+        411,
+        412,
+        413,
+        414,
+        415,
+        450,
+        451
+      ],
+      "Home.xml": [
+        9000,
+        9100,
+        9090
+      ],
+      "VideoOSD.xml": [
+        87,
+        200,
+        201,
+        202,
+        204,
+        205,
+        250,
+        253,
+        255,
+        257,
+        260,
+        261,
+        262,
+        263,
+        264,
+        272
+      ]
+    },
+    "schema": 3
+  },
+  "unified_fold_composition": true,
+  "version": "1.0.5.275",
+  "view_modes_audited": [
+    "normal",
+    "cinema",
+    "compact",
+    "twopane"
+  ],
+  "view_runtime_activation_fix_162": {
+    "fix": "Load enabled MyVideoNav view controls independent of script.skinvariables mappings, use each view\u2019s native content visibility condition, and restore single direct Container.SetViewMode(target) actions in selector 1130.",
+    "preserved": "1.0.5.161 adaptive glass side handle, panel layout/actions, providers, playback, Command Center, runtime API and native engine",
+    "root_cause": "1.0.5.158 bypassed script.skinvariables buildviews to avoid the crash-adjacent reload path, but MyVideoNav and individual view controls still honored the stale generated Exp_View_* mappings. The selector therefore exposed views whose target controls were not loaded or not visible, so Container.SetViewMode became a no-op.",
+    "scope": "16x9 MyVideoNav view availability/visibility + custom_1130 selector execution only",
+    "script_skinvariables_buildviews_used": false,
+    "selector_auto_close_removed": true,
+    "skin_reload_required_for_selection": false,
+    "source": "locked Infinity Mobile 1.0.5.161 Adaptive Glass Side Invoke Handle",
+    "view_reset_to_50_removed": true
+  },
+  "view_selector_click_fix_159": {
+    "fix": "Close selector first, reset to view 50 for Kodi view-switch reliability, then apply requested view ID.",
+    "root_cause": "Container.SetViewMode was executed while modal window 1130 was still active, so it targeted the selector instead of the underlying MyVideoNav container.",
+    "scope": "16x9 custom_1130_Views.xml item onclick sequencing only",
+    "script_skinvariables_buildviews_used": false,
+    "skin_reload_required": false,
+    "source": "Infinity Mobile 1.0.5.158 View Selector Reload Bypass",
+    "superseded_by": "1.0.5.162 direct view runtime activation fix after stale Exp_View_* gating was confirmed"
+  }
+}

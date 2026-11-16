@@ -1,0 +1,2610 @@
+{
+  "base": "Exact locked Infinity Mobile 1.0.5.166 + System Hub Authorization & Accounts polish only",
+  "brand_system_1_0": {
+    "base": "exact locked Change 32M-H6 / 1.0.5.84",
+    "cinema": "BIGGER STORIES. DEEPER IMMERSION.",
+    "command_center": "0.3.5.11 unchanged",
+    "compact_microline": "WITHOUT LIMITS",
+    "core": "INFINITY",
+    "intentional_protected_visual_copy_changes": [
+      "16x9/Custom_1192_InfinityPerformance.xml",
+      "16x9/Custom_1193_InfinityBrowse.xml",
+      "16x9/Custom_1194_InfinityCommandCenter.xml",
+      "16x9/Custom_1198_InfinityNav.xml",
+      "16x9/DialogNotification.xml",
+      "16x9/Home.xml",
+      "16x9/Includes.xml",
+      "16x9/IncludesVariables.xml",
+      "16x9/Variables.xml",
+      "20x9/Custom_1192_InfinityPerformance.xml",
+      "20x9/Custom_1193_InfinityBrowse.xml",
+      "20x9/Custom_1194_InfinityCommandCenter.xml",
+      "20x9/Custom_1198_InfinityNav.xml",
+      "20x9/Home.xml",
+      "5x6/Custom_1192_InfinityPerformance.xml",
+      "5x6/Custom_1193_InfinityBrowse.xml",
+      "5x6/Custom_1194_InfinityCommandCenter.xml",
+      "5x6/Custom_1198_InfinityNav.xml",
+      "5x6/Home.xml",
+      "6x5/Custom_1192_InfinityPerformance.xml",
+      "6x5/Custom_1193_InfinityBrowse.xml",
+      "6x5/Custom_1194_InfinityCommandCenter.xml",
+      "6x5/Custom_1198_InfinityNav.xml",
+      "6x5/Home.xml",
+      "addon.xml",
+      "infinity-skin.json",
+      "portrait/Custom_1192_InfinityPerformance.xml",
+      "portrait/Custom_1193_InfinityBrowse.xml",
+      "portrait/Custom_1194_InfinityCommandCenter.xml",
+      "portrait/Custom_1198_InfinityNav.xml",
+      "portrait/Home.xml"
+    ],
+    "primary_tagline": "ENTERTAINMENT WITHOUT LIMITS.",
+    "protected_hashes_refreshed_after_brand_pass": true,
+    "source_change33_package": "Infinity-Diggz-1.0.5-C34-Change-33-Unified-Brand-System.zip",
+    "source_change33_sha256": "da0ff7f93a24b0849718f51cde1bcc89f3d5641fd19d21cc567f6874c6566a69",
+    "source_change33_version": "1.0.5.73",
+    "system_surfaces": [
+      "INFINITY SYSTEM HUB",
+      "INFINITY COMMAND CENTER",
+      "INFINITY HEALTH CENTER"
+    ]
+  },
+  "candidate": 275,
+  "candidate_locked": false,
+  "candidate_version": "1.0.5.275",
+  "canonical_home_class": "tall",
+  "canonical_home_trial": false,
+  "canonical_profile": "unified",
+  "change31": {
+    "allowed_existing_file_changes": [
+      "addon.xml",
+      "resources/icon.png",
+      "resources/fanart.jpg",
+      "16x9/Startup.xml",
+      "16x9/custom_1101_Startup.xml",
+      "16x9/DialogBusy.xml"
+    ],
+    "allowed_new_files": [
+      "20x9/Startup.xml",
+      "20x9/custom_1101_Startup.xml",
+      "20x9/DialogBusy.xml",
+      "6x5/Startup.xml",
+      "6x5/custom_1101_Startup.xml",
+      "6x5/DialogBusy.xml",
+      "5x6/Startup.xml",
+      "5x6/custom_1101_Startup.xml",
+      "5x6/DialogBusy.xml",
+      "portrait/Startup.xml",
+      "portrait/custom_1101_Startup.xml",
+      "portrait/DialogBusy.xml"
+    ],
+    "cinema_mode": "Originally protected in Change 31; superseded only by explicit Change 32M merge",
+    "command_center": "0.3.5.6 unchanged",
+    "manifest_normalization": "Protected-file hashes were refreshed against the exact locked Change 30 package before applying the intentional addon.xml metadata hash. No protected runtime file was changed by this normalization.",
+    "rollback_base_sha256": "cd3f61e5e31a69813ac7ca287b6dc1703f0c7c3742ac129d1b494552fcdfc2ec",
+    "scope": "startup + loading + add-on identity only"
+  },
+  "change33_h6_merge": {
+    "base": "exact locked H6 / 1.0.5.84",
+    "base_sha256": "9fb79e3785d7d3d0abc18a2b59d8acf996be1ae6152b045aeeeaf66fecb58735",
+    "brand_source": "Change 33 Unified Brand System 1.0 / 1.0.5.73",
+    "brand_source_sha256": "da0ff7f93a24b0849718f51cde1bcc89f3d5641fd19d21cc567f6874c6566a69",
+    "cinema_handoff": "H4 VIEW MODES -> universal side drawer retained",
+    "command_center": "0.3.5.11 unchanged",
+    "merge_method": "three-way text merge for overlapping Home/Nav files using Change32M common ancestor; Change33 non-overlap branding files transplanted; runtime/action semantics gated",
+    "normal_contract": "H6 original Normal retained; AUTO/Cinema hero must not bleed into Normal"
+  },
+  "change33m_h6_r1": {
+    "base": "Change 33M-H6 Unified Brand System / 1.0.5.86",
+    "cinema_view_modes": "preserved from H4/H6",
+    "command_center": "0.3.5.11 unchanged",
+    "locked_ancestry": "H6 / 1.0.5.84",
+    "normal_rule": "explicit VisualMode=normal suppresses AUTO hero and is republished on Home load",
+    "version": "1.0.5.88"
+  },
+  "change34": {
+    "base": "exact locked Change 33M-H6-R1 / 1.0.5.88",
+    "cinema_view_modes": "H4 VIEW MODES side-drawer handoff preserved",
+    "command_center": "0.3.5.11 unchanged",
+    "motion": "rail handoff + stage settle + MENU + Quick/Deep bottom sheets + focus lift",
+    "normal": "H6 original Normal and R1 Normal-state precedence preserved",
+    "scope": "Cinema presentation/motion only",
+    "trim": "bottom sheets shrink only unused/dead presentation space; action/control ownership unchanged"
+  },
+  "change35": {
+    "base": "exact locked Change 34 / 1.0.5.90",
+    "cinema_view_modes": "H4 VIEW MODES preserved",
+    "command_center": "0.3.5.11 unchanged",
+    "deep_stage": "MORE MENUS expands second stage",
+    "menu_indicator": "font-safe ASCII caret",
+    "normal": "H6/R1 protected",
+    "quick_stage": "first MENU activation",
+    "scope": "Cinema two-stage drawer presentation only"
+  },
+  "compact_continue_watching_115": {
+    "base_sha256": "3fb40157613208a8682de985e6cb2f7b0b04164edfc2f8f42de200331001c502",
+    "base_version": "1.0.5.113",
+    "cinema_untouched": true,
+    "device_acceptance_required": true,
+    "mode": "compact-only",
+    "normal_untouched": true,
+    "playback_provider_bound": false,
+    "profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "progress_broker": "plugin.video.themoviedb.helper",
+    "provider_examples": [
+      "POV",
+      "Umbrella",
+      "Seren",
+      "other configured TMDb Helper players"
+    ],
+    "runtime_tested": false,
+    "sections": [
+      "movies",
+      "tvshows"
+    ],
+    "status": "candidate_not_locked",
+    "tv_route": "trakt_ondeck / tv",
+    "twopane_untouched": true
+  },
+  "compact_stack_alignment_116": {
+    "base_version": "1.0.5.115",
+    "intentional_added_files": [
+      "INFINITY_COMPACT_ALIGNMENT_1_0_5_116.txt"
+    ],
+    "intentional_edited_files": [
+      "addon.xml",
+      "infinity-skin.json",
+      "16x9/Home.xml",
+      "20x9/Home.xml",
+      "6x5/Home.xml",
+      "5x6/Home.xml",
+      "portrait/Home.xml",
+      "Infinity-Protected-Manifest.json"
+    ],
+    "locked_base_remains": "1.0.5.113 until device acceptance",
+    "movies_continue_watching": true,
+    "profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "portrait",
+      "5x6"
+    ],
+    "provider_neutral": true,
+    "runtime_tested": false,
+    "scope": "compact-only no-overlap geometry correction",
+    "status": "candidate_not_locked",
+    "supersedes_candidates": [
+      "1.0.5.114",
+      "1.0.5.115"
+    ],
+    "tv_continue_watching": true,
+    "version": "1.0.5.116"
+  },
+  "continuity_189": {
+    "apk_unchanged": 2103293,
+    "explicit_protected_exceptions": {
+      "addon.xml": {
+        "after": "4e94c21e9bb306c349310670a3d8a8a10b517d57e3c445d6811202ce746122ef",
+        "before": "0ea7c862433cebc5e1637bf83fb811620c613a877e4abcb0b56cbda03f13014f"
+      },
+      "infinity-skin.json": {
+        "after": "eb42ea98a1aca2d79d15e3128609bd32343bac6ff7407c970fe71ef333f94d84",
+        "before": "35093a75f773a319110cce1d249eae49c29f6fa54754751b7c2dcf29301a747c"
+      },
+      "resources/lib/infinity_native_ambient.py": {
+        "after": "7ba2fb298b2bc48ab98de0584062493d16a64cc697a5366aa08a8a0632c469e1",
+        "before": "a86680d67679a9c5dd0910cb182008198ab20c6e018580b8038148e5ead0eb8a"
+      },
+      "unified/AddonBrowser.xml": {
+        "after": "2d4ac50b8f92dcc1b5cc8dd7e39eacb58d01a810cf6847be49156177d4ebd16c",
+        "before": "eaa0af04e68e88f0bbaa23fda98a0acd16567aaa8f35f90b4d43120f1e63e07b"
+      },
+      "unified/Custom_1191_InfinitySystemHub.xml": {
+        "after": "8ae078e0ca2e6b65a69ef69f18890d00e38971a977efcebdfdcfc966a56c390d",
+        "before": "34956e08db79efef67c6f78c7d37cd28b237725477bd921bca16b5ec65d65d7c"
+      },
+      "unified/DialogButtonMenu.xml": {
+        "after": "b86a41f19199cea67249b4fdedd55bdf1f3116e4f66f56f4a490cb7eccee27a9",
+        "before": "d91ed8ce9ef67204a6fd69a0bc8e4eeb7a7782b640c50e32e944b24c8ddefcc2"
+      },
+      "unified/Home.xml": {
+        "after": "5560cae56d47170d965b0dea2647657a4621a8e07bb6714fd743548d72cdb6de",
+        "before": "4829e2ac07ffbe006632bf26ecbb6d8c4b672ff0cb14398df98621f716864a67"
+      },
+      "unified/Includes_InfinityHomeUnified.xml": {
+        "after": "c97c96767502176d01d733dbe69592de4187beca0c897483353601a7c346870f",
+        "before": "925ebde88edb833cc8cf0b7c0f241a890abc434b1c49c0a2ea0e5edbe9ed32db"
+      }
+    },
+    "native_marker_bridge": "only when Infinity.InPlaceReflow=true",
+    "no_provider_or_player_mutations": true,
+    "parent_manifest_sha256": "1dbdef9f941a24d1cdf25573fe44481ebf42f5c65353c0f3d667783305c809c5",
+    "physical_tested": false,
+    "process_death_widget_cache": false,
+    "removed_display_only_widget_revision": true,
+    "trace_contains_content": false
+  },
+  "core_reflow_only": true,
+  "core_reflow_only_trial": true,
+  "corrective_231": {
+    "final_lock": false,
+    "no_self_heal_or_user_data_reset": true,
+    "physical_fold_verified": false,
+    "source_parent_commit": "2a9b6ae6bd0556b2f7b13a786a6382850b05cd83"
+  },
+  "critical_232": {
+    "compact_header_only": true,
+    "final_lock": false,
+    "physical_fold_verified": false,
+    "source_parent_commit": "4e4ca79f134ce9b0ac22c66cd13e246a11207de8"
+  },
+  "current_release": {
+    "baseline": "exact locked 1.0.5.200",
+    "baseline_sha256": "576f74c262bf2d28b09a1174ca96d81505d27b7933a07a009917184b4b114a87",
+    "physical_device_verified": false,
+    "requires_apk": 2103306,
+    "scope": [
+      "all settings categories",
+      "nested selector/color/view/widget forms",
+      "Kodi settings templates",
+      "native automatic switch placement",
+      "per-page scrolling",
+      "theme and reduced-motion consistency"
+    ],
+    "screensaver_candidate": "421",
+    "screensaver_id": "screensaver.arctic.mirage",
+    "status": "candidate; device acceptance pending",
+    "title": "Complete Settings Audit and Polish RC1",
+    "version": "1.0.5.201"
+  },
+  "custom_addon_rails_218": {
+    "apk_changed": false,
+    "base_sha256": "486aa86c8f8dcda31d80c6d058f4b96154dcb2b3f1a18cfa464c65e280ec7e70",
+    "base_version": "1.0.5.215",
+    "baseline_record_commit": "85b1305ef7a220dd23aaeb40c7d38150b8da4a92",
+    "full_skin_zip": true,
+    "helper_version": "0.2.0",
+    "locked": false,
+    "menu_owner": "DialogContextMenu.xml, scoped Rails/add-on branch; original non-add-on branch retained",
+    "modes": [
+      "normal",
+      "cinema",
+      "compact",
+      "twopane"
+    ],
+    "physical_device_verified": false,
+    "rails_source_record_commit": "faae58d7594b8be1e423e119ddd1e1c9839767fd",
+    "rc2_helper_sha256": "b0d0b293cc66d937cb82dd6c8ac9e97956e67f88efec10e764d4631540f7a9da"
+  },
+  "custom_addon_rails_220_context_repair": {
+    "apk_modified": false,
+    "base_218_sha256": "271c323f049696cbb7f539be75a662f8ae8ab23f322c4ccd731d3e65cec96a5f",
+    "chooser": "helper .0.2.2 uses Kodi-native DialogSelect instead of missing helper-owned XML",
+    "device_acceptance_required": true,
+    "foundation_version": "1.0.5.215",
+    "helper_required": "0.2.2",
+    "native_context_menu": "all 14 DialogContextMenu.xml restored BYTE IDENTICAL to verified .215",
+    "parent_version": "1.0.5.218",
+    "status": "host candidate, device not tested, NOT LOCKED",
+    "unchanged_approved_rails": "all Home.xml, all rail includes, saved card schema and layout"
+  },
+  "custom_addon_rails_221_input_fix": {
+    "android_apk_modified": false,
+    "change": "14 rail static fallbacks shown only if helper absent or listing failed; 14 Cinema menus split dynamic vs legacy",
+    "global_input_keymap_modified": false,
+    "helper_required": "0.2.3",
+    "parent_skin_sha256": "4595d5294cf9858897e1d100e2b8604527c5ef944e84a1b40dc50d5748b5ff1f",
+    "parent_version": "1.0.5.220",
+    "physical_fold_acceptance_required": true,
+    "protected_foundation": "1.0.5.215",
+    "status": "test_candidate\u2014not device verified\u2014not locked",
+    "userdata_schema_changed": false
+  },
+  "deep_cleanup": {
+    "backend_build_commit": "69305d740317753c863994516709cef85be56f62",
+    "backend_run": 34778736661,
+    "backend_version_code": 2103126,
+    "backend_version_name": "1.0.9-Deep-Cleanup-1",
+    "background_integrity_interval_seconds": 30,
+    "base_sha256": "dddcb621acfee4f287efb87adc53aaf227a7bb58f44a177b2724447a15d4fc64",
+    "base_user_locked": true,
+    "base_version": "1.0.5.96",
+    "command_center_version": "0.3.5.12",
+    "install_surfaces": [
+      "native APK",
+      "Command Center add-on",
+      "skin add-on"
+    ],
+    "lock_control": 262,
+    "manual_integrity": "immediate",
+    "player_static_structure": "unchanged from locked .96",
+    "protected_policy": "retain every prior protected path; add packaged XML/JSON except the hash manifest and runtime-generated shortcut/view-type includes",
+    "recovery_restores_skin_runtime": "1.0.5.96",
+    "recovery_skin_version": "1.0.5.99",
+    "rotation_control": 263,
+    "runtime_generated_exclusions": [
+      "16x9/script-skinshortcuts-includes.xml",
+      "16x9/script-skinviewtypes-includes.xml"
+    ],
+    "runtime_tested": false,
+    "status": "candidate_not_locked",
+    "version": "1.0.5.98"
+  },
+  "delivery_195_previous_release": {
+    "baseline": "1.0.5.190 / APK 2103302",
+    "command_center": "0.3.5.20",
+    "native_responsive_marker_enabled": false,
+    "profiles": [
+      "unified"
+    ],
+    "requires_apk": 2103303,
+    "runtime_tested": false,
+    "status": "source candidate; physical acceptance pending; historical crash and takeover ownership unproven",
+    "title": "Mobile repair candidate",
+    "version": "1.0.5.194"
+  },
+  "delivery_196_previous_release": {
+    "baseline": "1.0.5.194 / APK 2103303",
+    "command_center": "0.3.5.20",
+    "deferred_movie_video_framing_changed": false,
+    "locked_baseline_zip_sha256": "7e20256adb34354cea6eb9cc1ec696885c2f9c6625ba4667a1210bbe14e4782a",
+    "native_responsive_marker_enabled": false,
+    "profiles": [
+      "unified"
+    ],
+    "repair_xml": {
+      "unified/Custom_1197_InfinityDisplayMode.xml": {
+        "after": "6627fc3b7ee5b4cf50b0d819c0a21cb7bad3d739d024712a8745f8b24f83e8f8",
+        "before": "cd2f3abc4ec595e552199d7312afd921f58aaed5d559923e16629324f91942a9"
+      },
+      "unified/Custom_1198_InfinityNav.xml": {
+        "after": "437fd869facc7c35b2f32e3fd229c81eed65ee6ec5bfeb41730e3e5b48bb9651",
+        "before": "cbee0b0c739662cb258036905c81810fdf985f2217df637dec1a49192a9bad87"
+      },
+      "unified/DialogButtonMenu.xml": {
+        "after": "245676178d6d750537769f83215cd706a536fbc497568ec0a43c4306bb06caad",
+        "before": "b86a41f19199cea67249b4fdedd55bdf1f3116e4f66f56f4a490cb7eccee27a9"
+      },
+      "unified/DialogMediaSource.xml": {
+        "after": "8f246e30631f89953c93be433131cdf46e346597b09eaa61e6118629b34d92ba",
+        "before": "fc8f792fcd428ed77107180c4e158e0e8f5098d728b9dff315210dc340445ca4"
+      },
+      "unified/Home.xml": {
+        "after": "11ef0072eec4c117e0b02a3ede9f8f592cb1956ed8433e19f249efddb4d598ac",
+        "before": "21567d1041551fed8ef3ca5abf6380b43df653af161a1967c6db164a1401aab2"
+      },
+      "unified/IncludesVariables.xml": {
+        "after": "65511e4e198a68255f8d104c66afd9541c911086555c7f761513f5491749ebc9",
+        "before": "c173a8a3782102bf55de215ced4b81269bd2b36a9a46ba878f81a540f698dff5"
+      },
+      "unified/VideoOSD.xml": {
+        "after": "d427fa90f3089a9d2e4ed18eac220a4fd96ee126b55f3340e0c3704c3b1c546d",
+        "before": "6dbca06ae078b399ca0f0beccd086afd942c445e2aa699893d2571267082b2b2"
+      }
+    },
+    "requires_apk": 2103304,
+    "runtime_tested": false,
+    "status": "package/source verified; physical acceptance pending",
+    "title": "Responsive Repair RC1",
+    "version": "1.0.5.195"
+  },
+  "delivery_197_previous_release": {
+    "baseline": "exact locked 1.0.5.195 / APK 2103304",
+    "command_center": "0.3.5.20",
+    "deferred_movie_video_framing_changed": false,
+    "locked_baseline_zip_sha256": "c5290ee4352ba8b0b60af9222b4e7b032c40c2d1ccef4d1a4387699f9a5c83f9",
+    "native_responsive_marker_enabled": false,
+    "open_runtime_gates": [
+      "native graceful-exit completion",
+      "Umbrella source/resolver sizing and Back freeze",
+      "idle screensaver takeover ownership",
+      "physical fold/orientation/theme/touch matrix"
+    ],
+    "physical_device_verified": false,
+    "profiles": [
+      "unified"
+    ],
+    "repair_xml": {
+      "unified/Custom_1198_InfinityNav.xml": {
+        "after": "25b60eaca60f927ab364b733604fa1a740d5834922dbfb1e7e71fa24428add0b",
+        "before": "437fd869facc7c35b2f32e3fd229c81eed65ee6ec5bfeb41730e3e5b48bb9651"
+      },
+      "unified/Home.xml": {
+        "after": "e621925860065cc631070a0b28653e9ff323e7974c1f1cf0fc8a8c3d4375e90a",
+        "before": "11ef0072eec4c117e0b02a3ede9f8f592cb1956ed8433e19f249efddb4d598ac"
+      }
+    },
+    "requires_apk": 2103305,
+    "runtime_tested": false,
+    "scope": [
+      "Power-ended initial drawer viewport",
+      "outline-only hamburger focus",
+      "unique UI Theme control ID and focus marker"
+    ],
+    "status": "package/source verified; physical acceptance pending",
+    "title": "Drawer Follow-up RC1",
+    "version": "1.0.5.196"
+  },
+  "delivery_198_previous_release": {
+    "back_freeze_resolved": false,
+    "baseline": "exact locked skin 1.0.5.196 / APK 2103305",
+    "deferred_movie_video_framing_changed": false,
+    "native_responsive_marker_enabled": false,
+    "physical_device_verified": false,
+    "profiles": [
+      "unified"
+    ],
+    "requires_apk": 2103305,
+    "scope": [
+      "stable focused Add-on Browser typography",
+      "palette-following focused text and surface",
+      "existing cyan focus rim"
+    ],
+    "shutdown_changed": false,
+    "source_select_repaired_by_skin": false,
+    "status": "source/package verified; physical acceptance pending",
+    "title": "Browser Focus RC1",
+    "version": "1.0.5.197"
+  },
+  "edge_fit_repair": true,
+  "experience_173": {
+    "baseline": "Infinity-Mobile-1.0.5.172-End-to-End-Glass-Candidate.zip",
+    "baseline_sha256": "beacde41b8a0c56941cc70f54145dfbb760f31a129283b71c45b44c1b27ad24c",
+    "controller": "0.3.5.17",
+    "device_acceptance_required": true,
+    "runtime_tested": false,
+    "scope": "Nine integrated experience extensions; native Cobra unchanged"
+  },
+  "fold_corrective_230": {
+    "cobra_changed": false,
+    "explicit_protected_exceptions": {
+      "16x9/AddonBrowser.xml": {
+        "after": "664ac272c38f925e5bdcbb07c10f333aad7c33bdab97bec3d03e208cff8f0c68",
+        "before": "bda0bcf37658e299eb8eb83796353d5f18b0dc5d205a8dd8c9e05df1365743ff"
+      },
+      "16x9/Custom_1191_InfinitySystemHub.xml": {
+        "after": "6d60e4b57f90c28049c24473f979c521ac64fc51a2f9dc7e67498672494c2fb1",
+        "before": "359ec2cbf55f1437e79b498cb87e5303884ba49a04eb94182eab3458cdafe205"
+      },
+      "16x9/Home.xml": {
+        "after": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+        "before": "44d4377bacc7d3898223e2cfb6d3add73b8da61e3ba8511d5151b0761b653cfa"
+      },
+      "16x9/Includes_InfinityHomeUnified.xml": {
+        "after": "a8a94bb9bd3eebcde57453db2de9a16fd99e6f6d8f16f3cee8419458a58447eb",
+        "before": "f5c2f7a7929a6dda901755d180252e30998db7f2001105963b13281fb06ae9dc"
+      },
+      "16x9/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "16x9/MyVideoNav.xml": {
+        "after": "6ba4e269f5efaf9d1a012177f29e6bebb61391f818b5981d84823d6ed585fe6d",
+        "before": "fa7fcf8acd3bff6c5ae2133c4385957c22c34e974003e517b7b55137a4673639"
+      },
+      "16x9/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "16x9/VideoOSD.xml": {
+        "after": "545c0181f699f738e2983451b13e6141a7fe0bc416980363dc86581c60ad7d84",
+        "before": "6b2be8668b04fd20ef46c6e9d81a82abd1cf36f13e8e0c6bdfb9e11e2f68637d"
+      },
+      "16x9/View_50_List.xml": {
+        "after": "1604781817f2496fb209a964decbbce921a5af0b3ffae4c071cb020b6a1756ad",
+        "before": "6f658b3a9776f877c73c2900c051afec683a51e3e72ea9aeee60be65da1073cc"
+      },
+      "20x9/AddonBrowser.xml": {
+        "after": "0fe90e7ff9541b7d1e68f39aa5095a876833b57f09b996ab952d6a8cd0138c80",
+        "before": "5c9ceed5801d740b8bd5ff39c9f2cc9dd9d1edea8518abe033214746d311984f"
+      },
+      "20x9/Custom_1191_InfinitySystemHub.xml": {
+        "after": "b21b63349e5b365adf42c9bddb41e640362e3fadf174c2f28bfa5eeffb00949b",
+        "before": "c7f157704dd4900963f0ffd2b7d45ebdfe31fde99a543e80f9ca43689b7feae3"
+      },
+      "20x9/Home.xml": {
+        "after": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+        "before": "44d4377bacc7d3898223e2cfb6d3add73b8da61e3ba8511d5151b0761b653cfa"
+      },
+      "20x9/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "20x9/VideoOSD.xml": {
+        "after": "63e4212fce9e4a209606df1be85184f323e8db88360531beff7e36fa8c07c3ba",
+        "before": "840db23995f676b0a6828246c51e3bacfc25811f9fbbf7b5f5e469ec0089003d"
+      },
+      "5x6/AddonBrowser.xml": {
+        "after": "3cb69978281e68cade95ce2d8a3315aa68cae45b28a741b39a8bf12fc8efc6f3",
+        "before": "345eae6d9cfceee3f8e5e1ffaf6968d046a2ff9ad0a8a660f8ba9934d5ca23f7"
+      },
+      "5x6/Custom_1191_InfinitySystemHub.xml": {
+        "after": "21376124e938ff3f5adf1a1fe4f8cb09a7e6aab07c15022a4cdb9fd1f31020ae",
+        "before": "f242daa6d1c1fd3e25ee6d1ea8a88f495a25024699c251d1d8a2687aa8faf8b5"
+      },
+      "5x6/Home.xml": {
+        "after": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+        "before": "44d4377bacc7d3898223e2cfb6d3add73b8da61e3ba8511d5151b0761b653cfa"
+      },
+      "5x6/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "5x6/VideoOSD.xml": {
+        "after": "18025b0974b186a0ec38cabf141cb0065f9d0e6655aeef019b67711d0ac0493d",
+        "before": "326a22b65f90d266eaea0d38f0e518e46b833b1053a894046582fd5ef8172988"
+      },
+      "6x5/AddonBrowser.xml": {
+        "after": "727cfb2487284f0a6c3701dd3439f238eedcbba9fbdd1eca9ccfd3d1fbd628d2",
+        "before": "aa0b68ba7cb800433b1964dcd3c3bbd0dd198b3d48a6997182c64b1ebc177315"
+      },
+      "6x5/Custom_1191_InfinitySystemHub.xml": {
+        "after": "cdde62422dd3fee208c672a3d419fb546a6a166d49fa7cc671761864177dc9b8",
+        "before": "abb0d8ce237ca333a2090fef3a6ec6e4e3dc6eda788a93c380c63c42ea34cc43"
+      },
+      "6x5/Home.xml": {
+        "after": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+        "before": "44d4377bacc7d3898223e2cfb6d3add73b8da61e3ba8511d5151b0761b653cfa"
+      },
+      "6x5/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "6x5/VideoOSD.xml": {
+        "after": "017021ff3613fe21c3cbcf6ecb3de59ff85abfa089de81307f04e309ee3dc0e6",
+        "before": "0c60dc532985d7bfa5c0ece47e76ae499c1a18624fe4511052fa2c33a6a25734"
+      },
+      "addon.xml": {
+        "after": "635d05cf132c1f02564e4e8c5768e54eaa5af7dc1f28984c2b527a379507c6b8",
+        "before": "ad0fd01468352dfdb0b6be330fa4944dd56e02daad578dbc910def651df38644"
+      },
+      "fallback/AddonBrowser.xml": {
+        "after": "664ac272c38f925e5bdcbb07c10f333aad7c33bdab97bec3d03e208cff8f0c68",
+        "before": "bda0bcf37658e299eb8eb83796353d5f18b0dc5d205a8dd8c9e05df1365743ff"
+      },
+      "fallback/Home.xml": {
+        "after": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+        "before": "44d4377bacc7d3898223e2cfb6d3add73b8da61e3ba8511d5151b0761b653cfa"
+      },
+      "fallback/Includes_InfinityHomeUnified.xml": {
+        "after": "a8a94bb9bd3eebcde57453db2de9a16fd99e6f6d8f16f3cee8419458a58447eb",
+        "before": "f5c2f7a7929a6dda901755d180252e30998db7f2001105963b13281fb06ae9dc"
+      },
+      "fallback/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "fallback/MyVideoNav.xml": {
+        "after": "6ba4e269f5efaf9d1a012177f29e6bebb61391f818b5981d84823d6ed585fe6d",
+        "before": "fa7fcf8acd3bff6c5ae2133c4385957c22c34e974003e517b7b55137a4673639"
+      },
+      "fallback/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "fallback/VideoOSD.xml": {
+        "after": "545c0181f699f738e2983451b13e6141a7fe0bc416980363dc86581c60ad7d84",
+        "before": "6b2be8668b04fd20ef46c6e9d81a82abd1cf36f13e8e0c6bdfb9e11e2f68637d"
+      },
+      "fallback/View_50_List.xml": {
+        "after": "1604781817f2496fb209a964decbbce921a5af0b3ffae4c071cb020b6a1756ad",
+        "before": "6f658b3a9776f877c73c2900c051afec683a51e3e72ea9aeee60be65da1073cc"
+      },
+      "media/infinity_ui/clock_moon.png": {
+        "after": "97dcf6bc19ce904475dee57d664e12a6f88411353e28a7b69478bb653b13bf32",
+        "before": null
+      },
+      "media/infinity_ui/header_dark_clock_safe.png": {
+        "after": "5b1486e6ba0fe1f27e889a048ed3d774cab65adac3e1766b18e441d7a84ab694",
+        "before": null
+      },
+      "portrait/AddonBrowser.xml": {
+        "after": "dfc6526fdb386539f8d8df0ddd387273dd710ce0796392de0ff87cf8044105bc",
+        "before": "1ce9b4245b7cff7eefe92ca5625751a858bb14a96fa1b803f3edf1de40d1d283"
+      },
+      "portrait/Custom_1191_InfinitySystemHub.xml": {
+        "after": "582879686c3ec86948cf78080316588433b06b1d6ae3fccc904474426da22849",
+        "before": "becf08b09741727ea394b8c40f2336000239814f509d0a7f9008daf6807b38af"
+      },
+      "portrait/Home.xml": {
+        "after": "95af1900c472e58079773f2bc15a4f7994cfd369122ce05a0f2513f3108d21f5",
+        "before": "44d4377bacc7d3898223e2cfb6d3add73b8da61e3ba8511d5151b0761b653cfa"
+      },
+      "portrait/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "portrait/VideoOSD.xml": {
+        "after": "39b63a5e6e29d8769b6b340d1c5cd48eb746f8d3823b843e89f4238a6193fd07",
+        "before": "cf9756278c8b7646071499d291dee0a68dfc0a63ce22485bbe8c11a4665c8419"
+      },
+      "responsive/base/AddonBrowser.xml": {
+        "after": "e5756fa85404e12ce5a761513797e1ac702efe77e8fe81e94d59649056a14586",
+        "before": "7d9ff95904c937321d751367db2d97a006f8b2d52524550e28322c8736d25d5e"
+      },
+      "responsive/base/Custom_1191_InfinitySystemHub.xml": {
+        "after": "b57183ee0dc8fa04d3b7a758f674593a2741df41cae4af7ae92a2434f8a33c07",
+        "before": "91200c87890f98e9263323fbe7fe9937226ce6b2ba73515ccf85df7512a6eb37"
+      },
+      "responsive/base/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/base/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/base/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/base/MyVideoNav.xml": {
+        "after": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+        "before": "f0d9aa14a61f94295b3b2511ec5f8b5cefcd4f1bd7cf1c156b922ec48a142d0e"
+      },
+      "responsive/base/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/base/VideoOSD.xml": {
+        "after": "edec96d76977daa3a7a28105ff3bdedb26f98742940239a2e2cc474a662ff133",
+        "before": "b32b472cbc687381f6ebea16820710b5a9b5a98ecbf1e5ea519cb804ac982881"
+      },
+      "responsive/base/View_50_List.xml": {
+        "after": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+        "before": "e133e7372496d378645451cc3f76da4aec48a072e47aa617a4b5c5bc942cc7c5"
+      },
+      "responsive/landscape/AddonBrowser.xml": {
+        "after": "2dde10dae884ff91a69aef7709fa3ade1e73af707f38a1369323eb1396e54ee9",
+        "before": "30798761f3203d072c61a89116f5d89a184b6604701e0af56ad35e5f7d441dcd"
+      },
+      "responsive/landscape/Custom_1191_InfinitySystemHub.xml": {
+        "after": "3ffb911606cd5b8f6d5cf90b37f1b2de1ab24be3c03f10015c9c1c119c702d01",
+        "before": "949bd757e7466b8b19b2b8e062f596704821268971b829e9864fdd317f348829"
+      },
+      "responsive/landscape/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/landscape/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/landscape/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/landscape/MyVideoNav.xml": {
+        "after": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+        "before": "f0d9aa14a61f94295b3b2511ec5f8b5cefcd4f1bd7cf1c156b922ec48a142d0e"
+      },
+      "responsive/landscape/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/landscape/VideoOSD.xml": {
+        "after": "2a3f9ce074a9baa608ba943f7fadf5292d01074bd8d3abc8552535bd5817d47b",
+        "before": "21097df9b405d5725f80b193e9a19340822bda47dd8b487edf9429ee67309592"
+      },
+      "responsive/landscape/View_50_List.xml": {
+        "after": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+        "before": "e133e7372496d378645451cc3f76da4aec48a072e47aa617a4b5c5bc942cc7c5"
+      },
+      "responsive/portrait/AddonBrowser.xml": {
+        "after": "52471ebc5c0787a46e9edb38e119cb662c491cb822bd3abf82166530afe3c19a",
+        "before": "69c87e4ab7760b7e4ec63c46595a002ab54759189ed7b344b372570474a23e93"
+      },
+      "responsive/portrait/Custom_1191_InfinitySystemHub.xml": {
+        "after": "0a383f48df3e8928bcdb0a8c0680f894a6950ce1db1d0fc30dd2aa243183b3b7",
+        "before": "8706a2056163513a13a7330844d39027ca9b762bc540623d9435092a49e9bd6c"
+      },
+      "responsive/portrait/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/portrait/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/portrait/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/portrait/MyVideoNav.xml": {
+        "after": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+        "before": "f0d9aa14a61f94295b3b2511ec5f8b5cefcd4f1bd7cf1c156b922ec48a142d0e"
+      },
+      "responsive/portrait/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/portrait/VideoOSD.xml": {
+        "after": "90fd64abb5324dfce3806ccc9c33e9c1e96489ee56be00eed1816152d8fc4ed5",
+        "before": "b46dd5812b27260f0f6a87eeb0044cc0f6ba3da92a01db34664672d3ff3a9904"
+      },
+      "responsive/portrait/View_50_List.xml": {
+        "after": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+        "before": "e133e7372496d378645451cc3f76da4aec48a072e47aa617a4b5c5bc942cc7c5"
+      },
+      "responsive/square/AddonBrowser.xml": {
+        "after": "19b9cec0a89d7279326033bc8f0c9a3ae9bc468df9af05e23d0ccec416bc5e9b",
+        "before": "724d38f2a84eb7faa417f8028276e304de52a865c48da59f411117444112b8a0"
+      },
+      "responsive/square/Custom_1191_InfinitySystemHub.xml": {
+        "after": "b57183ee0dc8fa04d3b7a758f674593a2741df41cae4af7ae92a2434f8a33c07",
+        "before": "91200c87890f98e9263323fbe7fe9937226ce6b2ba73515ccf85df7512a6eb37"
+      },
+      "responsive/square/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/square/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/square/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/square/MyVideoNav.xml": {
+        "after": "3506e3cbd21a6fa8237dc42cbc94e48a07df0b0bf2241ec4c5433a2e2550490c",
+        "before": "8544c0547a2343ce7f62d3a413272a3f838e7045f7f557f2d84485e58d2c4ae2"
+      },
+      "responsive/square/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/square/VideoOSD.xml": {
+        "after": "b181301f41f0fa3742e30246155103e12c3c0d21565ceeaebf2cc2e30dc5b336",
+        "before": "0cc86e52d57016c729c530b78e6235860753b39eff54a58dbc61930047ceca2d"
+      },
+      "responsive/square/View_50_List.xml": {
+        "after": "8783162437b26d0424e5b71e56e09fa853c5dfe1302be63be5e1a98a90f88102",
+        "before": "bc6fec3c05f6e8bde67fec934c7f3f41a645a16431e068768f1a1d2b26173663"
+      },
+      "responsive/tall/AddonBrowser.xml": {
+        "after": "4afa9b58fa0a2d27bd28d6f7faa8f3344ee6f4428aa7eb59055924a1c1dbf53a",
+        "before": "2c910b45058c9226c24e87cdf1d2ebd1f756c4314a04c6e201c028574346d435"
+      },
+      "responsive/tall/Custom_1191_InfinitySystemHub.xml": {
+        "after": "897e983595028076d1455731dd33a477f11970948f4f57f77080e43720f86a99",
+        "before": "3afd3ace4b844e60c585962099908f381835490db5ba9c429643158796573621"
+      },
+      "responsive/tall/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/tall/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/tall/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/tall/MyVideoNav.xml": {
+        "after": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+        "before": "f0d9aa14a61f94295b3b2511ec5f8b5cefcd4f1bd7cf1c156b922ec48a142d0e"
+      },
+      "responsive/tall/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/tall/VideoOSD.xml": {
+        "after": "6ccfe65882899a261ace3026f6db8ae6e81390ebf67b21a4c317474f4eadcbbf",
+        "before": "03fd44cb828c2358aa74cb11580b045e419220f04b9f84fce983040a72c0f532"
+      },
+      "responsive/tall/View_50_List.xml": {
+        "after": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+        "before": "e133e7372496d378645451cc3f76da4aec48a072e47aa617a4b5c5bc942cc7c5"
+      },
+      "responsive/ultrawide/AddonBrowser.xml": {
+        "after": "26b79a9c5ed7dcfa1f657b57daeed4a621d0ffa0e4d8749250a418bd1335677f",
+        "before": "7680d6169196717772910b348abfaf02c7916b9093e8b9c122a6174ac97555ad"
+      },
+      "responsive/ultrawide/Custom_1191_InfinitySystemHub.xml": {
+        "after": "fa06edfab3d22bf200250faaeb073dbd10cd724042cf1b7a50e5300313c35013",
+        "before": "933d15a8ed50168dbb6a8f75ce37ff23347c82d35017d394a7381db1eb5797e1"
+      },
+      "responsive/ultrawide/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/ultrawide/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/ultrawide/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/ultrawide/MyVideoNav.xml": {
+        "after": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+        "before": "f0d9aa14a61f94295b3b2511ec5f8b5cefcd4f1bd7cf1c156b922ec48a142d0e"
+      },
+      "responsive/ultrawide/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/ultrawide/VideoOSD.xml": {
+        "after": "028df7c140496e55636aa32818272142e8aca6648c38205e52571d5aa412eeee",
+        "before": "b31894947193253a2d6e6fffcafb5b893096a5d44a1d88d59b682dc9765d7ed3"
+      },
+      "responsive/ultrawide/View_50_List.xml": {
+        "after": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+        "before": "e133e7372496d378645451cc3f76da4aec48a072e47aa617a4b5c5bc942cc7c5"
+      },
+      "responsive/wide/AddonBrowser.xml": {
+        "after": "e5756fa85404e12ce5a761513797e1ac702efe77e8fe81e94d59649056a14586",
+        "before": "7d9ff95904c937321d751367db2d97a006f8b2d52524550e28322c8736d25d5e"
+      },
+      "responsive/wide/Custom_1191_InfinitySystemHub.xml": {
+        "after": "b57183ee0dc8fa04d3b7a758f674593a2741df41cae4af7ae92a2434f8a33c07",
+        "before": "91200c87890f98e9263323fbe7fe9937226ce6b2ba73515ccf85df7512a6eb37"
+      },
+      "responsive/wide/Home.xml": {
+        "after": "85dfa342897e9f1586d7264075efbc7a6d240a5116a3ca6680487c6bf5eb5928",
+        "before": "7b94d2074336ceceee86645f1e1c4ca9febaad387cec96c035aa78a142901634"
+      },
+      "responsive/wide/Includes_InfinityHomeUnified.xml": {
+        "after": "077fa70cc156e7dcb1fb1d52b676be2e0b576c093663c09fecdc08a3562d5181",
+        "before": "dbe6ec1e5b3d459384dfc027ee7d0dc29878dcefaa316686d551f1f8cf7dd60a"
+      },
+      "responsive/wide/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "responsive/wide/MyVideoNav.xml": {
+        "after": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+        "before": "f0d9aa14a61f94295b3b2511ec5f8b5cefcd4f1bd7cf1c156b922ec48a142d0e"
+      },
+      "responsive/wide/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "responsive/wide/VideoOSD.xml": {
+        "after": "edec96d76977daa3a7a28105ff3bdedb26f98742940239a2e2cc474a662ff133",
+        "before": "b32b472cbc687381f6ebea16820710b5a9b5a98ecbf1e5ea519cb804ac982881"
+      },
+      "responsive/wide/View_50_List.xml": {
+        "after": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+        "before": "e133e7372496d378645451cc3f76da4aec48a072e47aa617a4b5c5bc942cc7c5"
+      },
+      "unified/AddonBrowser.xml": {
+        "after": "75d5293d407513dc0ed14280b3fbb3cf181a8d9261dfc3393f053873b02a2701",
+        "before": "3248b8d63373ae07aca438f8b74d42b86ecc093ad591a2b62fd24cbb7a61e156"
+      },
+      "unified/Custom_1191_InfinitySystemHub.xml": {
+        "after": "2abf9350fb2517ebca2574ef9d4f76cbf2d956f5556be748ba2c20e3fd2924fe",
+        "before": "f704884362582e28f681902def37e6ea7ad921111f6a526bfa81f2ec16838381"
+      },
+      "unified/Home.xml": {
+        "after": "9e80adba97809f41b0dfdd6fd3aa03609cb7bf3868fa01e76cece8abf0699843",
+        "before": "fb20170a19bfed91eb13216fba59251ba746fa298af4566e7956eac2e841edcb"
+      },
+      "unified/Includes_InfinityHomeUnified.xml": {
+        "after": "5a6ec196bbca08033ea9f7e7db3f411ebe881956d82c7c9c8bd3c0f2dfc97ddc",
+        "before": "f7edef44b47a9e4bca01fa9fa02c44cc78a7ad6f641af853c42360014e446c4f"
+      },
+      "unified/InfinityPlayerSettings.xml": {
+        "after": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+        "before": null
+      },
+      "unified/MyVideoNav.xml": {
+        "after": "fd13bd1161723cf527fea6ee0a9646439ab5cb4ff88c8d3c9b0471f43414358b",
+        "before": "ff9aff5a58b294052b8d1914e9a24e420f05486dcb1d36c986ec8b9140a8770f"
+      },
+      "unified/Variables.xml": {
+        "after": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+        "before": "d8af11cd0901c9aa3049a53dcb5d41c2316e6de0a100ac78bf39ce3a697f2fdd"
+      },
+      "unified/VideoOSD.xml": {
+        "after": "996fb0a2b5a49e03922e0ac277d189654cab65f602d03e0cbff67d61d19e7f8b",
+        "before": "afc0af915b66889b02d85beca86fc86b8a8316f623941c7e1fdd8adc2bc8e787"
+      },
+      "unified/View_50_List.xml": {
+        "after": "ea27150ba3eb2932769fc8ef007fe6b0eb53f81fd8e08b179af0573478710bec",
+        "before": "480d7a1135c0902eacc3d5d515b1acdd3e912fba09b85a21f33c41de9803f261"
+      }
+    },
+    "final_lock": false,
+    "parent_apk_sha256": "d4ae792898b26bbea47b97310244b31304f972f062e692c1562edef3ac0bbd58",
+    "physical_fold_verified": false
+  },
+  "four_repair": {
+    "crash_fixed": false,
+    "native_required": true,
+    "parent_sha256": "8ca8fc72ce24ae88d558d06485345ec37a2cd491ebea5805e169d84acf8ed235",
+    "physical_fold_verified": false,
+    "unchanged_userdata": true
+  },
+  "h4": {
+    "base": "exact user-locked H3 / 1.0.5.77",
+    "command_center": "0.3.5.11 unchanged",
+    "home_controls_changed": [
+      "19518",
+      "19615"
+    ],
+    "scope": "Cinema direct Normal controls -> universal side-drawer mode handoff only",
+    "side_drawer_focus_target": "1198201",
+    "state_change_on_view_modes_open": false
+  },
+  "h6": {
+    "base": "exact user-locked H4 / 1.0.5.80",
+    "cinema_view_modes_handoff": "preserved from H4",
+    "command_center": "0.3.5.11 unchanged",
+    "hero_9800_normal_owner": false,
+    "reference": "Candidate 28 locked design-contract Home structure + C34 Master System Map v1",
+    "scope": "Normal presentation only; restore original pre-four-mode header -> latest releases -> categories -> submenu -> providers hierarchy"
+  },
+  "hash": "SHA-256 of final package files; manifest itself excluded.",
+  "health_center_audit_sync_164": {
+    "changed_profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "footer": "dynamic Window(Home).Property(KHC.Version); no hard-coded Health Center version",
+    "health_center_target": "2.5.9",
+    "preserved": "all non-Health-Center UI, view-mode fixes, adaptive glass handle, screen routing, player/provider/native contracts",
+    "scope": "Health Center custom window version display only + skin metadata",
+    "source": "locked 1.0.5.163"
+  },
+  "historical_base": "MERGED from accepted Deep Branding Change 31 + accepted Cinema Change 32; common locked ancestor Change 30 / 1.0.5.69",
+  "historical_policy": "User-requested merge onto exact locked H6. Apply Change 33 Unified Brand System 1.0 presentation/copy deltas while preserving H6 Original Normal Restoration, H4 Cinema VIEW MODES handoff, Command Center 0.3.5.11 ownership, player/browser/runtime actions, provider routes and responsive mode behavior.",
+  "home_unification_113": {
+    "addon_card_modes": [
+      "normal",
+      "compact",
+      "two-pane"
+    ],
+    "base_sha256": "e3c6b221f4df1caf9353cf158917efc442129310313cb09ffde2300ab25a1d98",
+    "base_user_locked": true,
+    "base_version": "1.0.5.112",
+    "device_acceptance_required": true,
+    "header_order": [
+      "date",
+      "weather"
+    ],
+    "intentional_added_files": [
+      "16x9/Includes_InfinityHomeUnified.xml",
+      "INFINITY_HOME_UNIFICATION_1_0_5_113.txt"
+    ],
+    "intentional_edited_files": [
+      "addon.xml",
+      "infinity-skin.json",
+      "16x9/Includes.xml",
+      "16x9/Home.xml",
+      "20x9/Home.xml",
+      "6x5/Home.xml",
+      "5x6/Home.xml",
+      "portrait/Home.xml",
+      "Infinity-Protected-Manifest.json"
+    ],
+    "profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "protected_runtime_contracts_untouched": [
+      "Cinema",
+      "VideoOSD/player",
+      "AddonBrowser/FileBrowser",
+      "Custom_1198_InfinityNav",
+      "Command Center",
+      "APK/native engine"
+    ],
+    "runtime_tested": false,
+    "scope": "skin-only shared Home component system + visual unification",
+    "shared_include": "16x9/Includes_InfinityHomeUnified.xml",
+    "status": "candidate_not_locked",
+    "time_role": "dominant separate clock aligned to same right edge",
+    "version": "1.0.5.113",
+    "weather_content": "location + temperature + conditions"
+  },
+  "item1_rotate_cyan_228": {
+    "changed_osd_count": 13,
+    "cobra_changed": false,
+    "final_lock": false,
+    "parent_sha256": "cc07fe41ccef2b9eca52b8b273ac5ad9a6c1f498a008d64ac0526a7e62dbe699",
+    "physical_fold_verified": false
+  },
+  "locked_design_boards": {
+    "dark_sha256": "8f47818862605e5affc5bc12d1828eb235961f974816637cffe45b2f86a89126",
+    "light_sha256": "f4adc88db8a68fd675cd6a7c9dec9fd5c00c6cc403480d94691497715d7a8b7e"
+  },
+  "locked_player_baseline": {
+    "candidate": 31,
+    "sha256": "64491f843d98c66f6524d2a382a4995fec1a1db615b891616efece3d5f99f53c"
+  },
+  "merge32m": {
+    "cinema_source": "Change 32 Cinema Motion Handoff Polish",
+    "cinema_source_sha256": "6320f480ff93ebb7d8927aebb270926a05ffbec2e95e4476fd3e2a5ec0eb342a",
+    "command_center": "0.3.5.6 unchanged",
+    "common_ancestor_sha256": "cd3f61e5e31a69813ac7ca287b6dc1703f0c7c3742ac129d1b494552fcdfc2ec",
+    "main_source": "Change 31 Deep Branding / Additive Motion",
+    "main_source_sha256": "fb29ec4d3246c3366c9c0d62df35aa1b42fb9981281fe5bb06f6e89ad6417b40",
+    "new_files": [
+      "INFINITY_CHANGE_32M_MERGE_CONTRACT.txt"
+    ],
+    "reconciled_files": [
+      "addon.xml",
+      "Infinity-Protected-Manifest.json",
+      "INFINITY_CHANGE_31_CONTRACT.txt"
+    ],
+    "transplanted_files": [
+      "16x9/Home.xml",
+      "16x9/Custom_1198_InfinityNav.xml",
+      "20x9/Home.xml",
+      "20x9/Custom_1198_InfinityNav.xml",
+      "6x5/Home.xml",
+      "6x5/Custom_1198_InfinityNav.xml",
+      "5x6/Home.xml",
+      "5x6/Custom_1198_InfinityNav.xml",
+      "portrait/Home.xml",
+      "portrait/Custom_1198_InfinityNav.xml"
+    ],
+    "version": "1.0.5.72"
+  },
+  "merged_cleanup": {
+    "apk_modified": false,
+    "backend_apk_version_code": 2103125,
+    "backend_apk_version_name": "1.0.9-Player-Rotation-1",
+    "backend_commit": "1925438aac2391911fe7f0ac352b2762a7d29096",
+    "backend_run": 34755876464,
+    "base_known_integrity_mismatches": [
+      "addon.xml"
+    ],
+    "base_version": "1.0.5.94",
+    "command_center_modified": false,
+    "intentional_added_files": [
+      "INFINITY_MERGED_CLEANUP_1_0_5_96.txt",
+      "media/infinity_reference/outline.png",
+      "media/infinity_reference/rotate.png",
+      "media/infinity_ui/icons/back.png",
+      "media/infinity_ui/icons/gear.png",
+      "media/infinity_ui/icons/grid.png"
+    ],
+    "intentional_edited_files": [
+      "16x9/DialogContextMenu.xml",
+      "16x9/Includes.xml",
+      "16x9/Variables.xml",
+      "16x9/VideoOSD.xml",
+      "20x9/VideoOSD.xml",
+      "5x6/VideoOSD.xml",
+      "6x5/VideoOSD.xml",
+      "Infinity-Protected-Manifest.json",
+      "addon.xml",
+      "infinity-skin.json",
+      "portrait/VideoOSD.xml"
+    ],
+    "rotation_control": 263,
+    "rotation_setting": "Infinity.PlayerRotationUnlocked",
+    "rotation_state_meaning": "selected UI policy; not native delivery, preference or grant confirmation",
+    "runtime_tested": false,
+    "source_sha256": {
+      "ancestor": "95a4ca496cb0f1b98f79881032bfcbcca4729cc8f8ad09b19c289b3d7a2281c3",
+      "base": "7f928d749fa79c02589c40a8ef50779b6076291fb5049d2483b88a695bd7a510",
+      "rotation": "6c4cc9d780a69b7e963958b3e0525f5a6ed53a6cb52fb10af87ecf7d7d0bc3ed"
+    },
+    "status": "candidate_not_locked",
+    "version": "1.0.5.96"
+  },
+  "mobile_badge_glass_polish_169": {
+    "base_sha256": "71df8f682467bfb46b40221664219f75b0a41b4ae82fc8fb93080c7e60ccf008",
+    "base_version": "1.0.5.167",
+    "change": "Replaced the permanently hidden Home status label with a capability-gated Liquid Glass badge; retained the 20x9 Compact fallback when no badge is active.",
+    "changed_profiles": [
+      "16x9/Home.xml",
+      "20x9/Home.xml",
+      "5x6/Home.xml",
+      "6x5/Home.xml",
+      "portrait/Home.xml"
+    ],
+    "locked_base_preserved": true,
+    "runtime_tested": false,
+    "status": "candidate_not_locked"
+  },
+  "mobile_glass_172": {
+    "base_sha256": "fa6e100b0338f637013e7c5b54d7429e1cea57526d087f210fdafb4613355d18",
+    "base_version": "1.0.5.171",
+    "counts": {
+      "motion_gates": 584,
+      "rims": 355,
+      "textures": 7017,
+      "theme_values": 16
+    },
+    "fixes": "Reduced-motion gates for timed decorative dialog/player animations and busy pulses; OLED legacy surfaces/fields use black rather than blue-gray fills.",
+    "glass": "Layered translucent surfaces and static specular rims, not live backdrop blur/refraction. Four tiny nine-slice RGBA maps; no shaders, added decoders or continuous glass animations.",
+    "limits": "Source and package checks only; Kodi runtime unavailable. All modes, theme contrast, fold/rotation, playback, GPU load and native FD_SET crash still require device acceptance.",
+    "preservation": "Existing control IDs, actions, providers, navigation, visibility and geometry unchanged. Native-controlled background IDs receive no extra rim overlay. Static placement/zoom and state animations retained.",
+    "runtime_tested": false,
+    "scope": "Mobile skin materials: drawer, toasts, shared legacy dialogs/settings, loading, context menus and Home playback dock. Existing fullscreen player OLED adapters retained.",
+    "status": "candidate_not_locked"
+  },
+  "mobile_home_playback_171": {
+    "base_sha256": "1c9882087103339f6ec410fcb7fb010f54a2adca4d99d31393497d8146e72041",
+    "base_version": "1.0.5.170",
+    "controls": "Seek -10/+10 when supported; play/pause, stop, fullscreen. Dock yields to focus in intersecting lower rows; explicit player shortcut opens/focuses the dock. Cinema drawers suppress the dock.",
+    "limits": "Candidate source/static checks only. Android device playback, fold/rotation, and native crash acceptance still required. Unknown 16:9 device facts fail closed.",
+    "mobile": "Android only, rejects reported TV/television device modes. Shared 16:9 profile requires positive phone/tablet/fold/mobile device classification. Dedicated TV packages remain untouched.",
+    "playback": "One Kodi videowindow displays the active video session; no new decoder, playback start/stop on Home load, or provider changes. Live title/time/progress and pause state come from Kodi.",
+    "preservation": "Menu/submenu geometry, full-screen OSD, native engine, provider actions, and locked .170 package are unchanged. Existing hide-now-playing preferences are respected.",
+    "runtime_tested": false,
+    "scope": "Portrait Normal Continue Watching reuses Compact containers 8830/8831. All four view modes in five mobile responsive Home profiles receive native background video and a shared Liquid Glass transport dock.",
+    "status": "candidate_not_locked"
+  },
+  "mobile_normal_view_spacing_170": {
+    "changed_runtime_file": "portrait/Home.xml",
+    "geometry": "In both itemlayout and focusedlayout: surface top 338\u21926; frame 336\u21924; artwork 344\u219212; label 674\u2192342; accent 717\u2192385. Card sizes unchanged.",
+    "parent_locked_source": "1.0.5.169",
+    "parent_sha256": "5ce64886ac6dc8d22cdaef08f23060ea74ac4aae6f5acf5a73e610e0bf585b9e",
+    "runtime_tested": false,
+    "scope": "Portrait Normal view addon-card vertical placement only.",
+    "status": "candidate_not_locked"
+  },
+  "native_responsive_marker_enabled": false,
+  "native_video_ambient": {
+    "apk_parent": 2103282,
+    "capture": "Existing Kodi XBMCVideoView PixelCopy; RenderCapture for non-Surface renderers",
+    "command_center_unchanged": "0.3.5.17",
+    "device_verified": false,
+    "drawer_action": "RunScript(script.infinity.commandcenter,ambient-home)",
+    "drawer_entry": "AMBIENT HOME",
+    "drawer_location": "SYSTEM / directly below SETTINGS",
+    "drawer_modes": [
+      "off",
+      "subtle",
+      "immersive"
+    ],
+    "parent": "4263de3906ea0dc6e24f3c6f04c2f779b0c7a8bbdd31656b82e221402063d1c9",
+    "requires_apk": 2103284,
+    "surface_api": 1
+  },
+  "phase_d_225": {
+    "native_or_userdata_changes": false,
+    "parent_sha256": "e23d5d08c7737f317c2d55ae3f27e8746a019afd02dc20f6fbc73dc48c0c994e",
+    "physical_fold_verified": false,
+    "source_checkpoint": "224965e068bae594daabf4f81fbaba9dcfaae29f"
+  },
+  "player_drawer_contrast": {
+    "apk_modified": false,
+    "base_sha256": "236c73db90370949914f3c7c47a6b1fa15bc43014d59f6390f8b1296b66436cd",
+    "base_user_locked": true,
+    "base_version": "1.0.5.98",
+    "cause": "The player retains a dark surface in Light mode, but drawer foregrounds used general light-theme dark ink.",
+    "cinema_home_modified": false,
+    "command_center_modified": false,
+    "device_acceptance": "Open drawer in Light, Dark and OLED; inspect all rows; focus and open Audio/Video settings; Back/close; rotate/fold.",
+    "disabled": "FFA9BDCC",
+    "focus_background": "FF075F8C",
+    "geometry_actions_navigation_motion": "byte-preserved outside color-only drawer delta",
+    "primary": "FFFFFFFF",
+    "runtime_tested": false,
+    "scope": "Playback drawer contrast only in all five VideoOSD profiles",
+    "secondary": "FFD2E2EE",
+    "shared_palette_modified": false,
+    "status": "candidate_not_locked",
+    "version": "1.0.5.100"
+  },
+  "policy": "Screen-profile routing candidate verification. Existing authored geometry, player, provider, navigation and native behavior are protected. Physical-device rotation/fold acceptance required.",
+  "polish_188": {
+    "apk_unchanged": 2103293,
+    "explicit_protected_presentation_exceptions": {
+      "addon.xml": {
+        "after": "0ea7c862433cebc5e1637bf83fb811620c613a877e4abcb0b56cbda03f13014f",
+        "before": "3d5ce8961de9106a93e424fa501eb9b98a71a4de3aeae524cf5960d702e121e9"
+      },
+      "infinity-skin.json": {
+        "after": "95502eeb4e97674f9d7b2acd9a6c566553968abcb8d7f5fd89ccb63eb6eec121",
+        "before": "4e316ed9503c1664f9b8beb6dc077a41316581b996fd6516b93dd6a740449c36"
+      },
+      "resources/lib/infinity_native_ambient.py": {
+        "after": "a86680d67679a9c5dd0910cb182008198ab20c6e018580b8038148e5ead0eb8a",
+        "before": "334f878658d9e820ea43ef30e2ee93fe4a22930329c88bab8cc078aefdada192"
+      },
+      "unified/AddonBrowser.xml": {
+        "after": "eaa0af04e68e88f0bbaa23fda98a0acd16567aaa8f35f90b4d43120f1e63e07b",
+        "before": "51a5af2b68cc4264e45298bb1a9017c423c511341756412cb0b8434be4238163"
+      },
+      "unified/Custom_1191_InfinitySystemHub.xml": {
+        "after": "34956e08db79efef67c6f78c7d37cd28b237725477bd921bca16b5ec65d65d7c",
+        "before": "1a283f4d5142e2f4bd367f73bff6437f1bcea9360c4b081be6399d5087ed6703"
+      },
+      "unified/Custom_1192_InfinityPerformance.xml": {
+        "after": "e957e175cbafd28386d83089cbf59ba04e76ff6d06e24b5d4fabc1f9245439db",
+        "before": "1f63fd7de53fa42dea63c9a54097a96c42ccbf4e834e2e116cd0d416345009c6"
+      },
+      "unified/Custom_1193_InfinityBrowse.xml": {
+        "after": "b0eeb2092f941c8ea7e709f4f70df410330524f010c4388e22d2635c750cfa19",
+        "before": "600555f185459be3ae5ada60e1b9af2d5a1acd94b5c7ae19fa996f23f55b4850"
+      },
+      "unified/Custom_1194_InfinityCommandCenter.xml": {
+        "after": "f19ef1cc2bd4d0ed3976c6698fdc269e30ed98f1035f8d883e030fc37a485dea",
+        "before": "73c98abd7a0ecb0f53b76e471227600d76c0e7f3dc98bc4e8f2a4be94e40be2b"
+      },
+      "unified/Custom_1198_InfinityNav.xml": {
+        "after": "50007b23b19780cbe1576b3467c887d5455e66aaf8a0410c5bc4151b1415bf3b",
+        "before": "c55f2774ea10dd2037bf11039f131045a0b9eaf860e0e637798f1cd8d3de3a53"
+      },
+      "unified/DialogBusy.xml": {
+        "after": "f9791b1012f555656a92f2478b0e8f1f886e6d30335f2491411070712b0808d6",
+        "before": "0fffca5197b7667c4259951eb0b3cab4cc15a93272d9b137c5c5a2fc3c98b0e4"
+      },
+      "unified/DialogButtonMenu.xml": {
+        "after": "d91ed8ce9ef67204a6fd69a0bc8e4eeb7a7782b640c50e32e944b24c8ddefcc2",
+        "before": "2dc81437c2ff52db8d4b26e89390f9884698dcde30b89870bbb9ac0ebfa7fcb6"
+      },
+      "unified/EventLog.xml": {
+        "after": "173569c6dc2d159f4cc5ef0da5d90eadd3a976097f169945716ec38c044afb75",
+        "before": "655032d2dc55804b708693c54cfa44e83faf46aa652d6462c1f138f5f181ff8c"
+      },
+      "unified/FileBrowser.xml": {
+        "after": "d7e8570fd46bf828dd7c27e01aa83e30d3f71c9024ae1905e04a7fc2e8942492",
+        "before": "1dd72f75eb4cfe73a24feffd31cc42ba642212dd8598a1687b9550e2d3cbfd16"
+      },
+      "unified/Home.xml": {
+        "after": "4829e2ac07ffbe006632bf26ecbb6d8c4b672ff0cb14398df98621f716864a67",
+        "before": "693ea5ef566b1d9bc751b3fd55bdb9f5f404c7d519145b09aa823843fb5fe18c"
+      },
+      "unified/Includes.xml": {
+        "after": "48f2d58eef7e68ff69cf0b99be2822f627e06f0eb7f4ce24333cf65c67cc93ca",
+        "before": "67f0109fba5f5b191c0ad56356e749f6dbad8a5d35af69bfe7fd138ba370ead1"
+      },
+      "unified/IncludesVariables.xml": {
+        "after": "c173a8a3782102bf55de215ced4b81269bd2b36a9a46ba878f81a540f698dff5",
+        "before": "73cee63456f0a45c719a7859f91621f9cea59f9e8847b07009f2c383b762f7fe"
+      },
+      "unified/Includes_CinemaBrowse.xml": {
+        "after": "70120d7a21b67f896dc8543e3c3f49599484960fbe8bfb1e3d0a722f3aba4746",
+        "before": "00d423730e379a3f9896288c5af263928ef10896595a48a90fb341e0c3f3bb8e"
+      },
+      "unified/Includes_CommonValues.xml": {
+        "after": "3e4b7fd89a651af58050ea284873a75a720c8063273d40ebbfd36eb5083767be",
+        "before": "a39c703840c5da3b691f157e1fb21c7601f296e7f5722a652116797903c84846"
+      },
+      "unified/Includes_InfinityLegacy.xml": {
+        "after": "05b03abd21be82ba4b590ced24b26fa8d45e58de5cc7f156504620c9dd3b9827",
+        "before": "be11d326457abe123f5adf7d31f0e1f0d13496746ab9e9806029b80e6efc68a3"
+      },
+      "unified/LoginScreen.xml": {
+        "after": "6ff82bf0d900ba025639c99c38a9b7d8d304d3cda4825f2dbb6f460e3b0060b8",
+        "before": "89d23cc909cdc3cef335d9d0366fc8b6d8d716ea5d59d396a70018043ad8a023"
+      },
+      "unified/MyFavourites.xml": {
+        "after": "760c550d325c689c140b7b31d75a5094b0d321a52861d22c55535b35c5b848dc",
+        "before": "a518f7ba536fc51aa2d6ec178debecca80e064ff660a34dc987d6ddfc51f49fd"
+      },
+      "unified/MyGames.xml": {
+        "after": "4228a95a3c00291c81fc439c11aa9367b7411272eb65ca54ba50de468d48719c",
+        "before": "fdfa413e0b075de831b80d08bb6bc33cef95189e9f90d7dc85a39b9cd0898224"
+      },
+      "unified/MyMusicNav.xml": {
+        "after": "d4ffa6249a65c716002fa224d26152b6b6a7a2b4378d5f0e1e7471eb29c57139",
+        "before": "e9f3324636f8094fe3b5b16e65d20f0499c3890b23331bd01be55118713aa212"
+      },
+      "unified/MyMusicPlaylistEditor.xml": {
+        "after": "b6ba4a889ab2bc16a3775125e9054e86d1326ef57d5b0990aca904bc7d607341",
+        "before": "eb5feb4a0d0278dad44ccca4e2ef36cf902ce48e76d2ba9e404c632cb9b85d7e"
+      },
+      "unified/MyPics.xml": {
+        "after": "592393e319bc52866dd5d4c2bb7d9d1774f794ed0b400590f9403723d3d1ecba",
+        "before": "50278325790771988aeb32182700c1656949321d642391293ff7bdbfe9cb061c"
+      },
+      "unified/MyPlaylist.xml": {
+        "after": "d093fcb41a7586e20af6ffbbfbe0176cd7006740dbd8a81762201f29efc0ef92",
+        "before": "b80b7e47c9e68d73473fbeb5b05fc96efb69b0397cf6d11babfdbc09abae1673"
+      },
+      "unified/MyPrograms.xml": {
+        "after": "2d9a9a69443fd27a67ba2d3816d07d138bcaa6cf63dddedc1b3289d53ac854b9",
+        "before": "dee3730e3eefe82c2c7e7290483bfa23832bafa17e2526a59ecd171e4a41a172"
+      },
+      "unified/MyVideoNav.xml": {
+        "after": "18299647dd0173563d9fc1d9816d536c153ebf10610a10bbdb1f788ef25a2a6f",
+        "before": "a1df9e289bc5df715784429d5c62b5896ecbe8722f40ee751315283fd94da572"
+      },
+      "unified/MyWeather.xml": {
+        "after": "fcba2ad85d26dd53e9eb6c2a3c7d2d4444670261efae859d27473e2df7ead190",
+        "before": "9dac04b349f76479744ba6d5dafb689255c7b9fd3d7078e3c715dbbc396b2677"
+      },
+      "unified/SettingsProfile.xml": {
+        "after": "dcbc69d99710efde986b92e06bb01cf169b51002bded9e1fab46eaf104f2d9dd",
+        "before": "25fc3ae365cd25d30792fc160e0b1181691b0e953190865790441d8c2286517d"
+      },
+      "unified/SkinSettings.xml": {
+        "after": "cd66c914a0aa4e361e97e54d233f685d616e29aa262af537665fb78b0da91e5a",
+        "before": "bc472a8f60ddcc291a7d458d0746f02fcb7856696a10dd96a9b50bdf376070a8"
+      },
+      "unified/VideoOSD.xml": {
+        "after": "92ccb8ca17da7be4c3d008c8531dfb044d03dceb83211323d2e545b5a028ec8e",
+        "before": "2d032750978ca77aa7ec41bdc13c2be05d5d2a6ad8039ec46ab9f0669ffd8f4a"
+      },
+      "unified/custom_1101_Startup.xml": {
+        "after": "d86337bd42584be8cdc60c0413f1a7b67472166f1cd55f5c8fc1c8aae3c6435f",
+        "before": "f4443192338a8afd4a0b2da91c07b2f7a9df2cf9325c12c07695dfa9499d27ee"
+      },
+      "unified/custom_1133_Apps.xml": {
+        "after": "f4b7f73ae8613a5961632f7193032b1b7b7e28aedea8086434a723e3711de251",
+        "before": "683f89f2e730faab52b525cad7c61af87acb5a43b9a3896f70c0b97d0be7aff0"
+      },
+      "unified/script-globalsearch.xml": {
+        "after": "25b45f022c13562017017851c4e1d7c9a2ea6063af6cae89979883bda3554b3b",
+        "before": "93265cf471a5879ac6e6bd87184bbcb74a4557a68a3d2846888e535fd6b921df"
+      }
+    },
+    "parent_manifest_sha256": "09dc36866fad31a4846d1ff26e18d50c78de7b16ae51335e43cfafd0ba4bfe3c",
+    "physical_tested": false
+  },
+  "previous_release_metadata": {
+    "baseline": "1.0.5.184",
+    "command_center": "0.3.5.19",
+    "generic_android_adaptive_canvas": true,
+    "native_engine": "locked 2103291 In-Place Responsive Reflow",
+    "native_responsive_marker_enabled": false,
+    "requires_apk": 2103292,
+    "runtime_tested": false,
+    "scope": "Horizontal edge-fit only; no native/player/provider redesign",
+    "status": "device_acceptance_pending",
+    "title": "Core Reflow Edge-Fit RC1",
+    "view_modes_audited": [
+      "Normal",
+      "Cinema",
+      "Compact",
+      "Two-Pane"
+    ]
+  },
+  "protected_files": {
+    "16x9/AddonBrowser.xml": "63635eb8a96867080b6c9725dc6136d30144baeb33a1b3b890a12ba5e47cb080",
+    "16x9/Custom_1190_InfinityPalette.xml": "97e5213df867c83e6e5deb025e615f74dd3c56ca8b88a9e34e82c72964dabb5f",
+    "16x9/Custom_1191_InfinitySystemHub.xml": "6d60e4b57f90c28049c24473f979c521ac64fc51a2f9dc7e67498672494c2fb1",
+    "16x9/Custom_1192_InfinityPerformance.xml": "04dd7ae4bf4699d5f7a454543cd2b8bc03ede1bb768590f201ebb6ee22a41a64",
+    "16x9/Custom_1193_InfinityBrowse.xml": "216f9ab4667fac51b9be07d6ae06f92a369c0be2875fbec493d9c126414f64fe",
+    "16x9/Custom_1194_InfinityCommandCenter.xml": "3a846f805c1d0e6d2b6922078a74ff9769fe832f99625e35ce28df9de64ac92a",
+    "16x9/Custom_1195_InfinityAudioSubtitles.xml": "d10519b1cf4404a8f1788add20f4526462421cc4e884be36601be205dea14b17",
+    "16x9/Custom_1196_InfinityPlaybackSpeed.xml": "a40e0bbd1d6b60cefcd43805b22baa1223a9f8a59089aa6562bb31ffdf36c63a",
+    "16x9/Custom_1197_InfinityDisplayMode.xml": "3fd6e6791ba3e96b34a58e40a9686ff7788c3ec1fcafea40dea349d9f875274d",
+    "16x9/Custom_1198_InfinityNav.xml": "9b8514bdcb095d3e3029764137674b999cdbba17a2d65ed5a19e1c16aef82ab1",
+    "16x9/Custom_5001_skins.xml": "df5821dbbfcc9bb33e611ca1b19c2dce53e0a1335d544f06f6a2810488d26fb6",
+    "16x9/Custom_5002.xml": "d5526bcdf55bc003a65808b5c516573b0216e878548c1d90649eeb54c003365a",
+    "16x9/Defaults.xml": "bf1f8e5da6daf9df06a26a398d2cd7005c31a33dc6d5f4da60d3ce8ab25b855b",
+    "16x9/DialogAddonInfo.xml": "477797bc7834b3dffd613b2da218bc431282487f1539a68147f007188cc1b1a6",
+    "16x9/DialogAddonSettings.xml": "68828166c8875204e0a533beec5dc2505a7f34bb84c7962a0716e47818c44714",
+    "16x9/DialogBusy.xml": "5362eded0f3be8384bfeecc278c28f80e3b04c46a3f81999916121cd87566234",
+    "16x9/DialogButtonMenu.xml": "412aff7b84a115da8297bc17dc0560d95cfc8813b2bfa2fbb5555e723c138fb8",
+    "16x9/DialogColorPicker.xml": "eab034ff804ef32f200a6fb09034f4c22fe1130ce372277c00cf7ae264d4def3",
+    "16x9/DialogConfirm.xml": "d13c0ea378ad474b0590daf700da3408af3e41364813f062020a417736262fc2",
+    "16x9/DialogContextMenu.xml": "773b83383b9e0b333ca588ecc2ef1e6b54981726181ba097a56f1f62e47766ea",
+    "16x9/DialogExtendedProgressBar.xml": "dabeb2499eeb9046b5246fa57f1a539a98ce299ee1692b2b7ac693e6e22f6bac",
+    "16x9/DialogFavourites.xml": "11b3ef7cafa66f18593020940c898a7f57fb36ac67e6e0bdd663bfd10dc00caa",
+    "16x9/DialogFullScreenInfo.xml": "a0865453f50b2d21757f725be9f40f4ffaab832daa32ad6b8210a673bfeffc70",
+    "16x9/DialogGameControllers.xml": "f74cd38eb9e0baf305bf0b05f9d2502e4921e6270263999cd1a8eebdc77bda42",
+    "16x9/DialogKeyboard.xml": "e8bdcb9c342fca212051984855a052994b519a4b6f654d358f748160e907f033",
+    "16x9/DialogMediaSource.xml": "058277efefb50228c5b4ed0a0b283d87149ed4f8e0f0db91f3449d9d1b0fe414",
+    "16x9/DialogMusicInfo.xml": "c85d9351d2b6510af8dfa1f1887d7b7f567f0644657e199467a41389383431a3",
+    "16x9/DialogNotification.xml": "e6c7d15948acc6fba7ae2792a15b0e7e533bc1f1a6f73c711cc6117ee885a6a9",
+    "16x9/DialogNumeric.xml": "757b6acdeee14cb823b793421d49f8295e817870e582e4a6373d0afcd3230a31",
+    "16x9/DialogPVRChannelGuide.xml": "ec283f9af0c5ff531f34924f33132dfdbd900d0ead014ec662cbea80c50bf473",
+    "16x9/DialogPVRChannelManager.xml": "b3a4bc769577fe4caae7ba2cec1f57ac351a12d71d747e4c0293f06859e353ba",
+    "16x9/DialogPVRChannelsOSD.xml": "79a5723c09dba1eafd8c648aa95db13f4c8bc23145a38bbc6a06e8659ee36b93",
+    "16x9/DialogPVRGroupManager.xml": "e39b6ff27e3d0da0f21218cca646ac6a195247e284a62cffa8e6c0391781979f",
+    "16x9/DialogPVRGuideControls.xml": "74ad8412c20a92c34be349c0755d1b2c531c12520e1c73d05ed66f825470a498",
+    "16x9/DialogPVRGuideSearch.xml": "14808f78327d7654c6c18a6d6ad7d3fb4f77cac3b84d2aa231979689cd97a8db",
+    "16x9/DialogPVRInfo.xml": "6efd1fe439f3d98bc0c0926f615472ceb0eed4543e8802f468e0cbfc5b163e73",
+    "16x9/DialogPVRRadioRDSInfo.xml": "d838d6abd76f8e0299a0c8e4aac5d0eab0524896eedbe98cbb27ad294b361a7c",
+    "16x9/DialogPictureInfo.xml": "bdec2a24fbc20ff391cd2fd443dba575ce0562e86ee8aa0cc71f46fafd050711",
+    "16x9/DialogPlayerProcessInfo.xml": "e6226dbc2afab72705cfed0f7ed948f02cd2ca1769561801975ac8f9d24eacf8",
+    "16x9/DialogSeekBar.xml": "bbe86bb75d284fbb3c400fabaab4327a377941e8d916f40dcde41112ec755c94",
+    "16x9/DialogSelect.xml": "c6959b3bb39dc56b3dddcabb74c58cc0a381da72fb7222a62d06dc400968dbdc",
+    "16x9/DialogSettings.xml": "eaf0628d0ca00183c2e576ec9d657a00d63875f20bf1544f198f9c7093890d0c",
+    "16x9/DialogSlider.xml": "fa7c22e140183cb6625ccdc6dd1e5ddd7d4eb5fcb1e7380e36b4ac90f776bbe9",
+    "16x9/DialogSubtitles.xml": "45c3b6898b133dbcbaa94d807a3454c1a154969e8931634f2e5345380918eca0",
+    "16x9/DialogTextViewer.xml": "1596671b3e5b79d210da4cf96eef50e5296176f205ea5b1ed3b16575f5abc3d2",
+    "16x9/DialogVideoInfo.xml": "d17ec02403f79abe8671fa052bbde71ba135db2ab2bdc7e913164765eb8f492f",
+    "16x9/DialogVideoManager.xml": "9d411732c53ae7fc96fc18a974c893dbed2d1684e6a8628d2f2d9dfc5324fa50",
+    "16x9/DialogVolumeBar.xml": "dcdaaff87cf99106d66d6192f4b3347ccb79479fe8e68e90ff60b5a1d6c4a6bc",
+    "16x9/EventLog.xml": "1b5a0c9bbd29925214f0afef5d248d2ec0948e955d7c2de31db98eb242946b03",
+    "16x9/FileBrowser.xml": "0b1ed00417f26bb88aa05e04681cc7efccfd6ac880f6832a8e0c6d236017dd91",
+    "16x9/FileManager.xml": "1df9d27a464c2558fca45911b9dbc9459e79d8289f3bb833f07e50e2a1e901b0",
+    "16x9/Font.xml": "89525ca166cb939bac6c158e03a09f1637222a90b5bb24fad85aa477af96b6d3",
+    "16x9/GameOSD.xml": "b5a8ef2a2b96668fa0e1df1431d103f65c00559e602abe00dfc0549f699a0484",
+    "16x9/Home.xml": "c0e8803c503927e7167c94bb49e3191aef68cc367a20373d01f6bc3f684d8330",
+    "16x9/Includes.xml": "f017ba5b3e8b2de82f992459b44eab40896ffeb370ae27c882270952921f71f5",
+    "16x9/IncludesBackgroundBuilding.xml": "970ad182ac5d844ccc75a47049093450f12967782e4de5cb00cfa8e63ea0bb16",
+    "16x9/IncludesCodecFlagging.xml": "2f497e32e0fe4606b4496314edda3a026bf590270fb368206b1158beb644e8b7",
+    "16x9/IncludesDialogSelect.xml": "149684c6699d9b56cb695055b05a1619647787b8e0c008f7bd7aeba8ee6425e3",
+    "16x9/IncludesNowPlaying.xml": "55f0fb496021a8c10220f5c0d2a1a0259c46b058e3866fb3165648741590743e",
+    "16x9/IncludesOnScreenDisplay.xml": "b362bd8bf7e12fdf3561205274a5709004967d81d9c80d4a7c379e42802dbb25",
+    "16x9/IncludesVariables.xml": "b0786602d1f0abaf5e5d5556b1124bcbe574d7f1f6753014887f91138ee58405",
+    "16x9/Includes_Animations.xml": "40e3f2d725c0c852319302c2d344af4543a7f49b6671fcadbd8c08de8ec2132c",
+    "16x9/Includes_Backgrounds.xml": "3dea64c510c087f69bda74487ae22ea5534cfa6b26c0088fc00c5abeff84b29d",
+    "16x9/Includes_CinemaBrowse.xml": "76e49a586323046bd220522d4a17bdfda0de44cb69e27b07a61127ea7dffe35b",
+    "16x9/Includes_CommonValues.xml": "e9616503844c1794bd9948957880fbdb8c5dcf3b78d49e04e02b46558545b795",
+    "16x9/Includes_DialogInfo.xml": "f61c92a1596a0a9889b90c1566cacb9394a57654c1056564953cb06b30fc181b",
+    "16x9/Includes_DialogSettings.xml": "82597e711108c02f81b11407aa4a35af4e163341513979bff57627a7653e9d62",
+    "16x9/Includes_Games.xml": "3e9a9c8f742d956c0a1718e0b108ad56761e56ed1515dc0448ccc88b250284d6",
+    "16x9/Includes_Home.xml": "4dc172be28b6912dfda3995d406587d3c5a092cb48e56185896a1af6b3dc2181",
+    "16x9/Includes_InfinityExperience.xml": "06733179581fc5f8bed18cb5e89b3f1703d5d7192534d00dd8226b5b35587c41",
+    "16x9/Includes_InfinityHomePlayback.xml": "a9fbf03ce0d5712c61ae28f85e25eab2f77dcc1172a76f3ec7b90e3e7c6f8d31",
+    "16x9/Includes_InfinityHomeUnified.xml": "4377c1f595f94cf46bf3ff192f1498e454c38e71a8f17e31e48b1ce76bc15093",
+    "16x9/Includes_InfinityLegacy.xml": "9ff4f3d8b293a26830eecdb45d1c648d8ccd7c64d20a827100d36f153c784b15",
+    "16x9/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "16x9/Includes_InfinityRepairs.xml": "1d150aee88c260ee9215f0b9b87d3bd58d468c6dd855acea733c0aeee7a831d3",
+    "16x9/Includes_InfinityRuntime.xml": "d1f0aadb3f386a9a64852fc96b5bc8de76282762c88bfef3a30a4dad8134dab7",
+    "16x9/Includes_LiveBG.xml": "0289be58995ba27bf863a4522859d3c7785114d0fc45aa28a99698db8a454cee",
+    "16x9/Includes_Lyrics.xml": "8bc9c6e83e8018482b88a2010ab5d8f0e121b014c8988f26125d1d017a980ac1",
+    "16x9/Includes_PVR.xml": "2c109d899f4743fd63195c8839ff0fee63bc5ea342ebd12ba8b76fd25a745f30",
+    "16x9/Includes_PVR_Views.xml": "c5ee0d28c681518e3f95ced3b18c01224e98430bfaff689ee53c5f44d98d10a2",
+    "16x9/Includes_Select.xml": "ece1e69e459869db609c7afd2a120637bb693642b0db3e7c3814339436e0b840",
+    "16x9/Includes_ViewSettings.xml": "7061a90cda68651514f7292e8e3a5aa3437695d0d9dea970d15efd256795f0d0",
+    "16x9/Includes_Views.xml": "7dbbbcac471de1d04fb3a6b020daf36e05d3181f014d2329d3c6b247a491d19e",
+    "16x9/Includes_Widgets.xml": "f3f69004f4ccf3ff7c54de9c1ba67fd1bb98077ae3088e6eb6f948940a96c0f5",
+    "16x9/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "16x9/LoginScreen.xml": "bc7c9c2918ab392bfc487470fecd41c5c0dc6a134dd9dc9cca35035aa25dd478",
+    "16x9/MusicOSD.xml": "c99e8726726a74d5309b594af88b62ff115883b9ded006059f23909f34dd71b7",
+    "16x9/MusicVisualisation.xml": "13ba87eeda95083e9f57c1640f27a8aef43fb4a7dd255cd86b170f0cfebcfa74",
+    "16x9/MyFavourites.xml": "09b3fc85642f9fe871d79b35ab0ab90671367d189987f69938740f8b5f2f0019",
+    "16x9/MyGames.xml": "153c4853be8a3c6316a6767da1f8d9f2b0068899352b25ddf98baed9add5cf22",
+    "16x9/MyMusicNav.xml": "46dab43db3188e9ceb1056b3c7320b21194dff62b45ad67c9e9d8f2b4fa3592a",
+    "16x9/MyMusicPlaylistEditor.xml": "cc955fcbd32a3fbe320ed53211884bed32b2331c777970c6b399401969e41715",
+    "16x9/MyPVRChannels.xml": "61d334935582818e2f8d5273aafceacf7aba372948e2a26ba3b4467ef3d924ce",
+    "16x9/MyPVRGuide.xml": "8204586648b79dbbf4f01eec22dbc898c5efe9f207ba21c7a905b331b5b8d348",
+    "16x9/MyPVRRecordings.xml": "40328747d7c55fe6d20820fafee36c711f6891cc989633c51b8430f72762f6b5",
+    "16x9/MyPVRSearch.xml": "5eda996747689cc9a06f067a13bbe5495c687d7b6c64af8012df6b42279a2ef5",
+    "16x9/MyPVRTimers.xml": "a612fe99701743eecec8a262b477c7d4ac6a3349fc3cc8699ee892718cf1fbc5",
+    "16x9/MyPics.xml": "16af9480776027317a27ff7bb84e63b4f2d0a22ba3004b58009bd5b5ba4bc983",
+    "16x9/MyPlaylist.xml": "15a397beb34e9357e9ca4ef941005b132c0d7087f7aeb949c0604fd715e3b3d1",
+    "16x9/MyPrograms.xml": "a1b6417d5c3533663bf43c6997e8424ffe30508bf8513d1d75965262498a8ade",
+    "16x9/MyVideoNav.xml": "6ba4e269f5efaf9d1a012177f29e6bebb61391f818b5981d84823d6ed585fe6d",
+    "16x9/MyWeather.xml": "37bf8909e152c54bdd4ffeb59d7610825801ac0c1c080a088159404e2d16cc15",
+    "16x9/PlayerControls.xml": "31b75450614fbc642fb7025a37beb65257b8478808e177e8fa88608f63ef8102",
+    "16x9/Pointer.xml": "6f51af1b7c9d361df08a6280ee878774f4b1aeba6b51b4ab9e041dccca5a7b19",
+    "16x9/RecordPrefs.xml": "19964f8ad3ea8c8642193d102e3c703eb567a43a469a3318265152b5fb3c42ee",
+    "16x9/Settings.xml": "6be6732248aa03fa20e24d62664614b1ead6e0be2d64daef8127f68243158226",
+    "16x9/SettingsCategory.xml": "22454cdbc927c5e0f429f5ca241bbec23b5d4fbae285d068ecdfa1cde451810e",
+    "16x9/SettingsProfile.xml": "e5c67ee9a84f1ef75bbbe70721554f3f0d7eefce16021f3c08fdc884f2613ef8",
+    "16x9/SettingsScreenCalibration.xml": "a3c5e254bf074ef787366278a90575cf74aae912472bbbea92d16a1a54cc8360",
+    "16x9/SettingsSystemInfo.xml": "6c9effa42bf483d9058d0ef49451218282a10986671ed402db41b485e345bcab",
+    "16x9/SkinSettings.xml": "ae8890d53fb371dad78f5f2d27b8f6738605c9b9b8de4d865a31052d203c0b99",
+    "16x9/SlideShow.xml": "bb86baee632c49de43f30bda1e639e5bab86490530829da8efe4351ffe82afd7",
+    "16x9/SmartPlaylistEditor.xml": "78e21e90582ac3e22fdaf504998025ea8827afd507c660b4c8357e11c01b95f7",
+    "16x9/SmartPlaylistRule.xml": "68565b954d543ee6c4f505271325ea7bd7d91ef75f1c8add1153180b617b9cc7",
+    "16x9/Startup.xml": "6e8508e34f03f6809c9ea77180207ef8f950cfadb297c2c21f5db926fefe63fb",
+    "16x9/Timers.xml": "267fc832db572999d65190dad7e7e58172cbeb82684c7c5eb89e71134bdcb7f1",
+    "16x9/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "16x9/Variables_Widgets.xml": "554bae324a6097c1ae2918733731eaf0c1d8c5a21e87a4e077dd8701176dc24b",
+    "16x9/VideoFullScreen.xml": "5b1bbee1129419ed149c27c2191c737ae764a5acc47a77dda6444298d6d8947b",
+    "16x9/VideoOSD.xml": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e",
+    "16x9/VideoOSDBookmarks.xml": "6f2d0518624da3ad4ea86e96b60624c96686fe2d3cc1ed5d6d94a6500f9412c0",
+    "16x9/View_500_Icons.xml": "a348fd0b3372d4517ae7ea9f2cc5bce7ae42aa79cd53a0d053201b7574b8c6c8",
+    "16x9/View_501_LowList.xml": "ec42596ea2cb9a731ce2d92d8689c6655baab0831e54221932616d9f35c5d294",
+    "16x9/View_502_Episode.xml": "19888db83355b5d04fef74174fd7499b92c9b83861a4a233d257634a064ad205",
+    "16x9/View_503_Wall.xml": "317e706ac273e6c0480e3c54f35102f065beb031afffe68282490e42fc47576d",
+    "16x9/View_504_Gallery.xml": "29129f438225b449924c69cc36295c5a20e1b65f3db4e2dd4ebd33928e94f44a",
+    "16x9/View_505_Panel.xml": "03a354aec118b66f5450c88e48a79780067bdeff865597be81a2a7f5ee4768b6",
+    "16x9/View_506_RightList.xml": "b4a700c18b84c37c73d6d9bd1201f48cc69c011c08bd3ac7c87b23719ec5b2a9",
+    "16x9/View_507_BigList.xml": "dfa0203b48eb856705f454665aa63c90843cabe321ed9a206687441984d8d166",
+    "16x9/View_508_SongList.xml": "936dadfd1a2eaf5454c2903939a84b333aa0e9682db80d5d4cdc7efa24c7ad07",
+    "16x9/View_509_MyFlix.xml": "b7d679e2f3aca3769ad39d98ff1f0aceaa3645f0726ebd960ad67b15046a999f",
+    "16x9/View_50_List.xml": "1604781817f2496fb209a964decbbce921a5af0b3ffae4c071cb020b6a1756ad",
+    "16x9/View_51_InfoWall.xml": "e82b5280d78859eab1f20e329e2b1558f953a5244a5ef9b3326657be1a14bbdd",
+    "16x9/View_52_Landscape.xml": "3363ced68c3f8c2eab6cb918408f2e36c9cffa8f1af454e8d8a6636179b64197",
+    "16x9/View_53_ShowCase.xml": "59d4c76df569dbca779c87a2d520b75836e53996dd9a5f19afc18758a97c8e01",
+    "16x9/View_54_ShowCase.xml": "9492d8697d5d664bb53e43430c6309d896d022bac45a87cdf4627db02ca3a877",
+    "16x9/View_55_TriPanel.xml": "6f8fd7f99a753fbe30df7f5112d794365f0f6952f35f67a2ab909251eb6236e2",
+    "16x9/View_56_Posters.xml": "eea13cfb61c2b930b4b33dcf64a83af482b3a146c5438338f12ecc9c6ee2de7d",
+    "16x9/View_57_Shift.xml": "2d5dbdfcf32198c08d32e0be9862f9f6effdc920052616f37c60b8c055f839be",
+    "16x9/View_58_BannerWall.xml": "d9da6455796311f3680334624254006ba9144a7e63a67724ca5f8fc9de686c3c",
+    "16x9/View_591_BigFan.xml": "10b49f25e5fdf507506b58588e57697e63ea7504609c08a4bdeac6eb85de908b",
+    "16x9/View_59_Logo.xml": "7142187a903ab2487c387e3ff54e30c7fe4df975623dfcb601710a11bbd80061",
+    "16x9/View_602_FanartList.xml": "c1a4381f7074165575efe39188f629932a4a0501d11c4286d771444434beaec4",
+    "16x9/View_603_Music_JukeBox.xml": "9ad7f9e8af3d974e1f34dad15fa57d30d274173c89cc670e37bb18380d9145f9",
+    "16x9/View_609_Fullscreen_Wall.xml": "1e052d402c94b17daabdda9f69208899156f64c19df88daf3517756e53030624",
+    "16x9/ViewsWeather.xml": "7c0366c53b0e9beea4df0138130acbfa71f2c3d22d536c311ad13aa6c2c929a2",
+    "16x9/custom_1101_Startup.xml": "8c3db6cad6b02dd93aaf4ff94939c3724e10133caca7bf81a2a4a61517393bbb",
+    "16x9/custom_1110_TMDbHelper_Recommendations.xml": "22b378d2b05b1e518c402145d53fb07733592c672f13ea3ce588d5de45993575",
+    "16x9/custom_1111_TMDbHelper.xml": "0cdd1fda148f72b041718a55b8b222d22e4d2541c3d400372de2612e5981a891",
+    "16x9/custom_1112_TextViewer.xml": "0e2c3d2e282246d3cff87040cec469a1d80697bb1f67249c74410673440ec5aa",
+    "16x9/custom_1113_FullscreenFanart.xml": "f5b945ae1ab64aa9207c9dadbee8ab591cfdd0857429fdddcabc9ce89d46ad49",
+    "16x9/custom_1114_DialogSettings.xml": "277424b3c4464638421df66bebaa1308ec76870f6fddfa43fbbf918dc97f0bcb",
+    "16x9/custom_1117_AddonStatus.xml": "d0c8caa454c26744b8dfdbce10d792be7c7cf9e03b5131bc15507e9ef5696e63",
+    "16x9/custom_1119_ExtrasDialog.xml": "be279418e3263d955995c65e27e128ee99bd249746bf457b6243b43162f7466b",
+    "16x9/custom_1126_Confirm.xml": "75857370e93a7cbf95a2bf139e449a3577418c97a47cdea7107d540dfefb56d6",
+    "16x9/custom_1127_OverlayIcons.xml": "d231b0abd9bad2ae07261609746b12e6b2254f1be291a8767ebad9168fd25789",
+    "16x9/custom_1128_WindowCustomizer.xml": "d982c72ffb0deea0881911c78c0322360ea5576bdfdfcec6f6446061b75a36a8",
+    "16x9/custom_1129_Select.xml": "256dacc56560c2a94542008006890b796dcdd1f5cb3fc609d2ce78bc0bb5c38f",
+    "16x9/custom_1130_Views.xml": "5f5116746961cd018834687498c3e2c9a7bb07ecc339eee4b5a07a6cadfc358a",
+    "16x9/custom_1131_ViewSettings.xml": "b5bb8da41ac16fe49811baca3a0942eb772d00e0b29921f5e63f68809e102495",
+    "16x9/custom_1132_DisableViews.xml": "dd234e7f0df28df803ce0bae1bd1d105638d8bd25da2ee4b44fbb3e9c0176af5",
+    "16x9/custom_1133_Apps.xml": "f124a6e97e1ac591e1fb5de54e15e75a95ccd41834ca86d8ac23519162ce8919",
+    "16x9/custom_1134_PausedOverlay.xml": "adfea4cc88bf151dcfa2c4a571ef3d5e890bf6b0fbc8fc17630146d314c3b432",
+    "16x9/custom_1135_ReplaceWindow.xml": "4acc3ae98336b6e9c5591c252d601b84450c12b2c6ba591b4f509cb27554b7ff",
+    "16x9/custom_1140_Colors.xml": "a512db3c7fdce51dbba66db91cf4be327a6c40e9f28f8f7406d74ad93201e2d9",
+    "16x9/custom_1142_Skins2.xml": "69603cdbfd5b78180392445b0c019151be0233be23fb1a24f878b8ee094a005f",
+    "16x9/custom_1199_InfinityVideoLock.xml": "dbe34f3c9489b65fbdf49c2d260997e8d069d53765b4d35f04856c6295654b48",
+    "16x9/originalFont.xml": "07b32efd60429fe8bc6a57ab527ccc59fa68ab79b32cb3e1fdf66d176ca92a91",
+    "16x9/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "16x9/script-RSS_Editor-rssEditor.xml": "213105402d4528ac73f573dcee8b9736edf8475532c7b791c97b759c28da3795",
+    "16x9/script-RSS_Editor-setEditor.xml": "213105402d4528ac73f573dcee8b9736edf8475532c7b791c97b759c28da3795",
+    "16x9/script-XBMC_Lyrics-main.xml": "e3181b62720baccef059e808f223e639f59928f33b2f1aa54114225c2bcd0b0a",
+    "16x9/script-cu-lrclyrics-main.xml": "bf01366cae2f6dc62d2d5261315240037d94e2cdbcb8d0c9c4c686a283d1118c",
+    "16x9/script-embuary-image.xml": "a0a900bd147890d56bee862059b9720b229aa8f2323ead7dd4cc7dc5f8906b2e",
+    "16x9/script-embuary-person.xml": "7361e81c68d77f9a1d91165310aa5b516af693a99814db0a9ba504b517eb0059",
+    "16x9/script-embuary-video.xml": "39b4a8d0f1a35177021a993169cbb274dbdc9a2dfd1533bed5fb7aec52871b5f",
+    "16x9/script-globalsearch-main.xml": "f25851e875817cb6a0559d01177ea8d120df86af42dbd663c716751343c15ff1",
+    "16x9/script-globalsearch.xml": "2161344c9e8e8d859b8d2a64b45403f745677a015d890f9a09df00b3659f4ecf",
+    "16x9/script-script.module.t9.search-Main.xml": "85ea0a146c7657efb7efdce4c7e160a45e4265a2205c90882021925a9d86df8e",
+    "16x9/script-skinshortcuts-includes.xml": "44e891178854f0c057653250541c49be94c472477b4cf7423e0fd2ad569eee05",
+    "16x9/script-skinshortcuts.xml": "f7bd645d5219ad8910bab32c48ef6e0fb366991fe559e384efed2565c4dfa4cc",
+    "16x9/script-skinviewtypes-includes.xml": "942809d0d53ad1d90f77c0c7e91f154f154d234713dc7e7aaf5fb51952fe21b4",
+    "16x9/script-tmdbhelper-recommendations.xml": "1533ea247b2a1914bac2c536da4d3bafa1436c690338be2bf9e78da39fd85d6a",
+    "16x9/service-CoreELEC-Settings-mainWindow.xml": "6b756baf7e1b81953c42a4a3ed89ce2fd93b71ddd36bc9759467f24d03337111",
+    "16x9/service-LibreELEC-Settings-mainWindow.xml": "da356b4f439f9d94f5b548b279282628e07d04b9e12962e9254f9cec43e34337",
+    "20x9/AddonBrowser.xml": "f6951240708d21d573fd52c1fa8c84df504757d84375b8947d22734cb2a342c2",
+    "20x9/Custom_1190_InfinityPalette.xml": "6510f2f62dc16f3396b7c45e7c0402e9586f1ddf037f0c27e7e3c6468c00d7c2",
+    "20x9/Custom_1191_InfinitySystemHub.xml": "b21b63349e5b365adf42c9bddb41e640362e3fadf174c2f28bfa5eeffb00949b",
+    "20x9/Custom_1192_InfinityPerformance.xml": "c1443d2ef90e9d799803957c2e40eac48f051750080153a3399c20361dbc27e9",
+    "20x9/Custom_1193_InfinityBrowse.xml": "8eaee1bd482a83ac6f77f0f188ade39667c819210302c3e280a11e87514c8592",
+    "20x9/Custom_1194_InfinityCommandCenter.xml": "712671e60811b5455370702ab16e161625f2d3bd328553dd8e74fa6ef0baf4a0",
+    "20x9/Custom_1195_InfinityAudioSubtitles.xml": "f218f3b02cca91aacd4fc7688b51666e8b94e86d002e2c0bc76a208a94337232",
+    "20x9/Custom_1196_InfinityPlaybackSpeed.xml": "9991b7b6051611e09d4106f4e649b6f1fddf1ed1eba3ecad4e3f20700c62ef4e",
+    "20x9/Custom_1197_InfinityDisplayMode.xml": "b094fbf3188f399609300ded6ce58851838614b3b9a549399b7d0b3bda00ad96",
+    "20x9/Custom_1198_InfinityNav.xml": "10b606f41bc282568423744a5b771af8b86e087ccda0343711b0b84cd4b15853",
+    "20x9/DialogAddonInfo.xml": "89bd38791e603edc6cbcace1cd415a2ab894213294fe29d1728274c13c1427c7",
+    "20x9/DialogAddonSettings.xml": "de2d6b708c911998160617cf4be2868b11813a9b2809e7a9831ed50b07af0058",
+    "20x9/DialogBusy.xml": "44db94c092b64193c317b4143228ba9c8cb5f58018925fe8f7c9d446e974d6d6",
+    "20x9/DialogConfirm.xml": "719235b494a7e27b6f9ef6c450eba83d346af652315d6b7c6e79deea47b9e98e",
+    "20x9/DialogContextMenu.xml": "d7f11182c8c887f6fc74f6c3a4e1581e3857486d5723f8e2285735c513f95d6f",
+    "20x9/DialogExtendedProgressBar.xml": "00adad564be383c1b8ca29e1bb1c4b8bbaa18ef5605d66f64abc4f509c466df1",
+    "20x9/DialogGameControllers.xml": "7061de02a30087ab45059e1cee8739e5bffd4945c477b9aace512a5a8fa082b9",
+    "20x9/DialogKeyboard.xml": "597c20652887b48bab89ba95fd58573ccbef6d8800e9eb2ec08d5c4ed7212053",
+    "20x9/DialogMediaSource.xml": "905bd86453a42efc7c116c622abc61c1a634ca38d25b1d237501973b3cb22b83",
+    "20x9/DialogNotification.xml": "2e9df506c8874729bf6985eb515eb6f938ba1c5373674a42ef3c51855e98f158",
+    "20x9/DialogNumeric.xml": "c54dfb44a8d510643e45f4f85fe0a7f38caf0249a06446a17dc532c635be7de3",
+    "20x9/DialogPVRChannelManager.xml": "48fa8e8873385cd55ffd89055f3836710502fe164a219e09bde5f4b987eb6f53",
+    "20x9/DialogPVRGroupManager.xml": "9667988111ecd1f1f474c779544768c9e6f4680fa69802e08482f480059e20fc",
+    "20x9/DialogPVRGuideSearch.xml": "06982493dc1564fafeb6e219da06dabb84dedb832cebfb9765e915e176811e49",
+    "20x9/DialogPVRRadioRDSInfo.xml": "9a6a2fde8399d780679af17b5d210e00783f9e50c69cce57396af983afe5cb28",
+    "20x9/DialogPictureInfo.xml": "c7b4fc9ae8edbb303bfa6fecf88e34cf7bcc61f16b430e289654e0f142cfb28e",
+    "20x9/DialogPlayerProcessInfo.xml": "0887ae3ca71bd7133a6a0fb561bde8edf70a624953e94c6e2419750299733183",
+    "20x9/DialogSeekBar.xml": "7c11564c1ad52b34fb43a2f7fee2d9d435078f2fd6e74d83ebfeededefa8e6cd",
+    "20x9/DialogSelect.xml": "813a2693668e31942f0c93ed07e27fecf68d48daa6cc03707f057e70a77e9dfd",
+    "20x9/DialogSettings.xml": "268809a99c5346b1b3181c0934a636e1a25ec010c3056b0d7058a39cdcf9393e",
+    "20x9/DialogSlider.xml": "b69d0296d687b78e835c83c4da43939b37360b6e01a2497296c82875af41d8a2",
+    "20x9/DialogSubtitles.xml": "db5be200fdcb6cef8cec5890a877338cd0f7cb1cfe27a4dfe54b9e1b0113bace",
+    "20x9/DialogTextViewer.xml": "728b69231021e8744d11154cd1733711a1dd73e066c64e0c32a0db4895d16af9",
+    "20x9/DialogVideoManager.xml": "10ddbbe3cf002dc23e0ed86d7eb967e422afc0d75ed5eecd9dd656320eb79772",
+    "20x9/FileBrowser.xml": "07de411efef061dc6c7029db6b66a4fdd7af341e8b1f4aba13c205a0dca13cda",
+    "20x9/Home.xml": "c0e8803c503927e7167c94bb49e3191aef68cc367a20373d01f6bc3f684d8330",
+    "20x9/Includes_InfinityExperience.xml": "06733179581fc5f8bed18cb5e89b3f1703d5d7192534d00dd8226b5b35587c41",
+    "20x9/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "20x9/Settings.xml": "aed7a61cd20b0c3681c212441c9b5431fea1efb9d40b1051df54ae56781cb851",
+    "20x9/SettingsCategory.xml": "5b190f66db9fe5a5be8371387f028f596869de5fe461b873dec62685b8f61311",
+    "20x9/SmartPlaylistEditor.xml": "3c491ca75045e61e0343cd551453febda20d54530f4109fcff8528df6423b169",
+    "20x9/SmartPlaylistRule.xml": "8a2c413165983cd85965f0da65a06f06a33784c5748d344f7a9464a6b5613bea",
+    "20x9/Startup.xml": "aa16d718f6863b48e9e2ec5d223d3e24489b77dc58fe57cd6a74323877f5aabd",
+    "20x9/VideoFullScreen.xml": "5b1bbee1129419ed149c27c2191c737ae764a5acc47a77dda6444298d6d8947b",
+    "20x9/VideoOSD.xml": "2db244cb6d965a33bb0c931bdab15ef0e16dcaf072b0227848998f52ac432b8e",
+    "20x9/custom_1101_Startup.xml": "1ad23205acaf68f420ab6b20052baa213c5a884b88be1496227cdc244637bc04",
+    "20x9/custom_1199_InfinityVideoLock.xml": "964100d35878c289798c61431171fff425c73550111ee18e5d5679963649ab73",
+    "20x9/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "20x9/script-RSS_Editor-rssEditor.xml": "6abb062b960fc3f870da2a12aaef1201c27cd5ca01640e5398758a6d165aa93b",
+    "20x9/script-RSS_Editor-setEditor.xml": "6abb062b960fc3f870da2a12aaef1201c27cd5ca01640e5398758a6d165aa93b",
+    "5x6/AddonBrowser.xml": "330b08aa100d6221df057a6e8f24d8039569ec7cee52fd29812a37c627cec450",
+    "5x6/Custom_1190_InfinityPalette.xml": "7216e10b46155199e7678c25d06ba406248c76988ddb33734d5992657b12f913",
+    "5x6/Custom_1191_InfinitySystemHub.xml": "21376124e938ff3f5adf1a1fe4f8cb09a7e6aab07c15022a4cdb9fd1f31020ae",
+    "5x6/Custom_1192_InfinityPerformance.xml": "c1b69a5dd46e4f07f764ac76f69cb5a8b83286dbe403e365fd640c31dad9d1b6",
+    "5x6/Custom_1193_InfinityBrowse.xml": "1b91e60e569e6261ee088a649bdb8db6f5abe9bc7e48d7e8a564f01e7f642e79",
+    "5x6/Custom_1194_InfinityCommandCenter.xml": "44c17b579a90cad78b60e043a9a54d5168814564443bbb8073cc459746549a8a",
+    "5x6/Custom_1195_InfinityAudioSubtitles.xml": "1d493f417a17943c02bf9d4d979e4ca848b1e398090ffe8d8a0e059e85069ffd",
+    "5x6/Custom_1196_InfinityPlaybackSpeed.xml": "15d35ec9eff931abc2873851617590041927de669a8b4ecec42d73ab9da01d7b",
+    "5x6/Custom_1197_InfinityDisplayMode.xml": "de7304b1da8dff3db3ff73a801537fefd995fc320fec8b1333ee36620d59097f",
+    "5x6/Custom_1198_InfinityNav.xml": "1e37d63fe5f811c84fde3184d30f560745a4f04999e7876112e5b82a9366add3",
+    "5x6/DialogAddonInfo.xml": "fe14f3f3febb125720c87288497b6eb489559b5c269aca59a537ae03e6020ab0",
+    "5x6/DialogAddonSettings.xml": "0042ea7d2a089eab3bcf5e2a6ea89dc3089665bd7f8cc063485d54d821415875",
+    "5x6/DialogBusy.xml": "dc8cee25d323fef8b49345aee32c85b33279c03e95977e3ccec16aed7baf65d0",
+    "5x6/DialogConfirm.xml": "57993b643225d15b87e15a3f2a3e804eec96c20f809ad8270e14655d416358a9",
+    "5x6/DialogContextMenu.xml": "27d1d4bd991ae99de71145626dae992cf91346565ea0f24726aa1f3ecf1f510b",
+    "5x6/DialogExtendedProgressBar.xml": "e9f241f17c2690d42d2c8b1c3387e137491585df71e97da9e4450c10e1731cb9",
+    "5x6/DialogGameControllers.xml": "de0e04f3334f59fb38ec21511aafb876a159253efc6d658f4a1e592e3ad39a66",
+    "5x6/DialogKeyboard.xml": "51379f27a0de614bba16ecf62cb7497b2b50199c79280c965dfa7eee5ecc0c15",
+    "5x6/DialogMediaSource.xml": "b3c1fd32d57acd2c355731a6b99e6568483e22800aec679f5c682a1ec6eb6fc5",
+    "5x6/DialogNotification.xml": "fc3e8a5c12fb75df4b3139e30b8e37614013e2acb8570119846eebcf01609d0e",
+    "5x6/DialogNumeric.xml": "deb6f542d39c02e9d28c0bbec9f0c6f0496b40992196de33ac8e26e0a8d87bd9",
+    "5x6/DialogPVRChannelManager.xml": "5879e76cf7d4aac6d6c6d20a57953f2f5ad3920e3eb6aac9b03aa1017224a658",
+    "5x6/DialogPVRGroupManager.xml": "d47cb1f9189942015ea1cd546d8b8b735fd9ff130baa4f747d1f7ac9e6d49c51",
+    "5x6/DialogPVRGuideSearch.xml": "7e1dc738e70ac11a0603840cc70da7616098b513bb60b7327634b31913d7578e",
+    "5x6/DialogPVRRadioRDSInfo.xml": "f94606990358d10da3748da50ca1ca3b2a734ee520abe4f90c82dca6e94b4867",
+    "5x6/DialogPictureInfo.xml": "9e77a473c6f2ad612aef55216c7b6f46dd7b1b863e81627751426b3e5c9ebfc3",
+    "5x6/DialogPlayerProcessInfo.xml": "ed19b4d6f61ffb4d76baffc1de15019bf1cc8949d862e534639c77f056ba76cc",
+    "5x6/DialogSeekBar.xml": "52b994aa7a4d6b0daf7fec488f20cce794676f091c35464816c8a9071a695777",
+    "5x6/DialogSelect.xml": "9360f0be788d12e63d26d3447ecc6a2f3f021059197115d6f79e54aaa75292bf",
+    "5x6/DialogSettings.xml": "827dd3193523aba8d9111a809de04c1c754e601a55e2f92227c7b396a86fbf05",
+    "5x6/DialogSlider.xml": "438fc46c592c87a0a4d1840275d31e50ecadf34b0536deb2e0481f30926c596e",
+    "5x6/DialogSubtitles.xml": "4512fabb29610f39a2c5fe98bd6268c2f5de05242dca7caa30ef7d4f89dd3ce3",
+    "5x6/DialogTextViewer.xml": "01aec19a72675b3d67ef710465ce6cd52c373530ffbd0b150643e85699de715f",
+    "5x6/DialogVideoManager.xml": "91c59e120687e555c63efa269e34784dd9fa7d5a6586bcccddc811fcd73e9db6",
+    "5x6/FileBrowser.xml": "a3c3431e808d02fd547ce4b013526fef77281655c90564de78a82fd4c8d74603",
+    "5x6/Home.xml": "c0e8803c503927e7167c94bb49e3191aef68cc367a20373d01f6bc3f684d8330",
+    "5x6/Includes_InfinityExperience.xml": "06733179581fc5f8bed18cb5e89b3f1703d5d7192534d00dd8226b5b35587c41",
+    "5x6/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "5x6/Settings.xml": "7d6d010cfa0bbdc5b02aeddc15f9a8f2543e5c11c6f66d23c53257dc88c89d35",
+    "5x6/SettingsCategory.xml": "4fab412ea503a515d690cc48d90b8b6c0e47f26dcef4f478954d43b4f3dcda77",
+    "5x6/SmartPlaylistEditor.xml": "30e1cbb55286ab3c2f1789e170a6c77ca1ec7aeb5658071455bab8567e3489f6",
+    "5x6/SmartPlaylistRule.xml": "c6108b89ea23a5af5647703060b48435ee4c40c4a2a05b0fc4d784054e1eb12b",
+    "5x6/Startup.xml": "6c536726f84c2d617746e01eefadbc67a1fb98dfd8e098b15fc831c20e84c2a0",
+    "5x6/VideoFullScreen.xml": "5b1bbee1129419ed149c27c2191c737ae764a5acc47a77dda6444298d6d8947b",
+    "5x6/VideoOSD.xml": "900d3787b74e1be65e942449a1868acc6f022f5d3d2e8526203f855519e4842b",
+    "5x6/custom_1101_Startup.xml": "dccf85a454c6e826727240be53113497a41f82897c7af15703b9c3a1a9505a1c",
+    "5x6/custom_1199_InfinityVideoLock.xml": "71abc36ab03a867fad66cf9f115c653b9de723fa291bc9a0cc8597d864745ed2",
+    "5x6/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "5x6/script-RSS_Editor-rssEditor.xml": "76c882533b46f3db4a500f8e708646c51c5d6e6ecbb0f15d9d1594a3aa4a5180",
+    "5x6/script-RSS_Editor-setEditor.xml": "76c882533b46f3db4a500f8e708646c51c5d6e6ecbb0f15d9d1594a3aa4a5180",
+    "6x5/AddonBrowser.xml": "02f14e5468e850426ad6c42d5b63b4f3e918cfc9c1af202c86c995c739b3454a",
+    "6x5/Custom_1190_InfinityPalette.xml": "9fee9f094b3238d955539ec63fb4a2fe3cee10eb7866ae47347d0921e0435d1a",
+    "6x5/Custom_1191_InfinitySystemHub.xml": "cdde62422dd3fee208c672a3d419fb546a6a166d49fa7cc671761864177dc9b8",
+    "6x5/Custom_1192_InfinityPerformance.xml": "60782fee823a2a0e76fb860a0b0985b468ba4795c8e444c3c31d82942f7ef452",
+    "6x5/Custom_1193_InfinityBrowse.xml": "2db2912a02d5486e6a940e4eb9d7d761a8a9766f65a1a8c2a0e58f40fa011eed",
+    "6x5/Custom_1194_InfinityCommandCenter.xml": "e5fe7e72829790d7db331644398c95c7a6ed8c4d296812784043ad2ed94c378a",
+    "6x5/Custom_1195_InfinityAudioSubtitles.xml": "42d827bfb9809219109bd170323c810c28c5580ddc7c6ebf05b7666857964611",
+    "6x5/Custom_1196_InfinityPlaybackSpeed.xml": "a7ac9634fa9dcb5045e2ea25eb0a53cd0f4508d2d7448ec291ab03bb13bf5161",
+    "6x5/Custom_1197_InfinityDisplayMode.xml": "c579e8a7019a157cdeb8da3761a798646f82786acb7ee37537a357fe1b44c678",
+    "6x5/Custom_1198_InfinityNav.xml": "fe709c5e091f6840ef1aba3a404d1770148ec9e3fc980dc1375dd33ef1ff769f",
+    "6x5/DialogAddonInfo.xml": "5808f134f29e4eface065a0ece051d6f170eb121afa62463d896e132ef3203a5",
+    "6x5/DialogAddonSettings.xml": "6b53b185241e4351eef90c49d32a61c818256c668e1615d492d3c28f47b0f22c",
+    "6x5/DialogBusy.xml": "6fb1b0cda4e0913f143b3bdb5667c817037e0a01c6c7d68a56e7888e817c78cd",
+    "6x5/DialogConfirm.xml": "b7ce230044889b838222d0d604c5cd6c5bf816bd64ec4e445903b1b24a88bb8b",
+    "6x5/DialogContextMenu.xml": "264929f41b4a01d8f8d1ff69ac413c58b1cb44b3d4324cf23a53fc4a6a5cc2f1",
+    "6x5/DialogExtendedProgressBar.xml": "05f5af162a9b28b61999c125388533e212f923596138e70a967aa42195f825bf",
+    "6x5/DialogGameControllers.xml": "e778ddbd95a1cd1606c02db62883d4bb0855a4cf853365a4ec26e2cbd636b513",
+    "6x5/DialogKeyboard.xml": "956f71933c061e16be36ded4ece6621f6f9808367eef824d5d5596ed8efada86",
+    "6x5/DialogMediaSource.xml": "6369282f5f16afe6dfc29fbb17d0d063dd8190e9929ee3db98c167f14ec68cd0",
+    "6x5/DialogNotification.xml": "0bc92056d696cd5068a6fb5c76f2f3ee96a1de1ad296f3862b27d3cd37f59c83",
+    "6x5/DialogNumeric.xml": "f87ca7f0ad6835744fd56df6bc8277d3b6222aa896ff04b71146ecc26ee7206c",
+    "6x5/DialogPVRChannelManager.xml": "495d6f01fcfc3e2e4d57841179a0f56a5a3573784acbedd075392b665b913158",
+    "6x5/DialogPVRGroupManager.xml": "5287616fbe7a6b5551e0a23233fac6f14df6633aaa3948cc6204d303e0193059",
+    "6x5/DialogPVRGuideSearch.xml": "01c5f4a191d3e1f0e88d2f9984f3b5d2f14f1c10aa753ada0ad94a63020e291c",
+    "6x5/DialogPVRRadioRDSInfo.xml": "07b8585b43fb8c3a05fffbcf9c8162dd43ad17b4d1647c794266cc5f2d1c9722",
+    "6x5/DialogPictureInfo.xml": "88a1dab28ab05eb0c0906e79dee77f20c04bcb382dbb5e09cb3cb0430c7b82b2",
+    "6x5/DialogPlayerProcessInfo.xml": "e85d1b05330b6de204f211ccb90c2374bac1712b32052791d91ac4030168d309",
+    "6x5/DialogSeekBar.xml": "3347f4c073522b0c56e91d15d0cfc15cfaaf816fe94bc198955f764a15fb4d24",
+    "6x5/DialogSelect.xml": "e78e16cf8014fd422f5a85db9d4c8b7b59a0b43f38fcde6f4588c27106e910f9",
+    "6x5/DialogSettings.xml": "5920a99a3042634f8856619167971d5e0ccb7f9ee73505d66d8b10e9f0c4e62d",
+    "6x5/DialogSlider.xml": "1f5623e2615b46cc0e2490fcc37fd3af62a1cbaaec99f214d568e08490f992cd",
+    "6x5/DialogSubtitles.xml": "4fcc35f6d62ba95d383113ea6b6f9dcd39eb3fee6ffc9a716a159d24f9940946",
+    "6x5/DialogTextViewer.xml": "904d36eed442d8743561daca8c2de4409d7c013ad2351831bfa00b5679b70eaa",
+    "6x5/DialogVideoManager.xml": "5f3bea21af4325065bab6c6a87e805f19dc9854a85a47952990c7a299e51b419",
+    "6x5/FileBrowser.xml": "4737c441ae056d9448ea754fb1a4db2f0a57e226f94e57ce9a584dbfb60df944",
+    "6x5/Home.xml": "c0e8803c503927e7167c94bb49e3191aef68cc367a20373d01f6bc3f684d8330",
+    "6x5/Includes_InfinityExperience.xml": "06733179581fc5f8bed18cb5e89b3f1703d5d7192534d00dd8226b5b35587c41",
+    "6x5/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "6x5/Settings.xml": "b9f9420a25e96efb65b4497ecdc3267bb4eca8fe77f42e9b65ea901917481bb5",
+    "6x5/SettingsCategory.xml": "38cc1767f1b49ff3fb4ab1eedced4769853d9f9bd7f2a79f1aa1e0b276db278f",
+    "6x5/SmartPlaylistEditor.xml": "47dc8052df1475739715d02d233b65f201bcfee35d4c80c1bff868f8255dcc1f",
+    "6x5/SmartPlaylistRule.xml": "731f482df2e2043c18ceaee1d13f0e79a15d7fd3cdfcdd45ad80ee70773b25b3",
+    "6x5/Startup.xml": "56380276b7603d7b2f0d3375e338f8987f2092ac7ef968bdfc6f5877057c22a7",
+    "6x5/VideoFullScreen.xml": "5b1bbee1129419ed149c27c2191c737ae764a5acc47a77dda6444298d6d8947b",
+    "6x5/VideoOSD.xml": "210572e9a828c666eed9824ab58d0ecf9faa2809812cb8bb7ecd6d327e34abcc",
+    "6x5/custom_1101_Startup.xml": "dc132dde3e36c1f98f51864bdafb5e12227967ee9c07981a4cf617c5064df7aa",
+    "6x5/custom_1199_InfinityVideoLock.xml": "323e1023b81705b7045e3bd3e0cd6c79ad10e3a129688b480c0d6fda87969c90",
+    "6x5/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "6x5/script-RSS_Editor-rssEditor.xml": "5ca2e788c5cc526386f061a247a958bb35972bbc464451c5038c055bc5a0b67e",
+    "6x5/script-RSS_Editor-setEditor.xml": "5ca2e788c5cc526386f061a247a958bb35972bbc464451c5038c055bc5a0b67e",
+    "INFINITY_BOARD_GEOMETRY_33.json": "93cf7f22a95d88918cdd8c66e18f7ae4ca5f85b88c6e3d2af8980153bd36bc43",
+    "INFINITY_CANDIDATE_34_RUNTIME_CAPABILITY_INTEGRATION.txt": "9e23d7c7180a54c6fe6a8106d56d94469dc134eef69d4f25ff6d688a95dae1a3",
+    "INFINITY_MERGED_CLEANUP_1_0_5_96.txt": "150839ecd271e6c473ee822f4851c006b9fb6845f67c99fdd610bcd8e302e6e1",
+    "Infinity-Runtime-Capability-API.json": "c52b6238ecd3e26bc50b12e545c22d3dc811adfa0914b44e896a63edb77e44f0",
+    "addon.xml": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f",
+    "colors/InfinityDark.xml": "27c72b5cd10752bb6fbbb3991b0601a03df161e6bdd78728be5bf8c8ccbcc4ab",
+    "colors/InfinityLight.xml": "6a317bd9209c39fe1cc1c72c44e52ca0ca15f33809dd58405d5f6b773e0b8a0d",
+    "colors/defaults.xml": "f8f4eda26aa26ba77969377c763e76074158e5b177e61e63412359cc782dc393",
+    "extras/Custom_Debug_Overlay.xml": "cdf6bf8cb3e7060a9814dc4bdf9dfbf32df8e8a0348499e88f464b0ff1354102",
+    "extras/colors.xml": "e4fd26ab8b265ce9fe771cf059fa3b240daaabe7f9fae80c7f0a90287d5c6444",
+    "fallback/AddonBrowser.xml": "63635eb8a96867080b6c9725dc6136d30144baeb33a1b3b890a12ba5e47cb080",
+    "fallback/Home.xml": "c0e8803c503927e7167c94bb49e3191aef68cc367a20373d01f6bc3f684d8330",
+    "fallback/Includes.xml": "f017ba5b3e8b2de82f992459b44eab40896ffeb370ae27c882270952921f71f5",
+    "fallback/Includes_InfinityExperience.xml": "06733179581fc5f8bed18cb5e89b3f1703d5d7192534d00dd8226b5b35587c41",
+    "fallback/Includes_InfinityHomePlayback.xml": "a9fbf03ce0d5712c61ae28f85e25eab2f77dcc1172a76f3ec7b90e3e7c6f8d31",
+    "fallback/Includes_InfinityHomeUnified.xml": "4377c1f595f94cf46bf3ff192f1498e454c38e71a8f17e31e48b1ce76bc15093",
+    "fallback/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "fallback/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "fallback/MyVideoNav.xml": "6ba4e269f5efaf9d1a012177f29e6bebb61391f818b5981d84823d6ed585fe6d",
+    "fallback/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "fallback/VideoOSD.xml": "19ed1fb7e2d753c846529d4176f5ab3d158384b4d0c3f9959ca258b1fa0fef8e",
+    "fallback/View_50_List.xml": "1604781817f2496fb209a964decbbce921a5af0b3ffae4c071cb020b6a1756ad",
+    "fallback/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "fonts/BebasNeue.ttf": "a030495cf2841faf340a6decd71a6083a6c6f3e569c848b66eabfa0158c485ec",
+    "fonts/CaviarDreams.ttf": "e0e9896c72eaf72dec960bd405ec8d1cfff6629cb5309a44333d96fa2af3bcc5",
+    "fonts/FiraSans-Regular.ttf": "c29556a2719bf613ef3d5e070e40d903a8965d9c081beca1375dc1e6e0f93c23",
+    "fonts/LeagueGothic-Regular.ttf": "a71d574cb5c8b4e780964356223ca504eeee0144202766f569982da9e73c0d47",
+    "fonts/MaterialIcons-Regular.ttf": "ef149f08bdd2ff09a4e2c8573476b7b0f3fbb15b623954ade59899e7175bedda",
+    "fonts/NOTICE.txt": "38751245389e1e23f73e6f5384b5cbe7fa972cc4410c5adc9c04b082a0b9561a",
+    "fonts/NotoSans-Regular.ttf": "371924e7480d3d01807fdc1bd30442d0a6651e6b5ea546482f5883d613cf0419",
+    "fonts/OpenSans-Regular.ttf": "e64e508b2aa2880f907e470c4550980ec4c0694d103a43f36150ac3f93189bee",
+    "fonts/PermanentMarker.ttf": "9d31a5198c4ca4dfc9c5760022e7bb5b30eb21b8917963b2a3a2cda197f4f219",
+    "fonts/README.txt": "c8b88077052fed912b3f724c0ed230c501cf4e18833af7ca44338d3cd0b093e2",
+    "fonts/Raleway-Medium.ttf": "3d8a045b2c853ee51e5d734d3b53eacf3f5f5290d6b5b862134af53b29dd6818",
+    "fonts/Roboto-Bold.ttf": "84c9d92e4300b4e836c9dacd61d8142f5691e3c18da6c8a37a5e02edcb240a10",
+    "fonts/Roboto-Regular.ttf": "9e13e7dbe6f28b2730883209e6b98a7142f27fcc8d3e4bb1645c41cc978d853a",
+    "fonts/RobotoCondensed-Regular.ttf": "d5cbe10cfb954e6d580525bd05536b21447ce29ab8a84e21da8a58b588190326",
+    "fonts/UbuntuCondensed-Regular.ttf": "6c1f68d2e85832feae9ea30d2a6c0ea71ea623e8ea342bf00a414f6493ccf720",
+    "fonts/destructobeambb_reg.ttf": "74c6e6f4e624de109e6e8cccedfa7c746add11a2bad03d8fb051686797279ba1",
+    "fonts/gnyrwn975.ttf": "3b165904f3b906b6ac01c5964681dea158cbb62b88bfed59e9965790bb50e97a",
+    "fonts/licenses/BOXING License.txt": "d13dded58b4af492c2a3db876001006e81d66a7f37dd4f0e33a601637eb9b51f",
+    "fonts/licenses/CaviarDreams License.txt": "a62683604856bd6f9863027f0695835cc645fc81832ba3e1f24db3f1b541b35b",
+    "fonts/licenses/Exo2 License.txt": "1e01c6f37f19062381c6faeb8815d5925c37a87c4ebc0eb4390d11f13acd6886",
+    "fonts/licenses/Fredoka One_license.txt": "a4ab87a8114a72400d18d8d1cd2f58a1cbb92d1f95eaa33a06d6aded70a00c9b",
+    "fonts/licenses/Geomancy License.txt": "b94344a7967247c65d5d0268251a1074158547f7a323cf27a6b2d5c0e8b29af9",
+    "fonts/licenses/LeagueGothic.txt": "1900433a6778cb98d0a9f89d17d48d56985e71aba03944cd02698f949bca2a4c",
+    "fonts/licenses/Luckiest Guy_LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+    "fonts/licenses/MaterialIcons-Regular.txt": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+    "fonts/licenses/Poller One_licence.txt": "9fe429e755c8d0eaf6dfb42875d0a37231595629ea6500c7bc2e9eacb855d790",
+    "fonts/licenses/Raleway License.txt": "15801435b539e968facbe90bc3f3a1079ccf29f6356dd3fdfafb84857342c8ca",
+    "fonts/licenses/Ranchers-Regular_license.txt": "92ec07e14164f37ba71282866b2130a003206b8a1b5a2f6065baaeb0dc0c9f25",
+    "fonts/licenses/SF Distant Galaxy_Readme.txt": "07ee54cda7d2a1da630d5ad4a94d9fddc98959359d6a29f6dfa5284011a9823d",
+    "fonts/licenses/SIL Open Font License.txt": "a8b9df0b5796725c772a1a22da847d27ba6cece994fdad203a8bd28a21056086",
+    "fonts/licenses/Theboldfont License.txt": "4c25152aa60061a27d5c326c283c5960355f56b2c35df56372e3119c996f33b4",
+    "fonts/licenses/UbuntuCondensed License.txt": "52fdffecb23a020de527f68c516cac16dbbaf2dbb73fd9e29e2149703b881c82",
+    "fonts/licenses/gnyrwn975.txt": "0990b7756bf3b1aeaa53f7c6528ed9f1ff37a290edb07fdc1f5861f3508c1ae6",
+    "fonts/licenses/hemi head bd it License.txt": "5c8599dc442aa7ee98fddd48c5780ce8a11b6df03950ec7cd29c6bf44ba86d7a",
+    "fonts/licenses/play.regular License.txt": "abacd736967cf48df9deb9c7c22deada4b3dbc37c79a5179672cc58c7ea6157c",
+    "fonts/lyrics/BOXING.ttf": "cc13186abac0ec1166488da8eed42c1bc9ac595b37e6a8fa52e394f19e17b255",
+    "fonts/lyrics/Exo2-Black.ttf": "136e26e1a44e12dee7d4dd543afefad010cc5f884ad778289476803e0c12a49c",
+    "fonts/lyrics/FredokaOne-Regular.ttf": "a2fbb1416510efe20330272bc182d667efe1507db5faecde893084fb15953973",
+    "fonts/lyrics/Geomancy - Extra Bold.ttf": "c568b6b97e15af3c95763efa201add683ce3165782172cd560ae2f26da030643",
+    "fonts/lyrics/Luckiest Guy.ttf": "7753c26a6497377c3c41de662581d2093ea0411c09fa3960fc410278758d3318",
+    "fonts/lyrics/PollerOne.ttf": "49c5128cb550156e9384453906b869b830aafacfc3a9332ccf989c8ed146d773",
+    "fonts/lyrics/Ranchers-Regular.ttf": "19568aba8965664d1bc6f5a48c24d269c97501eed87af26b912f42b6e6f22adc",
+    "fonts/lyrics/SF Distant Galaxy.ttf": "2764df6c1ca360c7a2610c680b63bd4a0248ad58efc7f4f24d56ce81acbfb043",
+    "fonts/lyrics/hemi head bd it.ttf": "b10b5a247c8496e6f81018270dcaeaff4289d4bcdef01f47733076157a8c3c20",
+    "fonts/lyrics/theboldfont.ttf": "895259e486c5fcffa037a580191fda184c57ef29678650972279d9760652c3eb",
+    "fonts/play.regular.ttf": "6fb240521cfe3fe9983b590fdf0fac15e891b19b261ae382517066029eec46b3",
+    "fonts/webhostinghub-glyphs.ttf": "51454b7b9f3c133f40e2c319be101e6082c73aff7f80259d490cc4f4a5bcb57a",
+    "infinity-skin.json": "b1c8c0f095ddb3f699d17373914518c0811690ab220e1a97a13eec7d1cb9c38e",
+    "media/infinity_experience/edge-mask.png": "2d5d71370a626dd1d72dd4d4fb3d6e0a4718778e2ce4ac316630bcfdb57f63ff",
+    "media/infinity_experience/health-orb.png": "c95d8d3554da67c7baac0cc7d390808c3ca4221a1a3694859de4115f7e9b94e4",
+    "media/infinity_glass/field.png": "bb71c8e421b7b66785cfcf125789891a172b98204ccaa1d5ccfeee25e7e64c2c",
+    "media/infinity_glass/focus.png": "2b32f7247e5473dd10aaee37d4598da6c97750d5c77bd608dc4b1cd574766963",
+    "media/infinity_glass/rim.png": "bf420573757e67834b418a53cec93c300eeef19c7b992d595d16b988f2aefe43",
+    "media/infinity_glass/surface.png": "4bf7805270868d2b0e00b21200f9f54394fe86cbb9d7abfb9e6b7c6eeff493a0",
+    "media/infinity_legacy/back.png": "334d8372aa133c38e765ab2e0e702962730d18f856578b291043a79684ced685",
+    "media/infinity_legacy/border.png": "93559c83010f4739ced3541e3c04f194e8793b997b3f980bf567217ad7709535",
+    "media/infinity_legacy/card.png": "88a74144937b1b9e5d8a67d425bfe4a346c58ec80d4d5ed56592cd9c8423cb95",
+    "media/infinity_legacy/check_off.png": "0e2edb16ffaf759a7e4abd2b3595011dfe9d6910a853ca155903f15746df79bc",
+    "media/infinity_legacy/check_on.png": "e2108b2582c1900dce2434bac9110e4a26146ecea1360d796d74d86a3f9fa3f2",
+    "media/infinity_legacy/close.png": "49a8d8c9e3163a7b14371ffae7592516be629017693f80505c7dc495c93b31bf",
+    "media/infinity_legacy/close_focus.png": "913a1c13d41ffe7aa87bfa32b8bd65e3325900a41f3c986d7d43d6331c4fb6ff",
+    "media/infinity_legacy/down.png": "3d5b1c9054a1d8fb3da3ec4fbfee0d693cb4eaa80e63d4a67e8e62734a6ceeaf",
+    "media/infinity_legacy/field.png": "82027fcaf08f5d783fb9655ad3cc1b88b1de0eb7a1cee1b6225644ceadaa761c",
+    "media/infinity_legacy/focus.png": "33e1fe2b0753432df5572097e5ab5ecce9755268a979cb07a4d497499cdbdd5b",
+    "media/infinity_legacy/home.png": "a16ca8056bab52a024ef9a717aa8c759275ba58780fe89217571c667e96d1a69",
+    "media/infinity_legacy/key_back.png": "2b2a68c8e20bb721a0cd3d129baa4e7e9e6ea2f5cbde29955d369cf3d015ea16",
+    "media/infinity_legacy/key_cancel.png": "0d6626829e0e558f0c5722e85faa3f4d148cbec4ebba32ed72794d03c0f92a20",
+    "media/infinity_legacy/key_done.png": "39270a00d41f0e28592340d53f961d73b85be167829ce37c59ffd0e1fac39988",
+    "media/infinity_legacy/key_shift.png": "d238f4d23eeb976f57cbeeeb1f578d78d2aeed06b271d12c590ec5705ff1eae7",
+    "media/infinity_legacy/key_space.png": "2b15fde989c96c3456797e0b4c716bb8473d641b2438a898ed6a7c4fe17eccdf",
+    "media/infinity_legacy/left.png": "eee3f6716081e74d13cf5cdfe4eb34405b2c37dcf1798da92591ce8119b1d248",
+    "media/infinity_legacy/panel.png": "f9e22999374f4eecd48d1dc192429adba6f80fc09802ae0f0aa78de315b32b38",
+    "media/infinity_legacy/right.png": "e08e1b8a35ccc5ea4e6b928b3a04d3270cb59b5efbca007548918cf2e7a3c05e",
+    "media/infinity_legacy/spinner_inner.png": "97362b75d32287cd883729e8c21acbe327f0d95e839012318fbf538b18cb378d",
+    "media/infinity_legacy/spinner_outer.png": "b56c1b5ca13eb038bb9a92411d215718e33fbd109ea8bac4dc354a71f68a5860",
+    "media/infinity_legacy/switch_off.png": "1d4337792cf1e920a2c33603a3fe75545df7273c49f8d322c216e236e2a81605",
+    "media/infinity_legacy/switch_on.png": "c1b63ad2f86602872db781c07cd35ecbf99bd26805fc3091484012b83e4cfe8d",
+    "media/infinity_legacy/thumb.png": "9a844cf62f038e7b160d7e9a40bd949f90c169c7ad1d4387fa395d21cf023746",
+    "media/infinity_legacy/track.png": "5612e760e964eb3a657b27da932f8db89eb164326f6d6a60338fecaff41af247",
+    "media/infinity_legacy/trailer.png": "7ae364da8baac1ac021f6b7a3f604c12e403168444d73bef3394289db94548dc",
+    "media/infinity_legacy/up.png": "044629b49dc5e20f49598b7aa35c49ad89d701591dcb22b05e1f6cabc7dd300e",
+    "media/infinity_legacy/volume_down.png": "15104828c3729d0a1d245126047b616609c5c5e63cc355d54790657e102a1b48",
+    "media/infinity_legacy/volume_up.png": "f829b0156e41d2c4df24a6c77e70c9ef404205d58a202d8280c111f31ab03688",
+    "media/infinity_polish/addons.png": "d7d56ed4a9e65f3f00e465d7f710e9a0a965500a245e6fa4e6a5e7c9bbf007a6",
+    "media/infinity_polish/addons.svg": "35510c9dfa715eabd43afd12258955a332e6d6cc6b9b7c12f7afc571170b170e",
+    "media/infinity_polish/ambient.png": "f50453a852cbfe6507912e27966ae01cd84d9e0fd70b80df1ca5b29a8b3b2f73",
+    "media/infinity_polish/ambient.svg": "cfc4b04964b2d3376f159f95b5ba8623cf1766edce3a65952ec4cd106a3a50bf",
+    "media/infinity_polish/chevron.png": "4e9cc7cc68b11ec1d5a82b683242483663c3deec2d41621a23a4ca8e151de8bc",
+    "media/infinity_polish/chevron.svg": "c29c46a0dee3b48d1f3ab346a31f664623920c6208558320b8407a5d2110639e",
+    "media/infinity_polish/close.png": "16bf48d9253db2adc020da10151531cba7a1be27a95a2bede96a2a4a8f278ec6",
+    "media/infinity_polish/close.svg": "03f4e6b2a07cd842e3384e603a30c31eb8fce03a00ef4d37af3e87f692fb5f37",
+    "media/infinity_polish/collapse.png": "de46c71207794d395fd5eacda178f3ecc8e76eb35b346fd3e78d162eaf8d054a",
+    "media/infinity_polish/collapse.svg": "cf0e5851ece07f3ded18602847ea7a596c6c31c5fb45f84a6d33efb658369949",
+    "media/infinity_polish/favorite.png": "e94ba7114f3b291d559995946beb1d7d5447b29d5a603724e2ba27d9b23d64a7",
+    "media/infinity_polish/favorite.svg": "991f51d3bf00156011073f300884f9f6d23ef3da9779e5d4bcd2c159f62832bd",
+    "media/infinity_polish/field.png": "00d4decb3681176540a415959746bd898dacac8390634627b36ad6bc5096af31",
+    "media/infinity_polish/field.svg": "5780fb8ab31464e382a59d657a49612623586e6bc46f8282c7b806b690df08b3",
+    "media/infinity_polish/focus_rim.png": "e86d8016593c00a866fc29ba2d67615e2ea6a956d2b0662d481a746b21931637",
+    "media/infinity_polish/focus_rim.svg": "0b7ea552bd614c061987ff3dfe99b79559f581a246728be43b2789bc466da7df",
+    "media/infinity_polish/home.png": "f93332b447e9c1c62aab12e60149d8c38df6594c5d159d507e5cf70ca564b514",
+    "media/infinity_polish/home.svg": "5a6c12b8fcac223ce4b3bf37f71e7ba10a5ecc47c6adeca86f60ffe8b289b220",
+    "media/infinity_polish/infinity_mark.png": "d5abdc4d867d798e916cafccd9e061484feb00cb9c37976d2a196e036a65b202",
+    "media/infinity_polish/infinity_mark.svg": "a49f22aa593c062015d3f004c3cfe6541d820a70a1f95fc1068de06c5a6bcdce",
+    "media/infinity_polish/library.png": "ddd046d67db5c2c7aa260b26e359099e990ec88c687430e9cd996a1937546ba9",
+    "media/infinity_polish/library.svg": "f90a0346a85ebf0847fcf26f1ceb07d9e63c328d7e69862b9fec23a8fd77b611",
+    "media/infinity_polish/menu.png": "bd0d71cc550b1c0a78517f2efda15e8074b3847edd8d04e58354462fe1e7c794",
+    "media/infinity_polish/menu.svg": "b87ef256a6e35fdcc6578715d293c4a114344a1456f0de2e88f7f0ef4b3bdc24",
+    "media/infinity_polish/more.png": "ebc0c658e96deab7a2f0b5e90b98aedaab33804ab98135ac4d093b294869a5bb",
+    "media/infinity_polish/more.svg": "59e0e98806da145052fe916ce8f99e61f9e7185528083bd751cbc3ff12c40d8b",
+    "media/infinity_polish/movies.png": "5bf4c2859775f88f1b1444bf212d9bbec0e10f74cac13125d306d2aaf80c10b6",
+    "media/infinity_polish/movies.svg": "96306ea27ecf880893b50befa5bd4ec314ac4ca984d433a836dca9d8f2c696da",
+    "media/infinity_polish/music.png": "8f6b5dbfb27c96a9df2dbe02bf2cf18a3a854e9bc36f4517ae4db3e2814285b2",
+    "media/infinity_polish/music.svg": "505c03a4235df3f48e470cacf92b956cd993a5dcfddd6f9d3ebfd2cd424a5492",
+    "media/infinity_polish/power.png": "5902d9b5c8211d17152c59290049369f26a1f8ec6cafa777e7540cc743207bd4",
+    "media/infinity_polish/power.svg": "423d4541af931d967e6b36a3c89bbf341a5308b4c964b3835b74d5f71e4ce3e3",
+    "media/infinity_polish/refresh.png": "f9ed3a4a2da4458dcd28f9b4ef7d4a47cce256539a3b6a8e7c0d424a8fd59b37",
+    "media/infinity_polish/refresh.svg": "e473dde8824fd487e39c50424d371f6e54e5474125df876c440d9f60b2e6b372",
+    "media/infinity_polish/rim.png": "b4cb5d83c4c42f08236fd61a2ffa3e780d209f5170ffb040170953ae24b908f2",
+    "media/infinity_polish/rim.svg": "c52bf2f2a1fd0a6ec4ec7b12b88085bd701f007d701f5d988e3aa378586a457c",
+    "media/infinity_polish/search.png": "5ba884e907d4f3d81ba0431d01ac3f96d9620e1f7488ce7564e56d9a30c5b7bb",
+    "media/infinity_polish/search.svg": "ce9afc9f564a8729affe491811e856698a17f319d01c0b562f02d838acf5e138",
+    "media/infinity_polish/settings.png": "4570408e0a031426b75ee124a7bac41eedcde30671fef2938209c798f11bfc74",
+    "media/infinity_polish/settings.svg": "ffca605b6b493ef48c12b635a2389d50035eff137a5db098ffb20bc0cc5f7533",
+    "media/infinity_polish/surface.png": "dd567ac910907854c3873567999d9348b44564532ee673fe6fcc6a73e201ef97",
+    "media/infinity_polish/surface.svg": "6fc0f2f27216be09e366d395d0f30613282636eb37f903ff3d03479885af623f",
+    "media/infinity_polish/tv.png": "fd9b559f65c455887360f52955c549f25389c745de457f35563d995647338cfa",
+    "media/infinity_polish/tv.svg": "3200e053cb468adef33558c06ee267cb78fc2e01530615e1eefa8ae9a0992b5b",
+    "media/infinity_reference/outline.png": "e37f08abb1c63de6dcacd416eb41f3e70a14c5d0664b8739ec3862d88622c17f",
+    "media/infinity_reference/rotate.png": "e0ac8e5c3e967edbb8535815ecdc9e95c5d4c1eceefab098fe8d046455346748",
+    "media/infinity_system/disc.png": "0e66c864f7ef7da8cab4aef8f4cae708c4b7a83c36c42043e95e8a92c06b193d",
+    "media/infinity_system/disc.svg": "11b06cbed493d621c77fad33b589b3ab25410d20dbf6e28289dfa2ad1a63cf7c",
+    "media/infinity_system/drive.png": "557be1f7ed50e02d50be3083a26a7b1969027fc6a30e410492814e78f4d31376",
+    "media/infinity_system/drive.svg": "63a2640b739b7fd9184e01495d48155b56c8733e7ea523af7f5d3acc4c52a00b",
+    "media/infinity_system/error.png": "491f01bcf3b8bcea79330ec0b1098996f3115760b6b9bdd79ac805c7903e9ac1",
+    "media/infinity_system/error.svg": "184b879ef63acec5fac0912649ad4b7a2ca0a9cec1a91cf003eb77c63a7a05f7",
+    "media/infinity_system/file.png": "5cfa128e65cf3559b7ab4a8d7ab242bf6cd22fc7ece260b6b43e3eb9dbac9313",
+    "media/infinity_system/file.svg": "6d1df1a8d0ef26c5e7c0db1ded0d99ceea1b121837505f6220eada2473835ff5",
+    "media/infinity_system/folder.png": "a2f3f5e7defd7c9da9e742e173f2a8a4f2f7b2ff6373c68e4d6ea2dc831b0dd1",
+    "media/infinity_system/folder.svg": "b2f2ceedd8dd757c2afbb1066ec0e21eb028dc84f286ed61268ceedd571f6bae",
+    "media/infinity_system/game.png": "413d9fdb4eb35b86a08ba05d61c13637c41089cf6b923782bb9227bbc776f4bd",
+    "media/infinity_system/game.svg": "c772e3837ede6e10908a0ec7ba7b440ea56ff09ce2612b4d90608305e9ba1c54",
+    "media/infinity_system/network.png": "89c87ff6ab72e75d9b5cd4e85664f898d46a205b4925cfdeb94cf16c65f5305c",
+    "media/infinity_system/network.svg": "5cbfc68eb991ff81811cd15b2ea4bc65c8887c8823994b6a2a3d32bdb3249e89",
+    "media/infinity_system/picture.png": "6b6199a854cf10003f9944c729a6431d714d47f68c0e4d6566e12b2317917461",
+    "media/infinity_system/picture.svg": "6961df11617af1b567b044c14e1741537ef8c264de42d4afce1edaaa13598836",
+    "media/infinity_system/profile.png": "e52e9b8088201f25de38f938d718c39234aa977909d15b0facccde119dc8cf18",
+    "media/infinity_system/profile.svg": "cf46c44d02679430454141a35c38ab2373dd3bf6b3374ee08f7ddd8ca0db1e6e",
+    "media/infinity_system/source.png": "1d7832c2a76e161111dafdf2411ee73c57b0f6d06b71bb4e08a0a867ac04ace0",
+    "media/infinity_system/source.svg": "d91a2a206f37c791700565d60032da24d4fdc4454dee08acae9b609cdfd3e965",
+    "media/infinity_system/warning.png": "726d01d127e92e6eae9315fc099f9bfaec68b68355d33e99f02dc4427c87955b",
+    "media/infinity_system/warning.svg": "a794d1d360cc0a6627588872058d5507889b71b74b7e10276eefad9696a7c984",
+    "media/infinity_system/weather.png": "5990e10ce60769f125b66358bd39381e0cb45f28ddbd41e24bce9781495f8f4e",
+    "media/infinity_system/weather.svg": "b03bbdd07673092d5a41905c7931d0352592bfec594306f4064dc28e7c153d67",
+    "media/infinity_ui/blue.png": "0a58f8df357eb7cdc8d522b5063198b09fe4c2b497afa016a729f29a83fd49ef",
+    "media/infinity_ui/card_dark.png": "a99199a406b89293bbfc66a04f08394b43f97c09172c1785c4909adea239bd3f",
+    "media/infinity_ui/card_light.png": "496bc7e17a8c695428add66c70883871847fa5a369ab68e6e66ef85d1d58f767",
+    "media/infinity_ui/clapper.png": "4ed70b649c107831c7f52a59c04303640a2c0f84f69d82d1ee2686af261e3b57",
+    "media/infinity_ui/clock_moon.png": "97dcf6bc19ce904475dee57d664e12a6f88411353e28a7b69478bb653b13bf32",
+    "media/infinity_ui/contract_white.png": "d5a51b6aed15684ec8c123e30fe5703155359d6543b6d7b47cb5766ef44939de",
+    "media/infinity_ui/focus.png": "f00888e39cece07c1071b163991b34a798ca08d28333f6afaff88c8c4e0739b7",
+    "media/infinity_ui/folder.png": "e46e9ad11c38dfb021152a4adb133835c630e7585707ef17ff66fd495e8f8681",
+    "media/infinity_ui/frame.png": "d884a0d295d469a43b57f7a974d6734f0e336883c6821a800ebe91b126bfd251",
+    "media/infinity_ui/frame_soft.png": "e37f08abb1c63de6dcacd416eb41f3e70a14c5d0664b8739ec3862d88622c17f",
+    "media/infinity_ui/gear.png": "0e7a419512e9b8e4fcb7d541d3630d6df38009698c4eb3dcbad143fa161fbd4d",
+    "media/infinity_ui/grid.png": "e620e37aca0971f47e4d9c8d81c51cf6fe3df3a35976111a1b45c18c03769839",
+    "media/infinity_ui/header_dark.png": "da42e8db331e94753dd7875a53ad10b8743b0683ecd837ef341a7952912c7d57",
+    "media/infinity_ui/header_dark_clock_safe.png": "5b1486e6ba0fe1f27e889a048ed3d774cab65adac3e1766b18e441d7a84ab694",
+    "media/infinity_ui/header_dark_portrait.png": "f9737500df906f9ac7c69e89de9f866eda9b4010095d94d89fcd2787db55bdf6",
+    "media/infinity_ui/header_light.png": "329d0b8ad36c107ee843bf9018cb8b41728b44da010a8b828c854b23f8e656f0",
+    "media/infinity_ui/header_light_portrait.png": "6335a0bed900909dff500ed87b6978ecf16226f3fe6681c94d109d7a089e9b14",
+    "media/infinity_ui/icons/addons.png": "e2a243ba67e93d16d31f113968b22a63d916d09d0fc4ed874eb0af3afe85ec42",
+    "media/infinity_ui/icons/aspect.png": "264ce54d7b6c6c9c21a68f767c1ee2fc6f64647c203d3c60aa8e92b3fe6748b6",
+    "media/infinity_ui/icons/audio.png": "609b696e9990132c0cfe6355df46ddb40ed4053c807c4e91aeb532f042ec93cd",
+    "media/infinity_ui/icons/back.png": "7d7aacec22d19792765978f8d8ed7eb14f1acbf8acbb9fcac23ec046a24444f7",
+    "media/infinity_ui/icons/bookmark.png": "eb8ca1db355696548b0825e5a357e899dd72eacfc80ddd02911bbf2d2ab1a2bb",
+    "media/infinity_ui/icons/chapters.png": "ac746119c9e8831fcf995de28ac15a1b500e18fe7d3570814631058ad69a1e0f",
+    "media/infinity_ui/icons/clock.png": "dd5dd4313f8ecf2d7f32453b2d37fc49a493891418b6011939a01a6e822c4db6",
+    "media/infinity_ui/icons/close.png": "bba9acc1ae05d8cb734a1e6599cc0a46270f0bccdee4eb85e7f0f07cef7cd518",
+    "media/infinity_ui/icons/collapse.png": "4707f7af5b6cffcf9ed80a7baa1623a1d580b9db5055d0f250f01f1054f0c490",
+    "media/infinity_ui/icons/command.png": "24b16892d242bc9f3677a7105435ed3cbeb4a52ac3ab0df960b05b9bb760185b",
+    "media/infinity_ui/icons/display.png": "d716ec5b3e4c5316a72f483efeb584527c70ba0876b032fcb267077ff26a04a8",
+    "media/infinity_ui/icons/favourite.png": "48b96017b36efeaa351909be643f28dca0ac0c07f68ac5b3be1194d13b8e70d9",
+    "media/infinity_ui/icons/forward10.png": "986f542adc647055232b3081f2b20f963c9337c29964b5dd329fc67df3858daf",
+    "media/infinity_ui/icons/fullscreen.png": "92024c1c9c7bd967e9c0e20921c602249edecf1de85b29241ccd67549314dcfb",
+    "media/infinity_ui/icons/gear.png": "0e7a419512e9b8e4fcb7d541d3630d6df38009698c4eb3dcbad143fa161fbd4d",
+    "media/infinity_ui/icons/grid.png": "e620e37aca0971f47e4d9c8d81c51cf6fe3df3a35976111a1b45c18c03769839",
+    "media/infinity_ui/icons/guide.png": "fcbf12a3c16b8ffb2aa39c5309ba5b4bd1acccb0fa9bba341718411b7d52d852",
+    "media/infinity_ui/icons/home.png": "f38cd31fcf85bb2b50f5fdc8b83c1f9578473996dc10e71ac6d402261268c54c",
+    "media/infinity_ui/icons/infinity.png": "8a62d018401a46d9571a7a8124fa1b9c69d81be8cd01f0dcd28ba89cb44271b7",
+    "media/infinity_ui/icons/info.png": "ac09022dafe0ce762a1aeb3ca0edc999b86ea3b5d3b47783d07ffda193cb3acf",
+    "media/infinity_ui/icons/lock.png": "9cf864066595e15e9b105da330b7b799068b809e4daa0b773dc40202edb15c4e",
+    "media/infinity_ui/icons/menu.png": "08cda42e730af1038b4b03810797139d3fa9640ffc0f85da6c25f673a2840612",
+    "media/infinity_ui/icons/more.png": "8247bd511e51742e1572266e33e7653dfc41df2ef549e3af221a2ae67b4e166b",
+    "media/infinity_ui/icons/movie.png": "7cbeebe3c7c50bcd745885d3ab7cbcfe6c729c5fca68db8be37a53d60aa797ba",
+    "media/infinity_ui/icons/music.png": "25eadb47ff0f47fe18c8e8b0a5836e7c702d9a60ee09f0db1c0e906986d2a09a",
+    "media/infinity_ui/icons/mute.png": "6322f9faf6f5ce3fa57c18e1b0cf9a7eadeb1bf5d72f9eb701f497379c44b008",
+    "media/infinity_ui/icons/next.png": "716ba171c8a3d6f549b12036993b88a9addb00d68a2c8a55eb4e936c47ebba16",
+    "media/infinity_ui/icons/pause.png": "de8646e6c80fb5d8eee45d4cd4e2cbfa149b57629da1d6aa23c0cb1884a6f06f",
+    "media/infinity_ui/icons/play.png": "1a23fc1e1c377a634c9d3fdf644a132af8c9fa35070430d012322aa709eb53e5",
+    "media/infinity_ui/icons/playlist.png": "cfa6caf7d089de91d3a06d4f365c137c4d1473c49e8c55f290cc02a9bde41ed7",
+    "media/infinity_ui/icons/power.png": "9426b6ace6f59a2467fb798ef9fb2df61c1bbe85d038d1421d4b71d9988d2db3",
+    "media/infinity_ui/icons/prev.png": "3254a752355cf5724ffb1e150c047c2343ec611aa078f0dedc5a1c1305307993",
+    "media/infinity_ui/icons/replay.png": "cb4e9c2fbe68dd7cc33583861e6bea2f3a751d758367e92ba1ba1ac58bfc4fd0",
+    "media/infinity_ui/icons/rewind10.png": "9effaf31dbc4a741ff05c2675db2e175fc8d41d656398cf7ca298416c61529cf",
+    "media/infinity_ui/icons/search.png": "cc9eb75b739721870cb1a83e833325d63c96b7b56be809d1971635fe56786777",
+    "media/infinity_ui/icons/settings.png": "fcc9eedbf12e122391769bf6672b9d05797dd6e29031bdf982f792653090f817",
+    "media/infinity_ui/icons/speed.png": "5c2b23bbeb7cb6a8208e53458986f9924d202ba863e4e65cfd8184d7543dc010",
+    "media/infinity_ui/icons/sports.png": "928b732726aa2c2208f9384ab73702511e5d7a177a43df4e6eff4d861006abca",
+    "media/infinity_ui/icons/stop.png": "e3f6df20072d04642739e618646b1c4b738f8ff7ac55597c74daab0cea6a978d",
+    "media/infinity_ui/icons/subtitles.png": "005824b096fb8817e74ade6a4ae06616231296cc9363c0488e68e88198840334",
+    "media/infinity_ui/icons/trakt.png": "a6d1e7297e827a9067cc7bbbbb51152b0d2c50d8a4f3a361ea8aaf4ebdf76144",
+    "media/infinity_ui/icons/tv.png": "410b9387b7c355891897226c49224cea9f397b28c5a7089de02e6c3bcf4a134e",
+    "media/infinity_ui/icons/volume.png": "080b1a9fc9ae4e4bdf99f6936d5586a491c154771547947027130ff3c98b5a22",
+    "media/infinity_ui/infinity_logo.png": "6dbc16803c7353c67074758d1c8fd1ff19f5761a96be85cd10e1c4ba9055d91c",
+    "media/infinity_ui/nav_dark.png": "91a535365e0f60c40860b4f47b6a56923560726adf55dea107984857c5e7820c",
+    "media/infinity_ui/nav_light.png": "6abf7a9e2d71038851b5f880a16d0022a646e3fa232e650c3f719a2ce8819a5e",
+    "media/infinity_ui/osd_chip_dark.png": "f8a9372a7c6d07948f79c1eed5334e75984b6f696fef0a5c13009438987f6c77",
+    "media/infinity_ui/osd_chip_light.png": "0fd19b6cbbefc3b0e063f958018419991e405c964c8534e4599e31fd3b58ff55",
+    "media/infinity_ui/osd_focus.png": "333d25693f6c8982a31a73bc50b54b5339638e3493b173013e475764bdcb9334",
+    "media/infinity_ui/osd_scrim_dark.png": "2c0d6005386780fc9fa00ae09c16b299145f26124275d614b82bc06358551146",
+    "media/infinity_ui/osd_scrim_dark_c17.png": "db1984343aa2184eacd60ed21bd820e5424a6e8dec65539c66302a3dffa956b2",
+    "media/infinity_ui/osd_scrim_light.png": "f338b2b7151c678e3904d9f6138dfafd65fce4e4f7c421ac89af0c021bff0cfe",
+    "media/infinity_ui/osd_scrim_light_c17.png": "e281f49ea44fc8ce8a8cb97ac104c0be7bcf330107347fe0c02eebd0c1301a3c",
+    "media/infinity_ui/osd_scrim_oled.png": "fff76c92b3db23afc8c53a53daae35cc363fe9d82e197f3167c69910c373ab33",
+    "media/infinity_ui/osd_top_scrim_c17.png": "631d5e034bf638945aa24b9c49b9b198a925ffba153ca76915b1dc1283bf48f7",
+    "media/infinity_ui/osd_top_scrim_dark.png": "1d368f61466363e16086c501b6ee51ee989b18038886bb023fe000d4e21732f8",
+    "media/infinity_ui/osd_top_scrim_light.png": "c9fc4c6aa81ff879caf12f99e4384fd9a532852c51dbc24375c9802a8c9240a5",
+    "media/infinity_ui/panel_dark.png": "abfaeae758f874559343cfd25e9708b070e46b94948d95b64c0107d1fe90ecf9",
+    "media/infinity_ui/panel_light.png": "0f8fa283b457a1d822f0ad279a8e1599f1c8efd17deef18ee4fe5a9b7cb99fd0",
+    "media/infinity_ui/people.png": "dc3bb09a6183fe9af65147f622b3b258d0016ef10c7dae0db21b285484e6944c",
+    "media/infinity_ui/search.png": "49e2429bc46678d90f27738a7359da9a1236e8ec05409263e9c6467fe7e06013",
+    "media/infinity_ui/side_handle_glass_edge.png": "0a02aa210fc4b88f9b418c8851f6e75f9d3554665a87dc0258634809423d7421",
+    "media/infinity_ui/side_handle_glass_glow.png": "f2868cae641feb6ecd866e41c186fc59d94bb8cee45c46c7de6ac26f8bb8858c",
+    "media/infinity_ui/side_handle_glass_highlight.png": "11b9d228944c2194cac8814b872644bc52733ecf331981a7aa4411620cff13c5",
+    "media/infinity_ui/side_handle_glass_surface.png": "c0695a6b7ae2029e28e7e180fadbb58ac1fbee0dce2e0d71af85856323c5c875",
+    "media/infinity_ui/star.png": "5b12db6594fc037c183e05fbc3eaf0174f39a8f43553909db0ce55b2d130fcad",
+    "media/infinity_ui/track_dark.png": "d77bd3cda9e9d3b9e230e2ae222330e2dbdcc71ca8e6b9191f1e73c059fa7fbb",
+    "media/infinity_ui/track_dark_c17.png": "b7cfecac9513c60522a757d12cf0a100cfeabf0ba8855ee05a7aaea96a988b83",
+    "media/infinity_ui/track_light.png": "565f71630f6d6222c9426edecc176d136bc5a60a1ed8bc6ec5e98fe4a0d07c3f",
+    "media/infinity_ui/track_light_c17.png": "b4e302c962e575c2b595c298505b111b7984abef14c29e3d0ca8f51ad5342b9f",
+    "portrait/AddonBrowser.xml": "f565c5ac1d68801f2d0e810b7de8b9f39d25212fe5b7ce47810ba936ff91e828",
+    "portrait/Custom_1190_InfinityPalette.xml": "eb4052f95e2568534696d3e909ef8ba4ad1b871c0e63dc246423d0201e15fa37",
+    "portrait/Custom_1191_InfinitySystemHub.xml": "582879686c3ec86948cf78080316588433b06b1d6ae3fccc904474426da22849",
+    "portrait/Custom_1192_InfinityPerformance.xml": "61abb05cf978e2013a35461c2a349e797c2274e22ee9ab49d71c90c86868d426",
+    "portrait/Custom_1193_InfinityBrowse.xml": "eb0f272b36fc30e42e73a56e4bdc0e24f4eaf4be5294bbe609619b4b602abdef",
+    "portrait/Custom_1194_InfinityCommandCenter.xml": "df4c050a5b142da7820edb52802a5c4d41cd27f73f53c1269a4dc11178978578",
+    "portrait/Custom_1195_InfinityAudioSubtitles.xml": "bd18d5929fb0e537f4e3f6826905f1f5e464ad7bb830ab2d0c192d4b3ec100a2",
+    "portrait/Custom_1196_InfinityPlaybackSpeed.xml": "23c613bae7d8e45257be5ad0f301d06ae6d840d537e0521b2d11d5e5b8ef0ffb",
+    "portrait/Custom_1197_InfinityDisplayMode.xml": "93787a1b1b2eb3e5fbb84a0d671c26421057a215ccfe0d14fd53ae15a04211b1",
+    "portrait/Custom_1198_InfinityNav.xml": "2e11b98c1fe24b9b50feac3e34d642b21c08e146df18ffb867a76d7ab0f5651d",
+    "portrait/DialogAddonInfo.xml": "98ebea59328d585957cc84148c840b594659fb64ba6a0f744cfdc770cd3882c9",
+    "portrait/DialogAddonSettings.xml": "599e0dccee1c517a03e75c08b0c7fd5ec6326e9c1061dd99305d3a0befb11f03",
+    "portrait/DialogBusy.xml": "41a9396afd52ca057441919aa464f7cbb8f5050e1c1165ce9716ad1fc419dbea",
+    "portrait/DialogConfirm.xml": "560245f0e1e7337174ef117e320d2e9b5abead533fd65efab88ce0d1e855c41f",
+    "portrait/DialogContextMenu.xml": "27d1d4bd991ae99de71145626dae992cf91346565ea0f24726aa1f3ecf1f510b",
+    "portrait/DialogExtendedProgressBar.xml": "5fa547a3a8d61dd9fac40723fd5fe2651822d212cd22bb937e31915033963886",
+    "portrait/DialogGameControllers.xml": "dbc40dc3ab2fb4c5390ac2e1cc9b55342879ab139a70f93ccc9f4470b47b0721",
+    "portrait/DialogKeyboard.xml": "854b7bb576a0b4ddeb9045cbd141782cc5d132514e6f8e5bcfd7a196460b9d7a",
+    "portrait/DialogMediaSource.xml": "3bf59fd46c21e1ec219e5bbc64c27a2139b9e8f6bcc7ef4fe0a85aad00dfc60a",
+    "portrait/DialogNotification.xml": "9a1dbeeab098a973b0ad6aec67e861825496da4e6195f8a06211a3ae6e941754",
+    "portrait/DialogNumeric.xml": "1ef1a284054638d6a99c1cfde8c084573c47fed8498cda37975f20bbc3b8a938",
+    "portrait/DialogPVRChannelManager.xml": "08d685403a824e4ec94ee888fcd0751c86260eb60334155bf0f9ee2d1c01a75f",
+    "portrait/DialogPVRGroupManager.xml": "cce155dcac58ec2ed0114454f48e01fd8ceef67c327334f32af9214ce7f4d9fd",
+    "portrait/DialogPVRGuideSearch.xml": "5582d1be2bb017265fb2f864f308b3a06b026d5c4d7fa7cc309ac1ed0302c169",
+    "portrait/DialogPVRRadioRDSInfo.xml": "5589d352a3bd44de318071e441446e44b676795d88eef411297508cd60358cc6",
+    "portrait/DialogPictureInfo.xml": "c1e97ce2b4da9ff50b2aa0f44095e103761c735e415c0bb9d811fa81fb23bb75",
+    "portrait/DialogPlayerProcessInfo.xml": "09ad340711ee92b6002351b29e0d17c1d0b8b8023522502ca3041bee168ee51b",
+    "portrait/DialogSeekBar.xml": "f465e88805c228220269c7d0008e88352805648d72aba50ed615e856023732c0",
+    "portrait/DialogSelect.xml": "631ab1c23a563e077cd9b55219f55c7776c97d3aba99a179fdeef990a79607bf",
+    "portrait/DialogSettings.xml": "15f2d00184eec9c9c06e5681c168cff1a047ed1476603ec7345bf10a79e5c39c",
+    "portrait/DialogSlider.xml": "7564065e74f706bcb1f438be976a7bb0a8d758742c590fc64ead7e48eb3a159f",
+    "portrait/DialogSubtitles.xml": "bc4c613403deef8bec2edd0105aa3af0c94f41843589e44c99929bad4d33e3ca",
+    "portrait/DialogTextViewer.xml": "c406919582c5e78d004865a01c26ed1757d14abb679379aaaf48df0805b73002",
+    "portrait/DialogVideoManager.xml": "38e32c0e323e880cf34f5d966af2e4de90278c395190d16e63a4177210448260",
+    "portrait/FileBrowser.xml": "2f58f932a2884d5a0abb6779939fb6da3b9440e046f7021f5c94619d2e023097",
+    "portrait/Font.xml": "dc462c635b4f0259b13b34ca8ca7f3533dc22507938d8fd2e7d05665c1e3367c",
+    "portrait/Home.xml": "c0e8803c503927e7167c94bb49e3191aef68cc367a20373d01f6bc3f684d8330",
+    "portrait/Includes_InfinityExperience.xml": "06733179581fc5f8bed18cb5e89b3f1703d5d7192534d00dd8226b5b35587c41",
+    "portrait/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "portrait/Settings.xml": "b520c40d5e32c1cd16d90396aea1e03d1fc19da6714faf6da581e035247eda2f",
+    "portrait/SettingsCategory.xml": "ec6bdb0636f9cfba63516b57ca8725bd9ff7ed4c6b49107fbc2914bef8e401c7",
+    "portrait/SmartPlaylistEditor.xml": "c9f64506a68a423c79644fb0842ea5472c17975bfa54441b71e949bfd1cb54c1",
+    "portrait/SmartPlaylistRule.xml": "ebf55fdd981cae16acba6b458229e4b1700824b7ad849650b1a21f50ed19077a",
+    "portrait/Startup.xml": "73cb307b618ae79757100a01f72ff4eb9c9df16be709405244fc741ee223a45f",
+    "portrait/VideoFullScreen.xml": "5b1bbee1129419ed149c27c2191c737ae764a5acc47a77dda6444298d6d8947b",
+    "portrait/VideoOSD.xml": "3f980272eacb1f1ce9e224cbf3e5342a73b98d196b12a2f67d3ea0b2c676f69c",
+    "portrait/custom_1101_Startup.xml": "86669a8fd38dc282802eda7aa45e4fb4870abde7a13649619a33dd5339611b57",
+    "portrait/custom_1199_InfinityVideoLock.xml": "5117c02db6f69fb2b904c286c40691e8cef1a548850dcfc0e7e3c5ba832a72a7",
+    "portrait/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "portrait/script-RSS_Editor-rssEditor.xml": "0fd16ab65e9de662291ba0741f2f1348558e3f36886fba803bdc3ea5cbd8ca84",
+    "portrait/script-RSS_Editor-setEditor.xml": "0fd16ab65e9de662291ba0741f2f1348558e3f36886fba803bdc3ea5cbd8ca84",
+    "resources/lib/infinity_continuity.py": "a9a5477eec6ae1684d04d6b0a574be3f6b07172ca793240af82c8d26a421c9d1",
+    "resources/lib/infinity_library_navigation.py": "6cb5abe0d93544572135f2d7b3b3405ddee70d9e954a211292bfe0d08b4d03c9",
+    "resources/lib/infinity_native_ambient.py": "cb4a2f075c67842c4864f88077474715448d7109738f86ea0be472eea291618e",
+    "responsive/base/AddonBrowser.xml": "1f6b145ccc1c2ab61224a267cf8580ec16cdf9e9ae5540fdac598ee50fecb947",
+    "responsive/base/Custom_1191_InfinitySystemHub.xml": "b57183ee0dc8fa04d3b7a758f674593a2741df41cae4af7ae92a2434f8a33c07",
+    "responsive/base/Custom_1198_InfinityNav.xml": "5a4d7bbfb43296a2b504ba11e0c8966bbeccd9d01e85477324a36b804ff5db99",
+    "responsive/base/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/base/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/base/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/base/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/base/MyVideoNav.xml": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+    "responsive/base/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/base/VideoOSD.xml": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb",
+    "responsive/base/View_50_List.xml": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+    "responsive/base/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "responsive/landscape/AddonBrowser.xml": "7d4004e1ad99e6f5c6d332a3588133b2af54489f71c004e0fedd21ab1a6349b7",
+    "responsive/landscape/Custom_1191_InfinitySystemHub.xml": "3ffb911606cd5b8f6d5cf90b37f1b2de1ab24be3c03f10015c9c1c119c702d01",
+    "responsive/landscape/Custom_1198_InfinityNav.xml": "5a4d7bbfb43296a2b504ba11e0c8966bbeccd9d01e85477324a36b804ff5db99",
+    "responsive/landscape/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/landscape/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/landscape/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/landscape/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/landscape/MyVideoNav.xml": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+    "responsive/landscape/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/landscape/VideoOSD.xml": "4948593a00110f515c2117241a0e7e689a49f5270ea6e9daf65cb3add3b2e1ca",
+    "responsive/landscape/View_50_List.xml": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+    "responsive/landscape/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "responsive/portrait/AddonBrowser.xml": "3ead32837ea5a936dc9dc738b400a95d09ff9f1620ffb3d7bad3a60060520638",
+    "responsive/portrait/Custom_1191_InfinitySystemHub.xml": "0a383f48df3e8928bcdb0a8c0680f894a6950ce1db1d0fc30dd2aa243183b3b7",
+    "responsive/portrait/Custom_1198_InfinityNav.xml": "5a4d7bbfb43296a2b504ba11e0c8966bbeccd9d01e85477324a36b804ff5db99",
+    "responsive/portrait/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/portrait/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/portrait/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/portrait/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/portrait/MyVideoNav.xml": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+    "responsive/portrait/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/portrait/VideoOSD.xml": "1ae9d01ee11083c25b2140c65e6466dd3b0cdfd588f8a5383191811fe79e8289",
+    "responsive/portrait/View_50_List.xml": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+    "responsive/portrait/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "responsive/square/AddonBrowser.xml": "24c0139db3affa26f7b3bd2c3b1b349bc1c4639c49f3dd0375ebfbac3dce9314",
+    "responsive/square/Custom_1191_InfinitySystemHub.xml": "b57183ee0dc8fa04d3b7a758f674593a2741df41cae4af7ae92a2434f8a33c07",
+    "responsive/square/Custom_1198_InfinityNav.xml": "5a4d7bbfb43296a2b504ba11e0c8966bbeccd9d01e85477324a36b804ff5db99",
+    "responsive/square/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/square/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/square/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/square/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/square/MyVideoNav.xml": "3506e3cbd21a6fa8237dc42cbc94e48a07df0b0bf2241ec4c5433a2e2550490c",
+    "responsive/square/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/square/VideoOSD.xml": "b1e88299556a8f92955880d02dea6040276de4ca4a3cb9643e4ed1ed61758f5d",
+    "responsive/square/View_50_List.xml": "8783162437b26d0424e5b71e56e09fa853c5dfe1302be63be5e1a98a90f88102",
+    "responsive/square/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "responsive/tall/AddonBrowser.xml": "7bec2d84929c5f82786e7da55ac903bd5438d2d09a4bddda2bdc4e9195bef67c",
+    "responsive/tall/Custom_1191_InfinitySystemHub.xml": "897e983595028076d1455731dd33a477f11970948f4f57f77080e43720f86a99",
+    "responsive/tall/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/tall/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/tall/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/tall/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/tall/MyVideoNav.xml": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+    "responsive/tall/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/tall/VideoOSD.xml": "7da8ed4ce0db52d60ef52240150e21f9d3e1cd1f09f893528ffefd8d7cbaee27",
+    "responsive/tall/View_50_List.xml": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+    "responsive/tall/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "responsive/ultrawide/AddonBrowser.xml": "753804ec12c5c228517ccbae05bf029e97d098f788704ff81d3873696cb683e5",
+    "responsive/ultrawide/Custom_1191_InfinitySystemHub.xml": "fa06edfab3d22bf200250faaeb073dbd10cd724042cf1b7a50e5300313c35013",
+    "responsive/ultrawide/Custom_1198_InfinityNav.xml": "5a4d7bbfb43296a2b504ba11e0c8966bbeccd9d01e85477324a36b804ff5db99",
+    "responsive/ultrawide/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/ultrawide/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/ultrawide/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/ultrawide/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/ultrawide/MyVideoNav.xml": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+    "responsive/ultrawide/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/ultrawide/VideoOSD.xml": "7ca19c1a7991243aa3de3cc88a025459d204a5bd988262f3f79894195dd88bc4",
+    "responsive/ultrawide/View_50_List.xml": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+    "responsive/ultrawide/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "responsive/wide/AddonBrowser.xml": "1f6b145ccc1c2ab61224a267cf8580ec16cdf9e9ae5540fdac598ee50fecb947",
+    "responsive/wide/Custom_1191_InfinitySystemHub.xml": "b57183ee0dc8fa04d3b7a758f674593a2741df41cae4af7ae92a2434f8a33c07",
+    "responsive/wide/Custom_1198_InfinityNav.xml": "5a4d7bbfb43296a2b504ba11e0c8966bbeccd9d01e85477324a36b804ff5db99",
+    "responsive/wide/Home.xml": "e134d4d10b3d51aebce1b0e992ed9f6d7b6cc6257af4dd94c0fcbcdaa7f5af61",
+    "responsive/wide/Includes_InfinityHomeUnified.xml": "0498e4702664d516bb4bd55072cb36ee6c34b9432f749f48c47c9e38db0e6a4f",
+    "responsive/wide/Includes_InfinityPolish.xml": "690ddd6f936015198a946e6e4fcb1111441f1eb9022e0e50e106b45afde86ffe",
+    "responsive/wide/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "responsive/wide/MyVideoNav.xml": "c6782f0288306d85e6694d7b97830bed89422bdf1d41fb822d2ad27e01934fc6",
+    "responsive/wide/Variables.xml": "b131f1b87517ec7260bb13b20857b0c72533e0186248df6122d4c94330ef858e",
+    "responsive/wide/VideoOSD.xml": "febc99ccfe1d03857fe669cc1d36d6e5359c5dae176218b9a95651d9edcd4abb",
+    "responsive/wide/View_50_List.xml": "bd90c7aeda38bb91174d191b36b809cc0a317919749facfcafb7b72e0bb30af9",
+    "responsive/wide/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "shortcuts/buttonmenu.DATA.xml": "b8066dc7f09d6419f8c9d882ae711bd971496d4ddf3068f774cc4189f1903b19",
+    "shortcuts/games.DATA.xml": "1c5378c98212f7628e891392b5c629d3e4c66071232f387dc55f9081e751e593",
+    "shortcuts/livetv.DATA.xml": "a3a3cdd6fa1480d31987adfb18a9d5f45f9fd21fbde5203add0ddff339aededf",
+    "shortcuts/mainmenu.DATA.xml": "b72e2ea9784c17e104f9fa75cde71ef028a31e69c103c55eaa6a93ff3fd5d4ff",
+    "shortcuts/movies.DATA.xml": "0447ab44feaf74f243889f076226a1c765b95d52ea5d6bffaf41f3fbe06109c4",
+    "shortcuts/music.DATA.xml": "73b27c7b9eb48522be7d2ea412d73213ecc2da329f5d512e8c3fbf8c1f9b948b",
+    "shortcuts/musicvideos.DATA.xml": "374f3499bd308377b38e7ed8582f3ba6f97cac619596e68accd092c6162f345d",
+    "shortcuts/overrides.xml": "bce05d2bc2815f626527b5e4414504ee7df6a50bbbae43310753672187109f1a",
+    "shortcuts/pictures.DATA.xml": "cd2e196c4326d0a11f86d0b7a33095db2ea4f8dfff7a8eb577435504224110a9",
+    "shortcuts/playdisc.DATA.xml": "87878d114eb5081e1f1bfb053e82ba5812a3bacf74dc38088b297910e047803b",
+    "shortcuts/power.DATA.xml": "c4936297b74699b2e1e3bf6ba62c43dbba374398a5f9d2d7e2f6489e2f20178a",
+    "shortcuts/programs.DATA.xml": "e59d65576068d314441e8c821d682ffe547b50ba88f085e2ee1c12765c93767e",
+    "shortcuts/search.DATA.xml": "1c5378c98212f7628e891392b5c629d3e4c66071232f387dc55f9081e751e593",
+    "shortcuts/settings.DATA.xml": "f6868f2e9dddd5bc86841eb8b2a7be60c154ded21c973c7c5d6c182fd4b90a1d",
+    "shortcuts/skinviewtypes.json": "d51c97fba49dcf745fce84d925004cdeb1d8753c1f83b37ca8a7d26667211f18",
+    "shortcuts/template.xml": "bc5229e5c6fad1d6e037919f03af9046492b7a8328bd2dc3d2fa7fa6e99a9d2f",
+    "shortcuts/tvshows.DATA.xml": "ec05e593a42040be5bb6209ff6a6554b8577d584d994737260efca089d71231d",
+    "shortcuts/videos.DATA.xml": "a7878f5c57a2c196a5204c0a3d2d78825cf92fe5fca2f78a2f485e739a5ce379",
+    "shortcuts/weather.DATA.xml": "1c5378c98212f7628e891392b5c629d3e4c66071232f387dc55f9081e751e593",
+    "unified/AddonBrowser.xml": "8519c5b49534b1eed24727227f587e3ed11d2568c725f319e1ef577a92917726",
+    "unified/Custom_1188_InfinityHealthCenter.xml": "080f63e416b8ec2e2f0c5e2109d8636b95d1e15d43c8979dff50a0eda7b85a7f",
+    "unified/Custom_1190_InfinityPalette.xml": "d5d2eae53ddf4f7be014bf2933b928123c0c99ef679d00c21b8bdcf76cbaf1c2",
+    "unified/Custom_1191_InfinitySystemHub.xml": "52d3713f1c5b57080048be13d9216909fccf6e01ec24d02b112e4eb14d28e164",
+    "unified/Custom_1192_InfinityPerformance.xml": "2f1b6181b72c62e2e251eae351201051f46511ca05fa976818b02e8379c493ad",
+    "unified/Custom_1193_InfinityBrowse.xml": "36a1d72777fef0b364b120defbb9a306428164217f498428e75a2d68d0cb984a",
+    "unified/Custom_1194_InfinityCommandCenter.xml": "05dbaf9ec6412afe33256c740338dca3a68185395649e4eca2c3457bb2244efa",
+    "unified/Custom_1195_InfinityAudioSubtitles.xml": "359e38ee8f12263b9e4a42855932c9cb6ffe43cbdacfacf2b5db3be9862eef3f",
+    "unified/Custom_1196_InfinityPlaybackSpeed.xml": "7f2e34a383dc7b94a83c885cd556ccb9bad6b46b83b42d41d4e09064c5304965",
+    "unified/Custom_1197_InfinityDisplayMode.xml": "65bad2c336bffd5ae3b4d0f74fd052bdc23dadf87658030b40d7122a4fa8e607",
+    "unified/Custom_1198_InfinityNav.xml": "15da2e0b3e3779f08018a624d20d72f8aef4a0d412a559fb679c64fd1858dfde",
+    "unified/Custom_5001_skins.xml": "0a5ed37e7160311ff7615530aa7585e210a79afcb8dd836784aac6bf52354e98",
+    "unified/Custom_5002.xml": "dbf1eb59a962857db9fc5effe6f7ff772cbdc14f20ccc420533a2db1b6ac9fc6",
+    "unified/Defaults.xml": "be1b1c43cb321af9f3262ccbd5b6eff59396657464f17549a8967ebe065b7f62",
+    "unified/DialogAddonInfo.xml": "a68e6730cf0a6efee0da4856c99332528b4aefb18a9093a664dd29be4f668b18",
+    "unified/DialogAddonSettings.xml": "21c05c814d387cbc23b1d6ebe8ffca887f62ac1407927afeb2a9d928ce09c216",
+    "unified/DialogBusy.xml": "69c85c61818cc4e4fca2eaf54954d68e25b0885d3a59919728ada489fba7c499",
+    "unified/DialogButtonMenu.xml": "9872884b3cc41eeea4515496212b782194f91d43421995c62676e669a03a0a66",
+    "unified/DialogColorPicker.xml": "4f46bb46d3eb2439b901d0fcfc8e9409d172f9e1a65366559274b51624bf5a46",
+    "unified/DialogConfirm.xml": "e02241b217835a5c25ac2c5ec84ba25704849161b7e66245e6dca559ed3325b9",
+    "unified/DialogContextMenu.xml": "b962cf5aff5997f8eba5f106261753eb93692941e4b6ffd857f036f21f7a0ad8",
+    "unified/DialogExtendedProgressBar.xml": "49ff5dd3ccadcadd8b2f3d3f0210ec733f157cff4126b484ab0f97d3f8b4c45f",
+    "unified/DialogFavourites.xml": "183c71163210060a55e7f87052142ed675450790e535e153385641790081c5e4",
+    "unified/DialogFullScreenInfo.xml": "5fc149858e940896ed95eb83a1067352adc827b10c11e44df1694c604ec04210",
+    "unified/DialogGameControllers.xml": "a923ac95b6b7561e4ec51b779c72594ff2ff750a497aa16c208c47399c148d46",
+    "unified/DialogKeyboard.xml": "cbf57cd84b806264095c26c5907250f360600a8e73e3581dfc4f2695efa31125",
+    "unified/DialogMediaSource.xml": "ce649aca4289cff359f45adfb040288136585783e1553c8a0f0c16bc86a0ea68",
+    "unified/DialogMusicInfo.xml": "91260819baf7c44c29c6347a44bbbd664b8a43d48f68688fb4a967d0e68e8e66",
+    "unified/DialogNotification.xml": "bd6a9ebd805023d892ec69b5e640c1644b35611e211098e5554201d0355085c0",
+    "unified/DialogNumeric.xml": "c7866c8dd7fe85fd663af4c6fdce834f79afd3b87856b6824e014c6aa6186d69",
+    "unified/DialogPVRChannelGuide.xml": "5541c56e06c7a422bb23843aebe67036814005858ceee6410b39f25cd58b646c",
+    "unified/DialogPVRChannelManager.xml": "9815e0616203c7258edd1db72f7ce0786d1573760c0b31d53a94aa2441270642",
+    "unified/DialogPVRChannelsOSD.xml": "c91ef00da1716a750ea9ca99f89c89c6a3d9fb3bab5e0cc4525a296181589386",
+    "unified/DialogPVRGroupManager.xml": "8f088a4d6f3c7b0bb526452a59d18c3bd5e6c4270df515668657e92e68a586c6",
+    "unified/DialogPVRGuideControls.xml": "34e0266d347560e520fbf27d0e988d46320c31a8c1452903d8219f2c139e35d0",
+    "unified/DialogPVRGuideSearch.xml": "60c2e3aedfa17a1c71ea5fc14cbe401906b909cebf6d95fa9ef8bcfd4dd49d0d",
+    "unified/DialogPVRInfo.xml": "4da6dfb418ef4dbfe1778734196672b11c1a97905c078a1d1e89c637fec2286c",
+    "unified/DialogPVRRadioRDSInfo.xml": "93ee5bf5510922511de07f1fbe01b5885491a324d6d1f2702b5caef1a8b6f457",
+    "unified/DialogPictureInfo.xml": "0126ae83bcc93f9c0010c478469e22ce181f617002be4e92b76486932d9373ff",
+    "unified/DialogPlayerProcessInfo.xml": "7b25e243f65122add78e70050d337a293470ae0daf6df30f304387b343e66f5a",
+    "unified/DialogSeekBar.xml": "ebe39189635dc592a29def1b618c1c057ea4e774549ba20b68e8ddb859c5d187",
+    "unified/DialogSelect.xml": "766c78c4c4498d7b7a776ff01413f41e62d4a0daa756acdd44d8bf7c425c1527",
+    "unified/DialogSettings.xml": "f3284362e534dc534f60790546cc105ad72fd9ad92fe3ae660468dac361f1c81",
+    "unified/DialogSlider.xml": "719485644e876621261c2e9a15b9d59029ce3108640d84a155d6f2ba3b18763f",
+    "unified/DialogSubtitles.xml": "bf0615cc4de6ff4194d20b4ab3a092a91c5bc84d50f86747f72c4511a870caf2",
+    "unified/DialogTextViewer.xml": "b34487f855c60a0557d0417b719f30ce0772794cb589d0c125dd3df6f9a445f2",
+    "unified/DialogVideoInfo.xml": "5e79e8db63567c27753d8d058382d20ecc74b2bb21a32be2e96ebe1261f22b32",
+    "unified/DialogVideoManager.xml": "1a56c8c7784198e771f463db356c2ad9eea1a6d1ed904bd7ab4163ded12aad69",
+    "unified/DialogVolumeBar.xml": "a372e0ee7b924fdec2f925a1ecbe52fe70f68507a7d578dc0fbdd86146c4ea69",
+    "unified/EventLog.xml": "526d47a0d6dc8f6a814e2b5bb5b2fe35e3531308c3b7f6533da7e6e6ae6b7ca9",
+    "unified/FileBrowser.xml": "6e8eddf1a4d549b7f60410bc87521d1966e4e5d0592d55993057377b26555e06",
+    "unified/FileManager.xml": "9caaf2cc63d364ae695fdd82303ad0f60e359b08852286eb2871e595346c9d04",
+    "unified/Font.xml": "dc462c635b4f0259b13b34ca8ca7f3533dc22507938d8fd2e7d05665c1e3367c",
+    "unified/GameOSD.xml": "e820f9900c6f573f28928904c04f0a93b6c4054279fbe7334c138e92ab228e0d",
+    "unified/Home.xml": "3f92581a3a6e0e379336fdea9dbe25543f599333e70ab075007f14bac033720f",
+    "unified/Includes.xml": "8a2425229e67894d4eb166176c8800c2f79447851717daad1f2818ada3625e48",
+    "unified/IncludesBackgroundBuilding.xml": "e06b0774d6afe2fbc40d82ea71ee2bbd88c839c3d43b1e74d7fec08492b9acc6",
+    "unified/IncludesCodecFlagging.xml": "f7d358ee532682ec4fde3ea2d2e89c73fef006cce69fbaaf495a77f8b8133019",
+    "unified/IncludesDialogSelect.xml": "de0937f8230dee3de7aaf3f3f08637e71eab7910e8dac58bec9986b5ac71335d",
+    "unified/IncludesNowPlaying.xml": "9c226a7948ba5f7601cce075a99552b715530f11c4b851947b85642b9b45e21f",
+    "unified/IncludesOnScreenDisplay.xml": "6882490a307bf4acdbd58e12ab902a5dbb0a649d175d8d7890927902fd7dacc0",
+    "unified/IncludesVariables.xml": "9eef5e31311bca42caee796fd01c81be078a5722b21be20102447dd00a61fee9",
+    "unified/Includes_Animations.xml": "285c289db0a13c800d0f35b65f5544811be6b23c001d94bf56d4dee6c9c31f03",
+    "unified/Includes_Backgrounds.xml": "c88225d3336a5a3f2f04f28aa7d0c8028327b846c092f16343129860943777ca",
+    "unified/Includes_CinemaBrowse.xml": "2b00ef82b0016f0781acc52843a98d2256164706a30eb7fe4538320a11032629",
+    "unified/Includes_CommonValues.xml": "91f4efcc6a20bd22676969a3c050baf6f85c2367b312367892843ac943b8c038",
+    "unified/Includes_DialogInfo.xml": "3349d15b759824eab2fb71ce9ef025d188283b7343a94cbd8b53b4e1e487f57b",
+    "unified/Includes_DialogSettings.xml": "7b0a84650946f4cef1ce50fa1fe601706ed75e6cc4119e62f506876b5fa97729",
+    "unified/Includes_Games.xml": "95fe5b6946ed1f3009182bbe4e1987f65d75fb926ed137e30ab6f66c7521e4ff",
+    "unified/Includes_Home.xml": "f53ecf7049f2578166fc65bc8f09063c6c7bb652d7ce0450eae1b4709ef2e238",
+    "unified/Includes_InfinityExperience.xml": "afb48c4c26c6d6c1b412262a914eff44bc2a928ac73a54c9bebd0b3ecc441dca",
+    "unified/Includes_InfinityHomePlayback.xml": "768d14ae4f7d492b615ef7f40b6ba11f66ea65d66a6c6f9a5aa60255f209f65e",
+    "unified/Includes_InfinityHomeUnified.xml": "34342f7b2149c564e86e3f99ee4093f272e99122a27fd7371598ebf95ea33273",
+    "unified/Includes_InfinityLegacy.xml": "64756d520a673efd1aa392f37d0ad51afde56e467ed51dd652cf67bba4404385",
+    "unified/Includes_InfinityMediaLists.xml": "20b44d5beefd2d6143e511add0c92fb7b68e2e4967c253e5e45d97eb4f62297c",
+    "unified/Includes_InfinityPolish.xml": "9b02b925726bb76cee3fc1672aeb3da794d2743431c2a74ef0a0d49e2d55c71f",
+    "unified/Includes_InfinityRepairs.xml": "3639d61936cdbb7e29d23ca86d2112ec9a495b75056d1338bf3cb036ab9a890f",
+    "unified/Includes_InfinityRuntime.xml": "9aa791bd83e7df514a22eb2644753d25965993eb80af8dbcac2f9b59c18e8ff7",
+    "unified/Includes_InfinityUIRepair.xml": "efa2f3a570a8681299c7cb9980801094740fe305d1fbf022b58333962428b466",
+    "unified/Includes_InfinityVideoOptions.xml": "c2fcaba2e910fa657a4569644d8c218a739e753f141f3501ef668e36cbf30fd5",
+    "unified/Includes_LiveBG.xml": "7e5b5ac10efc1315fdca3816d38ff3ad3df066f19bbe1b40cacc9b8a1448c205",
+    "unified/Includes_Lyrics.xml": "02022bd5a7f94f1a0fefa7d586da99e3b7b63b45faf37efae91420eddec048d2",
+    "unified/Includes_PVR.xml": "f9f7275f7718cc1fc74e7f7cae87ccddb0570a2a7c57dccd3b9235f1fb9dca27",
+    "unified/Includes_PVR_Views.xml": "c8223915d2e880ebdea00c97c2c8c3e91f70a078e5305b352617206fc9da30df",
+    "unified/Includes_Select.xml": "ef1726ca9c70b6f2208022d24b2e85fcc0bbac593a344784a84faa966c058de0",
+    "unified/Includes_ViewSettings.xml": "b37a296cde4774fa1be4749f088c4d5449411ee0ab6b8574c8543459f2c52235",
+    "unified/Includes_Views.xml": "4f97fb3e63f9f6641249c69743ecbb44327a837465f06fcc67d2bf8321e210d2",
+    "unified/Includes_Widgets.xml": "467aa6c4bdd037a334489bfe1b535812476385b3fdca67c4b86d439eed0674fe",
+    "unified/InfinityItemOptions.xml": "592c83144e69375a8b159f6e5a846c949b451aeb06442aa9777aac134fe783c7",
+    "unified/InfinityPlayerSettings.xml": "bd79865e4d17e80c93cf373115071e1a5d10a4d50b195fe956df24029056a43e",
+    "unified/InfinityTraktNotice.xml": "321835add4ebbb71fcf9e177868f000ca35659c776d1473e0532aa0a1fd70064",
+    "unified/LoginScreen.xml": "97cdf767ae9c3bc97c3e4584a27d63c851173ad2dd2c7738aa667fea5d4e9e7b",
+    "unified/MusicOSD.xml": "db25d3b0a44900f2f6ac690ad28cfaf740f9ac5ee3f37238c19364c8137df0cd",
+    "unified/MusicVisualisation.xml": "dd0193736e77511ffac34d21dfb54ae8222c83142b4cfda2cd10f84994e66db1",
+    "unified/MyFavourites.xml": "e6edb92ca872bc108ea4e2889e23b34a63bf892b83e5affd09c6628a9bbad3eb",
+    "unified/MyGames.xml": "69010f31750c13be82133856bb8d964cb046661a54eafad65940a17ce9439e48",
+    "unified/MyMusicNav.xml": "9e755613b8d92888701143b05c969e1aa632f00aded0431912cc376c8c2c948a",
+    "unified/MyMusicPlaylistEditor.xml": "3eb8304a8132a0491913bcf38bc21aea1526149b334de91be212b7b73c50692b",
+    "unified/MyPVRChannels.xml": "9cceb25320dc00fbace92d59e60fd9c51cdcbc96f3f6a0532c50eaab35ed285b",
+    "unified/MyPVRGuide.xml": "90f71c02c8c3eb4e78f6119647fa996629cd007444d616e323172e8dc9f2d8a7",
+    "unified/MyPVRRecordings.xml": "3ffad94f19096d1627c566c9ef27f79b95869678faec761e8fa98df2c2058970",
+    "unified/MyPVRSearch.xml": "7a43ed5c50ad4a61c5b0996f2c893fd852b5e34ac40e1db31a309be3475cd8eb",
+    "unified/MyPVRTimers.xml": "94d6c89471a36c57f51441032cdf50e5e9d06c173bd5fb62a6439f0e182a8643",
+    "unified/MyPics.xml": "d563d1b494d9c60f68cc9d12948e6e1729a48057f3fafbd3cc70d4a5445180d0",
+    "unified/MyPlaylist.xml": "4be4568be17ff5a9258641901fc7620f5f7d4dbb8fde1f424955a7b1360e6295",
+    "unified/MyPrograms.xml": "faa3c7a7444ea0a10a65b47ee892000a7729d60b7bf9b4e8b5e6986c826c5921",
+    "unified/MyVideoNav.xml": "7df68af11f2484e9e8187aa0b689305cb2b305b6001b57ca9ca5704050dca4de",
+    "unified/MyWeather.xml": "584f555abfa74022307e990c4c0c4059feaa6605b433e7294eca37a12c9e2079",
+    "unified/PlayerControls.xml": "e9c0cf8d81f2e489cda268bee1cc82a373212ad433c1e10befdf43e41102276b",
+    "unified/Pointer.xml": "5b2485b33e250c7d14e6993fd0b2a370d8ee2c4d174fedb8b3ab66fd734d0640",
+    "unified/RecordPrefs.xml": "be8e07c54d9ffad1008ab0f8b2538200389992ab54431674e39a2a1c709c3f1d",
+    "unified/Settings.xml": "814855cf6934261203eee073d39d459c10b1f29d65e404c69c22e8317136b622",
+    "unified/SettingsCategory.xml": "95ea9a95d9009c8b12544b0bbe5314903c60d7e63e0be01f201d7aca8bc6b9d7",
+    "unified/SettingsProfile.xml": "a16d5803a58ee58640b968029cf58736d18f226b80afd92f82ae7c097379e19b",
+    "unified/SettingsScreenCalibration.xml": "732b2d319bb8e5dccd5b45a6c609c87b549778f1ed25eb1e9b6fd36dd0cf618f",
+    "unified/SettingsSystemInfo.xml": "7500041603e1d0ee759b4bc148d9f07747db6e5d4b1e954e914fcff67b8316ba",
+    "unified/SkinSettings.xml": "64541799ebca9d2f4a1d9f3bd54ba5b5d3eeabe7874229c482ce92a93c84b12a",
+    "unified/SlideShow.xml": "9c4897511faf05da78a0662541ff1c528a5a7a442338add4a93f2167479a9c58",
+    "unified/SmartPlaylistEditor.xml": "8ae6cd0536a37e8f84766f2ebad006a9a986f2741c3c2055955a1b3414800ea7",
+    "unified/SmartPlaylistRule.xml": "03cddb662c0d2d68ba4830add5a7c2662610beccc8848ee7ff696c8258745ff1",
+    "unified/Startup.xml": "bee4b8f9f62f56fbb124e5b95b86d6d93ca25544642112656baab09f02a60061",
+    "unified/Timers.xml": "99ccd7d4841736693966265da6d9c04070d897fb6bbe0633b21572d46d38aa04",
+    "unified/Variables.xml": "39fdd8f7d563ec6730c2c2585b232bab401509fd72d5dfe386554d1494626ef8",
+    "unified/Variables_Widgets.xml": "7de00e6342135066e1bcde32a60a114716a324d60d18ac45bc14b0cbc746e42f",
+    "unified/VideoFullScreen.xml": "9c4897511faf05da78a0662541ff1c528a5a7a442338add4a93f2167479a9c58",
+    "media/infinity_cast/cast.png": "bedc5b14478cc89f18e22daee237050270879bb79b6f993ef42c3b888bc74fd0",
+    "unified/VideoOSD.xml": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46",
+    "unified/VideoOSDBookmarks.xml": "b456ea19bc37f3a55536086d739a84e51d69b7e263cfcbfeec04a5262d798dfd",
+    "unified/View_500_Icons.xml": "6104dc82013c94cccc8c39479fe2283e9cd4ae593deaad5271d3cb6b1d64cded",
+    "unified/View_501_LowList.xml": "3c8ef880efc9a1cbd34ca9908615a825b65e9685e993082e7c4cfead7a7e547c",
+    "unified/View_502_Episode.xml": "1ef0163ddff115bebaacc48edf835b434d5d66b5e5454c21f296b461af831fef",
+    "unified/View_503_Wall.xml": "9377a0dac67187005c7f7a1bcb113ba7caee225561a10ecb5705138c5ce3126e",
+    "unified/View_504_Gallery.xml": "4796f39ff9c673f06a837543d2358840d7effd11fe6c893c3c8a6fc20d408a95",
+    "unified/View_505_Panel.xml": "29eac228718f5825a011b2d0f88224aaaf261c756aca753ba3a89b57a50fed1e",
+    "unified/View_506_RightList.xml": "ca2cc9879b63031d7c4b4e0cb9037443db6e5d469fbaf3fc51500c6af51776ab",
+    "unified/View_507_BigList.xml": "2e59b8518f15bf15cca19bf8c1433254f6ca25771dac65530f3e7b94569d3e76",
+    "unified/View_508_SongList.xml": "8d7b6d0116ae09e38c93c7bf4511b2b396b8677da73af3653c068f6ad3303a64",
+    "unified/View_509_MyFlix.xml": "c050917194ebf1f7dd439fb9645b3874f78f8e345995b6c76e92294545a444e7",
+    "unified/View_50_List.xml": "a66fcbfd27bd01371196d7800202d7a8aa0f084bcd56efb41d5753be4010d0a9",
+    "unified/View_51_InfoWall.xml": "495bb6c70af3cec7506bff6dea8f0dc02eb79b8b7b4fe9da63365c9c271766ee",
+    "unified/View_52_Landscape.xml": "90fd92e081b333cc13538d9c20d2a191045f5050ef66fd2d41a6a882b158b592",
+    "unified/View_53_ShowCase.xml": "1498881c2629c6c8b292696a9b54760207b6f7b972ae5108b5d41a838570197f",
+    "unified/View_54_ShowCase.xml": "be209e97f1ba458247434fdda67bd69c7af5f432c2695fcef18be111d73b551c",
+    "unified/View_55_TriPanel.xml": "740fa9f158bc183f021c0007c8412d14dc7982c68084cdafae109272c9e8d95b",
+    "unified/View_56_Posters.xml": "04a661c108a2b88736aefdaa3b70277bd7cca60faa63d3b577bc642d59e9e7d3",
+    "unified/View_57_Shift.xml": "e42f3ade76b8d37f882598ee75887b6bedb5d6721bce62087471e9ca0bb7f213",
+    "unified/View_58_BannerWall.xml": "c94fe8d0ac31e2e3ff09fb78f40800e7013eb646235771e0e258365a46e4980e",
+    "unified/View_591_BigFan.xml": "5d5469b24b7712107a874387804fb8ac746ac24a29566980fe076ba818341a4f",
+    "unified/View_59_Logo.xml": "2366810565c304ae6e3d11ef73e076ec7f9321a49c184e3ec735c28eaf2d8c9d",
+    "unified/View_602_FanartList.xml": "65e385409485e2196ede3bf0a21c37879e020efcb04ade25d4b88754a95afcf1",
+    "unified/View_603_Music_JukeBox.xml": "eec1db76369b2fba895dffaf4cce27e9dfb76ca3335b8449550fb14af8e3b002",
+    "unified/View_609_Fullscreen_Wall.xml": "30c96e3fb4812a03bdead762c62d9dbd2c14016339da6cb27cd5cb37cc321ffc",
+    "unified/ViewsWeather.xml": "06a76ef696f73031a4d127c623eb2fedd7da080f3c273b9669dacbf58a22c335",
+    "unified/custom_1101_Startup.xml": "701cc91cde5955e3e9434d4173894b198a4c3e26f09f0a189c29ce4211452783",
+    "unified/custom_1110_TMDbHelper_Recommendations.xml": "acd89f08a3b7f1aa73291235fa7958fef89e0779da1983b42688422cd7b9fd48",
+    "unified/custom_1111_TMDbHelper.xml": "78049dc8712e9a1b0c7bdc1da8d81b0408123aa0e862b7b3ca84d8ca8b17eb67",
+    "unified/custom_1112_TextViewer.xml": "97298e309659be1b0dba222215a5a921f79ce025f68db88235b714093ff6ae6b",
+    "unified/custom_1113_FullscreenFanart.xml": "f5b945ae1ab64aa9207c9dadbee8ab591cfdd0857429fdddcabc9ce89d46ad49",
+    "unified/custom_1114_DialogSettings.xml": "6c7433824568896cd9ee8148ea2061336fc94d031f4b88ab57c759e9b2659e83",
+    "unified/custom_1117_AddonStatus.xml": "c9898fece19083a384101ee467a7c7a8e21deec61704773b86727bfbea7b42f5",
+    "unified/custom_1119_ExtrasDialog.xml": "a88c48724963139f7276997aac965e38f4903f1b4bcf3caa0704407f77e2e7d6",
+    "unified/custom_1126_Confirm.xml": "b46996e0cd0a03a372f6b55408898df8c61ba54797ad7c754e8c9a79fb3e1514",
+    "unified/custom_1127_OverlayIcons.xml": "c5c376791d07ea0c26bad12b922eeb0d3d7e8882d118778fbb37f2bd25d8f864",
+    "unified/custom_1128_WindowCustomizer.xml": "54b8891f5f3748c7f1268ba82e9b428cc20ccef3b9a531dfa79ea0d47eea46d3",
+    "unified/custom_1129_Select.xml": "b054b82824de54faed97b3d9c0c322816003d848723414a38ad8947446720fc8",
+    "unified/custom_1130_Views.xml": "175eccb1c770ed3268dbfeba8b954a429c4aea66dc6d1fd3031b77d60cb5e380",
+    "unified/custom_1131_ViewSettings.xml": "1f3ab55a3141ae5bba41c9010c409d9a6d166253bb0d0bd63fc64079d1dfc16a",
+    "unified/custom_1132_DisableViews.xml": "900feb728e5546c1b0390a02702da0c23d6109aaeec0c462345d06df053d217e",
+    "unified/custom_1133_Apps.xml": "75c7fda63cfa87eafab3e5489f3e88016a915a370a2a4cb515ae9953a8224543",
+    "unified/custom_1134_PausedOverlay.xml": "2e761ec3599de89d7698dc822079791aa6458de9809921e908a6c0dffcdda51c",
+    "unified/custom_1135_ReplaceWindow.xml": "6a5944941d502aa6bf726ebb6c689c2dc227af7240054f1d306b9c10bf328c2b",
+    "unified/custom_1136_InfinityVideoViews.xml": "dc95a4f91455573737b61368022cec2a189fe5167d4e3aa13ae03f66aa4d32d7",
+    "unified/custom_1137_InfinityVideoViewSettings.xml": "ac5c229d3e78d99dbc26663431dc7b17fdacde2920be2e717c6a50b0c85c748e",
+    "unified/custom_1138_InfinityVideoDisableViews.xml": "84b22b790dc64b4032ae05a229b117c9dbbfde8d23b7fbbdf921cb1aece8afba",
+    "unified/custom_1140_Colors.xml": "ac04e18135a97d60cfa30fb3c75c4b3a586bd11152b0ce0cef366b3f00c0613f",
+    "unified/custom_1142_Skins2.xml": "8a4a3db82b8a1c908830ee9e69a2df311803bac02608d9c24d5f59c13b7b0261",
+    "unified/custom_1199_InfinityVideoLock.xml": "71f145d07add0ea092ad660d5238cbe92735182bccb5022edb8fec968e85c75d",
+    "unified/originalFont.xml": "a9e5076bac04776678125af029a319a99e6abdab8208aa8877c2629f14ed8715",
+    "unified/screensaver-arctic-mirage-addon.xml": "4035f45b347a69f31d004d5884d6c4ad605a60639ded4c20f77b1a91d86b1e81",
+    "unified/script-RSS_Editor-rssEditor.xml": "34ca75fd993aa2c26e39d94778d90eb9eae968a57fed5ad680025a469cc4fa4a",
+    "unified/script-RSS_Editor-setEditor.xml": "34ca75fd993aa2c26e39d94778d90eb9eae968a57fed5ad680025a469cc4fa4a",
+    "unified/script-XBMC_Lyrics-main.xml": "31af007a1ddc10888e5bd03dd3a1b18fc4f932cc3274591fea8b236df7345017",
+    "unified/script-cu-lrclyrics-main.xml": "638bb8a924b83ba80adcad9e56e732c1fccf1c1022ae50d9a93b54b2f3746bc8",
+    "unified/script-embuary-image.xml": "e867e4a491d952307efdc71d3140b27217cf1b57200b936f407e8411ac8e3bf1",
+    "unified/script-embuary-person.xml": "53dbdb0994a233f562db52022814ca788d1bb364d7d76f367e8243fd61c4bda9",
+    "unified/script-embuary-video.xml": "1e3a76b94dceeebfd56fdb5b1e3ba9a5714921d003760de451a92a6f1cff1b32",
+    "unified/script-globalsearch-main.xml": "b87c7266c81ebff7f7fef716a30e7218d87be6573829cd85ffe4a4249755493c",
+    "unified/script-globalsearch.xml": "874d0475379ac152538d14e3c9a79390c5e59fa4bc356f4147f85607cf6c9023",
+    "unified/script-script.module.t9.search-Main.xml": "6aaab1de0eabb2b59a01db790694e95d2537886172cd97ff06d0d195f34abfa9",
+    "unified/script-skinshortcuts-includes.xml": "544425b90d3cdccbf21b01b2cfff0f673fc592091dd8e3e8b83f53d5411dea18",
+    "unified/script-skinshortcuts.xml": "2ae4fcd8f8a449fba38e699b2fa33c9d8fd897c91f6478114dc4f04a2a220689",
+    "unified/script-skinviewtypes-includes.xml": "8e033c7c09c0fd140080988d596e80db9e725c51b2edb5b8d2eaf5bfa687e429",
+    "unified/script-tmdbhelper-recommendations.xml": "0bbbdeacf951a24a8f4de68a4a46ad637b9d519d502bdb14e36b9bb22417aca9",
+    "unified/service-CoreELEC-Settings-mainWindow.xml": "206508a816b94a6233dba782f5a6eff351d269082325c8caf438c089ff556d7b",
+    "unified/service-LibreELEC-Settings-mainWindow.xml": "1bc202c1d8168eb73773cf82a9534485a1aa6b365a0a98f111cb202b12d4deaf"
+  },
+  "release_186_metadata": {
+    "baseline": "1.0.5.185",
+    "canonical_home_source": "portrait/Home.xml",
+    "canonicalized_legacy_profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait",
+      "fallback"
+    ],
+    "command_center": "0.3.5.19",
+    "generic_android_adaptive_canvas": true,
+    "native_engine": "locked 2103291 In-Place Responsive Reflow",
+    "native_responsive_marker_enabled": false,
+    "non_home_windows_changed": false,
+    "requires_apk": 2103292,
+    "runtime_tested": false,
+    "status": "device_acceptance_pending",
+    "title": "Canonical Home Trial RC1",
+    "view_modes": [
+      "Normal",
+      "Cinema",
+      "Compact",
+      "Two-Pane"
+    ]
+  },
+  "responsive_cw_118": {
+    "base_user_locked": true,
+    "base_version": "1.0.5.116",
+    "cinema_layout_changed": false,
+    "continue_watching_owner": "Infinity Command Center local Kodi playback index",
+    "intentional_added_files": [
+      "INFINITY_RESPONSIVE_CW_1_0_5_118.txt"
+    ],
+    "intentional_edited_files": [
+      "16x9/Home.xml",
+      "16x9/Includes_InfinityHomeUnified.xml",
+      "20x9/Home.xml",
+      "5x6/Home.xml",
+      "6x5/Home.xml",
+      "addon.xml",
+      "infinity-skin.json",
+      "portrait/Home.xml",
+      "Infinity-Protected-Manifest.json"
+    ],
+    "portrait_geometry_changed": false,
+    "profiles_using_continue_watching": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "portrait",
+      "5x6"
+    ],
+    "required_command_center": "0.3.5.8",
+    "runtime_tested": false,
+    "skin_scope": "20:9 Compact real-estate recovery + shared Continue Watching route switch",
+    "specific_playback_addon_required": false,
+    "status": "candidate_not_locked",
+    "trakt_required": false,
+    "width_recovery": {
+      "new_width": 2276,
+      "old_width": 2040,
+      "parent_content_width": 2280,
+      "profile": "20x9"
+    }
+  },
+  "responsive_reflow_contract": "2103291 plus 2103293 native container/item reflow",
+  "responsive_reflow_geometry_repaired": true,
+  "responsive_shell_109": {
+    "base_sha256": "1d4e9f49a9387bc6ed14aaa39a98156674c3fb0ba883c87a3b56eaebda45158a",
+    "base_user_locked": true,
+    "base_version": "1.0.5.108",
+    "device_acceptance_required": true,
+    "fixes": [
+      "portrait clock/weather constraint repair",
+      "expanded drawer ghost-slot compaction after retired LIVE TV row",
+      "20x9/front-display collapsible rail shell"
+    ],
+    "inherited_108_integrity_mismatches_normalized": [
+      "16x9/Custom_1198_InfinityNav.xml",
+      "16x9/Home.xml",
+      "20x9/Custom_1198_InfinityNav.xml",
+      "20x9/Home.xml",
+      "5x6/Custom_1198_InfinityNav.xml",
+      "5x6/Home.xml",
+      "6x5/Custom_1198_InfinityNav.xml",
+      "6x5/Home.xml",
+      "addon.xml",
+      "portrait/Custom_1198_InfinityNav.xml",
+      "portrait/Home.xml"
+    ],
+    "intentional_edited_files": [
+      "addon.xml",
+      "Infinity-Protected-Manifest.json",
+      "portrait/Home.xml",
+      "20x9/Home.xml",
+      "16x9/Custom_1198_InfinityNav.xml",
+      "20x9/Custom_1198_InfinityNav.xml",
+      "6x5/Custom_1198_InfinityNav.xml",
+      "5x6/Custom_1198_InfinityNav.xml",
+      "portrait/Custom_1198_InfinityNav.xml"
+    ],
+    "protected_runtime_contracts_untouched": [
+      "VideoOSD/player",
+      "Cinema behavior/content geometry",
+      "AddonBrowser/FileBrowser",
+      "Command Center",
+      "APK/native engine"
+    ],
+    "runtime_tested": false,
+    "scope": "skin-only responsive shell stabilization + integrity normalization",
+    "status": "candidate_not_locked",
+    "version": "1.0.5.109"
+  },
+  "resume_hub_api": "2.0",
+  "retained_reflow_190": {
+    "ambient_yields_to_screensaver": true,
+    "continue_fixed_upward_offset_removed": true,
+    "explicit_protected_exceptions": {
+      "addon.xml": {
+        "after": "e02852224d216b5f38ae6f2885aebd909cba245ba25e8f6ac71eadc93996139d",
+        "before": "4e94c21e9bb306c349310670a3d8a8a10b517d57e3c445d6811202ce746122ef"
+      },
+      "infinity-skin.json": {
+        "after": "f333e62e5a94dbb367fa98557c929fcbdcece820590760f1f04bf211f412ca37",
+        "before": "eb42ea98a1aca2d79d15e3128609bd32343bac6ff7407c970fe71ef333f94d84"
+      },
+      "resources/lib/infinity_continuity.py": {
+        "after": "a9a5477eec6ae1684d04d6b0a574be3f6b07172ca793240af82c8d26a421c9d1",
+        "before": "6c0ed5876355e678323a910a044170ce37a7dbb3f01d2ba37a06dfd398cbe8d6"
+      },
+      "resources/lib/infinity_native_ambient.py": {
+        "after": "3e33144282d81aa727466f530fd3d37deaee8357c5973c0c7b932bbcc3db1f5f",
+        "before": "7ba2fb298b2bc48ab98de0584062493d16a64cc697a5366aa08a8a0632c469e1"
+      },
+      "unified/Home.xml": {
+        "after": "8321d9a36b2e6197b043f87fd2a218c70b98617ce591c6036d7f8433b1f2d3d1",
+        "before": "5560cae56d47170d965b0dea2647657a4621a8e07bb6714fd743548d72cdb6de"
+      }
+    },
+    "native_text_repair_apk": 2103294,
+    "no_reload_bridge_preserved": true,
+    "parent_manifest_sha256": "60076f84d31fffd9a5e9dcd9514cd26663c9aad51be8aaa31ab0b6439b7fb6f7",
+    "physical_tested": false,
+    "provider_or_player_mutations": false,
+    "screensaver_freeze_fixed": false,
+    "screensaver_read_only_diagnostics": true
+  },
+  "return_stack_hotfix_112": {
+    "base_sha256": "62942936043b0d6a07849d24d670495e3e0e509ede90977fccec563557d74a24",
+    "base_user_locked": true,
+    "base_version": "1.0.5.109",
+    "device_acceptance_required": true,
+    "finding": "18 duplicate unconditional window activations existed only in 5x6/Home.xml and portrait/Home.xml",
+    "fixed_controls_per_portrait_profile": [
+      "8893",
+      "19893",
+      "8898",
+      "8895",
+      "8897",
+      "8894",
+      "8896",
+      "19895",
+      "19897"
+    ],
+    "intentional_direct_addonbrowser_preserved": [
+      "Home Navigation ADD-ONS",
+      "Custom_1198_InfinityNav ADD-ONS",
+      "Settings Add-ons",
+      "script.skinshortcuts generated Add-ons"
+    ],
+    "intentional_edited_files": [
+      "addon.xml",
+      "Infinity-Protected-Manifest.json",
+      "5x6/Home.xml",
+      "portrait/Home.xml"
+    ],
+    "protected_runtime_contracts_untouched": [
+      "AddonBrowser.xml",
+      "FileBrowser.xml",
+      "VideoOSD/player",
+      "Cinema",
+      "Command Center",
+      "APK/native engine"
+    ],
+    "runtime_tested": false,
+    "scope": "skin-only Home navigation return-stack repair + full stacked-window activation audit",
+    "status": "candidate_not_locked",
+    "version": "1.0.5.112"
+  },
+  "runtime_reference": {
+    "capability_api": "1.2",
+    "command_center_minimum": "0.3.5",
+    "native_bridge_minimum": 5,
+    "skin": "30.7"
+  },
+  "schema": 2,
+  "screen_adaptation_163": {
+    "changed_scope": "addon.xml, infinity-skin.json, manifest metadata; audit TXT added",
+    "coordinate_policy": "alias aspects reuse target folder logical dimensions; no new logical canvas size introduced",
+    "geometry_rewritten": false,
+    "glass_handle_preserved": true,
+    "player_provider_native_changed": false,
+    "render_strategy": "route more device aspect ratios into the existing 16x9/20x9/6x5/5x6/portrait authored families",
+    "source": "locked 1.0.5.162",
+    "view_execution_preserved": true
+  },
+  "side_invoke_handle_glass_161": {
+    "adaptation": "Light=frosted via adaptive surface; Dark/OLED=smoky via adaptive surface; accent edge/bloom follows adaptive focus/accent token",
+    "added_media": [
+      "media/infinity_ui/side_handle_glass_surface.png",
+      "media/infinity_ui/side_handle_glass_edge.png",
+      "media/infinity_ui/side_handle_glass_highlight.png",
+      "media/infinity_ui/side_handle_glass_glow.png"
+    ],
+    "changed_controls": [
+      "16x9/Includes.xml SideBladeLeft control 9001 visual layers",
+      "16x9/Includes_InfinityLegacy.xml legacy SideBladeLeft control 9001 visual layers"
+    ],
+    "preserved": "panel actions, contents, return-control behavior, MediaMenu property semantics, navigation, providers, player and runtime/native contracts",
+    "scope": "SideBlade invoke handle visual finish only",
+    "source": "1.0.5.160",
+    "touch_target": "1.0.5.160 geometry preserved: left 394 / top 372 / width 126 / height 228",
+    "visible_glass": "left 416 / top 372 / width 78 / height 228"
+  },
+  "side_invoke_handle_polish_160": {
+    "changed_controls": [
+      "16x9/Includes.xml SideBladeLeft control 9001",
+      "16x9/Includes_InfinityLegacy.xml InfinityLegacy_SideBladeLeft control 9001"
+    ],
+    "feedback": "stronger resting visibility; 90ms focus zoom 100->106 and fade 82->100",
+    "geometry": "left 394 / top 372 / width 126 / height 228",
+    "preserved": "panel actions, contents, return-control behavior, MediaMenu property semantics, navigation, providers, player and runtime contracts",
+    "scope": "SideBlade invoke handle only",
+    "source": "1.0.5.159"
+  },
+  "skin_lock": {
+    "locked_version": "1.0.5.188",
+    "payload_lock": true,
+    "physical_device_acceptance": false,
+    "promotion_lock": false,
+    "reason": "User-directed immutable skin package lock; no APK/native changes",
+    "status": "locked"
+  },
+  "skin_version": "1.0.5.275",
+  "system_hub_authorization_polish_167": {
+    "authorization_route": "RunAddon(script.infinity.authsurface)",
+    "changed_profiles": [
+      "16x9",
+      "20x9",
+      "6x5",
+      "5x6",
+      "portrait"
+    ],
+    "dedicated_icon": "infinity_ui/icons/lock.png",
+    "dedicated_subtitle": "Trakt, Debrid and connected service authorization",
+    "preserved": "1.0.5.165 collision fix, 1.0.5.162 view activation, 1.0.5.161 glass handle, player/providers/native 2103254",
+    "reflow": "all seven System Hub cards fit within the glass panel; Power Options and footer restored",
+    "source": "locked 1.0.5.166"
+  },
+  "unified_fold_composition": true,
+  "view_reload_bypass_158": {
+    "dynamic_action_removed": "script.skinvariables action=buildviews in MyVideoNav",
+    "native_root_cause_confirmed": false,
+    "reason": "repeated DialogSelect -> full skin unload/reload is the reproducible crash-adjacent path",
+    "replacement": "existing ActivateWindow(1130) static selector",
+    "scope": "View As action only",
+    "source": "Infinity Mobile 1.0.5.157 Sidebar Original Control Tree"
+  },
+  "view_runtime_activation_fix_162": {
+    "changed_scope": "16x9 MyVideoNav.xml, custom_1130_Views.xml, and native video view visibility gates only",
+    "preserved": "1.0.5.161 adaptive glass side handle and all non-view product behavior",
+    "root_cause": "Static view selector bypassed script.skinvariables buildviews, while MyVideoNav/view controls remained gated by stale generated Exp_View_* mappings; requested view IDs could therefore be unavailable/invisible and Container.SetViewMode would no-op.",
+    "selector_behavior": "single direct Container.SetViewMode(target); selector remains open for live preview; no reset-to-50; no ReloadSkin/buildviews",
+    "source": "locked 1.0.5.161"
+  },
+  "view_selector_click_fix_159": {
+    "behavior": "Close modal before SetViewMode; view 50 reset then target view; no buildviews/ReloadSkin path",
+    "changed_file": "16x9/custom_1130_Views.xml",
+    "native_root_cause_confirmed": false,
+    "source": "1.0.5.158",
+    "superseded_by": "1.0.5.162 after stale Exp_View_* runtime gating was confirmed as the blocking condition"
+  },
+  "watched_recovery_224": {
+    "broad_animations_changed": false,
+    "parent_sha256": "557003afc83a2661fec6ccef921979e264ff28e93595fb633340c618ab69bd56",
+    "physical_fold_verified": false,
+    "recovery_windows": 13,
+    "source_profiles": 14
+  }
+}

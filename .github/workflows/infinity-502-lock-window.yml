@@ -59,6 +59,7 @@ jobs:
             --ecj lock-window-work/ecj-3.37.0.jar \
             --d8 "$ANDROID_HOME/build-tools/35.0.0/lib/d8.jar" \
             --aapt2 "$ANDROID_HOME/build-tools/35.0.0/aapt2" \
+            --zipalign "$ANDROID_HOME/build-tools/35.0.0/zipalign" \
             --apksigner "$ANDROID_HOME/build-tools/35.0.0/lib/apksigner.jar" --debug-sign
           sudo chmod 666 /dev/kvm
       - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d

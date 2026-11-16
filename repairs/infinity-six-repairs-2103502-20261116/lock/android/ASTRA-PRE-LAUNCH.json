@@ -3,10 +3,10 @@
   "approved": true,
   "scope": "PRE_LAUNCH: isolated actual Android State/Dialog component, two selected synthetic viewport/theme profiles only",
   "inputs": {
-    ".github/workflows/infinity-502-lock-window.yml": "e096298404af12e0435135ca73d801f10c22fb4dbe630bcec2439ca3a84bba81",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/build_probe.py": "da1c896b724e5e45d5ad2120918682d47c8743cc11d43e39a998cf29bb1d6d88",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "36d64d3249dc9bebdab6702117f78f5bd37fd51cd18de31320fe144d09665988",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "b5952507c367f3e83ae20069ace04d4692ba2fabd4d56fd212d8b1a9b88dce82",
+    ".github/workflows/infinity-502-lock-window.yml": "ec0f289ade47d12a5d2e272500a7b012652b224cf7e724eb180accb6d3d1cf0a",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/build_probe.py": "83e6d9414d0c674485bc7cf53d26bc86addfedb46a77b10d214bbe954f45ffa2",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "6ac5a1fc467209c5768ba22983ccd6eccea03e110af2270b3ae5f921573d0537",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "f8081985c713ba99e2230ff75e51cd322b96e3b3b55b1b14a3d129daf65d54ab",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "6f8d7cdd492db00c4668e0e34d2c134deb9df7e236aaf7b0acf05d6cb26a7472",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "109a91a7522c3b3341eda4b2833241db9f5de97a70ace977c965e9f73934133c",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "c5972caaebc606c10b08a4d2fc7c33d3aab25c1eb5264c0c2c67b5aaf07303e1",
@@ -25,5 +25,15 @@
     "shutdown",
     "physical Fold acceptance",
     "owner installer"
-  ]
+  ],
+  "correction_review": {
+    "previous_run": 43828772992,
+    "status": "APPROVED_CORRECTION_SPECIFIC_RERUN",
+    "changes": [
+      "ARSC stored and SDK zipalign pre-sign/post-sign check",
+      "retain install outcome and stop duplicate geometry install on failure"
+    ],
+    "production_State_Dialog": "UNCHANGED",
+    "prior_failure": "Install failed; no actual lock checks executed; exact original Android error unavailable"
+  }
 }

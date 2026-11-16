@@ -117,6 +117,38 @@
       "repair": 5,
       "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
       "final_independent_review": "PENDING integrated review"
+    },
+    {
+      "path": "overlay/script.kodihealthcenter/addon.xml",
+      "APK_member": "assets/addons/script.kodihealthcenter/addon.xml",
+      "before_sha256": "84759a45b9a7be3989bf8c8cccab26939665bd2e52aaf4e971e167f2640c68d8",
+      "repair": 4,
+      "reason": "Root version2.5.27 to2.5.28 only; forward selection for reviewed inventory correction",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/addon.xml",
+      "APK_member": "assets/addons/skin.infinity.diggz/addon.xml",
+      "before_sha256": "32b3c029d09e2f5d1695f39c1a658759da63e1973a17e99c477a86afbc087400",
+      "repair": 5,
+      "reason": "Root version1.0.5.274 to1.0.5.275 only; retain all declarations",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/infinity-skin.json",
+      "APK_member": "assets/addons/skin.infinity.diggz/infinity-skin.json",
+      "before_sha256": "5ad2f63a5cabb4815ab5cd4e3088a36195cee637a41e881a16f272bc2486eea5",
+      "repair": 5,
+      "reason": "Top-level version,skin_version,candidate only; distinguish existing UI backup generation",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+      "APK_member": "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+      "before_sha256": "8374b6e34b497db6f3f5a60e675e37165f3292d50ebc83e0d95f3140858c1aba",
+      "repair": 5,
+      "reason": "Top-level candidate,candidate_version,skin_version plus exactly4 affected protected hashes",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16"
     }
   ],
   "production_allowlist_rule": "Add exact source/preimage only after proven defect and independent Astra review; no broad directory allowance. No production edits before approval.",

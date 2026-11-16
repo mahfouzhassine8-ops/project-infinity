@@ -45,6 +45,10 @@ def main():
                  'night_mode': adb('shell', 'cmd', 'uimode', 'night')}
         report['results'].append(entry)
         success &= result.returncode == 0
+        receipt_path = destination / 'ANDROID-LOCK-COMPONENT.json'
+        if receipt_path.exists() and json.loads(receipt_path.read_text()).get('phase') == 'install':
+            report['not_run'] = [row[0] for row in selected[len(report['results']):]]
+            break  # A shared package-install failure cannot be retested meaningfully at another size.
         # A failure is retained; the second geometry is independent and remains selected.
     report['pass'] = success
     (output / 'SELECTED-WINDOWS.json').write_text(json.dumps(report, indent=2) + '\n')

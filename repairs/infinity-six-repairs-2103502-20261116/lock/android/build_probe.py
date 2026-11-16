@@ -1,6 +1,6 @@
 """Build only com.projectinfinity.lockqa from actual State/Dialog and disposable instrumentation."""
 from pathlib import Path
-from zipfile import ZipFile, ZIP_DEFLATED
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 import argparse
 import hashlib
 import json
@@ -32,6 +32,7 @@ def main():
     parser.add_argument('--d8', type=Path, default=Path('/workspace/scratch/cast-sdk86/tools/d8.jar'))
     parser.add_argument('--aapt2', type=Path, default=Path('/workspace/scratch/cast-sdk86/tools/aapt2'))
     parser.add_argument('--apksigner', type=Path)
+    parser.add_argument('--zipalign', type=Path)
     parser.add_argument('--compile-only', action='store_true')
     parser.add_argument('--debug-sign', action='store_true')
     parser.add_argument('--receipt', type=Path)
@@ -58,7 +59,9 @@ def main():
               'compile_output': compile_log, 'actual_Android': 'NOT_RUN', 'native_bridge': 'NOT_INCLUDED',
               'production_Main_or_stubs': 'NOT_INCLUDED', 'Kodi_shutdown': 'NOT_RUN', 'owner_installer': False}
     if not args.compile_only:
+        if args.zipalign is None: raise ValueError('--zipalign is required for Android package alignment')
         report['packaging_tools'] = {'d8': digest(args.d8), 'aapt2': digest(args.aapt2)}
+        report['packaging_tools']['zipalign'] = digest(args.zipalign)
         jar = args.work / 'probe.jar'
         with ZipFile(jar, 'w', ZIP_DEFLATED) as archive:
             for source in sorted(classes.rglob('*.class')):
@@ -67,10 +70,17 @@ def main():
         run(['java', '-cp', args.d8, 'com.android.tools.r8.D8', '--min-api', '26', '--lib', args.android_jar, '--output', dex, jar])
         shell = args.work / 'shell.apk'
         run([args.aapt2, 'link', '--manifest', manifest, '-I', args.android_jar, '-o', shell])
-        apk = args.work / 'CI-LOCK-PROBE-UNSIGNED-NOT-OWNER.apk'
-        with ZipFile(apk, 'w', ZIP_DEFLATED) as out, ZipFile(shell) as base:
-            for name in base.namelist(): out.writestr(name, base.read(name))
+        unaligned = args.work / 'probe-unaligned.apk'
+        with ZipFile(unaligned, 'w', ZIP_DEFLATED) as out, ZipFile(shell) as base:
+            for name in base.namelist():
+                out.writestr(name, base.read(name), compress_type=ZIP_STORED if name == 'resources.arsc' else base.getinfo(name).compress_type)
             for source in sorted(dex.glob('*.dex')): out.writestr(source.name, source.read_bytes())
+        apk = args.work / 'CI-LOCK-PROBE-UNSIGNED-NOT-OWNER.apk'
+        run([args.zipalign, '-f', '4', unaligned, apk])
+        run([args.zipalign, '-c', '4', apk])
+        with ZipFile(apk) as check:
+            assert check.getinfo('resources.arsc').compress_type == ZIP_STORED
+        report['resource_table'] = 'STORED_AND_4_BYTE_ALIGNED'
         assert "package: name='" + PACKAGE + "'" in run([args.aapt2, 'dump', 'badging', apk])
         report['status'] = 'PASS_DISPOSABLE_UNSIGNED_PROBE_BUILD'
         if args.debug_sign:
@@ -85,6 +95,7 @@ def main():
             run(['java', '-jar', args.apksigner, 'sign', '--ks', key, '--ks-key-alias', 'lockqa',
                  '--ks-pass', 'pass:android', '--key-pass', 'pass:android', '--out', signed, apk])
             signature = run(['java', '-jar', args.apksigner, 'verify', '--verbose', '--print-certs', signed])
+            run([args.zipalign, '-c', '4', signed])
             assert ORIGINAL_CERT not in signature.replace(':', '').lower(), 'Owner signer forbidden in component probe'
             report['debug_signature'] = signature; apk = signed
             report['status'] = 'PASS_DISPOSABLE_DEBUG_PROBE_BUILD'

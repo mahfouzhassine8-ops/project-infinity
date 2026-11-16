@@ -123,6 +123,42 @@
       "reason": "Dedicated lock-owned state/input window/native handoff; no storage/provider/player modifications.",
       "final_independent_review": "PENDING integrated review",
       "candidate_source_sha256": "c59a1b1d64f5033d32b8f55290915e458ba24e1be81ad861d403e86d529221d3"
+    },
+    {
+      "path": "overlay/script.kodihealthcenter/addon.xml",
+      "APK_member": "assets/addons/script.kodihealthcenter/addon.xml",
+      "before_sha256": "84759a45b9a7be3989bf8c8cccab26939665bd2e52aaf4e971e167f2640c68d8",
+      "repair": 4,
+      "reason": "Root version2.5.27 to2.5.28 only; forward selection for reviewed inventory correction",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16",
+      "candidate_source_sha256": "c3233a9d6d6e5520c0da6903eb55919c57f10b45a87a199b6582481bc9b0ee45"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/addon.xml",
+      "APK_member": "assets/addons/skin.infinity.diggz/addon.xml",
+      "before_sha256": "32b3c029d09e2f5d1695f39c1a658759da63e1973a17e99c477a86afbc087400",
+      "repair": 5,
+      "reason": "Root version1.0.5.274 to1.0.5.275 only; retain all declarations",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16",
+      "candidate_source_sha256": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/infinity-skin.json",
+      "APK_member": "assets/addons/skin.infinity.diggz/infinity-skin.json",
+      "before_sha256": "5ad2f63a5cabb4815ab5cd4e3088a36195cee637a41e881a16f272bc2486eea5",
+      "repair": 5,
+      "reason": "Top-level version,skin_version,candidate only; distinguish existing UI backup generation",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16",
+      "candidate_source_sha256": "b1c8c0f095ddb3f699d17373914518c0811690ab220e1a97a13eec7d1cb9c38e"
+    },
+    {
+      "path": "overlay/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+      "APK_member": "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json",
+      "before_sha256": "8374b6e34b497db6f3f5a60e675e37165f3292d50ebc83e0d95f3140858c1aba",
+      "repair": 5,
+      "reason": "Top-level candidate,candidate_version,skin_version plus exactly4 affected protected hashes",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16",
+      "candidate_source_sha256": "e68439c3ea840b2e728edc60c9bf6754175b4e149e2fe279e27faf7ff4f25fef"
     }
   ],
   "original_repository_production_files": "UNCHANGED; candidate inputs isolated in this repair directory",
@@ -131,5 +167,6 @@
   "native_full_source_and_ABI": "PENDING selected GitHub Actions build",
   "Cobra": "No source edits; all657 non-Main classes3 classes identical; remaining baseline APK members retained pending assembly audit",
   "user_data": "No store/profile/database mutation or restore",
-  "release": "NOT_SIGNED_NOT_PACKAGED_NOT_ACCEPTED"
+  "release": "NOT_SIGNED_NOT_PACKAGED_NOT_ACCEPTED",
+  "metadata": "METADATA-PRESERVATION.json and ASTRA-METADATA-REVIEW.json"
 }

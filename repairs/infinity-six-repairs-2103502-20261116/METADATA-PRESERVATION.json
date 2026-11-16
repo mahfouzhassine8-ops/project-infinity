@@ -1,0 +1,34 @@
+{
+  "status": "PASS_EXACT_METADATA_AND_PROTECTED_HASHES",
+  "baseline_apk_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "files": {
+    "script.kodihealthcenter/addon.xml": {
+      "before": "84759a45b9a7be3989bf8c8cccab26939665bd2e52aaf4e971e167f2640c68d8",
+      "after": "c3233a9d6d6e5520c0da6903eb55919c57f10b45a87a199b6582481bc9b0ee45"
+    },
+    "skin.infinity.diggz/addon.xml": {
+      "before": "32b3c029d09e2f5d1695f39c1a658759da63e1973a17e99c477a86afbc087400",
+      "after": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f"
+    },
+    "skin.infinity.diggz/infinity-skin.json": {
+      "before": "5ad2f63a5cabb4815ab5cd4e3088a36195cee637a41e881a16f272bc2486eea5",
+      "after": "b1c8c0f095ddb3f699d17373914518c0811690ab220e1a97a13eec7d1cb9c38e"
+    },
+    "skin.infinity.diggz/Infinity-Protected-Manifest.json": {
+      "before": "8374b6e34b497db6f3f5a60e675e37165f3292d50ebc83e0d95f3140858c1aba",
+      "after": "e68439c3ea840b2e728edc60c9bf6754175b4e149e2fe279e27faf7ff4f25fef"
+    }
+  },
+  "protected_files_verified": 949,
+  "changed_protected_entries": [
+    "addon.xml",
+    "infinity-skin.json",
+    "unified/VideoOSD.xml",
+    "unified/custom_1199_InfinityVideoLock.xml"
+  ],
+  "all_other_metadata_bytes": "UNCHANGED",
+  "APK_assembly": "NOT_RUN",
+  "runtime_profile_selection": "NOT_VERIFIED; equal or higher profile version may take precedence",
+  "profile_mutation": "NONE in this build; retained CC may refresh version-bound UI backup at runtime",
+  "acceptance": "PENDING"
+}
