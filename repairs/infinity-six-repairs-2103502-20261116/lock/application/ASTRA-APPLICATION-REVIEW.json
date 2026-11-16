@@ -1,0 +1,26 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_SELECTED_APPLICATION_SOURCE_REVIEW",
+  "selected_case": "actual_502_lock_stop_and_watched_actions",
+  "reviewed_inputs_sha256": "26deedebf36dbdab51279a01eaf5e83c40cb4f04ad0f3ffce335f72dd668cf59",
+  "input_count": 50,
+  "native": 43861331996,
+  "findings": [
+    "Every current input hash and exact keyset independently verified",
+    "Native artifact/proofs and exact engine hash match independent downloaded artifact review",
+    "Actual mapped inode/device/SHA/PID/startticks remain mandatory; independently verified absent GNU BuildID explicitly matched",
+    "Pre-dispatch and failure timestamps correlate actions even when input does not return",
+    "Watched actions preserve selected saved destinations, ratings, lists and hidden state, all unrelated buckets; no fake identities or history"
+  ],
+  "authorization": "ONE bounded selected Android application engineering run; disposable temporary test harness only",
+  "not_authorized_by_this_review": [
+    "original signing",
+    "owner APK",
+    "shutdown/reset/uninstall",
+    "provider/owner-store actions",
+    "release acceptance",
+    "IncidentB root-cause claim"
+  ],
+  "tests_rerun": false
+}

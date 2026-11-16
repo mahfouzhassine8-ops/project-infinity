@@ -47,7 +47,7 @@
       "before_sha256": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07",
       "repair": 5,
       "reason": "Compile dedicated lock owner and localize exactly28 newly emitted private helpers:25 retained lock plus3 observer unique_ptr helpers; no original export in list, exact ABI guard retained",
-      "independent_review": "Astra approved exact3 observer-helper map extension after43852054709 ABI evidence; concrete final review pending",
+      "independent_review": "Astra exact3 map addition and actual ELF28-private-name verification PASS43861331996",
       "candidate_source_sha256": "0d4ea2095ee4f723428ba917055ea8ae32bf70e47126804e20af71a4f6b67b69"
     },
     {
@@ -204,7 +204,7 @@
   "original_repository_production_files": "UNCHANGED; candidate inputs isolated in this repair directory",
   "DEX_preservation": "lock/DEX-BUILD-DIALOG-RETIREMENT.json; classes3 reused, changed Dialog compiled and references resolved",
   "OSD_preservation": "OSD-PRESERVATION-TEST.json",
-  "native_full_source_and_ABI": "Retained lock-only PASS43833259814; observer+lock43852054709 compiled/linked then strictABI FAIL (3 new private weak helpers); exact3 visibility correction prepared, next build pending",
+  "native_full_source_and_ABI": "PASS43861331996; actual ELF independently reviewed;136120 exports,11 deps preserved;9408 original source files unchanged; failed43852054709 retained",
   "Cobra": "No source edits; all657 non-Main classes3 classes identical; remaining baseline APK members retained pending assembly audit",
   "user_data": "No owner store/profile/database mutation or restore; future selected Android test uses a new disposable engineering profile only",
   "release": "NOT_SIGNED_NOT_PACKAGED_NOT_ACCEPTED",

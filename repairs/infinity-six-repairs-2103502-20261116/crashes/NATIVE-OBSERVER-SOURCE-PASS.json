@@ -1,0 +1,60 @@
+{
+  "APK": false,
+  "Android_execution": "NOT_RUN",
+  "baseline_native_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+  "baseline_source_map_sha256": "4ef7607c83dc97291c088de701cfec2456e4cd53f256599151fd3d1b43ba507a",
+  "candidate_source_count": 9418,
+  "changed": {
+    "xbmc/application/Application.cpp": {
+      "after": "7f0bf230e2252a2367ac4ca28ea5474ec9de41cced57feedfa4520ae0284d6fb",
+      "before": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356"
+    },
+    "xbmc/interfaces/builtins/AndroidBuiltins.cpp": {
+      "after": "e569d65a0183e37137c0b57a73ed4379ec37048dec3ddcb9df36879578c2768d",
+      "before": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d"
+    },
+    "xbmc/platform/android/activity/CMakeLists.txt": {
+      "after": "0d4ea2095ee4f723428ba917055ea8ae32bf70e47126804e20af71a4f6b67b69",
+      "before": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07"
+    },
+    "xbmc/platform/android/activity/InfinityActivityObserver.h": {
+      "after": "ef185b4145742051b5e82236849211ce437a3e621b2a572975813f02c43416a6",
+      "before": null
+    },
+    "xbmc/platform/android/activity/InfinityVideoLock.cpp": {
+      "after": "ef2954a3df7a28e151260b1bc77f57dc604fd7a1238cda5706d7ff12f64598ef",
+      "before": null
+    },
+    "xbmc/platform/android/activity/InfinityVideoLock.h": {
+      "after": "77d887486251216b03256e2c569e70c14c6e850105bbffc2c508379809b250d0",
+      "before": null
+    },
+    "xbmc/platform/android/activity/InfinityVideoLockGate.h": {
+      "after": "76c2bbf2d0d65ff4c2707fe9ea5507769e0950247dd16e1c074d43b2edde06e3",
+      "before": null
+    },
+    "xbmc/platform/android/activity/JNIMainActivity.cpp": {
+      "after": "483a8f1298aaa6073b9a3f36c00fe47176d4857f7d3de0253b1b17832e0d788f",
+      "before": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f"
+    },
+    "xbmc/platform/android/activity/JNIMainActivity.h": {
+      "after": "b81b04feb5b6ffcff8176bb89720f0039af21622ca1447222ae421bf4c3a5ff7",
+      "before": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853"
+    },
+    "xbmc/platform/android/activity/XBMCApp.h": {
+      "after": "1c37af721e3c3da7cdf4085df6dec826a4d9965acf48acc67e6bda883bee5734",
+      "before": "c91a127abbb9ccf6d3274514b5e2b05c2e7787dce09ea11938bc8c42ff1ed052"
+    }
+  },
+  "exact_baseline_source_count": 9414,
+  "final_ABI_baseline": "EXACT_SIGNED502",
+  "historical_ELFs": "SEGREGATED_PROVENANCE_COMPARISONS_ONLY",
+  "historical_producer": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+  "historical_receipts": "PROVENANCE_ONLY_NOT_NEW_ACCEPTANCE",
+  "physical_acceptance": false,
+  "request_sha256": "ef12b91795833060319a25d8dc5feed77a5083bf8b2ac7cadd0a0d48f50448d2",
+  "signing": false,
+  "source": "dea5df6063b49d65099c7958722f2b9f33895600",
+  "status": "PASS_EXACT502_PREIMAGE_AND_TEN_REVIEWED_LOCK_OBSERVER_FILES",
+  "unchanged_native_files": 9408
+}

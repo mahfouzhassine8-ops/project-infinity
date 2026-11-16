@@ -17,6 +17,7 @@ def input_paths():
   'lock/application/SCOPE.json','lock/application/NATIVE.json',
   'crashes/watched_case.py','crashes/watched_probe.py','crashes/WATCHED-PUBLIC-FIXTURE.json',
   'crashes/WATCHED-SOURCE-REVIEW.json','crashes/OBSERVER-SOURCE.json',
+  'crashes/ASTRA-NATIVE-RESULT-REVIEW.json',
   'lock/build_dex.py','lock/patch_main.py','lock/DEX-BUILD-SELECTION.json',
   'lock/DEX-BUILD-DIALOG-RETIREMENT.json','lock/NATIVE-BUILD-SCOPE.json',
   'lock/CI-NATIVE.json','lock/ASTRA-DEX-REVIEW.json','lock/android/ASTRA-ATTEMPT9-REVIEW.json',

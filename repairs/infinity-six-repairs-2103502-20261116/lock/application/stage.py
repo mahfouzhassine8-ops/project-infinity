@@ -98,6 +98,7 @@ def main():
  work=ROOT/'lock-app-work';work.mkdir();evidence=work/'evidence';evidence.mkdir()
  sdk=Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0';android=sdk.parents[1]/'platforms/android-34/android.jar'
  base,binding=artifact(work,'baseline');engine,engine_binding=artifact(work,'native')
+ engine_binding.update(build_id=NATIVE['build_id'],build_id_status=NATIVE['build_id_status'])
  sig=run([sdk/'apksigner','verify','--verbose','--print-certs',base]);assert 'certificate SHA-256 digest: '+CERT in sig
  assert all(any(line.startswith('Verified using v'+str(v)+' scheme') and line.endswith(': true') for line in sig.splitlines()) for v in (1,2,3))
  tools,ecj=toolchain(work,sdk);dex=Path('/dev/shm/infinity502-app-dex')

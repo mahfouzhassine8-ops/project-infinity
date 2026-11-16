@@ -1,6 +1,7 @@
 """One actual application lock journey. No shutdown, reset, provider or owner data access."""
 from pathlib import Path
 from zipfile import ZipFile
+from datetime import datetime,timezone
 import argparse,hashlib,importlib.util,json,os,re,shutil,subprocess,sys,time,urllib.request,xml.etree.ElementTree as ET
 
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[3]
@@ -13,8 +14,9 @@ def main():
  work=ROOT/'lock-app-work';out=work/'evidence';apk=work/'INTERNAL-LOCK-QA-NOT-FOR-OWNER.apk'
  report={'status':'RUNNING_SELECTED_LOCK_APPLICATION_CASE','shutdown':'NOT_SELECTED','physical_Fold':'NOT_RUN','owner_installer':False,'cases':[]}
  def save():(out/'APPLICATION.json').write_text(json.dumps(report,indent=2)+'\n')
- def passed(name,**data):report['cases'].append({'case':name,'pass':True,**data});save()
- def record(name,value):report.setdefault('observations',[]).append({'event':name,'value':value});save()
+ def stamp():return {'UTC':datetime.now(timezone.utc).isoformat(),'monotonic':time.monotonic(),'engine_pid':pid}
+ def passed(name,**data):report['cases'].append({'case':name,'pass':True,**stamp(),**data});save()
+ def record(name,value):report.setdefault('observations',[]).append({'event':name,'value':value,**stamp()});save()
  def redact(raw):
   raw=re.sub(r'https?://[^\s\"\'<>]+','<URL_REDACTED>',raw)
   raw=re.sub(r'(?i)((?:authorization|cookie|password|access_token|refresh_token|api_key)[\"\']?\s*[:=]\s*)[^\r\n]+',r'\1<REDACTED>',raw)
@@ -40,6 +42,9 @@ def main():
   nonlocal sequence
   alive();sequence+=1
   assert not {'pid','sequence','action'}.intersection(arguments)
+  if action in ('watched_select','watched_button'):
+   record('watched_input_dispatch',{'sequence':sequence,'action':action,
+          **{k:arguments[k] for k in ('window','dialog','control','label','input') if k in arguments}})
   path=work/'request.json';path.write_text(json.dumps({'pid':pid,'sequence':sequence,'action':action,**arguments}));adb('push',path,QAROOT+'/request.json')
   def read():
    value=transport.read_json(QAROOT+'/reply.json')
@@ -119,6 +124,7 @@ def main():
   identity=observer('native_identity')
   assembly=json.loads((out/'ASSEMBLY.json').read_bytes())
   assert identity['engine_sha256']==assembly['native']['member_sha256'],'ACTUAL_MAPPED_ENGINE_DIFFERS'
+  assert identity['build_id']==assembly['native']['build_id'] and identity['build_id_status']==assembly['native']['build_id_status'],'ACTUAL_ELF_NOTE_DIFFERS'
   report['native_identity']=identity;save()
   assert rpc('Player.Open',{'item':{'file':'special://profile/infinity502-lock-fixture.mp4'}})=='OK'
   first=until(lambda:(lambda s:s if s.get('playing') and s.get('time',0)>1 else None)(observer('snapshot')),'actual local playback',45)
@@ -161,6 +167,7 @@ def main():
   if not observer('snapshot')['osd']:assert rpc('Input.ExecuteAction',{'action':'showosd'})=='OK'
   until(lambda:observer('snapshot')['osd'],'original OSD for Stop',10)
   observer('focus_stop');until(lambda:observer('snapshot').get('focused_control')==253,'original Stop control253',10)
+  record('original_Stop_dispatch',{'control':253})
   assert rpc('Input.Select')=='OK'
   until(lambda:not observer('snapshot')['playing'],'actual original OSD media Stop',10)
   alive();passed('original_OSD_Stop_same_engine_alive',pid=pid,control=253)
@@ -172,7 +179,7 @@ def main():
   passed('normal_media_stop_and_observer_retirement',same_pid=pid)
   report['status']='PASS_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES'
  except Exception as error:
-  report['status']='FAIL_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES';report['error']=type(error).__name__+': '+str(error);raise
+  report['status']='FAIL_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES';report['error']=type(error).__name__+': '+str(error);report['failure_time']=stamp();raise
  finally:
   if 'original_education' in locals():
    try:

@@ -33,8 +33,9 @@ def native_identity():
     name=notes[position:position+n];position+=(n+3)&~3;desc=notes[position:position+d];position+=(d+3)&~3
     if name.rstrip(b'\0')==b'GNU' and t==3:build_id=desc.hex()
   stream.seek(0);digest=hashlib.file_digest(stream,'sha256').hexdigest()
- assert build_id,'MAPPED_ELF_BUILD_ID_REQUIRED'
- return {'pid':os.getpid(),'engine_sha256':digest,'build_id':build_id,'mapped_segments':len(rows),'inode':opened.st_ino,
+ return {'pid':os.getpid(),'engine_sha256':digest,'build_id':build_id,
+         'build_id_status':'PRESENT_IN_VERIFIED_ELF' if build_id else 'ABSENT_IN_VERIFIED_ELF',
+         'mapped_segments':len(rows),'inode':opened.st_ino,
          'process_start_ticks':Path('/proc/self/stat').read_text().rsplit(')',1)[1].split()[19]}
 
 def snapshot():

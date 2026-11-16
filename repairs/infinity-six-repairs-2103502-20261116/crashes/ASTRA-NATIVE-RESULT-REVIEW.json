@@ -1,0 +1,37 @@
+{
+  "status": "PASS_INDEPENDENT_NATIVE_ARTIFACT_REVIEW",
+  "run": 43861331996,
+  "source": "dea5df6063b49d65099c7958722f2b9f33895600",
+  "request_sha256": "ef12b91795833060319a25d8dc5feed77a5083bf8b2ac7cadd0a0d48f50448d2",
+  "reviewed_pins_sha256": "359a39d495d8d963aceda759ccad071400ea58e8906c25b430daabb7fcbb8589",
+  "engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+  "build_id": null,
+  "build_id_status": "NO_GNU_BUILD_ID_NOTE_IN_VERIFIED_ELF",
+  "baseline_sources": 9414,
+  "candidate_sources": 9418,
+  "unchanged_sources": 9408,
+  "existing_changes": 6,
+  "new_files": 4,
+  "exported_interfaces": 136120,
+  "added_exports": 0,
+  "removed_exports": 0,
+  "unchanged_dependencies": 11,
+  "version_definitions": [],
+  "private_literal_names": 28,
+  "private_map_sha256": "14ffdfec5e7f807b5b6bf2db4ea2d7250db707e27aabd9b92b954806ef6e028e",
+  "private_map_effective_occurrences_receipt": 1,
+  "proof_sha256": {
+    "ARM64.json": "3abbd69c71018370a036c971161c43a4621bf133dbb0bb470dd3b4c96f0757d3",
+    "SOURCE-PRESERVATION.json": "4c0be0ce36a060d979d8800f4c12bdecb2e1ac6c39422996e02df44c2c03dc30",
+    "ABI-COMPARISON.json": "6bf4a7982f9c72e362280ee5cab5e3cc9dc3c39335bfaf02f46f82a6d5466255"
+  },
+  "fixture_receipt_sha256": "78ea7cef39170f8b70b0fc6d71ac832e59cdef5c65a76734df10e5fe0147db2f",
+  "artifact_sha256": {
+    "native": "7bfe4e92d9f1253da590a997369fcc79bd9234263ed6d43ba0dc71cad36325f5",
+    "evidence": "843b16eec70bfe5c2f176a0c1643a5601836dfc40e9c18f46283106824611574"
+  },
+  "Android_execution": "NOT_RUN",
+  "release_approval": false,
+  "tests_rerun": false,
+  "application_probe_gate": "Current mandatory GNU Build ID assertion must explicitly handle verified absence; exact engine/process/mapped-file identity remains mandatory"
+}

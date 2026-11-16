@@ -1,10 +1,17 @@
 {
-  "status": "PENDING_NATIVE_RESULT_DO_NOT_LAUNCH",
+  "status": "VERIFIED_FULL_ARM64_SOURCE_AND_ABI",
   "run": 43861331996,
   "source": "dea5df6063b49d65099c7958722f2b9f33895600",
-  "artifact": null,
-  "archive_sha256": null,
-  "engine_sha256": null,
-  "proof_sha256": {},
+  "artifact": 14226277189,
+  "archive_sha256": "7bfe4e92d9f1253da590a997369fcc79bd9234263ed6d43ba0dc71cad36325f5",
+  "engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+  "proof_sha256": {
+    "ARM64.json": "3abbd69c71018370a036c971161c43a4621bf133dbb0bb470dd3b4c96f0757d3",
+    "SOURCE-PRESERVATION.json": "4c0be0ce36a060d979d8800f4c12bdecb2e1ac6c39422996e02df44c2c03dc30",
+    "ABI-COMPARISON.json": "6bf4a7982f9c72e362280ee5cab5e3cc9dc3c39335bfaf02f46f82a6d5466255"
+  },
+  "build_id": null,
+  "build_id_status": "ABSENT_IN_VERIFIED_ELF",
+  "independent_review": "crashes/ASTRA-NATIVE-RESULT-REVIEW.json",
   "retained_failed_attempt": 43852054709
 }
