@@ -81,7 +81,12 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     MotionEvent event=MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),
         MotionEvent.ACTION_POINTER_DOWN|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT),2,p,c,0,0,1,1,0,0,InputDevice.SOURCE_TOUCHSCREEN,0);
     try{pointer(event);}finally{event.recycle();}
-    inject(MotionEvent.ACTION_CANCEL,x,y);
+    // Prove the second contact cancels the hold before cleanup can cancel it.
+    require(ui(()->!a.holding()&&a.locked()),"Actual second pointer cancels hold before cleanup");
+    event=MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),
+        MotionEvent.ACTION_POINTER_UP|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT),2,p,c,0,0,1,1,0,0,InputDevice.SOURCE_TOUCHSCREEN,0);
+    try{pointer(event);}finally{event.recycle();}
+    up();
   }
   private void noRequestAfter(Runnable gesture,String label) {
     phase=label;

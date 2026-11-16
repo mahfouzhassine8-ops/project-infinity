@@ -1,0 +1,27 @@
+{
+  "run": 43834616665,
+  "source_commit": "055b3d8ca12174e8e30eff707608a9e519e1a370",
+  "artifact": 14210666790,
+  "artifact_sha256": "5c2329b7bd823e24b4efe79c76d9c684fd74c7479c2e4db9f50e0e4580be347f",
+  "status": "FAIL_FIXTURE_INTERFERENCE",
+  "production_Dialog_sha256": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
+  "confirmed": [
+    "Both selected profiles reach READY with exact approved geometry",
+    "Narrow window focus belongs to ImmersiveModeConfirmation during failure",
+    "Wide input is intercepted by Embedded{LetterboxEduWindowManager8} UID10179",
+    "Two-pointer POINTER_DOWN followed by one-pointer CANCEL is invalid and rejected by InputDispatcher"
+  ],
+  "selected_correction": [
+    "Valid two-pointer sequence with immediate cancellation assertion before cleanup",
+    "Verified disposable emulator-only first-use education setup and exact restoration; no UID injection bypass"
+  ],
+  "production_changes": "NONE_FOR_THIS_CORRECTION",
+  "selected_tests": [
+    "same two Android component profiles with corrected fixture"
+  ],
+  "limitations": [
+    "First-use tutorials excluded; injected focus-loss test remains",
+    "No actual native/Bridge/Kodi playback in component probe",
+    "Physical Fold NOT_RUN"
+  ]
+}
