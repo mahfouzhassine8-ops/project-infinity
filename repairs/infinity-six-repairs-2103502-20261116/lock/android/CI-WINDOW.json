@@ -1,6 +1,6 @@
 {
   "baseline": 2103502,
-  "source_commit": "872ca84f651b5784d04bffbbf846dd0ff69ac0e8",
+  "source_commit": "8c65d01340bbc164d0cf62c9b7f671b20af9871f",
   "selected_check": "isolated_android_video_lock_window",
   "Infinity_application_execution": false,
   "Infinity_shutdown": "NOT_SELECTED",
@@ -8,25 +8,35 @@
   "review": {
     "reviewer": "Astra",
     "approved": true,
-    "receipt_sha256": "a02c6e268876ba11195b6bdf83103f2839564d546f7583134bc55443270a14fd"
+    "receipt_sha256": "22adc76bae7d7e2b82c06731654604e8b4dfdcbb725bb7abcadd9be9bac579f2"
   },
   "inputs": {
-    ".github/workflows/infinity-502-lock-window.yml": "ec0f289ade47d12a5d2e272500a7b012652b224cf7e724eb180accb6d3d1cf0a",
+    ".github/workflows/infinity-502-lock-window.yml": "f798199f4a125a19085736d451ea6ebbc61b2b40ac81ba251240860a50436fa7",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/build_probe.py": "83e6d9414d0c674485bc7cf53d26bc86addfedb46a77b10d214bbe954f45ffa2",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "cadb87837cc613291a3513c6e3d913550086cc2107cf265b3dd6336be839d82f",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "a96740891b112c1e73615a376c350751930119c9285765caf799d00ed1ee5b81",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "736819608d792ea64cc6a8127245d65400e63f703a6cadf7322e453457b5c9cb",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "a7b4b9f4676e5eea2b13bb00b83aaa441681e614a8624a8dde9947fdae62bd37",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_probe.py": "f164f41dd2bfff023e536ad626f8971308ef3ea864ee0c6b6a4d3720589a600b",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/run_profiles.py": "1cf1fd68fcd55e5c0490cee4a5f4c944d05511aeab5a0e5f7eaa6054099b8354",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeActivity.java": "f952e3943e602f183e7647c8e2483bedf8a1cd5a164c88585e6facaf613bf99e",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/InfinityLockProbeInstrumentation.java": "14eaac7f55b619d0a8c775b59283f95c93c050223fd8a8692cab7e28f9be04d1",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/AndroidManifest.xml": "ac18002ad74496dba198ceedeec974370b61735318bf985f9c9f22e034d33752",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/android/ASTRA-PRE-LAUNCH.json": "a02c6e268876ba11195b6bdf83103f2839564d546f7583134bc55443270a14fd"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/ANDROID-ATTEMPT6.json": "fad025284ded78f0f872a263bd91dece8fe8ce94227bb78c3ca45a5129818e79",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/PIP-TAIL-COMPILE.json": "971ef4a278c54940d963e05e048e97974a1672b669ff2b320cf43fa48ed17165",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/android/ASTRA-PRE-LAUNCH.json": "22adc76bae7d7e2b82c06731654604e8b4dfdcbb725bb7abcadd9be9bac579f2"
   },
   "selected_profiles": [
     "narrow-dark",
     "wide-light"
   ],
   "physical_Fold": "NOT_RUN",
-  "correction_specific_rerun_of": 43836876847,
-  "reason": "Fix wm help test-setup exit convention, then execute previously NOT_RUN component checks; production sources unchanged"
+  "correction_specific_rerun_of": 43837801524,
+  "reason": "Run only unresolved PiP/tail with correct transition completion and SystemUI expansion; retain passed input/rotation/Home prefix and all production bytes",
+  "selection": "pip_tail",
+  "retained_prefix": {
+    "run": 43837801524,
+    "production_inputs": {
+      "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+      "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "a40ba40973795887d4a858f8a44c8c7e3bedbe8e1558413940a3d913ac2138fe"
+    }
+  }
 }
