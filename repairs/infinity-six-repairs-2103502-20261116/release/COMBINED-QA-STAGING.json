@@ -1,0 +1,121 @@
+{
+  "status": "PASS_UNSIGNED_COMBINED_QA_PRESERVATION_NOT_INSTALLABLE",
+  "source": "6687500e5f41d0791c851b448fc84a39b4e60584",
+  "baseline": {
+    "artifact": 14189813969,
+    "run": 43785765772,
+    "source": "92bef1bcf056abf58d6754354173565e56f907ac",
+    "archive_sha256": "936e9b52a1880d3412bc86ad4a594145f9927a7dba7b2243a88eb3cea26fb9b2",
+    "member": "Infinity-2103502-Combined-Original-Signer.apk",
+    "member_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28"
+  },
+  "native": {
+    "artifact": 14226277189,
+    "run": 43861331996,
+    "source": "dea5df6063b49d65099c7958722f2b9f33895600",
+    "archive_sha256": "7bfe4e92d9f1253da590a997369fcc79bd9234263ed6d43ba0dc71cad36325f5",
+    "member": "libkodi.so",
+    "member_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7"
+  },
+  "modules": {
+    "archive_sha256": "39bd397632869dbe8381208d8ea09781a51950c2bfb513e20faf079bcab876d0",
+    "artifact": 14235166467,
+    "run": 43886888869,
+    "source": "077cbd17010390172108dabe5495815c1f21a0ac"
+  },
+  "cast": {
+    "archive_sha256": "af92658619d0449c2f0b4600bdb02ead651e76a8c7bf273903112933142d0934",
+    "artifact": 14229837555,
+    "run": 43876785995,
+    "source": "f420b5519d440abef841e7215634b52a5e9839d8"
+  },
+  "changes": {
+    "AndroidManifest.xml": {
+      "before": "5752b094cc8415ed67f78882ff0dd3a445a52827ede181234abee8009ba0640a",
+      "after": "4cbbf714d5649fdb5ef7177446b117640447ebcb2623d7f3ccd458fa5e15308f"
+    },
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1": {
+      "before": "df66656d30cc4c6ad3d94866ddd7a09de7f064cd2947026517f4b65db9054b40",
+      "after": "2e9417232bcd059630c085b5b3ecf09cf8997fdd0150e942f730574992a13506"
+    },
+    "assets/addons/script.infinity.commandcenter/INFINITY-MODULES.v1.sig": {
+      "before": "24c2aa48787a84301717dd70dd86aeb3bbd4a4924198b87e08dfe6cc23694f58",
+      "after": "889a3f20460831d3ca35b29400e8888c19192ea104e337496bbbf3355fe46a8a"
+    },
+    "assets/addons/script.infinity.commandcenter/addon.xml": {
+      "before": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4",
+      "after": "a39dcece2d2926675019071c506031b6ba10d56a12a31b7766942386dc876b69"
+    },
+    "assets/addons/script.infinity.commandcenter/context.py": {
+      "before": "bd874b64942262853f424b3a3258a72ce67d905f07784f55b81fbb0af4cef050",
+      "after": "7fdb3fd781f2eaa3358a4c0d83932c16cc3f8bd064eb99ce6ab20152a5475aef"
+    },
+    "assets/addons/script.kodihealthcenter/addon.xml": {
+      "before": "84759a45b9a7be3989bf8c8cccab26939665bd2e52aaf4e971e167f2640c68d8",
+      "after": "c3233a9d6d6e5520c0da6903eb55919c57f10b45a87a199b6582481bc9b0ee45"
+    },
+    "assets/addons/script.kodihealthcenter/infinity_runtime_identity.py": {
+      "before": "9a87d2790f457af7965babce6fa7c45ff1c43b2dc938cc5defec64aa5442853c",
+      "after": "870a7e727bc73207672739cd9f872bc40142167878c2bec01ffd157b8485befa"
+    },
+    "assets/addons/skin.infinity.diggz/Infinity-Protected-Manifest.json": {
+      "before": "8374b6e34b497db6f3f5a60e675e37165f3292d50ebc83e0d95f3140858c1aba",
+      "after": "e68439c3ea840b2e728edc60c9bf6754175b4e149e2fe279e27faf7ff4f25fef"
+    },
+    "assets/addons/skin.infinity.diggz/addon.xml": {
+      "before": "32b3c029d09e2f5d1695f39c1a658759da63e1973a17e99c477a86afbc087400",
+      "after": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f"
+    },
+    "assets/addons/skin.infinity.diggz/infinity-skin.json": {
+      "before": "5ad2f63a5cabb4815ab5cd4e3088a36195cee637a41e881a16f272bc2486eea5",
+      "after": "b1c8c0f095ddb3f699d17373914518c0811690ab220e1a97a13eec7d1cb9c38e"
+    },
+    "assets/addons/skin.infinity.diggz/unified/VideoOSD.xml": {
+      "before": "4c9adac29735c6e53d5647d3381415cc696b39c6a69ec358654500c74ff46af1",
+      "after": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46"
+    },
+    "assets/addons/skin.infinity.diggz/unified/custom_1199_InfinityVideoLock.xml": {
+      "before": "38e6fb69b28759ddd567d429664623600ba7c9e2f3e57588f1715bc729be915b",
+      "after": "71f145d07add0ea092ad660d5238cbe92735182bccb5022edb8fec968e85c75d"
+    },
+    "assets/experience-component-updates.properties": {
+      "before": "cdad4b5998b1c183caf6897685081b04e1494d2877ba507a95276a42015e453c",
+      "after": "b690bfcbb745924813c2216931fdd0cdfdb9b252535e97ed3fac5a6b853ca87d"
+    },
+    "classes3.dex": {
+      "before": "5634f2376e5d0bf6176ebef6fa1ac16bb22fdecc1d018ac078f266bb757fe9b8",
+      "after": "a1c5742aa9a400590c8eb148c86d5b64e76963884a7b712ddb09cfa50668aa15"
+    },
+    "classes7.dex": {
+      "before": null,
+      "after": "3bc1c1e766c813caf7818c4e3d66357633a4025ba0b28b6be66fc7cfe03c053f"
+    },
+    "lib/arm64-v8a/libinfinitycastremux.so": {
+      "before": "613907f98b2a180f372413c70e2369d52872fcc9dc04385583c1c6515f28d53a",
+      "after": "86a34a4976813f24280345561170b1dee47e96fb9c3b34642190ced2c2fe9ffd"
+    },
+    "lib/arm64-v8a/libkodi.so": {
+      "before": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+      "after": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7"
+    }
+  },
+  "unchanged_members": 7760,
+  "APK_sha256": "16db9a12f6ffdcc1474558647150f940ac30ab34490dcab8e9610aca4a90dd02",
+  "package": "com.projectinfinity.kodi",
+  "provisional_versionCode": 2103504,
+  "version_reserved": false,
+  "original_signing": "PENDING_EXISTING_OWNER_AUTHORITY_GATES",
+  "ContinuePlaying": "DEFERRED_NOT_FIXED_UNCHANGED",
+  "Cobra": "UNCHANGED",
+  "native_build": false,
+  "DEX_build": false,
+  "owner_data": "NOT_ACCESSED",
+  "physical_acceptance": "PENDING_OWNER",
+  "known_limitations": [
+    "EmptyShell cause",
+    "MarkWatched originalSIGSEGVcause",
+    "ContentsetupSIGILLintranslatedAndroid",
+    "ActualTVCastplayback",
+    "Otherunexecutedengineeringgates"
+  ]
+}
