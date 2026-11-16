@@ -1,0 +1,36 @@
+name: Infinity Stage 1 - Read-only bundled feature source extraction
+on:
+  push:
+    branches: [infinity-stage1-inventory-20261116]
+    paths:
+      - '.github/workflows/infinity-stage1-extract-feature-source.yml'
+      - 'audits/infinity-stage1/extract_feature_source.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  extract-readonly:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download signed QA APK for static source inspection
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/qa /tmp/infinity-bundled-feature-sources
+          gh release download infinity-2103502-fast-qa --repo "$GITHUB_REPOSITORY" \
+             --dir /tmp/qa --pattern 'Infinity-2103502-Combined-Original-Signer.apk'
+      - name: Extract public bundled code, XML menu layouts and settings only
+        run: |
+          set -euo pipefail
+          python3 audits/infinity-stage1/extract_feature_source.py \
+             /tmp/qa/Infinity-2103502-Combined-Original-Signer.apk \
+             /tmp/infinity-bundled-feature-sources
+      - uses: actions/upload-artifact@v4
+        with:
+          name: infinity-stage1-feature-code-evidence
+          path: /tmp/infinity-bundled-feature-sources/
+          retention-days: 30
+          if-no-files-found: error
