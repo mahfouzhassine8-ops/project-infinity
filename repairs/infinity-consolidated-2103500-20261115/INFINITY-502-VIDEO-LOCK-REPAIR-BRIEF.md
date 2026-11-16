@@ -27,7 +27,7 @@ The November 16 owner request supplied a portrait locked-playback screenshot and
 
 **Owner-reported regression to repair, not just redesign:** Rotation between orientations and the normal Android Back gesture both bypass the current Video Lock. The actual padlock screen (custom window 1199) and its button-level OnBack rules are inadequate as a source of persistent truth; fix at the smallest appropriate session/lifecycle/input level after tracing. Do not implement broad global Android Back blocking.
 
-## Owner-approved outcome (behavioral contract; exact visual style requires clip review)
+## Owner-approved outcome (Video Lock behavior; top-left presentation locked)
 
 1. **Video continues playing** during lock. Lock must suppress ordinary unintended screen taps/seek/OSD/gesture commands within Kodi player area, without blocking legitimate OS/emergency/system gestures; respect Android BACK/back-exit policy and navigation safety.
 2. **Unlock is reliable and obvious:** intentional user interaction reveals an accessible, legible unlock affordance with a comfortable touch hitbox, and a clearly distinguishable locked state. Do not let auto-hide silently trap the user or produce repeated ambiguous taps. Specify/test clear hold/tap or confirmation logic after reviewing the recording.
@@ -35,6 +35,21 @@ The November 16 owner request supplied a portrait locked-playback screenshot and
 4. **State and lifecycle:** enter, idle, reveal, unlock, reenter, video end, screen rotate, Fold transition, external back/exit are deterministic. No stale timers/Window properties, overlays or stranded dialogs; unlock does not create fake loading tasks, change playback progress or trigger unwanted UI reset. Fix unified-only loader inconsistency if source/runtime evidence warrants it.
 5. **Preservation:** Only actual scoped player-lock XML and minimal necessary first-party support code may change, with exact old/new file list/hash receipts. No Cobra, cast transport, native media engine, stored progress, add-ons, providers, watchlist, shutdown or unrelated skin layouts.
 6. **QA:** Compare affected XML variants, validate XML/control navigation, onClick commands and focus behavior, test folded/unfolded/rotation, touch and BACK, locked/unlocked state, active paused/playing/resume/stop, reduced motion, and Kodi/Android UI in emulator plus owner Fold one acceptance cycle after package. After corrected code passes, original-sign successor QA APK from 502 with matching recovery; no premature "fixed" claim.
+
+## Owner-locked player VideoOSD visual-only design — November 16, 2026
+
+**OWNER APPROVED AND DESIGN LOCKED.** The final portrait reference is the third revised image based on owner screenshot `22702.jpg`: the same native Infinity player, with existing **one-row horizontal-scroll** VideoOSD control strip and larger, clearer, more finger-friendly icon artwork. The image is a **visual treatment reference**, not permission to replicate any incorrect control order, label, seek increment or grouping drawn by the mock.
+
+**Exact preservation contract (binding for Codex and Astra):**
+1. **Every existing button remains in its current physical position and order** in each existing layout, including buttons outside the currently visible scroll viewport. Existing left/right horizontal scrolling, overflow, scroll position, selection/focus, gestures and animations must continue working exactly as they currently do.
+2. Preserve the current single bottom control row and its container footprint/placement. **Do not introduce a new row, split controls into groups, float controls elsewhere, replace the layout, add logos, or add buttons.** The upper title/time header, recording pill, film frame, aspect fit, progress/seek bar and timestamps remain unchanged.
+3. The **only newly approved VideoOSD changes** are the adopted larger, more legible **visual icon styling** and finger-friendly visual affordance **within the controls' existing positional/interaction contracts**. Any hit-target improvement must not alter the tap result, neighboring-control ownership, control order, horizontal scrolling, focus transitions or layout geometry; if impossible without a layout change, stop and request explicit owner approval rather than shifting controls.
+4. Do not change **any** button's Kodi action, click handler, seek increment, display/audio mode, rotation, subtitles, back/stop, cast, More, or controller semantics. Icon art must truthfully correspond to the existing function, regardless of inaccuracies in the illustrative mock.
+5. Apply the same approved visual refinement consistently to existing portrait/landscape and front/inner responsive variants, with no new screens or global theme rewrite. Preserve Cobra, full player engine, provider interfaces, casts, user profiles and every other out-of-scope feature.
+6. **Separate existing authorization:** The previously approved **top-left miniature Video Lock** stays at the **exact existing upper-left location**, not a center-screen obstruction; intentional two-second hold-to-unlock, persistently locked across Android Back, rotations and fold/unfold; on successful unlock return to the **unchanged button mapping and positions**, with only the just-approved visual icon treatment. That lock *functional* repair is separate from the ordinary VideoOSD *visual-only* job.
+7. **Release gate:** Compare every VideoOSD control ID and `onclick`/action, absolute/relative placement, order, scrolling container and focus graph against signed 502 (automated checks + Android + owner Fold); audit exact XML source/member deltas. Reject any nonvisual change to ordinary VideoOSD controls, even if the mock appears attractive. Physical outcome and signed APK have NOT been completed.
+
+**No actual XML, Kotlin or native player code changed by recording this approval.**
 
 ## Next gate
 
