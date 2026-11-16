@@ -1,0 +1,119 @@
+{
+  "run": 43878757171,
+  "source": "f934a37b1271c714d927003ae92064c4da8d4c9c",
+  "artifact": 14231542577,
+  "archive_sha256": "04ab44449e02b8c74b468ff8838703944d746fe210712be63b7af86fa2da817a",
+  "status": "NORMAL_STOP_PASS_WATCHED_FIXTURE_FAILED_BEFORE_ACTION",
+  "normal_Stop": "Actual originalOSDcontrol253 viaInput.Select; samePID4528 alive; exactengineb3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+  "failure": "Addons.GetAddonDetails rejected fixtureprerequisite; noMarkWatchedaction orlockinputexecuted",
+  "owner_crash_causality": "NOT_ESTABLISHED_BY_THIS_BOUNDED_TEST",
+  "application": {
+    "status": "FAIL_SELECTED_ACTUAL_APPLICATION_LOCK_STOP_WATCHED_CASES",
+    "shutdown": "NOT_SELECTED",
+    "physical_Fold": "NOT_RUN",
+    "owner_installer": false,
+    "cases": [
+      {
+        "case": "normal_entry_native_and_Python_ready",
+        "pass": true,
+        "UTC": "2026-11-16T13:50:17.447749+00:00",
+        "monotonic": 452.856114619,
+        "engine_pid": 4528,
+        "pid": 4528,
+        "snapshot": {
+          "pid": 4528,
+          "skin": "skin.infinity.diggz",
+          "window": 10000,
+          "dialog": 9999,
+          "playing": false,
+          "osd": false,
+          "lock_entry": false,
+          "script.infinity.commandcenter": {
+            "version": "0.3.5.83",
+            "files": {
+              "addon.xml": "4b920288a58ff281de8aecc8117993f370a31d0110c299acd86fd8ec19a968e4",
+              "INFINITY-MODULES.v1": "df66656d30cc4c6ad3d94866ddd7a09de7f064cd2947026517f4b65db9054b40",
+              "INFINITY-MODULES.v1.sig": "24c2aa48787a84301717dd70dd86aeb3bbd4a4924198b87e08dfe6cc23694f58"
+            }
+          },
+          "skin.infinity.diggz": {
+            "version": "1.0.5.275",
+            "files": {
+              "addon.xml": "753fdac263bcb0495071de0fa30b8f2b8e7c77c78c265bf906877ae9752a361f",
+              "unified/VideoOSD.xml": "980dce71fe4a9354d96302084969ccc3f3c28f160c0bdc5eaa10cd12fb87ad46",
+              "unified/custom_1199_InfinityVideoLock.xml": "71f145d07add0ea092ad660d5238cbe92735182bccb5022edb8fec968e85c75d"
+            }
+          }
+        }
+      },
+      {
+        "case": "original_OSD_Stop_before_lock_same_engine_alive",
+        "pass": true,
+        "UTC": "2026-11-16T13:50:46.526420+00:00",
+        "monotonic": 481.934796923,
+        "engine_pid": 4528,
+        "pid": 4528,
+        "control": 253
+      }
+    ],
+    "environment": {
+      "ro.build.version.sdk": "36",
+      "ro.product.cpu.abilist": "x86_64,arm64-v8a",
+      "ro.dalvik.vm.native.bridge": "libndk_translation.so",
+      "ro.build.fingerprint": "google/sdk_gphone64_x86_64/emu64xa:16/BE2A.250530.026.F3/13894323:userdebug/dev-keys"
+    },
+    "adb_root": {
+      "returncode": 0,
+      "stdout": "restarting adbd as root\n",
+      "stderr": "",
+      "uid_reads": 1,
+      "last_uid_read": {
+        "returncode": 0,
+        "stdout": "0\n",
+        "stderr": ""
+      },
+      "verified_uid": 0,
+      "elapsed_seconds": 1.362816611000028
+    },
+    "fixture": {
+      "fresh_profile_only": true,
+      "clip_sha256": "549b586e602d81ea0cb38be1e9330433cab1e8c34dc04117661ad1da5fe43d58",
+      "owner_data": "NOT_ACCESSED",
+      "application_UID": 10216
+    },
+    "education_before": "",
+    "native_identity": {
+      "pid": 4528,
+      "engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+      "build_id": null,
+      "build_id_status": "ABSENT_IN_VERIFIED_ELF",
+      "mapped_segments": 3,
+      "inode": 180259,
+      "process_start_ticks": "12920"
+    },
+    "observations": [
+      {
+        "event": "original_Stop_dispatch_before_lock",
+        "value": {
+          "control": 253
+        },
+        "UTC": "2026-11-16T13:50:46.023909+00:00",
+        "monotonic": 481.432349491,
+        "engine_pid": 4528
+      }
+    ],
+    "error": "RuntimeError: RPC Addons.GetAddonDetails: {\"code\": -32602, \"message\": \"Invalid params.\"}",
+    "failure_time": {
+      "UTC": "2026-11-16T13:50:46.548845+00:00",
+      "monotonic": 481.957200767,
+      "engine_pid": 4528
+    },
+    "observer_final_process": {
+      "expected_pid": 4528,
+      "observed_pid": "4528",
+      "request_sequence": 11,
+      "UTC": "2026-11-16T13:50:46.566374+00:00"
+    },
+    "education_restored": ""
+  }
+}

@@ -145,17 +145,8 @@ def main():
   assert identity['engine_sha256']==assembly['native']['member_sha256'],'ACTUAL_MAPPED_ENGINE_DIFFERS'
   assert identity['build_id']==assembly['native']['build_id'] and identity['build_id_status']==assembly['native']['build_id_status'],'ACTUAL_ELF_NOTE_DIFFERS'
   report['native_identity']=identity;save()
-  assert rpc('Player.Open',{'item':{'file':'special://profile/infinity502-lock-fixture.mp4'}})=='OK'
-  first=until(lambda:(lambda s:s if s.get('playing') and s.get('time',0)>1 else None)(observer('snapshot')),'actual local playback',45)
-  # Prioritize the two crash paths independently of the later lock journey.
-  # This is the original OSD Stop action, never a shutdown or forced stop.
-  if not observer('snapshot')['osd']:assert rpc('Input.ShowOSD')=='OK'
-  until(lambda:observer('snapshot')['osd'],'original OSD before Stop crash case',15)
-  observer('focus_stop');until(lambda:observer('snapshot').get('focused_control')==253,'original Stop focus before lock',10)
-  record('original_Stop_dispatch_before_lock',{'control':253})
-  assert rpc('Input.Select')=='OK'
-  until(lambda:not observer('snapshot')['playing'],'original Stop before lock',10)
-  alive();passed('original_OSD_Stop_before_lock_same_engine_alive',pid=pid,control=253)
+  # Normal original-OSD Stop passed run43878757171 on this exact engine/DEX.
+  # Reuse that result; execute the still-pending watched case before lock work.
   watched_spec=importlib.util.spec_from_file_location('selected_watched_case',crashes/'watched_case.py')
   watched=importlib.util.module_from_spec(watched_spec);watched_spec.loader.exec_module(watched)
   report['watched_case']=watched.run(rpc,observer,until,passed,record,alive,film_directory,film_directory+public['movie_member']);save()

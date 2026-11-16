@@ -3,7 +3,7 @@
   "status": "PASS_SELECTED_WATCHED_DRIVER_SOURCE_REVIEW",
   "source_sha256": {
     "watched_probe.py": "c1d3a6b383461c767c70016d28cf6d11bb6d1589ac738202ec05389b9a9ece33",
-    "watched_case.py": "dee8ab2dd70355dcefe83e4056f7bed80fbfc9ca7176aaf8be034746dcb4be42"
+    "watched_case.py": "37f733e3682809d5dade511d70e399b1c2ee41a47559c3f469df0809778f2443"
   },
   "reviewed": [
     "Normal content settings require actual Movies and Local information only values; negative control IDs use actual controls and native focus acceptance",
@@ -18,5 +18,10 @@
     "Passing this case does not establish IncidentB root cause or repair",
     "Only disposable film metadata and genuine watched operations; no owner store"
   ],
-  "production_watched_changes": false
+  "production_watched_changes": false,
+  "fixture_prerequisite_review": "Independent data reviewer approved removing redundantGetAddonDetails gate: actualenabled-scraper admission remains in exactnativeGUIDialogContentSettings; uniqueMovies/Localinformationonly UIselection/readback, scanallocatedID, exactpath/IMDb and neverplayedgates retained. OriginalfailinglookupID unavailable; no genericAPIrestriction or missingdefault inferred.",
+  "native_source_evidence": {
+    "AddonsOperations.cpp": "f5ffa7acdd3e47a6661345d63dd8ea86b996922c4373ca2e138f9c8dfd2911d7",
+    "GUIDialogContentSettings.cpp": "e4f3952bf4926c9dca90b489392042aa41e49a761217cd12c0c19b1dd70db756"
+  }
 }

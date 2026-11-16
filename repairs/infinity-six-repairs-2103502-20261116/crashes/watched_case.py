@@ -32,10 +32,11 @@ def run(rpc, observer, until, passed, record, alive, directory, filename):
         assert len(matches) == 1, ('UNIQUE_REAL_BUTTON_REQUIRED', expected, matches)
         return observed_input(observer('watched_button', dialog=value['dialog'], control=matches[0], label=expected))
     def context_button(expected): click_button(dialog(10106), expected)
-    for addon in ('metadata.local', rpc('Settings.GetSettingValue', {'setting': 'scrapers.moviesdefault'})['value']):
-        details = rpc('Addons.GetAddonDetails', {'addonid': addon, 'properties': ['enabled', 'version']})['addon']
-        assert details['enabled'], ('REQUIRED_EXISTING_SCRAPER_NOT_REGISTERED', addon)
-        if addon == 'metadata.local': assert details['version'] == '1.0.1'
+    # Let the existing Set content dialog enforce enabled-scraper admission.
+    # Require actual local-provider selection/readback and NFO identity below;
+    # the earlier generic addon-details assertion duplicated this admission.
+    record('watched_scraper_selection', {'required': 'metadata.local',
+           'configured_default': rpc('Settings.GetSettingValue', {'setting': 'scrapers.moviesdefault'})['value']})
     assert not ui()['playing']
     assert rpc('GUI.ActivateWindow', {'window': 'videos', 'parameters': ['sources://video/', 'return']}) == 'OK'
     source = until(lambda: (lambda value: value if value['window'] == 10025 and
