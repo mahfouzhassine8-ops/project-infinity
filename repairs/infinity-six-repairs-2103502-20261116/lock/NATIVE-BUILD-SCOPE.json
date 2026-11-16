@@ -11,17 +11,22 @@
   "baseline_source_map_sha256": "4ef7607c83dc97291c088de701cfec2456e4cd53f256599151fd3d1b43ba507a",
   "baseline_version_code": 2103502,
   "branch": "work/infinity-2103502-six-repairs-20261116",
-  "candidate_source_count": 9417,
-  "correction": "Repair 5 native video-lock integration only",
+  "candidate_source_count": 9418,
+  "correction": "Retained Repair5 native lock plus owner-authorized incidentA seven-observer lifetime correction",
   "engineering_files": [
     "repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py",
     ".github/workflows/infinity-502-lock-integration.yml",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json"
+    "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json",
+    "repairs/infinity-six-repairs-2103502-20261116/crashes/OBSERVER-SCOPE.json",
+    "repairs/infinity-six-repairs-2103502-20261116/crashes/ASTRA-OBSERVER-REVIEW.json"
   ],
   "existing_native_changes": {
     "xbmc/application/Application.cpp": "fb5167b4fd7cb7fa16357fe367c9d212ae9440b4821870e4fd2d90018d9b4356",
     "xbmc/interfaces/builtins/AndroidBuiltins.cpp": "20ecef50afef77c51229de6365f29f6d738aa6bba9847ec0af471394de75542d",
-    "xbmc/platform/android/activity/CMakeLists.txt": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07"
+    "xbmc/platform/android/activity/CMakeLists.txt": "8a883038637703d9d8843c98892566072e3ed27098b6676a6491269fec5fde07",
+    "xbmc/platform/android/activity/JNIMainActivity.cpp": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f",
+    "xbmc/platform/android/activity/JNIMainActivity.h": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853",
+    "xbmc/platform/android/activity/XBMCApp.h": "c91a127abbb9ccf6d3274514b5e2b05c2e7787dce09ea11938bc8c42ff1ed052"
   },
   "historical_material_role": "Historical source archives and temporary ELF comparison files are permitted only inside the unchanged reconstruction chain. They are not the application base, candidate engine, final ABI baseline, or new acceptance evidence. Provenance receipts remain under native502-lock-output/provenance; historical ELF files are never uploaded as candidate artifacts.",
   "input_artifacts": [
@@ -90,7 +95,8 @@
   "new_native_files": [
     "xbmc/platform/android/activity/InfinityVideoLock.cpp",
     "xbmc/platform/android/activity/InfinityVideoLock.h",
-    "xbmc/platform/android/activity/InfinityVideoLockGate.h"
+    "xbmc/platform/android/activity/InfinityVideoLockGate.h",
+    "xbmc/platform/android/activity/InfinityActivityObserver.h"
   ],
   "not_run": [
     "source reconstruction",
@@ -132,7 +138,7 @@
   "schema": 1,
   "selected_test": "lock_full_arm64_compile_link_exact502_abi",
   "selection_document": "NATIVE-TEST-SELECTION.json",
-  "source_preservation_rule": "Run the exact frozen producer source reconstruction with all existing content checks. Compare the resulting complete map and every source hash with the authenticated 9414-file signed502 map before writing any lock overlay. Then require exactly three original-source changes plus three new files and 9411 unchanged original hashes.",
+  "source_preservation_rule": "Reconstruct exact signed502 across all9414 original native sources before overlay. Permit exactly six existing-file changes and four new files (9418 total,9408 original files byte-identical); retained six lock files plus four observer lifetime files only.",
   "source_producer": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
   "status": "ENGINEERING_PREPARATION_ONLY_NOT_EXECUTED",
   "toolchain": {
@@ -144,7 +150,7 @@
     "python": "3.11.7",
     "runner": "ubuntu-22.04"
   },
-  "unchanged_original_source_count": 9411,
+  "unchanged_original_source_count": 9408,
   "private_link_symbols": [
     "_ZN17InfinityVideoLock4Gate4PackEjjb",
     "_ZN17InfinityVideoLock4Gate5BeginEjj",
@@ -172,5 +178,6 @@
     "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev",
     "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEaSIS3_EENS_9enable_ifIXsr14is_convertibleIPT_PS3_EE5valueERS4_E4typeERKNS_10shared_ptrIS7_EE"
   ],
-  "private_link_rule": "Anonymous literal local-only script, no wildcard/named version; exactly25 symbols absent from502; exact existing ABI/dependency comparison unchanged"
+  "private_link_rule": "Anonymous literal local-only script, no wildcard/named version; exactly25 symbols absent from502; exact existing ABI/dependency comparison unchanged",
+  "retained_successful_lock_build": 43833259814
 }

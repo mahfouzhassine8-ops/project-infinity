@@ -153,6 +153,38 @@
       "repair": 5,
       "reason": "Top-level candidate,candidate_version,skin_version plus exactly4 affected protected hashes",
       "independent_review": "Astra PRE_EDIT_APPROVED exact four files and fields 2026-11-16"
+    },
+    {
+      "path": "crashes/native/xbmc/platform/android/activity/JNIMainActivity.cpp",
+      "native_path": "xbmc/platform/android/activity/JNIMainActivity.cpp",
+      "before_sha256": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f",
+      "repair": "incident A, owner amendment b0d9aa31",
+      "reason": "Seven Infinity observer virtual calls only; factory publication after construction; exact-owner retirement and reader drain before deletion; legacy raw observers/checkpoints untouched.",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact observer/factory boundary"
+    },
+    {
+      "path": "crashes/native/xbmc/platform/android/activity/JNIMainActivity.h",
+      "native_path": "xbmc/platform/android/activity/JNIMainActivity.h",
+      "before_sha256": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853",
+      "repair": "incident A, owner amendment b0d9aa31",
+      "reason": "Seven Infinity observer virtual calls only; factory publication after construction; exact-owner retirement and reader drain before deletion; legacy raw observers/checkpoints untouched.",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact observer/factory boundary"
+    },
+    {
+      "path": "crashes/native/xbmc/platform/android/activity/XBMCApp.h",
+      "native_path": "xbmc/platform/android/activity/XBMCApp.h",
+      "before_sha256": "c91a127abbb9ccf6d3274514b5e2b05c2e7787dce09ea11938bc8c42ff1ed052",
+      "repair": "incident A, owner amendment b0d9aa31",
+      "reason": "Seven Infinity observer virtual calls only; factory publication after construction; exact-owner retirement and reader drain before deletion; legacy raw observers/checkpoints untouched.",
+      "independent_review": "Astra PRE_EDIT_APPROVED exact observer/factory boundary"
+    },
+    {
+      "path": "crashes/native/xbmc/platform/android/activity/InfinityActivityObserver.h",
+      "native_path": "xbmc/platform/android/activity/InfinityActivityObserver.h",
+      "before_sha256": null,
+      "repair": "incident A, owner amendment b0d9aa31",
+      "reason": "Private non-owning observer leases; no registry mutex across virtual/JNI calls; exact-owner drain before lifetime ends",
+      "independent_review": "Astra PRE_EDIT_APPROVED lifetime boundary"
     }
   ],
   "production_allowlist_rule": "Add exact source/preimage only after proven defect and independent Astra review; no broad directory allowance. No production edits before approval.",
@@ -167,5 +199,6 @@
   ],
   "data_precondition": "Original continue-watching.json must be preserved privately before Repair3 production correction; currently absent, no data mutation authorized.",
   "test_policy": "Select focused positive/negative tests per correction before execution; retain existing evidence without reruns; shutdown/relaunch now explicitly selected by owner but must retain separate genuine result.",
-  "release_gate": "All six required engineering gates and independent review before one consolidated APK; no partial or diagnostic release; physical acceptance never inferred."
+  "release_gate": "All six required engineering gates and independent review before one consolidated APK; no partial or diagnostic release; physical acceptance never inferred.",
+  "incident_specific_amendment": "OWNER-AUTHORIZED-TWO-CRASH-REPAIR-20261116.md @b0d9aa31"
 }

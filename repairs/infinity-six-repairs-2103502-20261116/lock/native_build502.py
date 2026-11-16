@@ -37,17 +37,32 @@ REQUEST = HERE / 'CI-NATIVE.json'
 SCOPE = HERE / 'NATIVE-BUILD-SCOPE.json'
 SELECTION = HERE / 'NATIVE-TEST-SELECTION.json'
 REVIEW = HERE / 'ASTRA-NATIVE-BUILD-REVIEW.json'
-SELECTED_TEST = 'lock_full_arm64_compile_link_exact502_abi'
+SELECTED_TEST = 'lock_and_observer_lifetime_full_arm64_compile_link_exact502_abi'
 EXISTING = {
     'xbmc/application/Application.cpp',
     'xbmc/interfaces/builtins/AndroidBuiltins.cpp',
     'xbmc/platform/android/activity/CMakeLists.txt',
+    'xbmc/platform/android/activity/JNIMainActivity.cpp',
+    'xbmc/platform/android/activity/JNIMainActivity.h',
+    'xbmc/platform/android/activity/XBMCApp.h',
 }
 NEW = {
     'xbmc/platform/android/activity/InfinityVideoLock.cpp',
     'xbmc/platform/android/activity/InfinityVideoLock.h',
     'xbmc/platform/android/activity/InfinityVideoLockGate.h',
+    'xbmc/platform/android/activity/InfinityActivityObserver.h',
 }
+CRASH_NATIVE = {
+    'xbmc/platform/android/activity/JNIMainActivity.cpp',
+    'xbmc/platform/android/activity/JNIMainActivity.h',
+    'xbmc/platform/android/activity/XBMCApp.h',
+    'xbmc/platform/android/activity/InfinityActivityObserver.h',
+}
+
+
+def native_path(name):
+    require(name in EXISTING | NEW, 'Unknown native overlay')
+    return (TASK / 'crashes' if name in CRASH_NATIVE else HERE) / 'native' / name
 
 
 def require(condition, message):
@@ -86,8 +101,11 @@ def relative(path):
 
 
 def source_hashes():
-    paths = [HERE / 'native' / name for name in sorted(EXISTING | NEW)]
+    paths = [native_path(name) for name in sorted(EXISTING | NEW)]
     paths += [Path(__file__).resolve(), ROOT / WORKFLOW, SCOPE, SELECTION]
+    paths += [TASK / 'crashes' / name for name in
+              ('OBSERVER-SCOPE.json', 'OBSERVER-SOURCE.json', 'ASTRA-OBSERVER-REVIEW.json',
+               'OBSERVER-HOST-ATTEMPT1.json', 'OBSERVER-RETIREMENT-RACE.json')]
     for path in paths:
         require(path.is_file() and not path.is_symlink(), 'Missing or linked reviewed input: ' + relative(path))
     return {relative(path): sha(path) for path in paths}
@@ -102,9 +120,10 @@ def gate():
     require(os.environ.get('GITHUB_EVENT_NAME') in ('push', 'workflow_dispatch'), 'Explicit request event required')
     head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
     require(head == os.environ.get('GITHUB_SHA'), 'Checkout does not match requested CI commit')
-    subprocess.run(['git', 'diff', '--exit-code', 'HEAD', '--', relative(HERE), WORKFLOW], cwd=ROOT, check=True)
+    subprocess.run(['git', 'diff', '--exit-code', 'HEAD', '--', relative(HERE),
+                    relative(TASK / 'crashes'), WORKFLOW], cwd=ROOT, check=True)
     request = json.loads(REQUEST.read_bytes())
-    require(request.get('schema') == 1 and request.get('operation') == 'exact502-lock-full-arm64-compile-link', 'Wrong native operation')
+    require(request.get('schema') == 1 and request.get('operation') == 'exact502-lock-observer-full-arm64-compile-link', 'Wrong native operation')
     require(request.get('branch') == BRANCH and request.get('root_approved') is True, 'Explicit root-approved branch request required')
     require(request.get('baseline_version_code') == 2103502 and request.get('baseline_apk_sha256') == APK, 'Wrong application baseline')
     require(request.get('baseline_native_sha256') == ENGINE and request.get('baseline_source_map_sha256') == MAP, 'Wrong native baseline')
@@ -115,10 +134,22 @@ def gate():
     require('Full ARM64 compile/link and exact502 exportedABI preservation' in selected.get('selected_before_execution', []), 'Selected test document changed')
     pins = source_hashes()
     require(request.get('reviewed_files') == pins, 'Request source/build/selection hashes differ')
-    native = {name: pins[relative(HERE / 'native' / name)] for name in sorted(EXISTING | NEW)}
-    require(request.get('native_sources') == native, 'Request must bind exactly six native overlays')
+    native = {name: pins[relative(native_path(name))] for name in sorted(EXISTING | NEW)}
+    require(request.get('native_sources') == native, 'Request must bind exactly ten native overlays')
     observed = {p.relative_to(HERE / 'native').as_posix() for p in (HERE / 'native').rglob('*') if p.is_file()}
-    require(observed == EXISTING | NEW, 'Unreviewed native overlay file')
+    crash_files = {p.relative_to(TASK / 'crashes/native').as_posix()
+                   for p in (TASK / 'crashes/native').rglob('*') if p.is_file()}
+    require(observed == (EXISTING | NEW) - CRASH_NATIVE and crash_files == CRASH_NATIVE,
+            'Unreviewed or overlapping native overlay file')
+    host = json.loads((TASK / 'crashes/OBSERVER-HOST-ATTEMPT1.json').read_bytes())
+    require(host['status'] == 'PASS_CORRECTED_SOURCE_HOST' and host['outside_reviewed_delta'] == 'BYTE_IDENTICAL',
+            'Corrected observer source host/preservation gate missing')
+    require({name: row['after'] for name, row in host['source'].items()} ==
+            {name: native[name] for name in CRASH_NATIVE}, 'Observer host receipt differs from requested source')
+    race = json.loads((TASK / 'crashes/OBSERVER-RETIREMENT-RACE.json').read_bytes())
+    require(race['status'] == 'PASS' and race['header_sha256'] ==
+            native['xbmc/platform/android/activity/InfinityActivityObserver.h'],
+            'Observer retirement race receipt differs from requested source')
     require(request.get('astra_review_sha256') == sha(REVIEW), 'Independent review hash differs')
     review = json.loads(REVIEW.read_bytes())
     require(review.get('reviewer') == 'Astra' and review.get('status') == 'PASS_SOURCE_REVIEW', 'Independent source review required')
@@ -131,7 +162,7 @@ def gate():
     if os.environ['GITHUB_EVENT_NAME'] == 'workflow_dispatch':
         require(os.environ.get('REQUEST_SHA256') == sha(REQUEST), 'Dispatch must name the exact checked-in request SHA-256')
     scope = json.loads(SCOPE.read_bytes())
-    require(scope.get('baseline_source_count') == 9414 and scope.get('candidate_source_count') == 9417, 'Wrong source counts')
+    require(scope.get('baseline_source_count') == 9414 and scope.get('candidate_source_count') == 9418, 'Wrong source counts')
     require(scope.get('baseline_source_map_sha256') == MAP and scope.get('baseline_native_sha256') == ENGINE, 'Scope baseline differs')
     require(set(scope.get('existing_native_changes', {})) == EXISTING and set(scope.get('new_native_files', [])) == NEW, 'Scope native allowlist differs')
     base = json.loads((TASK / 'BASELINE.json').read_bytes())
@@ -209,7 +240,7 @@ def candidate_map():
     require(not NEW.intersection(before), 'New lock path already belongs to baseline502')
     expected = dict(before)
     expected.update(request['native_sources'])
-    require(len(expected) == 9417, 'Candidate source count differs')
+    require(len(expected) == 9418, 'Candidate source count differs')
     require({name for name in before if before[name] != expected[name]} == EXISTING, 'Existing-source delta differs')
     return before, expected
 
@@ -244,16 +275,16 @@ def prepare():
             require(sha(target) == before[name], 'Existing native preimage changed')
         else:
             require(not target.exists(), 'Unexpected new native target')
-        candidate = HERE / 'native' / name
+        candidate = native_path(name)
         require(sha(candidate) == after[name], 'Overlay changed after request gate')
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(candidate.read_bytes())
         changed[name] = dict(before=before.get(name), after=after[name])
-    require(hasher().hashes(NATIVE) == after, 'Only the six requested native sources may differ')
+    require(hasher().hashes(NATIVE) == after, 'Only the ten requested native sources may differ')
     unchanged = sum(before[name] == after[name] for name in before)
-    require(unchanged == 9411, 'Unchanged native count differs')
+    require(unchanged == 9408, 'Unchanged native count differs')
     save('NATIVE-SOURCE-MAP.json', after)
-    save('SOURCE-PRESERVATION.json', dict(status='PASS_EXACT502_PREIMAGE_AND_SIX_REVIEWED_LOCK_FILES',
+    save('SOURCE-PRESERVATION.json', dict(status='PASS_EXACT502_PREIMAGE_AND_TEN_REVIEWED_LOCK_OBSERVER_FILES',
         source=os.environ['GITHUB_SHA'], request_sha256=sha(REQUEST), baseline_native_sha256=ENGINE,
         baseline_source_map_sha256=MAP, exact_baseline_source_count=len(before),
         candidate_source_count=len(after), unchanged_native_files=unchanged, changed=changed,
@@ -376,7 +407,7 @@ def compile_native():
     compiler.checked_sources = checked
     private_map = private_link_fixture()
     proof = with_tools(compiler.compile_engine)
-    require(proof['complete_native_engine_compiled'] and proof['reviewed_file_count'] == 9417, 'Full native engine compilation not established')
+    require(proof['complete_native_engine_compiled'] and proof['reviewed_file_count'] == 9418, 'Full native engine compilation not established')
     library = OUT / 'libkodi.so'
     require(sha(library) == proof['native_sha256'], 'Compiled engine proof differs')
     objects = list(Path(os.environ['BUILD_DIR']).rglob('InfinityVideoLock.cpp.o'))
@@ -390,6 +421,7 @@ def compile_native():
             'Private map must occur exactly once on final libkodi.so link')
     with library.open('rb') as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as binary:
         require(binary.find(b'com.projectinfinity.kodi.InfinityVideoLockBridge') >= 0, 'Lock bridge was not linked into the real engine')
+        require(binary.find(b'Infinity activity observer publication refused') >= 0, 'Observer lifetime correction was not linked')
     readelf = Path(os.environ['ANDROID_HOME']) / 'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
 
     def abi(path):
@@ -416,7 +448,7 @@ def compile_native():
     save('ARM64.json', dict(status='PASS_FULL_ARM64_LINK_AND_EXACT502_ABI',
         source=os.environ['GITHUB_SHA'], request_sha256=sha(REQUEST), selected_test=SELECTED_TEST,
         baseline_native_sha256=ENGINE, baseline_source_map_sha256=MAP, native_sha256=sha(library),
-        reviewed_file_count=9417, unchanged_original_native_sources=9411,
+        reviewed_file_count=9418, unchanged_original_native_sources=9408,
         lock_object_sha256=sha(objects[0]), lock_bridge_linked=True,
         exported_interfaces_preserved=len(after[0]), dependencies=sorted(after[1]),
         private_map_sha256=sha(private_map), private_map_link_occurrences=1,

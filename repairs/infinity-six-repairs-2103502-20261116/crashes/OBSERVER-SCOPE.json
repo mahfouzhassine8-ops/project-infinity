@@ -1,0 +1,28 @@
+{
+  "authorization": "b0d9aa315a7bdab6720c96f64932342222f2bd5d",
+  "baseline": 2103502,
+  "incident": "A",
+  "status": "PRE_EDIT_ALLOWLIST_FROZEN",
+  "reviewer": "Astra /root/astra_502_review",
+  "approved_boundary": "Seven Infinity observer virtual calls only; factory publication after construction; exact-owner retirement and reader drain before deletion; legacy raw observers/checkpoints untouched.",
+  "existing": {
+    "xbmc/platform/android/activity/JNIMainActivity.cpp": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f",
+    "xbmc/platform/android/activity/JNIMainActivity.h": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853",
+    "xbmc/platform/android/activity/XBMCApp.h": "c91a127abbb9ccf6d3274514b5e2b05c2e7787dce09ea11938bc8c42ff1ed052"
+  },
+  "new": [
+    "xbmc/platform/android/activity/InfinityActivityObserver.h"
+  ],
+  "unchanged": [
+    "Cobra",
+    "Stop handler",
+    "Mark Watched semantics",
+    "native persistence/checkpoint",
+    "Python startup",
+    "Cast",
+    "Search/providers",
+    "tracking/user records"
+  ],
+  "defect": "Exact502 admits _infinityGetState while its owner is still in base construction; real host pure virtual SIGABRT reproduced.",
+  "limits": "Owner exact tombstone offset unavailable; Stop causality and incident B root cause unproven."
+}

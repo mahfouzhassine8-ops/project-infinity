@@ -1,0 +1,37 @@
+{
+  "status": "PASS_CORRECTED_SOURCE_HOST",
+  "source": {
+    "xbmc/platform/android/activity/JNIMainActivity.cpp": {
+      "before": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f",
+      "after": "483a8f1298aaa6073b9a3f36c00fe47176d4857f7d3de0253b1b17832e0d788f"
+    },
+    "xbmc/platform/android/activity/JNIMainActivity.h": {
+      "before": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853",
+      "after": "b81b04feb5b6ffcff8176bb89720f0039af21622ca1447222ae421bf4c3a5ff7"
+    },
+    "xbmc/platform/android/activity/XBMCApp.h": {
+      "before": "c91a127abbb9ccf6d3274514b5e2b05c2e7787dce09ea11938bc8c42ff1ed052",
+      "after": "1c37af721e3c3da7cdf4085df6dec826a4d9965acf48acc67e6bda883bee5734"
+    },
+    "xbmc/platform/android/activity/InfinityActivityObserver.h": {
+      "before": null,
+      "after": "ef185b4145742051b5e82236849211ce437a3e621b2a572975813f02c43416a6"
+    }
+  },
+  "outside_reviewed_delta": "BYTE_IDENTICAL",
+  "harness_sha256": "f7e7261c1e75d599a34e5349a16698724c568ea30f1f7160a010fcf3b2150f68",
+  "extracted_methods_sha256": "c6b9c3a8cc3b761169f19a986a03507c0b52c6090a00be641ae1ab90e6980ab9",
+  "extracted_factory_sha256": "d378c99674b0f2f4d11b1407cdaef1173125d2398cf9f85fde705878679c9ecb",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "returncode": 0,
+  "stdout": "PASS actual seven observer bodies and factory lifetime; checks=2694\n",
+  "stderr": "",
+  "limits": [
+    "Minimal JNI carrier",
+    "Actual virtual owners use test-only barriers and return values",
+    "No Android/Stop/watched/owner-incident execution claim"
+  ]
+}

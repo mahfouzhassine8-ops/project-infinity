@@ -1,0 +1,128 @@
+{
+  "status": "PASS_SELECTED_ANDROID_FOCUS_RETIREMENT_AND_PIP_TAIL",
+  "run": 43844640475,
+  "source": "7c93c31da2cac1f3f97d86c948ccf1f1aaab7a53",
+  "artifact_id": 14215455119,
+  "artifact_sha256": "900a96ba3988ba3e44f736f2e303855222bbd0471b26a93d2c51936e4a3e3903",
+  "selection": "retirement_pip_tail",
+  "production_sources": {
+    "java/com/projectinfinity/kodi/InfinityVideoLockState.java": "af8bfeb061ad79d676fc20885b62c35761ef02e8317783ff280c6d3a92f7e150",
+    "java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1313b716f741503d4ce03d616ffe10d7e2a415928965ab3f012bbd6c47cc2034",
+    "android/InfinityLockProbeActivity.java": "9b331db61cb2d453160de1328332129c260a6e741a6a58d7b743ecf74f508686",
+    "android/InfinityLockProbeInstrumentation.java": "fbcd389eeb815c7c1db8a90e07b5430201b6db4ac5e74d9b9a16bc27be7197b5"
+  },
+  "fixture_apk_sha256": "a6216879f486ce4172ae4f17ccd4b89255f73952b10341c77c51b881a6b6e298",
+  "profiles": {
+    "narrow-dark": {
+      "receipt_sha256": "7960a7c0da938edb48fd7ccb348829992066ef48cf6ccf732d585615164d30f7",
+      "assertions": 30,
+      "checks": [
+        "Explicit valid component selection",
+        "Exact top-left viewport geometry",
+        "Selected system night mode and actual Dialog palette match Host fixture",
+        "Exact top-left viewport geometry",
+        "Physical window retained until actual focus dispatch returned case=1",
+        "Reentrant foreground hide preserves logical lock",
+        "Exact top-left viewport geometry",
+        "Physical window retained until actual focus dispatch returned case=2",
+        "Owner destruction retires once without cancelling old window disposal",
+        "Exact top-left viewport geometry",
+        "Physical window retained until actual focus dispatch returned case=3",
+        "Old disposal cannot dismiss replacement owner window",
+        "Dialog focus present before hold DOWN",
+        "Platform accepted actual PiP entry",
+        "Completed PiP entry cancels hold and retains owner",
+        "Expansion targets the same live owner task",
+        "System PiP ACTION_EXPAND accepted for exact probe",
+        "Exact visible probe PiP window exposes supported expansion",
+        "Actual PiP cancels hold and retains lock on return",
+        "Attempted edge swipe under gestural navigation retains locked input window",
+        "Synchronous Host READY revocation does not unlock or strand subsequent readiness",
+        "Stale session stop cannot retire owner",
+        "Main Looper advanced and locked events never reached underlay",
+        "Selected Dialog palette retained through lifecycle checks",
+        "Dialog focus present before hold DOWN",
+        "Two-second hold requests without dismissing lock",
+        "Completed hold survives ordinary MOVE and UP",
+        "Matching explicit Host restoration fixture confirms",
+        "Exact top-left viewport geometry",
+        "Owner destruction retires once"
+      ],
+      "not_run": [
+        "Input/hold/focus/rotation/Home prefix retained from run43837801524 (previous Dialog bytes); not repeated or claimed current-pass",
+        "BadToken/window-show fault injection; explicit callback path compiled, not Android-fault-injected here"
+      ],
+      "PiP_callbacks": {
+        "pip_enter_callbacks": 1,
+        "pip_exit_callbacks": 1,
+        "pip_draws": 3
+      },
+      "final_geometry": "Collected after deliberate owner destruction; unavailable target is caught diagnostic only, not a process crash",
+      "actual_final_player_bounds": [
+        0,
+        0,
+        720,
+        1680
+      ]
+    },
+    "wide-light": {
+      "receipt_sha256": "fd4e91febdecee518dd22375c4de7792424fbb68aa098a91040cd48dcd41f067",
+      "assertions": 30,
+      "checks": [
+        "Explicit valid component selection",
+        "Exact top-left viewport geometry",
+        "Selected system night mode and actual Dialog palette match Host fixture",
+        "Exact top-left viewport geometry",
+        "Physical window retained until actual focus dispatch returned case=1",
+        "Reentrant foreground hide preserves logical lock",
+        "Exact top-left viewport geometry",
+        "Physical window retained until actual focus dispatch returned case=2",
+        "Owner destruction retires once without cancelling old window disposal",
+        "Exact top-left viewport geometry",
+        "Physical window retained until actual focus dispatch returned case=3",
+        "Old disposal cannot dismiss replacement owner window",
+        "Dialog focus present before hold DOWN",
+        "Platform accepted actual PiP entry",
+        "Completed PiP entry cancels hold and retains owner",
+        "Expansion targets the same live owner task",
+        "System PiP ACTION_EXPAND accepted for exact probe",
+        "Exact visible probe PiP window exposes supported expansion",
+        "Actual PiP cancels hold and retains lock on return",
+        "Attempted edge swipe under gestural navigation retains locked input window",
+        "Synchronous Host READY revocation does not unlock or strand subsequent readiness",
+        "Stale session stop cannot retire owner",
+        "Main Looper advanced and locked events never reached underlay",
+        "Selected Dialog palette retained through lifecycle checks",
+        "Dialog focus present before hold DOWN",
+        "Two-second hold requests without dismissing lock",
+        "Completed hold survives ordinary MOVE and UP",
+        "Matching explicit Host restoration fixture confirms",
+        "Exact top-left viewport geometry",
+        "Owner destruction retires once"
+      ],
+      "not_run": [
+        "Input/hold/focus/rotation/Home prefix retained from run43837801524 (previous Dialog bytes); not repeated or claimed current-pass",
+        "BadToken/window-show fault injection; explicit callback path compiled, not Android-fault-injected here"
+      ],
+      "PiP_callbacks": {
+        "pip_enter_callbacks": 1,
+        "pip_exit_callbacks": 1,
+        "pip_draws": 2
+      },
+      "final_geometry": "Collected after deliberate owner destruction; unavailable target is caught diagnostic only, not a process crash",
+      "actual_final_player_bounds": [
+        0,
+        0,
+        1008,
+        1344
+      ]
+    }
+  },
+  "education_fixture_restored": true,
+  "prior_prefix": "run43837801524 previous Dialog bytes; historical failed run retained, not claimed current full pass",
+  "native_bridge": "NOT_INCLUDED",
+  "Infinity_application": "NOT_RUN",
+  "Infinity_shutdown": "NOT_RUN",
+  "physical_Fold": "NOT_RUN",
+  "owner_installer": false
+}

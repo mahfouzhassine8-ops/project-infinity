@@ -1,0 +1,157 @@
+#include "InfinityActivityObserver.h"
+#include <algorithm>
+#include <array>
+#include <atomic>
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
+#include <thread>
+
+using jlong=int64_t; using jobject=void*; using jlongArray=std::array<jlong,16>*;
+using jboolean=bool; using jint=int; using jfloat=float;
+constexpr bool JNI_FALSE=false; constexpr int ANDROID_LOG_ERROR=1;
+std::atomic<int> refused{0};
+int __android_log_write(int,const char*,const char*){++refused;return 0;}
+struct ANativeActivity{}; struct IInputHandler{};
+struct JNIEnv {
+  bool oom{false};
+  jlongArray NewLongArray(int n){if(n!=16)std::abort();return oom?nullptr:new std::array<jlong,16>{};}
+  void SetLongArrayRegion(jlongArray a,int first,int count,const jlong*v){std::copy(v,v+count,a->begin()+first);}
+};
+struct CJNIActivity {explicit CJNIActivity(const ANativeActivity*){}virtual ~CJNIActivity()=default;};
+class CJNIMainActivity:public CJNIActivity {
+public:
+  explicit CJNIMainActivity(const ANativeActivity*); ~CJNIMainActivity() override;
+  static jlongArray _infinityGetState(JNIEnv*,jobject);
+  static jboolean _infinityHasActiveVideo(JNIEnv*,jobject);
+  static void _infinitySyncDisplayState(JNIEnv*,jobject);
+  static jint _infinityWindowWidth(JNIEnv*,jobject);
+  static jint _infinityWindowHeight(JNIEnv*,jobject);
+  static jboolean _infinityCanEnterPictureInPicture(JNIEnv*,jobject);
+  static jfloat _infinityVideoAspectRatio(JNIEnv*,jobject);
+private: static CJNIMainActivity* m_appInstance;
+protected:
+  static void PublishInfinityObservers(CJNIMainActivity*);
+  static void RetireInfinityObservers(CJNIMainActivity*);
+  virtual std::array<int64_t,16> infinityGetState() const=0;
+  virtual bool infinityHasActiveVideo() const=0;
+  virtual void infinitySyncDisplayStateFromBridge()=0;
+  virtual int infinityWindowWidth() const=0;
+  virtual int infinityWindowHeight() const=0;
+  virtual bool infinityCanEnterPictureInPicture() const=0;
+  virtual float infinityVideoAspectRatio() const=0;
+};
+CJNIMainActivity* CJNIMainActivity::m_appInstance=nullptr;
+InfinityActivityObserver<CJNIMainActivity> g_infinityObservers;
+// @EXACT_JNI_METHODS@
+
+int checks=0;
+void check(bool value,const char* label){if(!value)throw std::runtime_error(label);++checks;}
+class Pause {
+  std::mutex mutex;std::condition_variable cv;bool entered=false,released=false;
+public:
+  bool enabled=false;
+  void Reset(){std::lock_guard<std::mutex> l(mutex);entered=false;released=false;enabled=true;}
+  void Enter(){if(!enabled)return;std::unique_lock<std::mutex> l(mutex);entered=true;cv.notify_all();cv.wait(l,[this]{return released;});}
+  void Wait(){std::unique_lock<std::mutex> l(mutex);check(cv.wait_for(l,std::chrono::seconds(2),[this]{return entered;}),"fixture barrier not reached");}
+  void Release(){std::lock_guard<std::mutex> l(mutex);released=true;cv.notify_all();}
+};
+Pause constructing,destructing,query;
+std::atomic<int> destroyed{0},identities{0},syncs{0};
+bool throwConstruction=false,throwQuery=false;
+struct ReceiverBase {
+  ReceiverBase(){constructing.Enter();if(throwConstruction)throw std::runtime_error("construction fixture");}
+  virtual ~ReceiverBase(){destructing.Enter();}
+};
+struct CXBMCApp:public CJNIMainActivity,public ReceiverBase {
+  static std::unique_ptr<CXBMCApp> m_appinstance;
+  // @EXACT_FACTORY_METHODS@
+  static CXBMCApp& Get(){return *m_appinstance;}
+  const int identity=++identities;
+  explicit CXBMCApp(ANativeActivity* a,IInputHandler&):CJNIMainActivity(a){}
+  ~CXBMCApp() override{++destroyed;}
+  std::array<int64_t,16> infinityGetState() const override {
+    query.Enter();if(throwQuery)throw std::runtime_error("observer fixture");return {{5,identity,15}};
+  }
+  bool infinityHasActiveVideo() const override{return true;}
+  void infinitySyncDisplayStateFromBridge() override {
+    // The real Sync calls Java snapshot getters. Model permitted callback
+    // reentry through the actual corrected GetState body, not a second gate.
+    JNIEnv env;auto state=_infinityGetState(&env,nullptr);
+    check(state&&(*state)[1]==identity,"nested JNI observer");delete state;++syncs;
+  }
+  int infinityWindowWidth() const override{return 720;}
+  int infinityWindowHeight() const override{return 1680;}
+  bool infinityCanEnterPictureInPicture() const override{return true;}
+  float infinityVideoAspectRatio() const override{return 2.0f;}
+};
+std::unique_ptr<CXBMCApp> CXBMCApp::m_appinstance;
+void defaults(const char* label){
+  JNIEnv env;auto state=CJNIMainActivity::_infinityGetState(&env,nullptr);
+  check(state&&*state==std::array<jlong,16>{},label);delete state;
+  check(!CJNIMainActivity::_infinityHasActiveVideo(&env,nullptr),"unavailable video");
+  check(CJNIMainActivity::_infinityWindowWidth(&env,nullptr)==-1,"unavailable width");
+  check(CJNIMainActivity::_infinityWindowHeight(&env,nullptr)==-1,"unavailable height");
+  check(!CJNIMainActivity::_infinityCanEnterPictureInPicture(&env,nullptr),"unavailable PiP");
+  check(CJNIMainActivity::_infinityVideoAspectRatio(&env,nullptr)==16.0f/9.0f,"unavailable aspect");
+  int before=syncs.load();CJNIMainActivity::_infinitySyncDisplayState(&env,nullptr);check(syncs==before,"unavailable sync");
+}
+int stateIdentity(){JNIEnv env;auto state=CJNIMainActivity::_infinityGetState(&env,nullptr);int value=state?(*state)[1]:-1;delete state;return value;}
+
+int main(){
+  IInputHandler input;JNIEnv env;
+  defaults("before native construction");
+  constructing.Reset();
+  std::thread create([&]{CXBMCApp::Create(nullptr,input);});
+  constructing.Wait();defaults("same construction window that aborted exact502");
+  constructing.Release();create.join();constructing.enabled=false;
+  auto* first=&CXBMCApp::Get();const int firstId=first->identity;
+  check(stateIdentity()==firstId,"published complete owner");
+  check(CJNIMainActivity::_infinityHasActiveVideo(&env,nullptr),"live video");
+  check(CJNIMainActivity::_infinityWindowWidth(&env,nullptr)==720,"live width");
+  check(CJNIMainActivity::_infinityWindowHeight(&env,nullptr)==1680,"live height");
+  check(CJNIMainActivity::_infinityCanEnterPictureInPicture(&env,nullptr),"live PiP");
+  check(CJNIMainActivity::_infinityVideoAspectRatio(&env,nullptr)==2.0f,"live aspect");
+  CJNIMainActivity::_infinitySyncDisplayState(&env,nullptr);check(syncs==1,"reentrant virtual call completes");
+  check(!g_infinityObservers.Publish(first),"overlapping publication rejected");
+  check(!g_infinityObservers.Publish(nullptr),"null publication rejected");
+  check(CJNIMainActivity::_infinityGetState(nullptr,nullptr)==nullptr,"null JNI env");
+  env.oom=true;check(CJNIMainActivity::_infinityGetState(&env,nullptr)==nullptr,"OOM preserved");env.oom=false;
+  throwQuery=true;bool caught=false;try{stateIdentity();}catch(const std::runtime_error&){caught=true;}throwQuery=false;
+  check(caught,"fixture exception escaped actual body; lease must drain");
+
+  constructing.Reset();
+  std::thread replace([&]{CXBMCApp::Create(nullptr,input);});
+  constructing.Wait();check(stateIdentity()==firstId,"old owner remains usable during replacement construction");
+  constructing.Release();replace.join();constructing.enabled=false;
+  auto* second=&CXBMCApp::Get();const int secondId=second->identity;
+  check(second!=first&&secondId!=firstId,"distinct replacement");
+  check(destroyed==1&&stateIdentity()==secondId,"replacement published after old retirement");
+  g_infinityObservers.Retire(first);check(stateIdentity()==secondId,"stale cleanup cannot retire replacement");
+  throwConstruction=true;caught=false;try{CXBMCApp::Create(nullptr,input);}catch(const std::runtime_error&){caught=true;}throwConstruction=false;
+  check(caught&&stateIdentity()==secondId,"failed replacement leaves complete existing observer");
+
+  query.Reset();destructing.Reset();
+  std::atomic<int> observed{0};
+  std::thread reader([&]{observed=stateIdentity();});query.Wait();
+  std::thread retire([]{CXBMCApp::Destroy();});
+  const auto deadline=std::chrono::steady_clock::now()+std::chrono::seconds(2);
+  for(;;){
+    auto lease=g_infinityObservers.Acquire();if(!lease)break;
+    check(std::chrono::steady_clock::now()<deadline,"retirement did not close admission");std::this_thread::yield();
+  }
+  check(destroyed==1,"no deletion while reader is active");
+  defaults("retiring owner rejects all new observers");
+  query.Release();reader.join();query.enabled=false;
+  check(observed==secondId,"inflight observer completed on exact owner");
+  destructing.Wait();check(destroyed==2,"factory deletion begins after reader drain");
+  defaults("derived destruction in progress");
+  destructing.Release();retire.join();destructing.enabled=false;
+  defaults("after complete destruction");
+  throwConstruction=true;caught=false;try{CXBMCApp::Create(nullptr,input);}catch(const std::runtime_error&){caught=true;}throwConstruction=false;
+  check(caught,"failed first construction surfaced");defaults("failed construction never published");
+  CXBMCApp::Create(nullptr,input);check(stateIdentity()==CXBMCApp::Get().identity,"fresh factory reentry");
+  CXBMCApp::Destroy();defaults("final retirement");check(refused==0,"no factory publication refusal");
+  std::cout<<"PASS actual seven observer bodies and factory lifetime; checks="<<checks<<"\n";
+}

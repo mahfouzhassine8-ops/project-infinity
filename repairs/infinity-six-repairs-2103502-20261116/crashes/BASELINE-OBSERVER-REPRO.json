@@ -1,0 +1,17 @@
+{
+  "status": "REPRODUCED_BASELINE_PURE_VIRTUAL_CONSTRUCTION_WINDOW",
+  "baseline": 2103502,
+  "source_sha256": {
+    "JNIMainActivity.cpp": "89c5f43f69fb1bdb5d1d7d2fd39b05b4bcfa3e076e6b31873ae949748d9f8a8f",
+    "JNIMainActivity.h": "488e2204749cb581a3030a3b0a8eef982c98da5745976b8f746cb635d01b5853"
+  },
+  "compiler": "g++ (Debian 14.2.0-19) 14.2.0",
+  "harness_sha256": "77972185d4d138d70da2a061f4a4d916e36cbb7a1050831f0c21304ba1d14786",
+  "extracted_bodies_sha256": "4297981b549f2a805aedf28c21c938b254fa1fb22198cd7ac648c8b1bc522797",
+  "returncode": -6,
+  "stderr": "ENTER_EXACT502_GETSTATE_WITH_BASE_PUBLISHED_DERIVED_NOT_CONSTRUCTED\npure virtual method called\nterminate called without an active exception\n",
+  "production_modified": false,
+  "Android": "NOT_RUN",
+  "owner_incident": "Mechanism consistent with sanitized triage; exact mapped build/offset correlation unavailable",
+  "reproduction": "Real virtual dispatch using exact constructor/destructor/GetState bodies; test-only next-base barrier creates an admitted construction interleaving"
+}

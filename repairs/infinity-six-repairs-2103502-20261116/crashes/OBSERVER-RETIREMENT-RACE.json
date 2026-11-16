@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "header_sha256": "ef185b4145742051b5e82236849211ce437a3e621b2a572975813f02c43416a6",
+  "test_sha256": "a22bda23eba814ba57cfd7ebf657766162cd0be6732f94ed3396dc91450bb7e8",
+  "sanitizers": [
+    "address",
+    "undefined"
+  ],
+  "iterations": 100,
+  "returncode": 0,
+  "stdout": "PASS 100 bounded duplicate-retirement/replacement races\n",
+  "stderr": "",
+  "limits": "Registry concurrency check, not concurrent factory support or complete schedule enumeration; no Android run"
+}

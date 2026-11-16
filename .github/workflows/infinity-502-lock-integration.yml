@@ -1,4 +1,4 @@
-name: Infinity502 reviewed video lock - full ARM64 integration
+name: Infinity502 reviewed lock and crash observer - full ARM64 integration
 on:
   push:
     branches: [work/infinity-2103502-six-repairs-20261116]
@@ -53,7 +53,7 @@ jobs:
       - name: Exact ELF shipped in signed502 and its complete 9414-file source map
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with: {artifact-ids: '14187138056', run-id: '43774504911', merge-multiple: true, github-token: '${{ github.token }}', path: baseline502-native}
-      - name: Reconstruct and require exact502 source equality before six lock overlays
+      - name: Reconstruct and require exact502 source equality before ten lock and observer overlays
         run: python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py prepare
       - name: Official Ubuntu dependency tooling with signature verification
         run: python repairs/infinity-six-repairs-2103502-20261116/lock/native_build502.py tooling

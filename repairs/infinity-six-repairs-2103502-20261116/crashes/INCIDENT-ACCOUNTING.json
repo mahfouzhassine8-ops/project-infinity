@@ -1,0 +1,46 @@
+{
+  "baseline": 2103502,
+  "APK_sha256": "f35b6e6015d91185d76a12b4f21cec17c9eaa65ef07b17d8fed91a547dfffb28",
+  "incident_A": {
+    "pid": 17519,
+    "utc": "2026-11-16T09:40:41.264Z",
+    "evidence": "Sanitized owner triage, not original tombstone available here",
+    "reported_stack": [
+      "__cxa_pure_virtual",
+      "CJNIMainActivity::_infinityGetState",
+      "Main.infinityPublishWindowSnapshot",
+      "InfinityCoreBridge.attach",
+      "Main.onCreate"
+    ],
+    "mechanism": "Base constructor publishes legacy m_appInstance before CXBMCApp receiver base/members finish construction. Seven Infinity virtual observers use that raw pointer. Exact callback/body host counterexample SIGABRT demonstrates accessible partial-construction window.",
+    "correction": "Separate factory-published non-owning leases for seven Infinity observers; retire and drain before deletion.",
+    "host": "PASS ASan/UBSan actual extracted seven observer and factory methods plus100 bounded retirement races",
+    "source_review": "Astra PASS",
+    "Android": "NOT_RUN",
+    "Stop_handler_causality": "NOT_ESTABLISHED; Stop methods unchanged",
+    "mapped_incident_build_id": "UNAVAILABLE"
+  },
+  "incident_B": {
+    "pid": 17845,
+    "tid": 22465,
+    "utc": "2026-11-16T09:53:13.535Z",
+    "signal": 11,
+    "fault_function": "UNKNOWN",
+    "watched_write_outcome": "UNKNOWN",
+    "matching_tombstone": "NOT_AVAILABLE",
+    "correction": "NONE; no evidence-backed defect yet",
+    "source_trace": "Native watched job holds shared_ptr; addon context invoker deep-copies selected CFileItem; verified first-party identity, persistence admission and readback remain unchanged",
+    "next_selected_scope": "Bounded real canonical local movie mark/unmark in disposable Android profile; exact menu and persistence contract preparation only"
+  },
+  "trace_producer": {
+    "APK_native_engine_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+    "APK_native_build_id": "38bdde64138d5540d4dbf2bf5ecf7f5b1c375b57",
+    "APK_libinfinitycrash_sha256": "039fb1e3cfbb2472f1ca5f441016e15782a68992c892b3b39d63adc027fdf209",
+    "diagnostic_engine_literal": "704834f42e49a2eea0a36ad41b5f79345f5e4108dcd339213899ea3c6ff045a0",
+    "finding": "Exact signed502 crash library contains this legacy compile-time literal. It is not an observed mapped engine hash and does not prove wrong engine installation.",
+    "source": "repairs/infinity-2103402-final/native-overlay/infinity_crash_recorder.c",
+    "production_change": false
+  },
+  "protected": "All old checkpoint, Stop, watched, provider, tracking, Cast and Cobra source preserved; no owner-data mutation",
+  "release": "Not complete; no APK created"
+}
