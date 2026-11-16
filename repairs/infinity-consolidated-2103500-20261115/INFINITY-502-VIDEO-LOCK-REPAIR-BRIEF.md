@@ -13,6 +13,20 @@
 - These source differences are **verified package differences**, not yet the physical failure's cause. The active skin root and behavior on owner's actual Fold remain unverified; avoid assuming packaged XML is the loaded copy.
 - Possible failure hypotheses to validate against the owner's recording: 3-second unlock auto-hide can frustrate tap, focus/default full-window capture, Back/gesture may dismiss or propagate unexpectedly, unified-only loading signals may generate overlay/stuck spinner or stale owner, layout sizing/position may be awkward when folded/unfolded. **All hypotheses, not established symptoms**.
 
+## Proposed UI selected for implementation — Infinity Video Lock
+
+The November 16 owner request supplied a portrait locked-playback screenshot and asked for the new screen mock plus **what happens at unlock**. A visual storyboard was generated showing a cyan Infinity-style padlock, clear **VIDEO LOCKED** state, an **intentional press-and-hold unlock control with a filling 2-second progress ring**, and the normal video transport/seek controls returning after unlock. The storyboard is a **design mock**, not implemented runtime UI or an APK.
+
+**Interactive behavior (implementation contract):**
+1. Tap VideoOSD lock icon → enter **session-owned locked mode**. Video/audio continues without pause/reseek. Present cyan padlock and a clearly discoverable **Hold to Unlock** control. The initial larger status may softly fade to a compact floating hint so the movie isn't covered; unlock target remains intentionally accessible when the user taps the protected screen.
+2. **Locked:** Kodi in-player taps, seek gestures, accidental play/pause/navigation, volume/OSD touches outside the reserved unlock affordance, swipe-to-back, repeated Android Back, rotation, fold/unfold and player layout reflow **never clear lock state or escape to the underlying player**. Android OS-level Home, notifications, emergency and permission UI remain governed by Android and are not intercepted.
+3. Touch the unlock affordance and **continuously hold for 2 seconds**. Display visible ring/bar filling and accessible text feedback; releasing early or moving outside the affordance cancels and **remains locked**. Duplicate touch or focus changes must not unlock. No 3-second disappearing button trap.
+4. On completion of a genuine 2-second hold, set session lock false exactly once, clean temporary timers/overlay state, dismiss the locked view and **restore VideoOSD transport controls**, progress/seek bar and existing view, without reopening media, changing play/pause state or playback position, injecting unrelated loading notifications, or resetting the player. A brief optional "Unlocked" confirmation may fade after controls appear.
+5. Stopping/ending playback clears the session lock safely. Background/resume and PiP keep correct ownership state; don't trap a session or leak stale dialogs. Front/inner portrait/landscape preserve an accessible, contrast-safe UI consistent with the user's Infinity theme.
+6. **Acceptance:** Record at least five rotation cycles, repeat Back/swipe, tap/seek suppression, fold/unfold, canceled/complete hold and unlock-to-VideoOSD transitions with same playback time/PID. Native gate enforcement may be necessary; an XML-only dialog is not sufficient if it can be dismissed by lifecycle navigation.
+
+**Owner-reported regression to repair, not just redesign:** Rotation between orientations and the normal Android Back gesture both bypass the current Video Lock. The actual padlock screen (custom window 1199) and its button-level OnBack rules are inadequate as a source of persistent truth; fix at the smallest appropriate session/lifecycle/input level after tracing. Do not implement broad global Android Back blocking.
+
 ## Owner-approved outcome (behavioral contract; exact visual style requires clip review)
 
 1. **Video continues playing** during lock. Lock must suppress ordinary unintended screen taps/seek/OSD/gesture commands within Kodi player area, without blocking legitimate OS/emergency/system gestures; respect Android BACK/back-exit policy and navigation safety.
@@ -26,4 +40,4 @@
 
 Request/look at the owner's **actual video recording** to identify the observed visual and malfunctioning interaction, correlate the actual active runtime skin variant and relevant logs. Source-level audit alone cannot establish exactly what failed. Then implement a bounded corrective change under this workstream, run targeted tests, compare full APK/native/skin diff and obtain independent review.
 
-**Status:** **AUDIT + DESIGN + FIX AUTHORIZED.** Exact issue and final approved design **PENDING RECORDING REVIEW**. Production source and APK **UNCHANGED** by this brief.
+**Status:** **AUDIT + DESIGN + FIX AUTHORIZED.** Owner's rotation/Back bypasses and the new two-second hold-to-unlock visual contract are specified; implementation and physical verification remain pending. Production source and APK **UNCHANGED** by this brief.
