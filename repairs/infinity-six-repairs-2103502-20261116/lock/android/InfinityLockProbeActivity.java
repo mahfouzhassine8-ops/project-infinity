@@ -30,10 +30,6 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
 
   @Override public void onCreate(Bundle saved) {
     super.onCreate(saved);
-    getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
-        View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
-        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
     underlay = new View(this) {
       @Override public boolean onTouchEvent(MotionEvent event) { touches++; return true; }
     };
@@ -50,6 +46,17 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
 
   @Override protected void onResume() {
     super.onResume();
+    // Match exact502 Main's existing owner-window policy; no new production policy.
+    if (android.os.Build.VERSION.SDK_INT >= 30) {
+      getWindow().setDecorFitsSystemWindows(false);
+      android.view.WindowInsetsController controller = getWindow().getInsetsController();
+      if (controller != null) {
+        controller.hide(android.view.WindowInsets.Type.statusBars() |
+            android.view.WindowInsets.Type.navigationBars());
+        controller.setSystemBarsBehavior(
+            android.view.WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+      }
+    } else getWindow().getDecorView().setSystemUiVisibility(0x1706);
     if (lock != null) {
       lock.setPictureInPicture(isInPictureInPictureMode());
       lock.setForeground(true);
@@ -117,6 +124,28 @@ public final class InfinityLockProbeActivity extends Activity implements Infinit
     if (!lock.lock(session)) throw new AssertionError("Component lock entry refused");
   }
   boolean locked() { return lock.isLocked(session); }
+  boolean holding() {
+    try {
+      java.lang.reflect.Field field = InfinityVideoLockDialog.class.getDeclaredField("state");
+      field.setAccessible(true);
+      return ((InfinityVideoLockState)field.get(lock)).isHolding();
+    } catch (ReflectiveOperationException error) { throw new AssertionError(error); }
+  }
+  JSONObject geometryEvidence() {
+    JSONObject report = new JSONObject();
+    try {
+      int[] p = new int[2]; underlay.getLocationOnScreen(p);
+      report.put("player_bounds", new JSONArray(new int[]{p[0], p[1], underlay.getWidth(), underlay.getHeight()}));
+      report.put("display_id", underlay.getDisplay() == null ? -1 : underlay.getDisplay().getDisplayId());
+      report.put("rotation", underlay.getDisplay() == null ? -1 : underlay.getDisplay().getRotation());
+      report.put("dialog_focused", dialogFocused()).put("ready_epoch", readyEpoch).put("locked", locked());
+      report.put("target", new JSONArray(target()));
+    } catch (Throwable unavailable) {
+      try { report.put("unavailable", unavailable.getClass().getSimpleName()); }
+      catch (org.json.JSONException ignored) { }
+    }
+    return report;
+  }
   void showFocusFixture() {
     focusFixture = new Dialog(this);
     TextView text = new TextView(this); text.setText("Disposable focus fixture");

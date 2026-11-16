@@ -1,0 +1,28 @@
+{
+  "run": 43829676190,
+  "source_commit": "d5f0986316617e22c24a106e3bb41cc48d453a89",
+  "artifact": 14208046966,
+  "artifact_sha256": "4df178cf4c413c21827073991af096766089db29377fd75710c64959ca3fbd19",
+  "status": "FAIL_ANDROID_INPUT_INJECTION",
+  "installation": "PASS separate test package, both selected geometries",
+  "failure": "Targeted input event injection was not directed at a window owned by the instrumented app UID",
+  "narrow_reached": [
+    "geometry",
+    "Host palette",
+    "initial input-block check",
+    "early release",
+    "outside/reentry"
+  ],
+  "wide_reached": [
+    "geometry",
+    "Host palette"
+  ],
+  "limitations": [
+    "Negative checks lacked explicit hold-DOWN delivery assertion; their output is not complete lock-behavior proof",
+    "Exact event/window cause not recorded by this harness version",
+    "No production cause established from injection exception"
+  ],
+  "next_selected_check": "Same focused profiles with positive DOWN delivery assertion, precise phase/input/stack and failure screenshot/window evidence",
+  "production_changed": false,
+  "physical_Fold": "NOT_RUN"
+}

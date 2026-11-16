@@ -27,6 +27,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
   private final JSONArray notRun = new JSONArray();
   private String runId;
   private String expectedTheme;
+  private String phase = "startup", lastInput = "none";
   private long downTime;
   private float x,y;
 
@@ -52,13 +53,25 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     require(ui(a::geometryMatches),"Exact top-left viewport geometry");
   }
   private void inject(int action,float px,float py) {
-    MotionEvent event=MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),action,px,py,0);
+    long eventTime=SystemClock.uptimeMillis();
+    MotionEvent event=MotionEvent.obtain(downTime,eventTime,action,px,py,0);
     event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-    try{sendPointerSync(event);}finally{event.recycle();}
+    try{pointer(event);}finally{event.recycle();}
+  }
+  private void pointer(MotionEvent event) {
+    lastInput="touch action="+event.getAction()+" pointers="+event.getPointerCount()+
+        " x="+event.getX()+" y="+event.getY()+" downTime="+event.getDownTime()+
+        " eventTime="+event.getEventTime()+" history="+event.getHistorySize();
+    sendPointerSync(event);
+  }
+  private void key(int code) {
+    lastInput="key code="+code;sendKeyDownUpSync(code);
   }
   private void down() {
+    require(ui(a::dialogFocused),"Dialog focus present before hold DOWN");
     float[] target=ui(a::target);x=(target[0]+target[2])/2;y=(target[1]+target[3])/2;
     downTime=SystemClock.uptimeMillis();inject(MotionEvent.ACTION_DOWN,x,y);
+    waitFor(a::holding,"actual Dialog received hold DOWN");
   }
   private void up() { inject(MotionEvent.ACTION_UP,x,y); }
   private void secondPointer() {
@@ -67,14 +80,16 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     for(int i=0;i<2;i++){p[i].id=i;p[i].toolType=MotionEvent.TOOL_TYPE_FINGER;c[i].x=x+i;c[i].y=y;c[i].pressure=1;c[i].size=1;}
     MotionEvent event=MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),
         MotionEvent.ACTION_POINTER_DOWN|(1<<MotionEvent.ACTION_POINTER_INDEX_SHIFT),2,p,c,0,0,1,1,0,0,InputDevice.SOURCE_TOUCHSCREEN,0);
-    try{sendPointerSync(event);}finally{event.recycle();}
+    try{pointer(event);}finally{event.recycle();}
     inject(MotionEvent.ACTION_CANCEL,x,y);
   }
   private void noRequestAfter(Runnable gesture,String label) {
+    phase=label;
     int previous=ui(()->a.requestCount);gesture.run();SystemClock.sleep(2150);
     require(ui(()->a.locked()&&a.requestCount==previous),label);
   }
   private void holdComplete() {
+    phase="continuous hold";
     int previous=ui(()->a.requestCount);down();
     waitFor(()->a.requestCount>previous,"continuous two-second request");
     require(ui(()->a.requestAt-downTime>=2000&&a.locked()),"Two-second hold requests without dismissing lock");
@@ -97,6 +112,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
     waitFor(()->!a.isInPictureInPictureMode()&&a.dialogFocused(),"foreground lock return");
   }
   private void rotate(int orientation) {
+    phase="rotation "+orientation;
     long epoch=ui(()->a.readyEpoch);
     action(()->a.setRequestedOrientation(orientation));
     int configuration=orientation==ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE?
@@ -106,7 +122,7 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
   }
 
   @Override public void onStart() {
-    boolean pass=false;String error="";
+    boolean pass=false;String error="",stack="";
     try {
       a=(InfinityLockProbeActivity)startActivitySync(new Intent(getTargetContext(),InfinityLockProbeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
       waitFor(()->a.underlay.getWidth()>0&&a.hasWindowFocus(),"owner layout");
@@ -115,11 +131,12 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       begin();int touches=ui(()->a.touches),keys=ui(()->a.keys),heartbeat=ui(()->a.heartbeat);
       require(("light".equals(expectedTheme)||"dark".equals(expectedTheme))&&
           ui(()->a.paletteMatches("light".equals(expectedTheme))),"Selected system night mode and actual Dialog palette match Host fixture");
+      phase="initial underlay input blocking";
       float[] outside=ui(()->{int[]p=new int[2];a.underlay.getLocationOnScreen(p);return new float[]{p[0]+a.underlay.getWidth()/2f,p[1]+a.underlay.getHeight()/2f};});
       downTime=SystemClock.uptimeMillis();inject(MotionEvent.ACTION_DOWN,outside[0],outside[1]);
       inject(MotionEvent.ACTION_MOVE,outside[0]+60,outside[1]);inject(MotionEvent.ACTION_UP,outside[0]+60,outside[1]);
-      sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_RIGHT);sendKeyDownUpSync(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
-      sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);
+      key(KeyEvent.KEYCODE_DPAD_RIGHT);key(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
+      key(KeyEvent.KEYCODE_BACK);key(KeyEvent.KEYCODE_BACK);
       require(ui(()->a.locked()&&a.touches==touches&&a.keys==keys&&a.requestCount==0),"Separate Dialog window blocks underlay touch/key/Back routing");
       noRequestAfter(()->{down();SystemClock.sleep(250);up();},"Early UP stays locked");
       noRequestAfter(()->{down();SystemClock.sleep(250);inject(MotionEvent.ACTION_MOVE,outside[0],outside[1]);inject(MotionEvent.ACTION_MOVE,x,y);up();},"Outside movement and reentry cancel hold");
@@ -127,9 +144,9 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       noRequestAfter(()->{down();SystemClock.sleep(250);
         MotionEvent event=MotionEvent.obtain(downTime,SystemClock.uptimeMillis(),MotionEvent.ACTION_MOVE,outside[0],outside[1],0);
         event.setSource(InputDevice.SOURCE_TOUCHSCREEN);event.addBatch(SystemClock.uptimeMillis()+1,x,y,1,1,0);
-        try{sendPointerSync(event);}finally{event.recycle();}up();},"Batched movement leaving and reentering cancels hold");
+        try{pointer(event);}finally{event.recycle();}up();},"Batched movement leaving and reentering cancels hold");
       noRequestAfter(()->{down();SystemClock.sleep(250);secondPointer();},"Second pointer cancels hold");
-      noRequestAfter(()->{down();SystemClock.sleep(250);sendKeyDownUpSync(KeyEvent.KEYCODE_BACK);up();},"Back cancels partial hold without dismissing");
+      noRequestAfter(()->{down();SystemClock.sleep(250);key(KeyEvent.KEYCODE_BACK);up();},"Back cancels partial hold without dismissing");
       holdComplete();long oldEpoch=ui(()->a.requestEpoch),oldRequest=ui(()->a.request),oldSession=ui(()->a.session);
       int revoked=ui(()->a.revokeCount);action(a::showFocusFixture);
       waitFor(()->a.revokeCount>revoked&&!a.dialogFocused(),"focus revocation");
@@ -169,16 +186,30 @@ public final class InfinityLockProbeInstrumentation extends Instrumentation {
       pass=true;
     } catch(Throwable failure) {
       error=failure.getClass().getSimpleName()+": "+failure.getMessage();
+      java.io.StringWriter detail=new java.io.StringWriter();
+      failure.printStackTrace(new java.io.PrintWriter(detail));stack=detail.toString();
+      try {
+        android.graphics.Bitmap screenshot=getUiAutomation().takeScreenshot();
+        if(screenshot!=null)try(java.io.OutputStream out=getTargetContext().openFileOutput("lock-failure-"+runId+".png",0)) {
+          screenshot.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out);screenshot.recycle();
+        }
+        try(ParcelFileDescriptor fd=getUiAutomation().executeShellCommand("dumpsys window windows");
+            java.io.InputStream input=new ParcelFileDescriptor.AutoCloseInputStream(fd);
+            java.io.OutputStream out=getTargetContext().openFileOutput("lock-failure-"+runId+"-window.txt",0)) {
+          byte[] buffer=new byte[4096];int count;while((count=input.read(buffer))!=-1)out.write(buffer,0,count);
+        }
+      } catch(Throwable captureFailure) { stack+="\nFailure capture unavailable: "+captureFailure.getClass().getSimpleName(); }
     }
     try {
       notRun.put("BadToken/window-show fault injection; explicit callback path compiled, not Android-fault-injected here");
       JSONObject result=new JSONObject().put("pass",pass).put("runId",runId).put("error",error)
+          .put("phase",phase).put("last_input",lastInput).put("failure_stack",stack)
           .put("API",android.os.Build.VERSION.SDK_INT).put("checks",checks).put("not_run",notRun)
           .put("palette",expectedTheme).put("native_skin_theme_resolution","NOT_INCLUDED")
           .put("scope","Actual unchanged State/Dialog with Android window-injected input; Host ACK is explicit test fixture")
           .put("native_bridge","NOT_INCLUDED").put("Kodi_playback","NOT_RUN").put("physical_Fold","NOT_RUN")
           .put("Infinity_shutdown","NOT_RUN").put("owner_installer",false);
-      if(a!=null)result.put("events",ui(()->a.events));
+      if(a!=null)result.put("events",ui(()->a.events)).put("geometry",ui(a::geometryEvidence));
       Bundle report=new Bundle();report.putString("lock_result",result.toString());
       finish(pass?Activity.RESULT_OK:Activity.RESULT_CANCELED,report);
     } catch(Exception failure) { Bundle report=new Bundle();report.putString("stream","Probe receipt failed: "+failure.getClass().getSimpleName());finish(Activity.RESULT_CANCELED,report); }

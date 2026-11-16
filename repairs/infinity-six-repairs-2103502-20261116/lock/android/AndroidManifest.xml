@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.lockqa" android:versionCode="1" android:versionName="CI-only">
   <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
-  <application android:label="Lock Component CI" android:theme="@android:style/Theme.Material.NoActionBar" android:debuggable="true" android:allowBackup="false">
+  <application android:label="Lock Component CI" android:theme="@android:style/Theme.NoTitleBar" android:debuggable="true" android:allowBackup="false">
     <activity android:name="com.projectinfinity.kodi.InfinityLockProbeActivity" android:exported="true" android:launchMode="singleTask" android:resizeableActivity="true" android:supportsPictureInPicture="true" android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density|uiMode" />
   </application>
   <instrumentation android:name="com.projectinfinity.kodi.InfinityLockProbeInstrumentation" android:targetPackage="com.projectinfinity.lockqa" android:functionalTest="true" />

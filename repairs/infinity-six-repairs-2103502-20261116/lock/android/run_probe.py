@@ -82,9 +82,29 @@ def main():
     result = completed_result(output, run_id, returncode, timed_out)
     result.update(apk_sha256=hashlib.sha256(args.apk.read_bytes()).hexdigest(), package=package,
                   owner_installer=False, Infinity_shutdown='NOT_RUN', native_bridge='NOT_INCLUDED', Kodi_playback='NOT_RUN')
-    (args.output / 'ANDROID-LOCK-COMPONENT.json').write_text(json.dumps(result, indent=2) + '\n')
-    logs = subprocess.run([args.adb, 'logcat', '-d', '-v', 'threadtime', 'AndroidRuntime:E', '*:S'], text=True, capture_output=True, timeout=15)
-    (args.output / 'android-errors.txt').write_text(logs.stdout)
+    receipt = args.output / 'ANDROID-LOCK-COMPONENT.json'
+    receipt.write_text(json.dumps(result, indent=2) + '\n')
+    capture_errors = []
+    if result['pass'] is not True:
+        for name in ('lock-failure-' + run_id + '.png', 'lock-failure-' + run_id + '-window.txt'):
+            try:
+                capture = subprocess.run([args.adb, 'exec-out', 'run-as', package, 'cat', 'files/' + name],
+                                         capture_output=True, timeout=15)
+                if capture.returncode == 0:
+                    (args.output / name).write_bytes(capture.stdout)
+                else: capture_errors.append(name + ': unavailable for this run')
+            except subprocess.TimeoutExpired:
+                capture_errors.append(name + ': retrieval deadline')
+    try:
+        logs = subprocess.run([args.adb, 'logcat', '-d', '-v', 'threadtime', 'AndroidRuntime:E',
+                               'InputDispatcher:W', 'InputManager:W', 'WindowManager:W', '*:S'],
+                              text=True, capture_output=True, timeout=15)
+        (args.output / 'android-errors.txt').write_text(logs.stdout)
+        if logs.returncode != 0: capture_errors.append('logcat retrieval failed')
+    except subprocess.TimeoutExpired:
+        capture_errors.append('logcat retrieval deadline')
+    result['capture_errors'] = capture_errors
+    receipt.write_text(json.dumps(result, indent=2) + '\n')
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result['pass'] else 1)
 

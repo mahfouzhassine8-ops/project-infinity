@@ -144,5 +144,33 @@
     "python": "3.11.7",
     "runner": "ubuntu-22.04"
   },
-  "unchanged_original_source_count": 9411
+  "unchanged_original_source_count": 9411,
+  "private_link_symbols": [
+    "_ZN17InfinityVideoLock4Gate4PackEjjb",
+    "_ZN17InfinityVideoLock4Gate5BeginEjj",
+    "_ZN17InfinityVideoLock4Gate6CommitEjm",
+    "_ZN17InfinityVideoLock4Gate6RetireEj",
+    "_ZN17InfinityVideoLock4Gate7AdvanceEjb",
+    "_ZN17InfinityVideoLock4Gate7SessionEm",
+    "_ZN3jni11call_methodIvNS_7jholderIP7_jclassEEJRlEEET_P7_JNIEnvRKT0_P10_jmethodIDDpOT1_",
+    "_ZN3jni11call_methodIvNS_7jholderIP7_jclassEEJRlRiEEET_P7_JNIEnvRKT0_P10_jmethodIDDpOT1_",
+    "_ZN3jni11call_methodIvNS_7jholderIP7_jclassEEJRlS5_S5_S5_EEET_P7_JNIEnvRKT0_P10_jmethodIDDpOT1_",
+    "_ZN3jni18call_static_methodIvJRlEEET_P7_JNIEnvRKNS_7jholderIP7_jclassEEPKcSC_DpOT0_",
+    "_ZN3jni18call_static_methodIvJRlRiEEET_P7_JNIEnvRKNS_7jholderIP7_jclassEEPKcSD_DpOT0_",
+    "_ZN3jni18call_static_methodIvJRlS1_S1_S1_EEET_P7_JNIEnvRKNS_7jholderIP7_jclassEEPKcSC_DpOT0_",
+    "_ZN3jni7details10jni_helperIvE11call_methodINS_7jholderIP7_jclassEEJRlEEEvP7_JNIEnvRKT_P10_jmethodIDDpOT0_",
+    "_ZN3jni7details10jni_helperIvE11call_methodINS_7jholderIP7_jclassEEJRlRiEEEvP7_JNIEnvRKT_P10_jmethodIDDpOT0_",
+    "_ZN3jni7details10jni_helperIvE11call_methodINS_7jholderIP7_jclassEEJRlS8_S8_S8_EEEvP7_JNIEnvRKT_P10_jmethodIDDpOT0_",
+    "_ZN3jni7details7forwardIRiEEOT_RNS0_16remove_referenceIS3_E4typeE",
+    "_ZN3jni7details7forwardIRlEEOT_RNS0_16remove_referenceIS3_E4typeE",
+    "_ZNK17CGUIWindowManager9GetWindowI10CGUIDialogLPv0EEEPT_i",
+    "_ZNK17InfinityVideoLock4Gate5ValueEv",
+    "_ZNKSt6__ndk110shared_ptrI9CFileItemE12owner_beforeIS1_EEbRKNS_8weak_ptrIT_EE",
+    "_ZNKSt6__ndk18weak_ptrI9CFileItemE12owner_beforeIS1_EEbRKNS_10shared_ptrIT_EE",
+    "_ZNKSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEE4lockEv",
+    "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEC2IS3_EERKNS_10shared_ptrIT_EENS_9enable_ifIXsr14is_convertibleIPS7_PS3_EE5valueEPNS_5__natEE4typeE",
+    "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEED2Ev",
+    "_ZNSt6__ndk18weak_ptrIN4KODI9MESSAGING21CApplicationMessengerEEaSIS3_EENS_9enable_ifIXsr14is_convertibleIPT_PS3_EE5valueERS4_E4typeERKNS_10shared_ptrIS7_EE"
+  ],
+  "private_link_rule": "Anonymous literal local-only script, no wildcard/named version; exactly25 symbols absent from502; exact existing ABI/dependency comparison unchanged"
 }

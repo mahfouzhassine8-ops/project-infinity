@@ -301,6 +301,59 @@ def dependencies():
     with_tools(historical.retained().dependencies)
 
 
+def private_link_fixture():
+    """Selected NDK visibility check before the full engine build; no runtime substitute."""
+    scope = json.loads(SCOPE.read_bytes())
+    names = scope['private_link_symbols']
+    require(len(names) == 25 and len(set(names)) == 25 and
+            all(re.fullmatch(r'_Z[A-Za-z0-9_]+', name) for name in names), 'Unexpected private helper list')
+    cmake = (NATIVE / 'xbmc/platform/android/activity/CMakeLists.txt').read_text()
+    blocks = re.findall(r'file\(WRITE "\$\{infinity_lock_exports\}" \[=\[\n(.*?)\]=\]\)', cmake, re.S)
+    expected = '{\n  local:\n' + ''.join('    ' + name + ';\n' for name in names) + '};\n'
+    require(blocks == [expected], 'Anonymous map differs from reviewed exact-name list')
+    tools = Path(os.environ['ANDROID_HOME']) / 'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin'
+    readelf = tools / 'llvm-readelf'
+
+    def exports(path):
+        result = set()
+        for line in subprocess.check_output([readelf, '--dyn-syms', '--wide', path], text=True).splitlines():
+            row = line.split()
+            if len(row) >= 8 and row[4] in ('GLOBAL', 'WEAK') and row[5] in ('DEFAULT', 'PROTECTED') and row[6] != 'UND':
+                result.add(row[7])
+        return result
+
+    require(not set(names).intersection(exports(BASELINE / 'libkodi.so')), 'Private map intersects an original502 export')
+    fixture = OUT / 'private-link-fixture'
+    fixture.mkdir(exist_ok=True)
+    script = fixture / 'InfinityVideoLock.exports.map'
+    script.write_text(expected)
+    old = fixture / 'old.cpp'
+    new = fixture / 'new.cpp'
+    old.write_text('extern "C" __attribute__((weak)) int retained_weak(int v) { return v+1; }\n'
+                   'extern "C" int baseline_entry(int v) { return retained_weak(v); }\n')
+    new.write_text('extern "C" __attribute__((weak)) int selected_internal(int) __asm__("' + names[0] + '");\n'
+                   'extern "C" __attribute__((weak)) int selected_internal(int v) { return v+2; }\n'
+                   'extern "C" __attribute__((weak)) int unlisted_new(int v) { return v+3; }\n')
+    command = [str(tools / 'clang++'), '--target=aarch64-linux-android21', '-fPIC', '-O0', '-shared',
+               '-nostdlib', '-fuse-ld=lld', '-Wl,--no-undefined']
+    base, expanded, selective = (fixture / (name + '.so') for name in ('base', 'expanded', 'selective'))
+    subprocess.run(command + [str(old), '-o', str(base)], check=True)
+    subprocess.run(command + [str(old), str(new), '-o', str(expanded)], check=True)
+    subprocess.run(command + [str(old), str(new), '-Wl,--version-script=' + str(script), '-o', str(selective)], check=True)
+    original, all_symbols, private = exports(base), exports(expanded), exports(selective)
+    require(original == {'retained_weak', 'baseline_entry'}, 'Fixture baseline differs')
+    require(all_symbols == original | {names[0], 'unlisted_new'}, 'Fixture additions differ')
+    require(private == original | {'unlisted_new'}, 'Map changed an unlisted/baseline symbol or retained private helper')
+    require(private != original, 'Negative ABI case must still detect the unlisted new export')
+    save('PRIVATE-LINK-FIXTURE.json', dict(status='PASS_PINNED_NDK_SELECTIVE_LOCAL_VISIBILITY',
+        selected_before_full_engine=True, map_sha256=sha(script), exact_names=names,
+        retained_weak_preserved=True, selected_new_helper_private=True,
+        unlisted_new_export_still_detectable=True, baseline502_exports_excluded=True,
+        clang_version=subprocess.check_output([tools / 'clang++', '--version'], text=True).splitlines()[0],
+        Android_execution='NOT_RUN', fixture_only=True))
+    return script
+
+
 def compile_native():
     gate()
     _, expected = candidate_map()
@@ -321,12 +374,20 @@ def compile_native():
     # Same generated-dependency exception as the frozen c3 full-engine build;
     # every reviewed source hash remains checked before and after compilation.
     compiler.checked_sources = checked
+    private_map = private_link_fixture()
     proof = with_tools(compiler.compile_engine)
     require(proof['complete_native_engine_compiled'] and proof['reviewed_file_count'] == 9417, 'Full native engine compilation not established')
     library = OUT / 'libkodi.so'
     require(sha(library) == proof['native_sha256'], 'Compiled engine proof differs')
     objects = list(Path(os.environ['BUILD_DIR']).rglob('InfinityVideoLock.cpp.o'))
     require(len(objects) == 1, 'Exact lock translation unit object missing or ambiguous')
+    maps = list(Path(os.environ['BUILD_DIR']).rglob('InfinityVideoLock.exports.map'))
+    require(len(maps) == 1 and maps[0].read_bytes() == private_map.read_bytes(), 'Effective private linker map differs')
+    links = [(path, path.read_text()) for path in Path(os.environ['BUILD_DIR']).rglob('link.txt')
+             if str(maps[0]) in path.read_text()]
+    flag = '-Wl,--version-script=' + str(maps[0])
+    require(len(links) == 1 and links[0][1].count(flag) == 1 and 'libkodi.so' in links[0][1],
+            'Private map must occur exactly once on final libkodi.so link')
     with library.open('rb') as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as binary:
         require(binary.find(b'com.projectinfinity.kodi.InfinityVideoLockBridge') >= 0, 'Lock bridge was not linked into the real engine')
     readelf = Path(os.environ['ANDROID_HOME']) / 'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
@@ -342,12 +403,15 @@ def compile_native():
             if len(fields) >= 8 and fields[4] in ('GLOBAL', 'WEAK') and fields[5] in ('DEFAULT', 'PROTECTED') and fields[6] != 'UND':
                 symbols.add((fields[7], fields[3], fields[4], fields[5]))
         require(any(row[0] == 'InfinityCommandCenterIdentityV1' for row in symbols), 'Original trust ABI absent')
-        return symbols, set(re.findall(r'Shared library: \[([^\]]+)\]', dynamic))
+        versions = subprocess.check_output([readelf, '--version-info', path], text=True)
+        definitions = tuple(re.findall(r'Rev:\s*\d+[^\n]*?Name:\s*(\S+)', versions))
+        return symbols, set(re.findall(r'Shared library: \[([^\]]+)\]', dynamic)), definitions
 
     before, after = abi(BASELINE / 'libkodi.so'), abi(library)
     save('ABI-COMPARISON.json', dict(baseline_native_sha256=ENGINE,
         removed=sorted(before[0] - after[0]), added=sorted(after[0] - before[0]),
-        dependencies_before=sorted(before[1]), dependencies_after=sorted(after[1])))
+        dependencies_before=sorted(before[1]), dependencies_after=sorted(after[1]),
+        version_definitions_before=before[2], version_definitions_after=after[2]))
     require(before == after, 'Exact502 exported ABI or shared dependencies changed')
     save('ARM64.json', dict(status='PASS_FULL_ARM64_LINK_AND_EXACT502_ABI',
         source=os.environ['GITHUB_SHA'], request_sha256=sha(REQUEST), selected_test=SELECTED_TEST,
@@ -355,6 +419,8 @@ def compile_native():
         reviewed_file_count=9417, unchanged_original_native_sources=9411,
         lock_object_sha256=sha(objects[0]), lock_bridge_linked=True,
         exported_interfaces_preserved=len(after[0]), dependencies=sorted(after[1]),
+        private_map_sha256=sha(private_map), private_map_link_occurrences=1,
+        version_definitions_preserved=before[2] == after[2],
         Android_execution='NOT_RUN', APK=False, signing=False,
         application_acceptance=False, physical_Fold_acceptance=False))
 
