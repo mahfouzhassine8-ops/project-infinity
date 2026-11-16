@@ -4,7 +4,7 @@
   "shutdown": "NOT_SELECTED",
   "original_signing": false,
   "owner_installer": false,
-  "source_commit": "8b5889530573d34b655efbc0bcd1bc2313794280",
+  "source_commit": "becea6556a191928e27bd25ed8452fa8b15a2b57",
   "inputs": {
     ".github/workflows/infinity-502-lock-application.yml": "7ccd1fcde38900d38e5ad9ccef6843c71c7b0df89e952e9193b30b07fd093daf",
     "repairs/dual-experience-isolation-2103420/inventory.py": "574c64b0a15200ba6f9971a2834f6cdb629dddd5ab5418186c4d5255d6e73bcb",
@@ -32,11 +32,11 @@
     "repairs/infinity-six-repairs-2103502-20261116/lock/NATIVE-BUILD-SCOPE.json": "4b5b9f5bbc239936c6d7191e828f6cd10839d16dc8de9a21face5e17d7408717",
     "repairs/infinity-six-repairs-2103502-20261116/lock/android/ASTRA-ATTEMPT9-REVIEW.json": "75eed42394bc753a010cbaa543e4495b90187412b1cc8fe6f0af11e124ae65d6",
     "repairs/infinity-six-repairs-2103502-20261116/lock/application/NATIVE.json": "fc8012452caaca67e96ec9336dc20b98771c59da4d3cf94a436188e96111c94b",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/SCOPE.json": "b4c303ba1d175460c8f96bbdad22fe34d34772c81b8190683939493b7bc149e2",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/gate.py": "aed80ea7fc2ff3f3d48c898701accd5e55d33eab6d1995a3abfd09b762ebed4c",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/SCOPE.json": "95932779c6aa5638df9ecd084b66048e00719a6e16e7bf145d4d4412f75cda23",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/gate.py": "ae51a6d80c57d2f64f81dbb1e298ae981d8c9f56c25ce98e0cf69b4085a91c08",
     "repairs/infinity-six-repairs-2103502-20261116/lock/application/qa.py": "815d5b87222a60bf350d71fcec42d5130e7c82163d87311c31485a326e6aa33c",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/stage.py": "59933889c792c9d9c7a6016d16718f869e4a0a63a776024ce6fa09d369835542",
-    "repairs/infinity-six-repairs-2103502-20261116/lock/application/verify.py": "5a356cd5c02302c0f007bafc0fd25268772606c1db1df9e9246ca3f9ca57e4c7",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/stage.py": "3b6eb5872ee9d75831677197585eecf03ec980ae107242bfe5379dca70d59e70",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/application/verify.py": "e40bb1d77e081decc647a3352e7e7b1ea7d571abc23aa1d5ff52d437b07c78eb",
     "repairs/infinity-six-repairs-2103502-20261116/lock/build_dex.py": "6613e1ee362b4600728b61d2080fefee598b62cde1f0c8770c7a87850505596b",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockBridge.java": "c59a1b1d64f5033d32b8f55290915e458ba24e1be81ad861d403e86d529221d3",
     "repairs/infinity-six-repairs-2103502-20261116/lock/java/com/projectinfinity/kodi/InfinityVideoLockDialog.java": "1313b716f741503d4ce03d616ffe10d7e2a415928965ab3f012bbd6c47cc2034",
@@ -50,6 +50,7 @@
     "repairs/infinity-six-repairs-2103502-20261116/lock/patch_main.py": "a817adde967bd8cdc96d1865851143550672540ec4754257e8f8593ff32c0d3e",
     "repairs/infinity-six-repairs-2103502-20261116/lock/smali/com/projectinfinity/kodi/Main.smali": "7da26733b05df5ab8aeab67493ba0698221f594a1fd62478c042f7c9be5c3761",
     "repairs/infinity-six-repairs-2103502-20261116/lock/verified-classes3.zip": "3e2be6a8fbb323f9e664985a2a10421aeb9c61ff1c8bf0030c47dd6f6173d6f1",
+    "repairs/infinity-six-repairs-2103502-20261116/lock/verified-classes7.zip": "04124f0ecc0cf029d2e8a5798b36fee97dda0c162391da5799f3c8810ca73a9e",
     "repairs/infinity-six-repairs-2103502-20261116/overlay/script.kodihealthcenter/addon.xml": "c3233a9d6d6e5520c0da6903eb55919c57f10b45a87a199b6582481bc9b0ee45",
     "repairs/infinity-six-repairs-2103502-20261116/overlay/script.kodihealthcenter/infinity_runtime_identity.py": "870a7e727bc73207672739cd9f872bc40142167878c2bec01ffd157b8485befa",
     "repairs/infinity-six-repairs-2103502-20261116/overlay/skin.infinity.diggz/Infinity-Protected-Manifest.json": "e68439c3ea840b2e728edc60c9bf6754175b4e149e2fe279e27faf7ff4f25fef",
@@ -76,8 +77,8 @@
     "independent_review": "crashes/ASTRA-NATIVE-RESULT-REVIEW.json",
     "retained_failed_attempt": 43852054709
   },
-  "independent_review_sha256": "906bb8f704d86384bcf74d75a993a030a22810d11f058f5647ca6efb35ea1f0a",
+  "independent_review_sha256": "19a5a206b75ca1354509166b8b83c561ccf9725ffd4824bad053bc327f715894",
   "selected_by": "Root Codex under six-repair5 and owner two-crash amendment b0d9aa31; one bounded engineering execution, no owner installer",
-  "previous_attempt": 43870192122,
-  "correction": "Test-only full engine identity progress and bounded120s verification; normalactions15s unchanged. Reuse exact verifiedARM64 and DEX. No fullenginebuild, host-suite repetition, productchange or acceptance inference."
+  "previous_attempt": 43872701752,
+  "correction": "Boundedroot handshake verifiesuid0 after observedadbdtransportclose; directreusebothoriginalDEX withallinput/finalbyteguards. No production/native/Java changes, no heavybuild or host-suite repeat."
 }
