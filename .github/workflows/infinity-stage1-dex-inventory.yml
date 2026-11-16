@@ -1,0 +1,42 @@
+name: Infinity Stage 1 - Android class and manifest static inventory
+on:
+  push:
+    branches: [infinity-stage1-inventory-20261116]
+    paths:
+      - '.github/workflows/infinity-stage1-dex-inventory.yml'
+      - 'audits/infinity-stage1/apk_dex_inventory.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-android:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download currently published QA APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/apk /tmp/infinity-stage1-android
+          gh release download infinity-2103502-fast-qa --repo "$GITHUB_REPOSITORY" \
+            --dir /tmp/apk --pattern 'Infinity-2103502-Combined-Original-Signer.apk'
+      - name: Read-only Android DEX class and methods index
+        run: |
+          set -euo pipefail
+          python3 audits/infinity-stage1/apk_dex_inventory.py \
+             /tmp/apk/Infinity-2103502-Combined-Original-Signer.apk \
+             /tmp/infinity-stage1-android
+      - name: Extract AndroidManifest components without starting application
+        run: |
+          set -euo pipefail
+          APK=/tmp/apk/Infinity-2103502-Combined-Original-Signer.apk
+          T=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)
+          "$T/aapt" dump xmltree "$APK" AndroidManifest.xml > /tmp/infinity-stage1-android/android-manifest-xmltree.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: infinity-stage1-android-dex-manifest-inventory
+          path: /tmp/infinity-stage1-android/
+          retention-days: 30
+          if-no-files-found: error
