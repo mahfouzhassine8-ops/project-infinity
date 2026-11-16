@@ -108,7 +108,7 @@ def main():
     dex = unique_sha(ROOT / 'fastqa-inputs/cast', CAST_DEX, 'classes.dex')
     sdk = Path(os.environ['ANDROID_HOME']) / 'build-tools/35.0.0'
     verified = subprocess.check_output([str(sdk / 'apksigner'), 'verify', '--verbose', '--print-certs', str(base)], text=True)
-    check('certificate SHA-256 digest: ' + CERT in verified and all('Verified using ' + x + ' scheme (APK Signature Scheme ' in verified or x == 'v1' for x in ('v2', 'v3')), 'ORIGINAL_CERTIFICATE')
+    check('certificate SHA-256 digest: ' + CERT in verified and all(re.search(r'Verified using v' + str(n) + r' scheme[^\\n]*: true', verified) for n in (1, 2, 3)), 'ORIGINAL_CERTIFICATE')
     outdir = ROOT / 'fastqa-output'
     outdir.mkdir(exist_ok=True)
     apk = outdir / 'Infinity-2103502-Fast-QA-UNSIGNED-NOT-INSTALLABLE.apk'
@@ -120,8 +120,8 @@ def main():
         original_manifest = old.read('AndroidManifest.xml')
         new_manifest = set_version(original_manifest, VER)
         old_label = old.read(LABEL)
-        check(old_label == b'infinity.last_updated_in=2103500\\ncobra.last_updated_in=2103445\\n', 'EXACT500_LABEL_REQUIRED')
-        updates = {NATIVE: native, DEX: dex, LABEL: b'infinity.last_updated_in=2103502\\ncobra.last_updated_in=2103445\\n',
+        check(old_label == b'infinity.last_updated_in=2103500\ncobra.last_updated_in=2103445\n', 'EXACT500_LABEL_REQUIRED')
+        updates = {NATIVE: native, DEX: dex, LABEL: b'infinity.last_updated_in=2103502\ncobra.last_updated_in=2103445\n',
                    'AndroidManifest.xml': new_manifest}
         with ZipFile(apk, 'w', allowZip64=True) as dest:
             for info in old.infolist():
@@ -160,7 +160,7 @@ def main():
         'profile_and_user_data': 'NOT_ACCESSED',
         'owner_installation': 'BLOCKED_PENDING_ORIGINAL_SIGNING_AND_REGISTRY',
     }
-    (outdir / 'QA-STAGING.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\\n')
+    (outdir / 'QA-STAGING.json').write_text(json.dumps(receipt, indent=2, sort_keys=True) + '\n')
     print(json.dumps({'status': receipt['status'], 'unchanged_members': unchanged, 'changed_members': sorted(changes)}))
 
 
