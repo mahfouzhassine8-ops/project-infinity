@@ -1,0 +1,15 @@
+{
+  "run": 43868851584,
+  "source": "43a02891416355093d65b11b06c83c547c30aa0d",
+  "status": "FAILED_CLASSES3_BYTE_REPRODUCTION_BEFORE_APK_ASSEMBLY",
+  "evidence_artifact": 14227560064,
+  "artifact_sha256": "738e1cf9ec9b695d00f587b404e841553878c4aa682e238fb91c2c7022d384c6",
+  "expected_classes3": "a1c5742aa9a400590c8eb148c86d5b64e76963884a7b712ddb09cfa50668aa15",
+  "observed_classes3": "c17d19f8a3e8f9bc46a80d83f93548d692cc2388b07a56ddcf8e825037f060ea",
+  "same": "All input/tool hashes, canonical658class inventory,657 untouchedclasses, Main-only hooks; classes7 and bothJavaJAR bytehashes identical",
+  "cause_limit": "Precise binary ordering difference not established; no code mismatch proven; failed byteguard retained",
+  "next_action": "Reuse exact reviewed classes3 and inventory via existing supported receipt option; preserve final byteguard",
+  "Android": "NOT_RUN",
+  "native_rebuild": false,
+  "owner_APK": false
+}

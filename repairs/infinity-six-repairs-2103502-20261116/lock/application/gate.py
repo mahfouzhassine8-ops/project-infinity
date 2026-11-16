@@ -20,6 +20,7 @@ def input_paths():
   'crashes/ASTRA-NATIVE-RESULT-REVIEW.json',
   'lock/build_dex.py','lock/patch_main.py','lock/DEX-BUILD-SELECTION.json',
   'lock/DEX-BUILD-DIALOG-RETIREMENT.json','lock/NATIVE-BUILD-SCOPE.json',
+  'lock/verified-classes3.zip','lock/DEX-CLASSES3-PRESERVATION.json',
   'lock/CI-NATIVE.json','lock/ASTRA-DEX-REVIEW.json','lock/android/ASTRA-ATTEMPT9-REVIEW.json',
  ]
  paths={REPAIR/name for name in fixed}

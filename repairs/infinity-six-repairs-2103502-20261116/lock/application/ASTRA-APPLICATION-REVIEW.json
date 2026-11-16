@@ -3,8 +3,8 @@
   "agent": "/root/astra_502_review",
   "status": "PASS_SELECTED_APPLICATION_SOURCE_REVIEW",
   "selected_case": "actual_502_lock_stop_and_watched_actions",
-  "reviewed_inputs_sha256": "26deedebf36dbdab51279a01eaf5e83c40cb4f04ad0f3ffce335f72dd668cf59",
-  "input_count": 50,
+  "reviewed_inputs_sha256": "a9f46b8119c52bb03ddd17c4b5bbde0528231173b67a0a55c349c6347bd29de9",
+  "input_count": 52,
   "native": 43861331996,
   "findings": [
     "Every current input hash and exact keyset independently verified",
@@ -22,5 +22,6 @@
     "release acceptance",
     "IncidentB root-cause claim"
   ],
-  "tests_rerun": false
+  "tests_rerun": false,
+  "packaging_correction": "Astra verified exact two-member archive, original receipt unchanged, supported reuse option and both finalDEX hashguards; one pending Android application execution only, no native rebuild or host-suite repeat"
 }

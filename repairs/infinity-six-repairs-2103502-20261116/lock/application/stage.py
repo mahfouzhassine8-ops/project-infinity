@@ -92,6 +92,23 @@ def toolchain(work,sdk):
  ecj=work/'ecj.jar';data=urllib.request.urlopen('https://repo.maven.apache.org/maven2/org/eclipse/jdt/ecj/3.37.0/ecj-3.37.0.jar',timeout=60).read();assert hashlib.sha256(data).hexdigest()==builder.ECJ_SHA;ecj.write_bytes(data)
  return tools,ecj
 
+def retained_classes3():
+ receipt=LOCK/'DEX-CLASSES3-PRESERVATION.json'
+ assert digest(receipt)=='827550a5f3b305a403d2ec511552d1156f30fb48e8a09cb35635984e79881d2a'
+ previous=json.loads(receipt.read_bytes());target=Path(previous['output'])
+ assert str(target)=='/dev/shm/infinity502-lock-dex/build-main-preserved' and not target.exists()
+ expected={'classes3.dex':previous['outputs_sha256']['classes3.dex'],
+           'ORIGINAL-CLASS-PRESERVATION.json':previous['classes3_preservation']['canonical_class_inventory_sha256']}
+ with ZipFile(LOCK/'verified-classes3.zip') as z:
+  assert len(z.infolist())==2 and set(z.namelist())==set(expected)
+  target.mkdir(parents=True)
+  for name,wanted in expected.items():
+   entry=z.getinfo(name)
+   assert entry.external_attr>>16==0o100600 and 0<entry.file_size<1024*1024
+   raw=z.read(name);assert hashlib.sha256(raw).hexdigest()==wanted,name
+   (target/name).write_bytes(raw)
+ return receipt
+
 def main():
  assert os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('GITHUB_REPOSITORY')==REPO
  assert os.environ.get('GITHUB_REF')=='refs/heads/work/infinity-2103502-six-repairs-20261116'
@@ -104,7 +121,7 @@ def main():
  tools,ecj=toolchain(work,sdk);dex=Path('/dev/shm/infinity502-app-dex')
  # Reproducible packaging on this fresh runner, reusing the verified native artifact.
  # No native rebuild or repeat host behavioral suite.
- run(['python',LOCK/'build_dex.py','--apk',base,'--output',dex,'--receipt',evidence/'DEX.json','--smali-tools',tools,'--ecj',ecj,'--android',android,'--d8',sdk/'lib/d8.jar'])
+ run(['python',LOCK/'build_dex.py','--apk',base,'--output',dex,'--receipt',evidence/'DEX.json','--smali-tools',tools,'--ecj',ecj,'--android',android,'--d8',sdk/'lib/d8.jar','--reuse-classes3-receipt',retained_classes3()])
  expected=json.loads((LOCK/'DEX-BUILD-DIALOG-RETIREMENT.json').read_text())['outputs_sha256']
  assert digest(dex/'classes3.dex')==expected['classes3.dex'] and digest(dex/'classes7.dex')==expected['classes7.dex']
  stream=module('retained_streaming_stage',ROOT/'repairs/infinity-consolidated-2103500-20261115/stage_fast_qa.py')
