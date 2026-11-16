@@ -91,7 +91,22 @@ def main():
   film.with_suffix('.nfo').write_text('<movie><title>Big Buck Bunny</title><year>2008</year><uniqueid type="imdb" default="true">tt1254207</uniqueid></movie>')
   film_directory=HOME+'/userdata/infinity502-watched-fixture/'
   (profile/'sources.xml').write_text('<sources><video><source><name>Infinity502 engineering movie</name><path pathversion="1">'+film_directory+'</path><allowsharing>false</allowsharing></source></video></sources>')
-  adb('root');adb('wait-for-device');shell('mkdir','-p',HOME);adb('push',str(fixture)+'/.',HOME)
+  # adbd may close its transport while enabling root. Accept only that observed
+  # transport result, then prove actual root on the reconnected disposable device.
+  root_started=time.monotonic();root_args=['adb','root'];transport.guard(root_args)
+  rooted=subprocess.run(root_args,capture_output=True,text=True,timeout=30)
+  report['adb_root']={'returncode':rooted.returncode,'stdout':rooted.stdout,'stderr':rooted.stderr,'uid_reads':0};save()
+  assert rooted.returncode==0 or (rooted.stdout+rooted.stderr).strip()=='adb: unable to connect for root: closed','UNEXPECTED_ADB_ROOT_FAILURE'
+  subprocess.run(['adb','wait-for-device'],check=True,capture_output=True,text=True,timeout=30)
+  def root_uid():
+   report['adb_root']['uid_reads']+=1
+   try:probe=subprocess.run(['adb','shell','id','-u'],capture_output=True,text=True,timeout=5)
+   except subprocess.TimeoutExpired:return False
+   report['adb_root']['last_uid_read']={'returncode':probe.returncode,'stdout':probe.stdout,'stderr':probe.stderr}
+   return probe.returncode==0 and probe.stdout.strip()=='0'
+  until(root_uid,'verified root after adbd reconnect',15)
+  report['adb_root'].update(verified_uid=0,elapsed_seconds=time.monotonic()-root_started);save()
+  shell('mkdir','-p',HOME);adb('push',str(fixture)+'/.',HOME)
   uid=shell('stat','-c','%u','/data/user/0/'+PACKAGE).strip();assert uid.isdigit() and int(uid)>=10000
   backing='/data/media/0/Android/data/'+PACKAGE;shell('chown','-R',uid+':'+uid,backing);shell('restorecon','-RF',backing)
   report['fixture']={'fresh_profile_only':True,'clip_sha256':hashlib.sha256(clip.read_bytes()).hexdigest(),'owner_data':'NOT_ACCESSED','application_UID':int(uid)};save()

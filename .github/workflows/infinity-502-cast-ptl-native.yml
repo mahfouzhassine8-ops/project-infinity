@@ -1,0 +1,32 @@
+name: Infinity502 standalone Cast PTL ARM64 - no Kodi build or release
+on:
+  push:
+    branches: [work/infinity-2103502-six-repairs-20261116]
+    paths: [repairs/infinity-six-repairs-2103502-20261116/cast/CI-NATIVE.json]
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity502-cast-ptl, cancel-in-progress: false}
+jobs:
+  cast-component:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env: {PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0 ndk;21.4.7075529', log-accepted-android-sdk-licenses: false}
+      - name: Compile only reviewed standalone Cast library and compare ABI
+        env: {GH_TOKEN: '${{ github.token }}'}
+        run: python repairs/infinity-six-repairs-2103502-20261116/cast/build.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success()
+        with:
+          name: Infinity502-Cast-PTL-${{ github.run_id }}-COMPONENT-ONLY
+          path: |
+            cast502-ptl-work/native/libinfinitycastremux.so
+            cast502-ptl-work/CAST-PTL-ARM64.json
+          if-no-files-found: error
+          retention-days: 90

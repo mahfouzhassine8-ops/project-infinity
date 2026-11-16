@@ -113,17 +113,26 @@ def main():
  assert os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('GITHUB_REPOSITORY')==REPO
  assert os.environ.get('GITHUB_REF')=='refs/heads/work/infinity-2103502-six-repairs-20261116'
  work=ROOT/'lock-app-work';work.mkdir();evidence=work/'evidence';evidence.mkdir()
- sdk=Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0';android=sdk.parents[1]/'platforms/android-34/android.jar'
+ sdk=Path(os.environ['ANDROID_HOME'])/'build-tools/35.0.0'
  base,binding=artifact(work,'baseline');engine,engine_binding=artifact(work,'native')
  engine_binding.update(build_id=NATIVE['build_id'],build_id_status=NATIVE['build_id_status'])
  sig=run([sdk/'apksigner','verify','--verbose','--print-certs',base]);assert 'certificate SHA-256 digest: '+CERT in sig
  assert all(any(line.startswith('Verified using v'+str(v)+' scheme') and line.endswith(': true') for line in sig.splitlines()) for v in (1,2,3))
- tools,ecj=toolchain(work,sdk);dex=Path('/dev/shm/infinity502-app-dex')
- # Reproducible packaging on this fresh runner, reusing the verified native artifact.
- # No native rebuild or repeat host behavioral suite.
- run(['python',LOCK/'build_dex.py','--apk',base,'--output',dex,'--receipt',evidence/'DEX.json','--smali-tools',tools,'--ecj',ecj,'--android',android,'--d8',sdk/'lib/d8.jar','--reuse-classes3-receipt',retained_classes3()])
- expected=json.loads((LOCK/'DEX-BUILD-DIALOG-RETIREMENT.json').read_text())['outputs_sha256']
+ # Reuse both exact reviewed DEX artifacts. No Java/D8/native recompilation.
+ prior=LOCK/'DEX-BUILD-DIALOG-RETIREMENT.json'
+ assert digest(prior)=='bdc5f558ef1790c1f64481be98aeb49453c9e124b4e9009e402ed290415b6958'
+ verified=json.loads(prior.read_bytes());assert verified['baseline_apk_sha256']==BASE
+ for name,expected_source in verified['input_sha256'].items():assert digest(LOCK/name)==expected_source,name
+ receipt=retained_classes3();assert digest(receipt)==verified['classes3_reused_receipt_sha256']
+ dex=Path(json.loads(receipt.read_bytes())['output'])
+ archive=LOCK/'verified-classes7.zip';assert digest(archive)=='04124f0ecc0cf029d2e8a5798b36fee97dda0c162391da5799f3c8810ca73a9e'
+ with ZipFile(archive) as z:
+  assert z.namelist()==['classes7.dex']
+  info=z.getinfo('classes7.dex');assert info.file_size<1024*1024 and info.external_attr>>16==0o100600
+  target=dex/'classes7.dex';assert not target.exists();target.write_bytes(z.read(info))
+ expected=verified['outputs_sha256']
  assert digest(dex/'classes3.dex')==expected['classes3.dex'] and digest(dex/'classes7.dex')==expected['classes7.dex']
+ (evidence/'DEX.json').write_text(json.dumps({'status':'PASS_REUSED_EXACT_VERIFIED_DEX_NO_COMPILATION','original_receipt_sha256':digest(prior),'original_receipt':verified,'actual_outputs_sha256':{name:digest(dex/name) for name in ('classes3.dex','classes7.dex')}},indent=2)+'\n')
  stream=module('retained_streaming_stage',ROOT/'repairs/infinity-consolidated-2103500-20261115/stage_fast_qa.py')
  inventory=module('retained_inventory',ROOT/'repairs/dual-experience-isolation-2103420/inventory.py')
  updates={'lib/arm64-v8a/libkodi.so':engine,'classes3.dex':dex/'classes3.dex','classes7.dex':dex/'classes7.dex'}
