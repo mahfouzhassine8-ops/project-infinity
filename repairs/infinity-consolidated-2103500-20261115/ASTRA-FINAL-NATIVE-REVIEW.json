@@ -1,0 +1,42 @@
+{
+  "status": "PASS_FINAL_NATIVE_INTEGRATION_AND_SIX_FILE_SOURCE_PRESERVATION",
+  "reviewer": "/root/astra_500_review (gpt-6-astra)",
+  "production_source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+  "run": 43774504911,
+  "engine_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+  "checks": {
+    "artifact_ZIP_sha256": "532fbbae52e334e367e8582e6427757b7943965ca04338012877bb4098d96b26",
+    "evidence_ZIP_sha256": "5fd83ff130d1ab22562c8f44268f36c1c708580aa2caa59397000510a15cab67",
+    "direct_ELF_inspection": "ELF64/DYN/AArch64; 136120 identical defined GLOBAL/WEAK interfaces; zero additions/removals; identical DT_NEEDED",
+    "source_map": "Baseline map bytes equal authenticated500 map; final9414 files,9410 unchanged; three existing files modified, one new private header; none removed",
+    "native_source_binding": "All four hashes equal reviewed c3c1e920 and current source",
+    "Cast_source_binding": "Both retained Cast hashes equal prior approved sources",
+    "policy_in_binary": "Both authenticated publisher source markers present in actual ELF",
+    "artifact_receipts": "Both independently downloaded receipt sets agree"
+  },
+  "files": {
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "1923f27eb318377798ab0a21cada92349bb9ae0b26af1e51afd736a5d205fb6e",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "a9c48ec8cd46a71bc5eebb59feee0a4dd787ab119fad3dbfbf40aaedf2e39509",
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/Dialog.cpp": "359dfb92f77810180a47494b0a70bd3930a2b62426e74b8b68b2d606e6e2bde5",
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/WindowDialogMixin.cpp": "b4699bac6885b20d9d03dafb94301c3be9e765cb356254f2a49affd50e10d810",
+    "repairs/infinity-consolidated-2103500-20261115/native/overlay/xbmc/interfaces/legacy/InfinityPromotionalDialog.h": "009a3819706d074859e979d1902d2cad65758d2a3d5ab3769cbdb261a9f9570d"
+  },
+  "retained_Android_observer_evidence": {
+    "run": 43771832750,
+    "engine_sha256": "1a1b7eb7e549396ee71254bb04ffdf25057c6cde28a147575fa8a4d4f9a77167",
+    "scope": "Eight actual embedded-engine cases bind this earlier observer-only binary, not execution of the final policy-containing binary."
+  },
+  "tests_rerun_by_reviewer": false,
+  "concrete_defect_found": false,
+  "pending": [
+    "Final engine actual GUI/full-application execution",
+    "Original progress-store and exact saved destinations",
+    "Selected Search item trusted identity",
+    "Empty-shell failure attribution",
+    "APK member preservation, original signing and install-over/recovery verification",
+    "Physical Fold and TV acceptance"
+  ],
+  "APK_approval": false,
+  "release_approval": false
+}

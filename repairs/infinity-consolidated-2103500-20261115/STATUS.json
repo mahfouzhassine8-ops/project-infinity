@@ -30,13 +30,13 @@
       "remaining": "Actual selected Otaku item media type and typed IDs/route not in supplied evidence; no guessed identity"
     },
     "Silent_Mode": {
-      "status": "OWNER_AUTHORIZED_POLICY_SOURCE_REVIEWED; HOST39PASS; NATIVE_BUILD_PENDING",
+      "status": "OWNER_AUTHORIZED_POLICY_SOURCE_REVIEWED; HOST39PASS; FULL_ARM64_LINK_ABI_PASS; GUI_PENDING",
       "evidence": "Suppression requires the exact verified publisher automatic-promotion caller plus the active Infinity skin and existing Silent Mode setting. Only Dialog::ok and QR WindowDialogMixin::show are hooked; manual, error, security and unknown callers retain normal behavior. No provider edit.",
       "code_changed": true,
-      "remaining": "New native policy build pending after same-interpreter GIL release around file I/O. Actual GUI behavior and installed SlyGuy coverage remain unverified.",
-      "source": "465d6a08e1f6291044d5921f20b4ada18395e66a",
+      "remaining": "Actual full-Kodi GUI behavior and installed SlyGuy source coverage remain unverified. The final engine compiled/linked and preserves exact500 ABI; this does not establish GUI suppression.",
+      "source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
       "host_checks": 39,
-      "native_build_run": null,
+      "native_build_run": 43774504911,
       "superseded_native_build": 43771295868
     },
     "Cast": {
@@ -61,8 +61,20 @@
     "forward_recovery": "NOT_BUILT",
     "accepted_baseline_advanced": false,
     "blocker": "The original continue-watching store, exact saved destinations and selected Otaku identifiers are absent; the empty-shell failure mechanism is not established. Full-application and policy GUI verification remain incomplete. No record reset, relaxed eligibility, guessed identity or partial release is authorized.",
-    "next_engineering_gate": "Finish the reviewed promotional policy ARM64 build and focused GUI verification. Original progress-record, saved-route, selected Search-identity and startup-failure evidence gaps remain open."
+    "next_engineering_gate": "Actual full-application GUI verification remains pending. Original progress-record, saved-route, selected Search-identity and startup-failure evidence gaps remain open; no consolidated installer can be represented as complete."
   },
   "Cobra": "UNCHANGED",
-  "user_data": "NO_PROFILE_STORE_OR_DATABASE_READ_OR_MODIFIED"
+  "user_data": "NO_PROFILE_STORE_OR_DATABASE_READ_OR_MODIFIED",
+  "native_integration": {
+    "status": "PASS_FULL_ARM64_LINK_SOURCE_AND_ABI",
+    "run": 43774504911,
+    "source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+    "native_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+    "native_files_unchanged": 9410,
+    "exported_interfaces_preserved": 136120,
+    "final_engine_Android_GUI": "NOT_RUN",
+    "retained_observer_Android_bridge_run": 43771832750,
+    "Astra_review": "PASS_FINAL_NATIVE_INTEGRATION_AND_SIX_FILE_SOURCE_PRESERVATION",
+    "Astra_receipt": "ASTRA-FINAL-NATIVE-REVIEW.json"
+  }
 }

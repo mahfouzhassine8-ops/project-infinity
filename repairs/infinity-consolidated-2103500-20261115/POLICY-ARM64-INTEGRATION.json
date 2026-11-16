@@ -1,0 +1,113 @@
+{
+  "status": "PASS_REVIEWED_NATIVE_CORRECTIONS_FULL_ARM64_LINK_AND_SOURCE_BINDING",
+  "run": 43774504911,
+  "source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+  "artifact_id": 14187138056,
+  "artifact_sha256": "532fbbae52e334e367e8582e6427757b7943965ca04338012877bb4098d96b26",
+  "evidence_artifact_id": 14187277572,
+  "evidence_artifact_sha256": "5fd83ff130d1ab22562c8f44268f36c1c708580aa2caa59397000510a15cab67",
+  "artifact_url": "https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/43774504911/artifacts/14187138056",
+  "native_bytes": 640353128,
+  "ARM64": {
+    "Android_execution": "NOT_RUN",
+    "application_acceptance": false,
+    "baseline_native_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+    "dependencies": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "exported_interfaces_preserved": 136120,
+    "native_sha256": "ed2d955d1825bf838ea50a712782e54b69926d40605270a2f241efd913202ee7",
+    "physical_Fold_acceptance": false,
+    "promotional_policy_compiled": true,
+    "signed": false,
+    "source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+    "status": "PASS_FULL_ARM64_LINK_AND_EXACT500_ABI"
+  },
+  "preservation": {
+    "Android_execution": "NOT_RUN",
+    "Cast_native": "UNCHANGED",
+    "Cobra": "UNCHANGED",
+    "Python_startup": "UNCHANGED",
+    "admission_SQLite_durability_guards": "UNCHANGED",
+    "baseline_native_sha256": "3caccc96c23336e220b791118989f3a850b73fa8804267fb7beb2aad3b3afc75",
+    "baseline_source_map_sha256": "26525c76540cd62fbc483b4d4ec2eb2579ef595a64f2fe564859131139498f1c",
+    "changed": {
+      "xbmc/interfaces/legacy/Dialog.cpp": {
+        "after": "359dfb92f77810180a47494b0a70bd3930a2b62426e74b8b68b2d606e6e2bde5",
+        "before": "ed08b1edbd77c0ded6d49c8942bfb5028fa5c4d278b02ae8fb96161378754315"
+      },
+      "xbmc/interfaces/legacy/InfinityPromotionalDialog.h": {
+        "after": "009a3819706d074859e979d1902d2cad65758d2a3d5ab3769cbdb261a9f9570d",
+        "before": null
+      },
+      "xbmc/interfaces/legacy/WindowDialogMixin.cpp": {
+        "after": "b4699bac6885b20d9d03dafb94301c3be9e765cb356254f2a49affd50e10d810",
+        "before": "46a79e7f92d3921b7006ea4bf2cb1b87908ad06fa2f4e115765efbfca6ba1de1"
+      },
+      "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": {
+        "after": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+        "before": "d81736cf62fb3406649065558f7ec28a7be243f32c3d7afae33fac78b6c207f3"
+      }
+    },
+    "signed": false,
+    "source": "c3c1e920e17fbeee5b9977eadc9409a9806a06f9",
+    "status": "PASS_EXACT_SIGNED500_PLUS_REVIEWED_OBSERVER_AND_NARROW_PROMOTION_POLICY",
+    "unchanged_native_files": 9410
+  },
+  "ABI": {
+    "added": [],
+    "dependencies_after": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "dependencies_before": [
+      "libEGL.so",
+      "libGLESv2.so",
+      "libandroid.so",
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libjnigraphics.so",
+      "liblog.so",
+      "libm.so",
+      "libmediandk.so",
+      "libshairplay.so"
+    ],
+    "removed": []
+  },
+  "not_claimed": [
+    "Final policy engine Android GUI execution",
+    "Full application startup/shutdown/relaunch",
+    "Owner installed promotional-source coverage",
+    "Missing progress records or saved destinations repaired",
+    "Physical Fold or TV acceptance",
+    "APK preservation or release approval"
+  ],
+  "APK": "NOT_BUILT",
+  "signed": false,
+  "independent_review": {
+    "status": "PASS_FINAL_NATIVE_INTEGRATION_AND_SIX_FILE_SOURCE_PRESERVATION",
+    "reviewer": "/root/astra_500_review (gpt-6-astra)",
+    "receipt": "ASTRA-FINAL-NATIVE-REVIEW.json",
+    "receipt_sha256": "5d25253e794ae8df7648c36fadd6f91e29e27e45f6c58c9542f24178759f854d"
+  }
+}
