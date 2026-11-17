@@ -1,0 +1,24 @@
+{
+  "status": "PASS_REVIEWED_GENUINE_FIXTURE_SPLIT_NO_PRODUCTION_CHANGE",
+  "reviewers": [
+    "/root/astra_cast502",
+    "/root/astra_502_review"
+  ],
+  "retained_failed_run": 44104795798,
+  "reason": "Both emulatorHEVCdecodersrejectMain10L153; Codecexception0xe, notquota",
+  "requirements": [
+    "Main10resources/ranges/strictindependentdecode retained; noAndroidMain10PASS",
+    "Onlyinventory-supportedactualgenuinelyencodedMain8RADLsourceforMediaCodec720p/AACcache/seeking/EOS/cancel",
+    "No sourcecodec relabeling; unchangedproduction6files/nativequotas",
+    "ReuseauthenticatedcompilednativeSO, sourcebindings+ELF+10JNIexportschecked"
+  ],
+  "native_SHA256": "fcd75bd6b331b0dde303c1abb8b52960157bebe1375824eaa85e39103d683a84",
+  "test_source_hashes": {
+    "repairs/infinity-cast-dual-failure-2103510-20261117/android/InfinityCastProbeActivity.java": "690cc548868fceca2595922acb03e195ac487f5600a7101e562de74152ba3555",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/build_android.py": "1be3ad48835a9bfd73c1e24b23adfd6dba41210081ceab50432786d3ae483caa",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/verify_android_media.py": "34660c9b58a9f32b596df3816446ca9d09adfb8b005b7dafacc313995f50d52b",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/run_android.py": "c88b6b399f623c4ec659bc25dac40ca292223a23a0d264424aa2781809b5455c",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/fixtures/inband-main-eac3.mkv": "9e29c90770ebbc270f2fba8388f3c24df4f93a531c2300dabdd2208f1db5213a"
+  },
+  "Main10_hardware_TV": "UNVERIFIED; physicalacceptancepending"
+}

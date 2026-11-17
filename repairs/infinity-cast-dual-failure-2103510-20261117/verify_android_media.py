@@ -11,10 +11,11 @@ def inspect(p):return json.loads(subprocess.check_output(['ffprobe','-v','error'
 def micros(v):
  from decimal import Decimal
  return int(Decimal(v)*1000000)
+direct_origin=micros(json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-of','json',str(work/'fixtures/direct-hevc.mkv')]))['format']['start_time'])
 source=inspect(work/'fixtures/direct-hevc.mkv');direct=inspect(media/'direct-converted.mp4');srcvideo=next(v for v in source['streams'] if v['codec_type']=='video');video=next(v for v in direct['streams'] if v['codec_type']=='video');assert video['codec_name']=='hevc' and video['profile']=='Main 10' and video['level']==153 and (video['width'],video['height'])==(srcvideo['width'],srcvideo['height'])
 for name,p in [('source',source),('direct',direct)]:
  packets=[q for q in p['packets'] if q['stream_index']==0]
- if name=='source':expected=[(micros(q['pts_time'])-source_origin,q['data_hash']) for q in packets]
+ if name=='source':expected=[(micros(q['pts_time'])-direct_origin,q['data_hash']) for q in packets]
  else:assert [(micros(q['pts_time'])-10000000,q['data_hash']) for q in packets]==expected,'DIRECT_HEVC_PACKETS_OR_PTS_CHANGED'
 for index in(0,1):
  packets=[q for q in direct['packets'] if q['stream_index']==index];times=[micros(q['dts_time']) for q in packets];assert all(b>a for a,b in zip(times,times[1:])),('DIRECT_NONMONOTONIC_DTS',index)
@@ -34,5 +35,5 @@ for mode in ('','direct-'):
  for n in range(6):
   p=media/(mode+str(n)+'.m4s');b=p.read_bytes();joined=media/('strict-'+mode+str(n)+'.mp4');joined.write_bytes((media/(mode+'init.mp4')).read_bytes()+b);strict_decode(joined);joined.unlink();moofs=[v for v in boxes(b) if v[2]==b'moof'];assert len(moofs)==1;at,size,_,h=moofs[0];headers=[v for v in boxes(b,at+h,at+size) if v[2]==b'mfhd'];assert len(headers)==1 and headers[0][1]==16;seq=int.from_bytes(b[headers[0][0]+12:headers[0][0]+16],'big');assert seq==n+1;rows.append(dict(index=n,sequence=seq,sha256=hashlib.sha256(b).hexdigest()))
  sequences['hardware' if not mode else 'direct']=rows
-r.update(status='PASS_ACTUAL_ANDROID_DUAL_CAST_OUTPUT_MEDIA',direct_HEVC='Main10L153; exactsourcecompressedpacketbytes_and_PTS; monotonicDTS; fullAVdecode',sequences=sequences,cache='Successful actualMediaCodec bootstrap followed bynonzero key requests whose inbandPSwere removed; sourceCSDcache reused',source_quota='UNCHANGED',physical_TV='NOT_TESTED',Fold_hardware_performance='NOT_TESTED')
+r.update(status='PASS_ACTUAL_ANDROID_DUAL_CAST_OUTPUT_MEDIA',direct_HEVC='Main10L153; exactsourcecompressedpacketbytes_and_PTS; monotonicDTS; fullAVdecode',sequences=sequences,Main10_Android_playback='SeeRESULT.direct_HEVC.codec_inventory; unsupportedisNOTPASS',hardware_fixture='GenuineMain8L3_RADL',cache='Successful actualMediaCodec bootstrap followed bynonzero key requests whose inbandPSwere removed; sourceCSDcache reused',source_quota='UNCHANGED',physical_TV='NOT_TESTED',Fold_hardware_performance='NOT_TESTED')
 out.write_text(json.dumps(r,indent=2)+'\n');print(out.read_text())

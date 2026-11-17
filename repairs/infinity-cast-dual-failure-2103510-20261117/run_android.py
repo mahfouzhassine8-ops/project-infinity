@@ -16,7 +16,7 @@ try:
   if result is not None:break
   time.sleep(1)
  assert result is not None,'NO_ACTUAL_PIPELINE_OUTCOME'
- result['emulator_ABIs']=abis;result['scope']='actual original510 ARM64 FFmpeg/JNI, directMain10 HLS andrealMediaCodec720p/AAC inbandCSD/cache; privateCIsoftwarebackend, notFoldhardwareorTVqualification'
+ result['emulator_ABIs']=abis;result['scope']='actual original510 ARM64 FFmpeg/JNI, directMain10HTTP/rangesandcodec_inventory; genuineMain8RADL realMediaCodec720p/AAC inbandCSD/cache; privateCIsoftwarebackend, notFoldhardwareorTVqualification'
  assert result['pass'] is True and result['status']=='PASS_ACTUAL_ARM64_DUAL_CAST_CORRECTIONS' and result['owned_native_after_close']==0,result
 except BaseException as e:
  if result is None:result={'pass':False}
