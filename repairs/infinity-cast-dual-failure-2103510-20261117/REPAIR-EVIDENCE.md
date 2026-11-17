@@ -20,3 +20,7 @@ These are reproduced supported-source/lifecycle defects. The owner's exact hvcC/
 - Physical Fold Main10 decoding, sustained hardware performance/thermal behavior, actual TV video/audio and normal phone/receiver handoff remain owner acceptance requirements. No physical success, shutdown acceptance or baseline promotion is claimed.
 
 Release staging/signing is still gated on the selected Android result, source/member preservation, independent review, original signing identity and registry reconciliation. No logging-only candidate or stale earlier implementation may substitute for the reviewed correction.
+
+## Selected Android result
+
+Run44108970398 passed the focused available Android gates with the exact reused native SO and production DEX. The genuine Main8 RADL source produced288 AVC720p frames with exact source PTS, unchanged continuous-AAC bytes/timing and GPU alignment SSIM0.942922. Independent fragments decoded cleanly, real HLS resumed video/audio after a2.5s seek, cancellation took116ms, and zero native contexts remained. Both Astra reviewers checked actual artifact hashes, receipts and fragment hashes. Main10 Android playback remains explicitly false/unsupported by the actual emulator inventory; physical hardware and TV acceptance remain pending. No Kodi build was performed.

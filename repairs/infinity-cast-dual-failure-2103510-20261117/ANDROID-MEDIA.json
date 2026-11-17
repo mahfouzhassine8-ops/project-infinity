@@ -1,0 +1,120 @@
+{
+  "status": "PASS_ACTUAL_ANDROID_DUAL_CAST_OUTPUT_MEDIA",
+  "video_packets": 288,
+  "video_PTS": "exact original values plus one fixed10s HLS epoch; DTS monotonic/noB",
+  "audio": "AAC-LC48k stereo, full decode; existing continuous AAC adapter unchanged",
+  "color": "actual SPS/VUI SDR709 limited",
+  "adjacent_independent_fragments": [
+    {
+      "name": "0.m4s",
+      "video_packets": 48,
+      "first_pts_us": 10005000,
+      "last_pts_us": 11963000
+    },
+    {
+      "name": "1.m4s",
+      "video_packets": 48,
+      "first_pts_us": 12005000,
+      "last_pts_us": 13963000
+    },
+    {
+      "name": "2.m4s",
+      "video_packets": 48,
+      "first_pts_us": 14005000,
+      "last_pts_us": 15963000
+    },
+    {
+      "name": "3.m4s",
+      "video_packets": 48,
+      "first_pts_us": 16005000,
+      "last_pts_us": 17963000
+    },
+    {
+      "name": "4.m4s",
+      "video_packets": 48,
+      "first_pts_us": 18005000,
+      "last_pts_us": 19963000
+    },
+    {
+      "name": "5.m4s",
+      "video_packets": 48,
+      "first_pts_us": 20005000,
+      "last_pts_us": 21963000
+    }
+  ],
+  "GPU_frame_alignment_SSIM": 0.942922,
+  "HDR_hardware_performance": "NOT_TESTED",
+  "physical_TV": "NOT_TESTED",
+  "direct_HEVC": "Main10L153; exactsourcecompressedpacketbytes_and_PTS; monotonicDTS; fullAVdecode",
+  "sequences": {
+    "hardware": [
+      {
+        "index": 0,
+        "sequence": 1,
+        "sha256": "6d33679728c48a48ae0b3c450ed174aad510993d1145d0965be6629427500757"
+      },
+      {
+        "index": 1,
+        "sequence": 2,
+        "sha256": "f61c66e3cad01d66285e3c622dc93b7484f142e746f154cb7242dca6efcf61c6"
+      },
+      {
+        "index": 2,
+        "sequence": 3,
+        "sha256": "8b0d5afb04de92f0b5eb1e6cce9446dec050168fe5d3a4de521aba8591fb5f27"
+      },
+      {
+        "index": 3,
+        "sequence": 4,
+        "sha256": "ec78631ca360015ba6cdfe1bf37c8dbadf2bf7ed76721292660ecb8f35244ce6"
+      },
+      {
+        "index": 4,
+        "sequence": 5,
+        "sha256": "5143fe5d98360e4ba024d4a097f2cc48fc3e0adc2137459ee45156410a1341c2"
+      },
+      {
+        "index": 5,
+        "sequence": 6,
+        "sha256": "61fe9f03c719ce0a0d5d0a867c1a99937eb7314c280beb9886c85e44c2c00c2c"
+      }
+    ],
+    "direct": [
+      {
+        "index": 0,
+        "sequence": 1,
+        "sha256": "6fbaf56d16dbb8545283af120dbe3d728b605db3423f276387b8b596f2001ab2"
+      },
+      {
+        "index": 1,
+        "sequence": 2,
+        "sha256": "f583cfcdf4626d5e7a8163fcc7b267e3b2392989a207ad6cd20f108d3c20ae8d"
+      },
+      {
+        "index": 2,
+        "sequence": 3,
+        "sha256": "285c07f153f540b42d93a24abf4e71162fa3b1aa7b63dea58d079c4c81b2ea11"
+      },
+      {
+        "index": 3,
+        "sequence": 4,
+        "sha256": "1973ff77c91a5635f1ea3968007c98bdb6d09b6dbd3b147fd8a0eb896041e89a"
+      },
+      {
+        "index": 4,
+        "sequence": 5,
+        "sha256": "9409c87ab5acd85d074aa465cf0c222448fdd858f67b3b9451d93388e89284ab"
+      },
+      {
+        "index": 5,
+        "sequence": 6,
+        "sha256": "4fedaa6bee27f421776fa8ff2ee537d758d2cd8e91b3cc907e18d3962f801e5e"
+      }
+    ]
+  },
+  "Main10_Android_playback": "SeeRESULT.direct_HEVC.codec_inventory; unsupportedisNOTPASS",
+  "hardware_fixture": "GenuineMain8L3_RADL",
+  "cache": "Successful actualMediaCodec bootstrap followed bynonzero key requests whose inbandPSwere removed; sourceCSDcache reused",
+  "source_quota": "UNCHANGED",
+  "Fold_hardware_performance": "NOT_TESTED"
+}

@@ -26,7 +26,7 @@ def main():
  remote=subprocess.check_output(['git','ls-remote','origin','refs/heads/'+c.CANONICAL],text=True).split()[0];subprocess.run(['git','fetch','--no-tags','origin',remote],check=True);live=subprocess.check_output(['git','show',remote+':'+c.AUTHORITY]);assert hashlib.sha256(live).hexdigest()==r['parent_authority_sha256'],'LIVE_REGISTRY_CHANGED'
  registry=json.loads(live);assert r['versions']['candidate']>max(registry['candidate_versionCode'],registry['last_issued_versionCode'])
  base=c.unique(c.obtain(r['baseline'],'cast510-dual-stage-base'),'Infinity-2103510-Combined-Original-Signer.apk');assert sha(base)==BASE;c.signature(base)
- verified=c.obtain(r['Android'],'cast510-dual-stage-Android');gate=json.loads(c.unique(verified,'RESULT.json').read_bytes());assert gate['pass'] is True and gate['status']=='PASS_ACTUAL_ARM64_DUAL_CAST_CORRECTIONS'
+ verified=c.obtain(r['Android'],'cast510-dual-stage-Android');gate=json.loads((verified/'cast510-dual-results/RESULT.json').read_bytes());app=json.loads((verified/'cast510-dual-results/media/RESULT.json').read_bytes());assert {k:gate[k] for k in app}==app,'ATOMIC_APP_RESULT_MUST_MATCH_WRAPPER';assert gate['pass'] is True and gate['status']=='PASS_ACTUAL_ARM64_DUAL_CAST_CORRECTIONS'
  assert gate['SDK_error_fields']['null_vs_zero'] is True and gate['SDK_error_fields']['safe_reason'] is True and gate['SDK_error_fields']['real_SDK_object'] is True
  direct=gate['direct_HEVC'];assert direct['fragment5_complete'] is True and direct['AAC'] is True and direct['Main10_level']==153
  if direct['HLS']['actual_Android_HLS_playback'] is not True:
