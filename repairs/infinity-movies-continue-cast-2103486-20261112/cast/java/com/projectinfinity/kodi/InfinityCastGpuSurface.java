@@ -18,18 +18,20 @@ final class InfinityCastGpuSurface implements AutoCloseable {
     private Surface decoderSurface;
     private HandlerThread callbacks;
     private final Object signal=new Object();
-    private boolean available,closing;
+    private boolean available,closing,initialized;
     private int textureId,program,position,texcoord,matrix;
     private final FloatBuffer vertices=buffer(new float[]{-1,-1,0,0,1,-1,1,0,-1,1,0,1,1,1,1,1});
     private final float[] transform=new float[16];
-    private final int drawWidth,drawHeight;
+    private int drawWidth,drawHeight;
     private static FloatBuffer buffer(float[] v){FloatBuffer b=ByteBuffer.allocateDirect(v.length*4).order(ByteOrder.nativeOrder()).asFloatBuffer();b.put(v).position(0);return b;}
-    InfinityCastGpuSurface(Surface encoder,int sourceWidth,int sourceHeight,int sarNum,int sarDen) throws IOException {
+    InfinityCastGpuSurface(){}
+    void initialize(Surface encoder,int sourceWidth,int sourceHeight,int sarNum,int sarDen) throws IOException {
         double aspect=(double)sourceWidth/sourceHeight*(sarNum>0&&sarDen>0?(double)sarNum/sarDen:1);
         drawWidth=Math.max(2,(int)Math.min(1280,720*aspect));drawHeight=Math.max(2,(int)Math.min(720,1280/aspect));
         try{
+            require(display==EGL14.EGL_NO_DISPLAY&&EGL14.eglGetCurrentContext()==EGL14.EGL_NO_CONTEXT,"cast_hw_egl_ownership");
             display=EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);int[] version=new int[2];
-            require(display!=EGL14.EGL_NO_DISPLAY && EGL14.eglInitialize(display,version,0,version,1),"cast_hw_egl_initialize");
+            require(display!=EGL14.EGL_NO_DISPLAY,"cast_hw_egl_display");initialized=EGL14.eglInitialize(display,version,0,version,1);require(initialized,"cast_hw_egl_initialize");
             int[] attributes={EGL14.EGL_RED_SIZE,8,EGL14.EGL_GREEN_SIZE,8,EGL14.EGL_BLUE_SIZE,8,EGL14.EGL_RENDERABLE_TYPE,EGL14.EGL_OPENGL_ES2_BIT,EGL14.EGL_SURFACE_TYPE,EGL14.EGL_WINDOW_BIT,0x3142,1,EGL14.EGL_NONE};
             EGLConfig[] configs=new EGLConfig[1];int[] count=new int[1];require(EGL14.eglChooseConfig(display,attributes,0,configs,0,1,count,0)&&count[0]==1,"cast_hw_egl_config");
             context=EGL14.eglCreateContext(display,configs[0],EGL14.EGL_NO_CONTEXT,new int[]{EGL14.EGL_CONTEXT_CLIENT_VERSION,2,EGL14.EGL_NONE},0);
@@ -45,7 +47,7 @@ final class InfinityCastGpuSurface implements AutoCloseable {
             try{program=GLES20.glCreateProgram();GLES20.glAttachShader(program,vertex);GLES20.glAttachShader(program,fragment);GLES20.glLinkProgram(program);int[] ok=new int[1];GLES20.glGetProgramiv(program,GLES20.GL_LINK_STATUS,ok,0);require(ok[0]==GLES20.GL_TRUE,"cast_hw_gl_link");}
             finally{GLES20.glDeleteShader(vertex);GLES20.glDeleteShader(fragment);}
             position=GLES20.glGetAttribLocation(program,"aPosition");texcoord=GLES20.glGetAttribLocation(program,"aTex");matrix=GLES20.glGetUniformLocation(program,"uMatrix");require(position>=0&&texcoord>=0&&matrix>=0,"cast_hw_gl_locations");glCheck();
-        }catch(Throwable failure){try{close();}catch(Exception ignored){}if(failure instanceof IOException)throw (IOException)failure;if(failure instanceof Error)throw (Error)failure;throw new IOException("cast_hw_gpu_initialize");}
+        }catch(Throwable failure){try{close();}catch(Exception cleanup){failure.addSuppressed(cleanup);}if(failure instanceof IOException)throw (IOException)failure;if(failure instanceof Error)throw (Error)failure;throw new IOException("cast_hw_gpu_initialize");}
     }
     Surface decoderSurface(){return decoderSurface;}
     private void current()throws IOException{require(EGL14.eglMakeCurrent(display,window,window,context),"cast_hw_egl_current");}
@@ -63,17 +65,21 @@ final class InfinityCastGpuSurface implements AutoCloseable {
         vertices.position(2);GLES20.glVertexAttribPointer(texcoord,2,GLES20.GL_FLOAT,false,16,vertices);GLES20.glEnableVertexAttribArray(texcoord);GLES20.glUniformMatrix4fv(matrix,1,false,transform,0);GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP,0,4);glCheck();
         require(EGLExt.eglPresentationTimeANDROID(display,window,Math.multiplyExact(ptsUs,1000)),"cast_hw_egl_timestamp");require(EGL14.eglSwapBuffers(display,window),"cast_hw_egl_swap");check.check();
     }
+    private static IOException cleanup(Throwable t,String code){return new IOException(code,t);}
     @Override public void close()throws IOException {
-        synchronized(signal){closing=true;signal.notifyAll();}
-        if(texture!=null)texture.setOnFrameAvailableListener(null);
-        if(decoderSurface!=null){decoderSurface.release();decoderSurface=null;}if(texture!=null){texture.release();texture=null;}
-        if(display!=EGL14.EGL_NO_DISPLAY){
-            if(context!=EGL14.EGL_NO_CONTEXT&&window!=EGL14.EGL_NO_SURFACE&&EGL14.eglMakeCurrent(display,window,window,context)){if(program!=0)GLES20.glDeleteProgram(program);if(textureId!=0)GLES20.glDeleteTextures(1,new int[]{textureId},0);}program=textureId=0;
-            require(EGL14.eglMakeCurrent(display,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_CONTEXT),"cast_hw_egl_unbind");
-            if(window!=EGL14.EGL_NO_SURFACE){require(EGL14.eglDestroySurface(display,window),"cast_hw_egl_surface_release");window=EGL14.EGL_NO_SURFACE;}
-            if(context!=EGL14.EGL_NO_CONTEXT){require(EGL14.eglDestroyContext(display,context),"cast_hw_egl_context_release");context=EGL14.EGL_NO_CONTEXT;}
-            require(EGL14.eglReleaseThread(),"cast_hw_egl_thread_release");require(EGL14.eglTerminate(display),"cast_hw_egl_display_release");display=EGL14.EGL_NO_DISPLAY;
-        }
-        if(callbacks!=null){callbacks.quitSafely();try{callbacks.join(1500);}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IOException("cast_hw_callback_interrupted");}require(!callbacks.isAlive(),"cast_hw_callback_not_retired");callbacks=null;}
+        synchronized(signal){closing=true;signal.notifyAll();}IOException problem=null;
+        try{if(texture!=null)texture.setOnFrameAvailableListener(null);}catch(Throwable t){problem=cleanup(t,"cast_hw_frame_listener_release");}
+        try{if(decoderSurface!=null){decoderSurface.release();decoderSurface=null;}}catch(Throwable t){problem=cleanup(t,"cast_hw_decoder_surface_release");}
+        try{if(texture!=null){texture.release();texture=null;}}catch(Throwable t){problem=cleanup(t,"cast_hw_texture_release");}
+        if(initialized){
+            try{if(context!=EGL14.EGL_NO_CONTEXT&&window!=EGL14.EGL_NO_SURFACE&&EGL14.eglMakeCurrent(display,window,window,context)){if(program!=0)GLES20.glDeleteProgram(program);if(textureId!=0)GLES20.glDeleteTextures(1,new int[]{textureId},0);}}catch(Throwable t){problem=cleanup(t,"cast_hw_gl_release");}
+            try{require(EGL14.eglMakeCurrent(display,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_SURFACE,EGL14.EGL_NO_CONTEXT),"cast_hw_egl_unbind");}catch(Throwable t){problem=cleanup(t,"cast_hw_egl_unbind");}
+            try{if(window!=EGL14.EGL_NO_SURFACE){require(EGL14.eglDestroySurface(display,window),"cast_hw_egl_surface_release");window=EGL14.EGL_NO_SURFACE;}}catch(Throwable t){problem=cleanup(t,"cast_hw_egl_surface_release");}
+            try{if(context!=EGL14.EGL_NO_CONTEXT){require(EGL14.eglDestroyContext(display,context),"cast_hw_egl_context_release");context=EGL14.EGL_NO_CONTEXT;program=textureId=0;}}catch(Throwable t){problem=cleanup(t,"cast_hw_egl_context_release");}
+            try{require(EGL14.eglReleaseThread(),"cast_hw_egl_thread_release");}catch(Throwable t){problem=cleanup(t,"cast_hw_egl_thread_release");}
+            if(window==EGL14.EGL_NO_SURFACE&&context==EGL14.EGL_NO_CONTEXT)try{require(EGL14.eglTerminate(display),"cast_hw_egl_display_release");initialized=false;display=EGL14.EGL_NO_DISPLAY;}catch(Throwable t){problem=cleanup(t,"cast_hw_egl_display_release");}
+        }else display=EGL14.EGL_NO_DISPLAY;
+        if(callbacks!=null){callbacks.quitSafely();try{callbacks.join(1500);require(!callbacks.isAlive(),"cast_hw_callback_not_retired");callbacks=null;}catch(InterruptedException e){Thread.currentThread().interrupt();problem=cleanup(e,"cast_hw_callback_interrupted");}catch(IOException e){problem=e;}}
+        if(problem!=null)throw problem;
     }
 }

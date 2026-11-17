@@ -66,7 +66,15 @@ def main():
   assert excluded==['classes6.dex'],excluded
   for lib in ('libkodi.so','libc++_shared.so','libshairplay.so'):
    n='lib/arm64-v8a/'+lib;data=base.read(n);z.writestr(n,data);native_hashes[lib]=hashlib.sha256(data).hexdigest()
-  z.write(native_work/'native/libinfinitycastremux.so','lib/arm64-v8a/libinfinitycastremux.so');z.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');z.write(dex/'classes.dex','classes'+str(max(indices)+1)+'.dex');z.write(fixtures/'hevc-eac3.mkv','assets/hevc-eac3.mkv')
+  z.write(native_work/'native/libinfinitycastremux.so','lib/arm64-v8a/libinfinitycastremux.so');z.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');z.write(dex/'classes.dex',excluded[0]);z.write(fixtures/'hevc-eac3.mkv','assets/hevc-eac3.mkv')
+ with ZipFile(unsigned) as z:
+  dex_names=[n for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)]
+  sequence=sorted(int(re.search(r'\d+',n).group()) if re.search(r'\d+',n) else 1 for n in dex_names)
+  assert sequence==list(range(1,len(sequence)+1)),'Android multidex must have no gap'
+  classes_seen=set()
+  for n in dex_names:
+   definitions=set(Dex(z.read(n)).classes);assert not definitions&classes_seen;classes_seen|=definitions
+  assert 'Lcom/projectinfinity/kodi/InfinityCastProbeActivity;' in classes_seen
  aligned=OUT/'aligned.apk';run(bt/'zipalign','-p','-f','4',unsigned,aligned);key=OUT/'CI-ONLY.keystore'
  run('keytool','-genkeypair','-alias','CI-only','-keyalg','RSA','-keystore',key,'-storepass','android','-keypass','android','-dname','CN=Disposable Cast Pipeline CI','-validity','2')
  run(bt/'apksigner','sign','--ks',key,'--ks-key-alias','CI-only','--ks-pass','pass:android','--key-pass','pass:android','--out',OUT/'CI-ONLY.apk',aligned)

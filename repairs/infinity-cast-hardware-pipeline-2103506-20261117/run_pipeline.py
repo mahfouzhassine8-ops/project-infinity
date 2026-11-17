@@ -4,10 +4,13 @@ ROOT=Path(__file__).resolve().parents[2];WORK=ROOT/'cast506-pipeline-work';OUT=R
 def adb(*args,timeout=30):return subprocess.check_output(['adb',*map(str,args)],text=True,stderr=subprocess.STDOUT,timeout=timeout)
 try:
  abis=adb('shell','getprop','ro.product.cpu.abilist').strip();assert 'arm64-v8a' in abis and adb('shell','getprop','ro.kernel.qemu').strip()=='1'
+ adb('shell','setprop','debug.checkjni','1')
+ assert adb('shell','getprop','debug.checkjni').strip()=='1'
  adb('install',WORK/'CI-ONLY.apk',timeout=180);adb('shell','am','start','-W','-n','com.projectinfinity.castqa.pipeline/com.projectinfinity.kodi.InfinityCastProbeActivity')
  end=time.monotonic()+240
  while time.monotonic()<end:
-  raw=adb('logcat','-d','-v','brief','InfinityPipelineProbe:I','*:S')
+  raw=adb('logcat','-d','-v','brief','InfinityPipelineProbe:I','AndroidRuntime:E','*:S')
+  assert 'Process: com.projectinfinity.castqa.pipeline,' not in raw,'CI_PACKAGE_RUNTIME_CRASH; inspect retained logcat'
   for line in raw.splitlines():
    m=re.search(r'InfinityPipelineProbe[^:]*:\s*(\{.*\})',line)
    if m:result=json.loads(m[1])

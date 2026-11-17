@@ -41,19 +41,31 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
  }
  private static String codecCode(String name){String value=name.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9_]","_");return value.matches("[a-z][a-z0-9_]{0,63}")?value:"component_name_unavailable";}
  private MediaCodecInfo choose(String mime,boolean encode,MediaFormat format)throws IOException {
-  for(MediaCodecInfo info:new MediaCodecList(MediaCodecList.ALL_CODECS).getCodecInfos()){
+  IOException performanceFailure=null;for(MediaCodecInfo info:new MediaCodecList(MediaCodecList.ALL_CODECS).getCodecInfos()){
    if(info.isAlias()||info.isEncoder()!=encode)continue;
    if(ciSoftware?!info.isSoftwareOnly():(!info.isHardwareAccelerated()||info.isSoftwareOnly()))continue;
    for(String type:info.getSupportedTypes())if(type.equals(mime))try{
     MediaCodecInfo.CodecCapabilities caps=info.getCapabilitiesForType(type);
-    if(caps.isFormatSupported(format))return info;
+    if(caps.isFormatSupported(format)){try{declaredPerformance(info,mime,format,encode);return info;}catch(IOException insufficient){performanceFailure=insufficient;}}
    }catch(IllegalArgumentException unsupported){}
   }
-  throw new IOException(encode?"cast_hw_avc_encoder_unavailable":"cast_hw_decoder_format_unavailable");
+  if(performanceFailure!=null)throw performanceFailure;throw new IOException(encode?"cast_hw_avc_encoder_unavailable":"cast_hw_decoder_format_unavailable");
+ }
+ private void declaredPerformance(MediaCodecInfo info,String mime,MediaFormat format,boolean encode)throws IOException {
+  if(ciSoftware)return;String owner=encode?"encoder":"decoder";int width=format.getInteger(MediaFormat.KEY_WIDTH),height=format.getInteger(MediaFormat.KEY_HEIGHT);double rate=format.getFloat(MediaFormat.KEY_FRAME_RATE);
+  MediaCodecInfo.VideoCapabilities video=info.getCapabilitiesForType(mime).getVideoCapabilities();need(video!=null&&video.areSizeAndRateSupported(width,height,rate),"cast_hw_declared_rate_unsupported");
+  android.util.Range<Double> achievable=video.getAchievableFrameRatesFor(width,height);
+  if(achievable!=null){InfinityCastDiagnostics.event("hw_capability",owner+"_achievable_fps_milli",(int)Math.min(Integer.MAX_VALUE,Math.round(achievable.getUpper()*1000)));need(achievable.getUpper()>=rate,"cast_hw_declared_throughput_insufficient");}
+  else InfinityCastDiagnostics.event("hw_capability",owner+"_achievable_rate_unreported",0);
+  List<MediaCodecInfo.VideoCapabilities.PerformancePoint> points=video.getSupportedPerformancePoints();
+  if(points!=null&&!points.isEmpty()){MediaCodecInfo.VideoCapabilities.PerformancePoint requested=new MediaCodecInfo.VideoCapabilities.PerformancePoint(width,height,(int)Math.ceil(rate));boolean supported=false;for(MediaCodecInfo.VideoCapabilities.PerformancePoint p:points)supported|=p.covers(requested);need(supported,"cast_hw_performance_point_insufficient");InfinityCastDiagnostics.event("hw_capability",owner+"_performance_point_covers",1);}
+  else InfinityCastDiagnostics.event("hw_capability",owner+"_performance_points_unreported",0);
+  // Declared capabilities are not a throughput guarantee. Both codecs must
+  // configure concurrently and actual conversion/delivery samples must qualify.
  }
  /** Invoked synchronously by the Cast native owner, before any phone pause. */
  void begin(String description,byte[] csd0,byte[] csd1,long beginUs,long endUs)throws IOException {
-  long entered=System.nanoTime();owner=Thread.currentThread().getId();deadline=SystemClock.elapsedRealtime()+14000;
+  need(idle(),"cast_hw_previous_segment_alive");long entered=System.nanoTime();owner=Thread.currentThread().getId();deadline=SystemClock.elapsedRealtime()+14000;
   try{
    check();JSONObject budget=new JSONObject(description);long remaining=budget.getLong("budget_ms");need(remaining>0,"cast_hw_video_deadline");deadline=SystemClock.elapsedRealtime()+Math.min(14000,remaining);need(decoder==null&&encoder==null&&gpu==null,"cast_hw_previous_segment_alive");JSONObject c=new JSONObject(description);
    inputWidth=c.getInt("width");inputHeight=c.getInt("height");long fpsNum=c.getLong("fps_num"),fpsDen=c.getLong("fps_den");need(inputWidth>0&&inputHeight>0&&inputWidth<=8192&&inputHeight<=4320&&fpsNum>0&&fpsDen>0,"cast_hw_source_geometry");double fps=(double)fpsNum/fpsDen;sourceFps=fps;need(fps>0&&fps<=120,"cast_hw_source_rate");
@@ -76,7 +88,7 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
    MediaCodecInfo enc=choose("video/avc",true,target),dec=choose(mime,false,source);check();
    InfinityCastDiagnostics.event("hw_decoder",codecCode(dec.getName()),profile);InfinityCastDiagnostics.event("hw_encoder",codecCode(enc.getName()),31);InfinityCastDiagnostics.event("hw_source","width",inputWidth);InfinityCastDiagnostics.event("hw_source","height",inputHeight);InfinityCastDiagnostics.event("hw_source","fps_milli",(int)Math.round(fps*1000));InfinityCastDiagnostics.event("hw_source","transfer",trc);InfinityCastDiagnostics.event("hw_capability","decoder_instances_declared",dec.getCapabilitiesForType(mime).getMaxSupportedInstances());InfinityCastDiagnostics.event("hw_capability","encoder_instances_declared",enc.getCapabilitiesForType("video/avc").getMaxSupportedInstances());
    encoder=MediaCodec.createByCodecName(enc.getName());encoder.configure(target,null,null,MediaCodec.CONFIGURE_FLAG_ENCODE);encoderInput=encoder.createInputSurface();encoder.start();encoderStarted=true;
-   gpu=new InfinityCastGpuSurface(encoderInput,inputWidth,inputHeight,c.optInt("sar_num",1),c.optInt("sar_den",1));decoder=MediaCodec.createByCodecName(dec.getName());decoder.configure(source,gpu.decoderSurface(),null,0);
+   gpu=new InfinityCastGpuSurface();gpu.initialize(encoderInput,inputWidth,inputHeight,c.optInt("sar_num",1),c.optInt("sar_den",1));decoder=MediaCodec.createByCodecName(dec.getName());decoder.configure(source,gpu.decoderSurface(),null,0);
    if(requestSdr)need(decoder.getInputFormat().getInteger("color-transfer-request",0)==MediaFormat.COLOR_TRANSFER_SDR_VIDEO,"cast_hw_tonemap_not_supported");decoder.start();decoderStarted=true;
    begin=beginUs;end=endUs;lastSlot=InfinityCastVideoContract.firstSlot(begin)-1;lastDecoded=lastEncoded=-1;frames=bytes=0;activeNanos=0;packets.clear();avcc=null;decoderEos=encoderEos=signalledEncoder=decoderFormatVerified=false;inputTimestamps.clear();presentedTimestamps.clear();
    InfinityCastDiagnostics.event("hardware_video",ciSoftware?"ci_small_software_backend":"hardware_pair_configured",0);
@@ -132,8 +144,8 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
   IOException problem=null;
   if(decoder!=null){try{if(decoderStarted)decoder.stop();}catch(Throwable e){problem=new IOException("cast_hw_decoder_stop");}finally{try{decoder.release();decoder=null;decoderStarted=false;}catch(Throwable e){problem=new IOException("cast_hw_decoder_release");}}}
   if(encoder!=null){try{if(encoderStarted)encoder.stop();}catch(Throwable e){problem=new IOException("cast_hw_encoder_stop");}finally{try{encoder.release();encoder=null;encoderStarted=false;}catch(Throwable e){problem=new IOException("cast_hw_encoder_release");}}}
-  if(gpu!=null){try{gpu.close();gpu=null;}catch(IOException e){problem=e;}}
-  if(encoderInput!=null){encoderInput.release();encoderInput=null;}packets.clear();avcc=null;
+  if(gpu!=null){try{gpu.close();gpu=null;}catch(Throwable e){problem=new IOException("cast_hw_gpu_release",e);}}
+  try{if(encoderInput!=null){encoderInput.release();encoderInput=null;}}catch(Throwable e){problem=new IOException("cast_hw_encoder_surface_release",e);}packets.clear();avcc=null;
   if(problem!=null)throw problem;
  }
  @Override public void close()throws IOException{cancel();if(!idle()&&owner!=Thread.currentThread().getId())throw new IOException("cast_hw_wrong_cleanup_owner");releaseSegment();}
