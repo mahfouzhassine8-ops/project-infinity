@@ -49,6 +49,7 @@ def request():
  c.tools();return r
 def preservation(base,apk,kind,r):
  inventory,cb,_,_,_=c.tools();version=r['versions'][kind]
+ assert set(r['expected_changes'][kind])==({LIB,'AndroidManifest.xml',LABEL} if kind=='candidate' else {'AndroidManifest.xml',LABEL}),'HARD_NATIVE_ONLY_MEMBER_ALLOWLIST'
  with ZipFile(base) as before,ZipFile(apk) as after:
   names=set(before.namelist())-set(inventory.SIGNATURE);assert set(after.namelist())-set(inventory.SIGNATURE)==names
   changes={}

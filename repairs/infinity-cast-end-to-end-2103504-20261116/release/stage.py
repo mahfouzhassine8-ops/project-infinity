@@ -19,6 +19,8 @@ def main():
  assert r['baseline_versionCode']==2103504 and r['signing'] is False and r['registry_write'] is False
  assert set(r['versions'])=={'candidate','recovery'}
  assert r['versions']['recovery']>r['versions']['candidate']>2103505
+ required={str((HERE/'stage.py').relative_to(ROOT)),'.github/workflows/infinity-504-cast-audio-release.yml','repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp',str((HERE.parent/'native/CastAudioAdapter.h').relative_to(ROOT))}
+ assert set(r['inputs'])==required,'EXACT_STAGE_SOURCE_BINDINGS'
  for name,wanted in r['inputs'].items():assert sha(ROOT/name)==wanted,name
  changed=subprocess.check_output(['git','diff','--name-only',r['source_commit'],os.environ['GITHUB_SHA']],text=True).splitlines()
  assert changed==[str((HERE/'STAGE-REQUEST.json').relative_to(ROOT))]
@@ -44,7 +46,10 @@ def main():
  builds=list(android.rglob('BUILD.json'));assert builds and all(p.read_bytes()==builds[0].read_bytes() for p in builds)
  build=json.loads(builds[0].read_bytes());assert build['native_library_sha256']==sha(library) and build['native_artifact']==r['native']
  assert gate['native_contexts_after_close']==0 and gate['cancellation'] is True
- assert all(v['video_byte_exact'] and v['AAC_LC_stereo'] and v['monotonic_DTS'] for v in gate['output_proof'])
+ expected_cases={'transients51','44100-odd','32000','main10-eac3'}
+ assert len(gate['output_proof'])==4 and {v['case'] for v in gate['output_proof']}==expected_cases
+ assert len(gate['cases'])==4 and {v['name'] for v in gate['cases']}==expected_cases
+ assert all(all(v[k] is True for k in ('video_byte_exact','video_PTS_DTS_preserved','AAC_LC_stereo','monotonic_DTS')) for v in gate['output_proof'])
  hls=gate['cases'][0]['HLS'];assert hls['actual_Android_HLS_playback'] and hls['video_rendered_frames']>0 and hls['audio_rendered_buffers']>hls['audio_rendered_buffers_before_seek']
  inventory,bundles,_,_,_=c.tools()
  out=ROOT/'cast504-stage';out.mkdir();reports={}
