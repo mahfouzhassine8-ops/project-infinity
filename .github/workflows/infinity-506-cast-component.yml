@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
         with: {distribution: temurin, java-version: '17'}
       - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
-        with: {packages: 'platform-tools platforms;android-35 build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+        with: {packages: 'platform-tools platforms;android-34 build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
       - name: Compile changed Cast DEX; reuse engine and all nonCast DEX
         run: python repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_component.py
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

@@ -5,13 +5,31 @@ It demonstrates media correctness only, never physical hardware throughput.
 """
 from pathlib import Path
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
-import hashlib,json,os,subprocess,sys,types
+import hashlib,json,os,subprocess,sys,types,shutil,stat
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1];OUT=ROOT/'cast506-pipeline-work'
 CAST=ROOT/'repairs/infinity-movies-continue-cast-2103486-20261112/cast'
 NATIVE=ROOT/'repairs/infinity-six-repairs-2103502-20261116/cast'
 def sha(p):
  with Path(p).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 def run(*args,**kw):subprocess.run(list(map(str,args)),check=True,**kw)
+def reuse_native(c,row,work):
+ # The producer's compile passed but its new test fixture failed before loading
+ # JNI. Authenticate that failed run explicitly; never claim the test passed.
+ producer=c.api('actions/runs/'+str(row['run']));assert producer['status']=='completed' and producer['conclusion']=='failure' and producer['workflow_id']==row['workflow_id'] and producer['head_sha']==row['source']
+ artifact=c.api('actions/artifacts/'+str(row['id']));assert not artifact['expired'] and artifact['workflow_run']['id']==row['run'] and all(artifact[k]==row[k] for k in ('name','digest','size_in_bytes'))
+ archive=work/'compiled-input.zip'
+ with archive.open('xb') as f:subprocess.run(['gh','api','repos/mahfouzhassine8-ops/project-infinity/actions/artifacts/'+str(row['id'])+'/zip'],stdout=f,check=True)
+ assert 'sha256:'+sha(archive)==row['digest'] and archive.stat().st_size==row['size_in_bytes']
+ original=work/'compiled-input';original.mkdir()
+ with ZipFile(archive) as z:
+  assert len(z.namelist())==len(set(z.namelist())) and sum(i.file_size for i in z.infolist())<32*1024*1024
+  for i in z.infolist():assert not Path(i.filename).is_absolute() and '..' not in Path(i.filename).parts and not stat.S_ISLNK(i.external_attr>>16)
+  z.extractall(original)
+ proof=json.loads(c.unique(original,'ARM64.json').read_bytes());assert proof['status']=='PASS_CAST506_HARDWARE_PIPELINE_ARM64_LINK' and proof['baseline']==2103506 and proof['engine_rebuilt'] is False
+ for n in ('repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp','repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h','repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h'):assert sha(ROOT/n)==proof['source_hashes'][n],n
+ library=c.unique(original,'libinfinitycastremux.so');assert sha(library)==proof['new_library_sha256'];target=work/'native';target.mkdir();shutil.copyfile(library,target/library.name)
+ ndk=Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin';elf=subprocess.check_output([ndk/'llvm-readelf','-h','-d','--dyn-syms','--wide',target/library.name],text=True);assert 'AArch64' in elf and all(n in elf for n in proof['exports']);proof['reused_compilation']=row;proof['historical_run_outcome']='FAIL_TEST_FIXTURE_BEFORE_JNI_LOAD; native compilation passed; no functional pass assumed'
+ return proof
 def main():
  assert os.environ['GITHUB_ACTIONS']=='true' and os.environ['GITHUB_REPOSITORY']=='mahfouzhassine8-ops/project-infinity'
  assert os.environ['GITHUB_REF']=='refs/heads/work/infinity-2103506-receiver-compatibility-20261117'
@@ -23,12 +41,13 @@ def main():
  helper='repairs/infinity-movies-continue-cast-2103486-20261112/release/common_release.py'
  raw=subprocess.check_output(['git','show','21616dfa94bf7ca9ec52e40119edf95df5e64073:'+helper]);scope={'__file__':str(ROOT/helper),'__name__':'_retained_reader'};exec(compile(raw,str(ROOT/helper),'exec'),scope);c=types.SimpleNamespace(**scope)
  apk=c.unique(c.obtain(r['baseline'],'pipeline506-authenticated-baseline'),'Infinity-2103506-Combined-Original-Signer.apk');assert sha(apk)==r['baseline']['APK_sha256']
- OUT.mkdir();native_work=OUT/'native-verification';native_work.mkdir()
- recipe=ROOT/'repairs/infinity-cast-mkv-2103494-20261113/build.py';old_argv=sys.argv[:];sys.argv=[str(recipe),'native',str(native_work),str(apk)]
- scope={'__file__':str(recipe),'__name__':'_retained_native_recipe'};exec(compile(recipe.read_text(),str(recipe),'exec'),scope)
- scope.update(HERE=NATIVE,ROOT=ROOT,BASE=r['baseline']['APK_sha256'],ENGINE='b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7')
- scope['native']();sys.argv=old_argv
- native=json.loads((native_work/'CAST-MKV-NATIVE.json').read_bytes());native.update(status='PASS_CAST506_HARDWARE_PIPELINE_ARM64_LINK',baseline=2103506,engine_rebuilt=False,source_hashes=r['inputs'])
+ c.signature(apk);OUT.mkdir();native_work=OUT/'native-verification';native_work.mkdir()
+ if 'reuse_native' in r:native=reuse_native(c,r['reuse_native'],native_work)
+ else:
+  recipe=ROOT/'repairs/infinity-cast-mkv-2103494-20261113/build.py';old_argv=sys.argv[:];sys.argv=[str(recipe),'native',str(native_work),str(apk)]
+  scope={'__file__':str(recipe),'__name__':'_retained_native_recipe'};exec(compile(recipe.read_text(),str(recipe),'exec'),scope)
+  scope.update(HERE=NATIVE,ROOT=ROOT,BASE=r['baseline']['APK_sha256'],ENGINE='b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7');scope['native']();sys.argv=old_argv
+  native=json.loads((native_work/'CAST-MKV-NATIVE.json').read_bytes());native.update(status='PASS_CAST506_HARDWARE_PIPELINE_ARM64_LINK',baseline=2103506,engine_rebuilt=False,source_hashes=r['inputs'])
  exports=set(native['exports']);old_exports={'open','inspect','init','segment','cancel','close','active'}
  assert exports=={'Java_com_projectinfinity_kodi_InfinityCastRemuxNative_'+n for n in old_exports|{'configureVideo'}}
  (OUT/'ARM64.json').write_text(json.dumps(native,indent=2)+'\n')

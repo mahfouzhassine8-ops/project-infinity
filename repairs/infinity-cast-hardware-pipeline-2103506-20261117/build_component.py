@@ -18,7 +18,9 @@ def main():
  helper='repairs/infinity-movies-continue-cast-2103486-20261112/release/common_release.py';raw=subprocess.check_output(['git','show','21616dfa94bf7ca9ec52e40119edf95df5e64073:'+helper]);scope={'__file__':str(ROOT/helper),'__name__':'_retained_reader'};exec(compile(raw,str(ROOT/helper),'exec'),scope);c=types.SimpleNamespace(**scope)
  apk=c.unique(c.obtain(r['baseline'],'component506-authenticated-baseline'),'Infinity-2103506-Combined-Original-Signer.apk');assert sha(apk)==r['baseline']['APK_sha256']
  WORK.mkdir();tools=WORK/'tools';tools.mkdir();sdk=Path(os.environ['ANDROID_HOME']);bt=sdk/'build-tools/35.0.0'
- for n,target in {'android.jar':sdk/'platforms/android-35/android.jar','core-lambda-stubs.jar':bt/'core-lambda-stubs.jar','d8.jar':bt/'lib/d8.jar','aapt2':bt/'aapt2'}.items():(tools/n).symlink_to(target)
+ for n,target in {'android.jar':sdk/'platforms/android-34/android.jar','core-lambda-stubs.jar':bt/'core-lambda-stubs.jar','d8.jar':bt/'lib/d8.jar','aapt2':bt/'aapt2'}.items():(tools/n).symlink_to(target)
+ pins={'android.jar':'6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad','aapt2':'d1096e11aba9c974644369ee3c50d239acac3f3428ffa928e5b9c14dfb7a57de','d8.jar':'305622ad00535684534eb8f742cbf5e628a9abc09d8ea4d39d1babb95bf0cee5','core-lambda-stubs.jar':'c8a21e0e653227d1fce74bd547c9e7278e17c016c405aa8e1f6c313b192ade31'}
+ for name,wanted in pins.items():assert sha(tools/name)==wanted,('Original Cast resource/compiler tool identity',name)
  subprocess.run(['python',str(CAST/'resolve_sdk.py'),str(WORK/'maven')],check=True)
  sys.path.insert(0,str(CAST));import audit_sdk_component
  audit_sdk_component.BASE=r['baseline']['APK_sha256'];recipe=CAST/'build_sdk_component.py';code=recipe.read_text();pin='fa0da5675443803ff2af42526243f81b9a1be774f7deeecdaf7e7557fff2a36c';assert pin in code;code=code.replace(pin,r['baseline']['APK_sha256']);sys.argv=[str(recipe),str(WORK),str(apk)];exec(compile(code,str(recipe),'exec'),{'__file__':str(recipe),'__name__':'__main__'})
