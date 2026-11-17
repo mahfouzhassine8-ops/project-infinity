@@ -44,7 +44,8 @@ def main():
  android=c.obtain(r['Android'],'cast504-stage-Android');gate=json.loads(c.unique(android,'ANDROID-CAST-AUDIO.json').read_bytes())
  assert gate['pass'] is True and gate['status']=='PASS_ACTUAL_ARM64_ANDROID_AAC_JNI_RELAY'
  builds=list(android.rglob('BUILD.json'));assert builds and all(p.read_bytes()==builds[0].read_bytes() for p in builds)
- build=json.loads(builds[0].read_bytes());assert build['native_library_sha256']==sha(library) and build['native_artifact']==r['native']
+ build=json.loads(builds[0].read_bytes());assert build['source']==r['Android']['source'] and build['status']=='CI_ONLY_SEPARATE_PACKAGE_READY'
+ assert build['native_library_sha256']==sha(library) and build['native_artifact']==r['native']
  assert gate['native_contexts_after_close']==0 and gate['cancellation'] is True
  expected_cases={'transients51','44100-odd','32000','main10-eac3'}
  assert len(gate['output_proof'])==4 and {v['case'] for v in gate['output_proof']}==expected_cases
