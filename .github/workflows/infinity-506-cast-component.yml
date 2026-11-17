@@ -1,0 +1,38 @@
+name: Infinity506 changed Cast component and preservation - no Kodi build
+on:
+  push:
+    branches: [work/infinity-2103506-receiver-compatibility-20261117]
+    paths: [repairs/infinity-cast-hardware-pipeline-2103506-20261117/CI-COMPONENT.json]
+permissions: {contents: read, actions: read}
+concurrency: {group: infinity506-cast-component, cancel-in-progress: false}
+jobs:
+  cast-component:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103506-receiver-compatibility-20261117'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env: {PYTHONDONTWRITEBYTECODE: '1', GH_TOKEN: '${{ github.token }}'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools platforms;android-35 build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Compile changed Cast DEX; reuse engine and all nonCast DEX
+        run: python repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_component.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity506-Cast-Component-${{ github.run_id }}-NOT-INSTALLER
+          path: |
+            cast506-component-work/component-reuse86/CAST506-COMPONENT.json
+            cast506-component-work/component-reuse86/COMPONENT-RESULT.json
+            cast506-component-work/component-reuse86/SOURCE-JAVA.json
+            cast506-component-work/component-reuse86/BUILD-SOURCES.json
+            cast506-component-work/component-reuse86/RESOURCE-IDENTITY.json
+            cast506-component-work/component-reuse86/mapping.txt
+            cast506-component-work/component-reuse86/dex/
+          if-no-files-found: warn
+          retention-days: 90

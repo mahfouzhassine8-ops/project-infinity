@@ -30,7 +30,8 @@
     "Host packet/config parsing, timestamp/frame-selection/fragment mux integration and unchanged direct-copy/AAC preservation",
     "Android small synthetic MediaCodec\u2192EGL\u2192AVC pipeline, AAC/fMP4 playback, adjacent/out-of-order/seek, cancellation and release; private separate CI package allows bounded small software backend for correctness only",
     "Production hardware-only codec/profile/raster/rate selection; concurrent configure, sample throughput and thermal checks with truthful physical qualification pending",
-    "Focused Cast ARM64/JNI and exact source/APK preservation, original-signed install-over QA/recovery when justified"
+    "Focused Cast ARM64/JNI and exact source/APK preservation, original-signed install-over QA/recovery when justified",
+    "Changed Cast component compile/link with original pinned SDK/private dependency versions; verify external baseline APIs and no Cobra imports. All nonCast DEX and Kodi reused."
   ],
   "Kodi_rebuild": false,
   "unrelated_DEX_rebuild": false,
@@ -39,7 +40,8 @@
   "software_4K_conversion": false,
   "physical_TV_success": "NOT_CLAIMED",
   "orchestration_allowed": [
-    ".github/workflows/infinity-506-cast-hardware-pipeline.yml"
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+    ".github/workflows/infinity-506-cast-component.yml"
   ],
   "orchestration_reason": "Add only selected pipeline probe; do not rerun prior inventory/audio jobs. No app behavior from workflow."
 }
