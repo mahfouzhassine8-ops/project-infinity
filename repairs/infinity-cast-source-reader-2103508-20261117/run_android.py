@@ -11,9 +11,8 @@ try:
  while time.monotonic()<end:
   raw=adb('logcat','-d','-v','brief','InfinityPipelineProbe:I','AndroidRuntime:E','*:S')
   assert 'Process: com.projectinfinity.castqa.pipeline,' not in raw,'CI_PACKAGE_RUNTIME_CRASH; inspect retained logcat'
-  for line in raw.splitlines():
-   m=re.search(r'InfinityPipelineProbe[^:]*:\s*(\{.*\})',line)
-   if m:result=json.loads(m[1])
+  saved=subprocess.run(['adb','shell','cat','/sdcard/Android/data/com.projectinfinity.castqa.pipeline/files/RESULT.json'],capture_output=True,text=True,timeout=15)
+  if saved.returncode==0 and saved.stdout.strip():result=json.loads(saved.stdout)
   if result is not None:break
   time.sleep(1)
  assert result is not None,'NO_ACTUAL_PIPELINE_OUTCOME'

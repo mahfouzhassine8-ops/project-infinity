@@ -2,7 +2,7 @@ name: Infinity506 Cast hardware pipeline selected JNI Android - no Kodi build
 on:
   push:
     branches: [work/infinity-2103506-receiver-compatibility-20261117, work/infinity-2103508-cast-source-reader-20261117]
-    paths: [repairs/infinity-cast-hardware-pipeline-2103506-20261117/CI-PIPELINE.json, repairs/infinity-cast-source-reader-2103508-20261117/CI-PIPELINE.json]
+    paths: [repairs/infinity-cast-hardware-pipeline-2103506-20261117/CI-PIPELINE.json, repairs/infinity-cast-source-reader-2103508-20261117/CI-PIPELINE.json, repairs/infinity-cast-source-reader-2103508-20261117/CI-RECOVERY.json]
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity506-cast-hardware-pipeline, cancel-in-progress: false}
 jobs:
@@ -58,7 +58,7 @@ jobs:
           retention-days: 90
 
   source-reader:
-    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103508-cast-source-reader-20261117'
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103508-cast-source-reader-20261117' && !startsWith(github.event.head_commit.message, 'Cast508 recover:')
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     env: {PYTHONDONTWRITEBYTECODE: '1', GH_TOKEN: '${{ github.token }}'}
@@ -105,5 +105,37 @@ jobs:
             cast508-reader-work/ARM64.json
             cast508-reader-work/fixtures/
             cast508-reader-work/native-verification/native/libinfinitycastremux.so
+          if-no-files-found: warn
+          retention-days: 90
+
+  source-reader-evidence-recovery:
+    if: github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103508-cast-source-reader-20261117' && startsWith(github.event.head_commit.message, 'Cast508 recover:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env: {PYTHONDONTWRITEBYTECODE: '1', GH_TOKEN: '${{ github.token }}'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - name: Authenticate original failed transport and verify actual complete functional/media evidence
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python repairs/infinity-cast-source-reader-2103508-20261117/recover_android.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity508-Cast-Reader-Recovered-${{ github.run_id }}-EVIDENCE-ONLY
+          path: cast508-recovered/
+          if-no-files-found: warn
+          retention-days: 90
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity508-Cast-Reader-Recovery-${{ github.run_id }}-RECEIPTS-ONLY
+          path: |
+            cast508-recovered/RECOVERED.json
+            cast508-recovered/MEDIA.json
           if-no-files-found: warn
           retention-days: 90
