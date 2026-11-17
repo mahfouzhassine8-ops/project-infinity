@@ -227,6 +227,17 @@ bool closedPicture(const AVPacket* packet,const AVCodecParameters* codec,bool no
   at+=int(n);
  }return false;
 }
+// Return the actual first HEVC VCL type, validating the complete access unit.
+static int hevcPictureType(const AVPacket* packet,const AVCodecParameters* codec){
+ if(codec->codec_id!=AV_CODEC_ID_HEVC || !codec->extradata || codec->extradata_size<23 || packet->size<=0 || packet->size>4*1024*1024)throw Failure("cast_hw_source_access_unit");
+ int bytes=(codec->extradata[21]&3)+1,first=-1;size_t at=0,size=size_t(packet->size);unsigned count=0;
+ while(at<size){if(size-at<size_t(bytes))throw Failure("cast_hw_source_access_unit");uint32_t n=0;for(int k=0;k<bytes;k++)n=(n<<8)|packet->data[at++];
+  if(++count>4096 || n<2 || n>size-at)throw Failure("cast_hw_source_access_unit");const uint8_t* nal=packet->data+at;int type=(nal[0]>>1)&63;
+  if((nal[0]&129) || (nal[1]>>3) || !(nal[1]&7))throw Failure("cast_hw_source_access_unit");
+  if(first<0 && type<=31)first=type;at+=n;
+ }
+ if(first<0)throw Failure("cast_hw_source_access_unit");return first;
+}
 void State::inspect(){
  deadline=Clock::now()+std::chrono::seconds(15);format=api().avformat_alloc_context();if(!format)throw Failure("mkv_memory_limit");
  auto* buffer=static_cast<unsigned char*>(api().av_malloc(32768));if(!buffer)throw Failure("mkv_memory_limit");
@@ -343,15 +354,14 @@ std::vector<uint8_t> State::segment(int index){
  for(;;){check();if(++readPackets>250000)throw Failure("mkv_packet_limit");int result=api().av_read_frame(format,packet.value);if(result==AVERROR_EOF)break;if(result<0)throw Failure("mkv_packet_read_failed");auto* p=packet.value;
   int source=p->stream_index;if((source!=video && source!=audio) || (source==audio && audioAdapter)){api().av_packet_unref(p);continue;}
   auto* stream=format->streams[source];if(out.packetHeader && source==audio)validateDolby(p,stream->codecpar->codec_id);if(p->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");int64_t at=micros(p->pts,stream->time_base);
-  if(source==video && (p->flags&AV_PKT_FLAG_KEY) && at>=end){
-   // Adapted audio is already complete. AVC IDR / HEVC IDR_N_LP cannot
-   // leave earlier pictures after this exact next cue. HEVC RADL stays on
-   // the original lookahead path; preserve preceding-cue DTS recovery.
-   if(audioAdapter && size_t(index+1)<keys.size() && p->pts==keys[index+1] && closedPicture(p,stream->codecpar,true)){api().av_packet_unref(p);break;}
+  if(source==video && writtenVideo && (p->flags&AV_PKT_FLAG_KEY) && at>=end){
+   // Decode-order ownership ends BEFORE the next random-access picture.
+   // Its RADL pictures belong to that picture, even when their PTS is earlier.
+   if(audioAdapter && size_t(index+1)<keys.size() && p->pts==keys[index+1] && closedPicture(p,stream->codecpar)){api().av_packet_unref(p);break;}
    if(boundary && at>end){api().av_packet_unref(p);break;}boundary=true;
   }
   if(at>=end)input->phase=Input::Lookahead;else if(at>=begin)input->phase=Input::Selected;
-  if(at<begin || at>=end){api().av_packet_unref(p);continue;}
+  if(source==video ? (boundary || (!writtenVideo && at<begin)) : (at<begin || at>=end)){api().av_packet_unref(p);continue;}
   if(source==video && writtenVideo==0){if(!(p->flags&AV_PKT_FLAG_KEY) || p->pts!=keys[index])throw Failure("mkv_keyframe_mismatch");if(!closedPicture(p,stream->codecpar))throw Failure("mkv_open_gop_not_supported");}
   for(int n=0;n<p->side_data_elems;n++)if(p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO || p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
   int mapped=source==video?0:1;int64_t offset=api().av_rescale_q(origin-TransportEpoch,AV_TIME_BASE_Q,stream->time_base);p->pts-=offset;if(p->dts!=AV_NOPTS_VALUE){p->dts-=offset;if(p->dts<0)throw Failure("mkv_unsupported_decode_preroll");}
@@ -385,15 +395,29 @@ std::vector<uint8_t> State::videoSegment(int index){
  if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("cast_hw_video_seek_failed");
  CastVideoResult result;std::vector<uint8_t> pendingHeader,pendingCsd;
  struct AudioPacket{std::vector<uint8_t> data;int64_t pts,dts,duration;int flags;std::vector<CastAudioAdapter::Side> side;};std::vector<AudioPacket> passthrough;
- const int64_t begin=origin+starts[index],end=origin+starts[index+1];bool started=false,first=true,boundary=false;int packets=0;Packet packet;
+ const int64_t begin=origin+starts[index],end=origin+starts[index+1];bool started=false,first=true,boundary=false,videoDone=false;int packets=0;Packet packet;
  try{
   for(;;){check();if(++packets>250000)throw Failure("mkv_packet_limit");int code=api().av_read_frame(format,packet.value);if(code==AVERROR_EOF)break;if(code<0)throw Failure("mkv_packet_read_failed");auto* q=packet.value;
    int stream=q->stream_index;if(stream!=video&&stream!=audio){api().av_packet_unref(q);continue;}
    for(int n=0;n<q->side_data_elems;n++)if(q->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO||q->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
    if(q->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");auto* track=format->streams[stream];int64_t at=micros(q->pts,track->time_base);
-   if(stream==video&&(q->flags&AV_PKT_FLAG_KEY)&&at>=end){if(boundary&&at>end){api().av_packet_unref(q);break;}boundary=true;}
+   if(stream==video){
+    if(videoDone){
+     // Passthrough audio may still need the original bounded key lookahead.
+     // Never offer later video, and never scan the remaining movie to EOF.
+     bool stop=(q->flags&AV_PKT_FLAG_KEY)&&at>end;api().av_packet_unref(q);if(stop)break;continue;
+    }
+    if(boundary && (q->flags&AV_PKT_FLAG_KEY) && at>end){api().av_packet_unref(q);break;}
+    if(!first && (q->flags&AV_PKT_FLAG_KEY) && at>=end){
+     if(size_t(index+1)>=keys.size() || q->pts!=keys[index+1] || !closedPicture(q,p))throw Failure("mkv_open_gop_not_supported");
+     // IDR_W_RADL and its following leading pictures complete this display
+     // interval. Decode the IDR too, but never render its out-of-window PTS.
+     boundary=true;videoDone=closedPicture(q,p,true);
+    }else if(boundary){int type=hevcPictureType(q,p);if(type!=6 && type!=7)videoDone=true;}
+    if(videoDone){api().av_packet_unref(q);if(audioAdapter || audio<0)break;continue;}
+   }
    if(at>=end)input->phase=Input::Lookahead;else if(at>=begin)input->phase=Input::Selected;
-   if(at<begin||at>=end){api().av_packet_unref(q);continue;}
+   if(stream==video ? (first && at<begin) : (at<begin || at>=end)){api().av_packet_unref(q);continue;}
    if(stream==video){if(first){if(!(q->flags&AV_PKT_FLAG_KEY)||q->pts!=keys[index]||!closedPicture(q,p))throw Failure("mkv_open_gop_not_supported");
      // The current verified key AU supplies missing in-band CSD; no extra scan.
      if(p->codec_id==AV_CODEC_ID_HEVC){

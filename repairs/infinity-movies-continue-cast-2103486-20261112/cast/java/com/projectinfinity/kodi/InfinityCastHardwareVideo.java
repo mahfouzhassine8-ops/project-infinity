@@ -108,8 +108,12 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
    int index=decoder.dequeueOutputBuffer(info,0);if(index==MediaCodec.INFO_TRY_AGAIN_LATER)break;
    if(index==MediaCodec.INFO_OUTPUT_FORMAT_CHANGED){MediaFormat f=decoder.getOutputFormat();need(f.getInteger(MediaFormat.KEY_COLOR_TRANSFER,-1)==MediaFormat.COLOR_TRANSFER_SDR_VIDEO&&f.getInteger(MediaFormat.KEY_COLOR_STANDARD,-1)==MediaFormat.COLOR_STANDARD_BT709,"cast_hw_sdr_output_unverified");int w=f.getInteger(MediaFormat.KEY_WIDTH),h=f.getInteger(MediaFormat.KEY_HEIGHT);int left=f.getInteger("crop-left",0),top=f.getInteger("crop-top",0);need(f.getInteger("crop-right",w-1)-left+1==inputWidth&&f.getInteger("crop-bottom",h-1)-top+1==inputHeight,"cast_hw_decoder_geometry_changed");decoderFormatVerified=true;continue;}
    if(index<0)continue;boolean eos=(info.flags&MediaCodec.BUFFER_FLAG_END_OF_STREAM)!=0;
-   boolean render=info.size>0&&info.presentationTimeUs>=begin&&info.presentationTimeUs<end;
-   if(render){need(decoderFormatVerified&&inputTimestamps.remove(info.presentationTimeUs),"cast_hw_decoder_format_or_timestamp");need(info.presentationTimeUs>lastDecoded,"cast_hw_decoder_pts_order");lastDecoded=info.presentationTimeUs;render=InfinityCastVideoContract.select(info.presentationTimeUs,begin,end,sourceFps,lastSlot);if(render)lastSlot=InfinityCastVideoContract.slot(info.presentationTimeUs);}
+   // Every decoded picture consumes its source receipt, including necessary
+   // preroll/postroll that is deliberately excluded from the display window.
+   boolean picture=info.size>0;
+   if(picture){need(decoderFormatVerified&&inputTimestamps.remove(info.presentationTimeUs),"cast_hw_decoder_format_or_timestamp");need(info.presentationTimeUs>lastDecoded,"cast_hw_decoder_pts_order");lastDecoded=info.presentationTimeUs;}
+   boolean render=picture&&info.presentationTimeUs>=begin&&info.presentationTimeUs<end;
+   if(render){render=InfinityCastVideoContract.select(info.presentationTimeUs,begin,end,sourceFps,lastSlot);if(render)lastSlot=InfinityCastVideoContract.slot(info.presentationTimeUs);}
    long pts=info.presentationTimeUs;decoder.releaseOutputBuffer(index,render);
    if(render){drainEncoder();presentedTimestamps.addLast(pts);gpu.render(pts,this::check);frames++;drainEncoder();}
    if(eos){need(inputTimestamps.isEmpty(),"cast_hw_decoder_frame_loss");decoderEos=true;}

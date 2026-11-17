@@ -1,15 +1,16 @@
 {
-  "status": "PASS_SOURCE_FOR_FOCUSED_COMPONENT_AND_ANDROID_PREPARATION",
+  "status": "PASS_SOURCE_RADL_AND_CSD_CORRECTIONS_FOR_FOCUSED_ANDROID",
   "reviewers": [
     "/root/astra_502_review",
     "/root/astra_cast502"
   ],
   "source_hashes": {
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "0404e0814d49ff434653e949b78dc94810f0d4721a43cbc27af3027f69449ca8",
-    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "a87e9374d91c7acf459293388f6be533df4e71a406a35ff7012f10e32c758dba",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "c6e9644be7ba3b48c08abbff6ee6b7c4eaa7c797b74c8dc5d1246488bc9707c0",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "69913356f870ab4f9e1e2561979b8ef5ca4f4e672327b27b87995955d0768dca",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "5db76e3a9365750d3f9e5cd3a9987edcdce13167f68df88e2176b060729ccea0"
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "5db76e3a9365750d3f9e5cd3a9987edcdce13167f68df88e2176b060729ccea0",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "cf41f1f690f97eff14533d0117cfc5306989dc8f9559d6e9f79961b98bb1cb39"
   },
   "reviewed": [
     "Handoff callback admission guards",
@@ -18,7 +19,10 @@
     "observed failures preserved despite concurrent close",
     "boundedgenuineHEVCparameter extraction",
     "State-onlyverifiedCSDcache published aftersuccessfulmux/qualify",
-    "stableindex-basedsingle-moof numbering"
+    "stableindex-basedsingle-moof numbering",
+    "ActualRADL decode-orderownership underunchangedquota",
+    "Boundedhardware currentpreroll and nextIDR19/RADLtail; secondboundarytermination",
+    "EverydecodedPTS consumesreceipt; unchangedrenderwindow/EOSloss/encoder equality"
   ],
   "remaining_gates": [
     "ConcreteCIrequest review",
@@ -26,5 +30,9 @@
     "APKpreservation/originalsigning/install-over"
   ],
   "owner_causes": "NOT_CONFIRMED; no4Kcodeccompatibility claim",
-  "physical_acceptance": false
+  "physical_acceptance": false,
+  "additional_evidence": [
+    "RADL-REPRODUCTION.json",
+    "RADL-HOST.json"
+  ]
 }

@@ -72,7 +72,7 @@ def convert(source,out,first_only=True):
      if w[0]==0xa1:block(w)
  assert len(before)==len(b) and key_count>=2
  out.write_bytes(b)
- subprocess.run(['ffmpeg','-nostdin','-v','error','-i',str(out),'-f','null','-'],check=True)
+ r=subprocess.run(['ffmpeg','-nostdin','-v','error','-xerror','-i',str(out),'-f','null','-'],capture_output=True,text=True);assert r.returncode==0 and not r.stderr.strip(),r.stderr
  result={'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'control_sha256':hashlib.sha256(before).hexdigest(),'fixture_sha256':hashlib.sha256(b).hexdigest(),'bytes':len(b),'private_before':len(h),'private_after':23,'keys':key_count,'later_parameter_NALs_replaced_by_valid_filler':replaced,'full_decode':'PASS','container_offsets_and_sample_times':'UNCHANGED_FROM_CONTROL','production_codec_metadata':'NOT_MODIFIED; TEST_FIXTURE_ONLY'}
  out.with_suffix('.json').write_text(json.dumps(result,indent=2)+'\n');return result
 if __name__=='__main__':
