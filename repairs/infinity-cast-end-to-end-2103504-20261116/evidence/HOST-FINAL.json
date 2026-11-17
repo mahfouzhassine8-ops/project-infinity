@@ -1,0 +1,68 @@
+{
+  "status": "PASS_SELECTED_CAST_AUDIO_HOST_INTEGRATION",
+  "cases": [
+    {
+      "case": "aac-unchanged",
+      "video_packets": 192,
+      "video_packet_hashes_and_PTS_preserved": true,
+      "DTS": "baseline unchanged",
+      "strict_monotonic_DTS": true,
+      "codecs": "avc1.4D400C,mp4a.40.2"
+    },
+    {
+      "case": "integrated51-flags",
+      "video_packets": 386,
+      "video_packet_hashes_and_PTS_preserved": true,
+      "DTS": "available source DTS preserved",
+      "strict_monotonic_DTS": true,
+      "codecs": "avc1.4D400C,mp4a.40.2"
+    },
+    {
+      "case": "44100-odd-mp4",
+      "video_packets": 298,
+      "video_packet_hashes_and_PTS_preserved": true,
+      "DTS": "available source DTS preserved",
+      "strict_monotonic_DTS": true,
+      "codecs": "avc1.4D400C,mp4a.40.2"
+    },
+    {
+      "case": "delayed51-mp4",
+      "video_packets": 386,
+      "video_packet_hashes_and_PTS_preserved": true,
+      "DTS": "available source DTS preserved",
+      "strict_monotonic_DTS": true,
+      "codecs": "avc1.4D400C,mp4a.40.2"
+    },
+    {
+      "case": "lookahead-eof-mp4",
+      "video_packets": 101,
+      "video_packet_hashes_and_PTS_preserved": true,
+      "DTS": "available source DTS preserved",
+      "strict_monotonic_DTS": true,
+      "codecs": "avc1.4D400C,mp4a.40.2"
+    },
+    {
+      "case": "hevc-converted",
+      "video_packets": 95,
+      "video_packet_hashes_and_PTS_preserved": true,
+      "DTS": "available source DTS preserved",
+      "strict_monotonic_DTS": true,
+      "codecs": "hev1.2.4.L153.90,mp4a.40.2"
+    },
+    {
+      "case": "32000-mp4",
+      "AAC_LC_stereo": true,
+      "strict_monotonic_DTS": true,
+      "sample_rate_preserved": 32000,
+      "ASAN_UBSAN": "PASS_CANONICAL_AUDIO_GRID_RANDOM_REQUESTS"
+    }
+  ],
+  "ASAN_UBSAN": "PASS_SELECTED_RANDOM_SEEK_AND_MID_CONVERSION_CANCELLATION",
+  "configuration_change": "REFUSED_BEFORE_CONVERSION",
+  "source_hashes": {
+    "/workspace/infinity-cast96-root-cause/repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24",
+    "/workspace/infinity-cast96-root-cause/repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef"
+  },
+  "physical_TV": "NOT_TESTED",
+  "Android": "PENDING"
+}

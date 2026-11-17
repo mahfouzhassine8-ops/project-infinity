@@ -1,0 +1,175 @@
+{
+  "ABI": {
+    "dependencies": [
+      "libc++_shared.so",
+      "libc.so",
+      "libdl.so",
+      "libm.so"
+    ],
+    "exports": [
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_open"
+      ],
+      [
+        "FUNC",
+        "GLOBAL",
+        "DEFAULT",
+        "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment"
+      ]
+    ]
+  },
+  "APK_build": false,
+  "Android_execution": "NOT_RUN",
+  "DEX_build": false,
+  "FFmpeg_source_sha512": "945e34840092dc0fd3824eb1af2be79868af2afb4fe13159b19a9bcfc464cc4d53243c13ff065199290e9393ddbf4b1c5c8abccf83a31a31d6c7490e499fd1fc",
+  "Kodi_build": false,
+  "baseline": 2103504,
+  "baseline_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+  "baseline_artifact": {
+    "APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+    "digest": "sha256:e3fae14dc9321ad1d380856e557e10fc33b37c71abb82ad0ce6f4d241350166e",
+    "id": 14239746699,
+    "name": "Infinity502-Consolidated-OriginalSigned-43895603388",
+    "run": 43895603388,
+    "size_in_bytes": 330961493,
+    "source": "80506277145dcd4bbd66da3eaa02d9c085c1b437",
+    "workflow_id": 397702717
+  },
+  "dependencies": [
+    "libc++_shared.so",
+    "libc.so",
+    "libdl.so",
+    "libm.so"
+  ],
+  "engine_changed": false,
+  "existing_engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+  "existing_native_libraries_replaced": false,
+  "exports": [
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_open",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init",
+    "Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel"
+  ],
+  "global_FFmpeg_callbacks_or_init_changed": false,
+  "new_audio_symbols": [
+    "av_channel_layout_compare",
+    "av_channel_layout_copy",
+    "av_channel_layout_uninit",
+    "av_frame_alloc",
+    "av_frame_free",
+    "av_frame_get_buffer",
+    "av_frame_make_writable",
+    "av_frame_unref",
+    "av_new_packet",
+    "av_packet_new_side_data",
+    "avcodec_alloc_context3",
+    "avcodec_find_decoder",
+    "avcodec_find_encoder",
+    "avcodec_free_context",
+    "avcodec_open2",
+    "avcodec_parameters_from_context",
+    "avcodec_parameters_to_context",
+    "avcodec_receive_frame",
+    "avcodec_receive_packet",
+    "avcodec_send_frame",
+    "avcodec_send_packet",
+    "swr_alloc_set_opts2",
+    "swr_convert",
+    "swr_free",
+    "swr_get_delay",
+    "swr_init"
+  ],
+  "new_library_sha256": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52",
+  "physical_TV": "NOT_TESTED",
+  "required_FFmpeg_symbols": [
+    "av_version_info",
+    "avutil_version",
+    "av_malloc",
+    "av_free",
+    "av_freep",
+    "av_dict_set",
+    "av_dict_get",
+    "av_dict_free",
+    "av_rescale_q",
+    "av_find_input_format",
+    "avformat_alloc_context",
+    "avformat_open_input",
+    "avformat_find_stream_info",
+    "avformat_close_input",
+    "avio_alloc_context",
+    "avio_context_free",
+    "avio_flush",
+    "avformat_index_get_entries_count",
+    "avformat_index_get_entry",
+    "av_seek_frame",
+    "avformat_alloc_output_context2",
+    "av_stream_new_side_data",
+    "avformat_new_stream",
+    "avformat_free_context",
+    "avcodec_parameters_copy",
+    "avcodec_get_name",
+    "av_ac3_parse_header",
+    "avformat_query_codec",
+    "avformat_write_header",
+    "av_interleaved_write_frame",
+    "av_write_frame",
+    "av_write_trailer",
+    "av_packet_alloc",
+    "av_packet_free",
+    "av_packet_unref",
+    "av_packet_rescale_ts",
+    "av_read_frame"
+  ],
+  "reviewed_inputs": {
+    ".github/workflows/infinity-504-cast-audio-native.yml": "5f61045b1ed4dc089fc9afa4c42fed2c07a06d232d1e7fbbdc3a407c1e8f7715",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/AUDIO-INTEGRATION-REVIEW.json": "80815e3dd0169d535ba394fb25614c26b800d406b9ea19531c954abce337db96",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/AUDIO-SOURCE-REVIEW.json": "351954603a022756fb9c4087cf75eb66eac67e894d43735e702286f23da650a6",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/SCOPE.json": "3126ad583fadbe97bdd4d081c33085eb65ba6c3eb607447bc13e839c9538eb67",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_native.py": "92dea53e56c91708c8e29b72579bf3c0b41266b52c880c60e95f8f797ef7cdd8",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+    "repairs/infinity-cast-mkv-2103494-20261113/build.py": "f365c32cfcbba5d7b80b56a4ee928f3d9acb479fc45c393410be89ecbcc26e5b",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24"
+  },
+  "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
+  "source_hashes": {
+    "repairs/infinity-six-repairs-2103502-20261116/cast/build.py": "25a1c94c0ea1370e0bd1311a55f29fe08a9246d724316947c95fba90af8021a0",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24"
+  },
+  "status": "PASS_CAST_AUDIO_ARM64_LINK_AND_EXACT504_ABI"
+}

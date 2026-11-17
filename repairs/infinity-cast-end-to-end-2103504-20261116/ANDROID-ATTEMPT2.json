@@ -1,0 +1,14 @@
+{
+  "run": 43996380048,
+  "source": "e478a2594c89d7e98b9a49e69fd098db83415587",
+  "status": "FAIL_CI_PACKAGING_INSTALL_REJECTED",
+  "native_encoder": "NOT_RUN",
+  "exact_android_error": "-124: Targeting R+ requires resources.arsc stored uncompressed and aligned4bytes",
+  "evidence_log": "LOGCAT PackageInstallerSession at01:37:26.706",
+  "artifact": {
+    "id": 14290412044,
+    "digest": "sha256:05cb93c0df536344910c650403545b1cef44dfc3735a1bf03bc077c77d5d96ab",
+    "size_in_bytes": 5055420
+  },
+  "correction": "Only CI resource-table compression; retain exact resource bytes; add stored/zipalign assertions; reuse finalARM64library934bb, noKodi/DEX production rebuild"
+}

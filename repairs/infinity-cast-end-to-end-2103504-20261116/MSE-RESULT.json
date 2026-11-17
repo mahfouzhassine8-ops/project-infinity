@@ -1,0 +1,29 @@
+{
+  "browser": "156.0.8078.79",
+  "cases": [
+    {
+      "name": "h264-aac",
+      "type": "video/mp4;codecs=\"avc1.4D400C,mp4a.40.2\"",
+      "type_supported": true,
+      "appended": 2,
+      "buffered": 1
+    },
+    {
+      "name": "h264-eac3",
+      "type": "video/mp4;codecs=\"avc1.4D400C,ec-3\"",
+      "type_supported": false
+    },
+    {
+      "name": "main10-aac",
+      "type": "video/mp4;codecs=\"hev1.2.4.L153.90,mp4a.40.2\"",
+      "type_supported": false
+    },
+    {
+      "name": "main10-eac3",
+      "type": "video/mp4;codecs=\"hev1.2.4.L153.90,ec-3\"",
+      "type_supported": false
+    }
+  ],
+  "physical_receiver": "NOT_TESTED",
+  "limitation": "Desktop Chromium MSE compatibility is not ONN firmware capability."
+}

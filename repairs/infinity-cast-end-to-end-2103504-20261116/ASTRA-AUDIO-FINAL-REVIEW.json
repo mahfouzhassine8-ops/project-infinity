@@ -1,0 +1,16 @@
+{
+  "reviewer": "Astra",
+  "status": "PASS_SELECTED_CAST_AUDIO_ENGINEERING",
+  "native_source_sha256": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24",
+  "audio_header_sha256": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+  "native_library_sha256": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52",
+  "ARM64_run": 43993371947,
+  "Android_run": 44000750859,
+  "Android_artifact_sha256": "f88eb6d8387aad81f9301984c92a66dd79d33eb141e4aa91eaf4644abff67799",
+  "scope": "Independent actual source/artifact/receipt review; no new tests. Audio conversion plus unchanged video bytes/timestamps and owned cancellation verified in selected translated Android. Existing GIL/shutdown/Cobra untouched.",
+  "limitations": [
+    "PhysicalTV HEVC decode and ownerERROR4resolution unverified",
+    "No new Kodi phonehandoff/shutdown test selected; existing paths unchanged"
+  ],
+  "historical_Android_run_43997770119": "FAIL despite greenworkflow; replaced synchronized counters/boundedrendergate and unconditionalthrow/independentreceipt assertion."
+}

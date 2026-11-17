@@ -320,6 +320,27 @@
       "review_role": "Reviewed combined unsigned staging; no original signing key",
       "source": "b93279a415bbfb456b7e6443f8965396e38aa6ce",
       "workflow_sha256": "295ef3aa36dd893bebb0e17981d9dca133f518539f2a27b037f5a6bcd4efd749"
+    },
+    {
+      "id": 420739373,
+      "path": ".github/workflows/infinity-504-cast-audio-native.yml",
+      "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
+      "workflow_sha256": "5f61045b1ed4dc089fc9afa4c42fed2c07a06d232d1e7fbbdc3a407c1e8f7715",
+      "original_key_access": false
+    },
+    {
+      "id": 420781757,
+      "path": ".github/workflows/infinity-504-cast-audio-android.yml",
+      "source": "28dd58eda9718ecbc4f563e00629b29fd659dea5",
+      "workflow_sha256": "33b1dd4fd469938af8c4728ae0254ae99085055c4d7a75e36211b3cb26dc7ddc",
+      "original_key_access": false
+    },
+    {
+      "id": 420817370,
+      "path": ".github/workflows/infinity-504-cast-audio-release.yml",
+      "source": "fcf9c40c645c8e4b50294887180b676d864e0e18",
+      "workflow_sha256": "a15e22cfb858d8c31c1774af6e2e89d5cbdcb7592f415cfaf1a519825539d13b",
+      "original_key_access": false
     }
   ],
   "audit_workflows": 644,
@@ -3090,7 +3111,10 @@
     419873232,
     420112512,
     420159842,
-    420238273
+    420238273,
+    420739373,
+    420781757,
+    420817370
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",

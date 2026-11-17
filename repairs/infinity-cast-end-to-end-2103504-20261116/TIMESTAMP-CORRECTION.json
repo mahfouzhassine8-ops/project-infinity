@@ -1,0 +1,18 @@
+{
+  "baseline": 2103504,
+  "before": {
+    "case": "h264-aac source cue2s",
+    "source_DTS_seconds": 1.917,
+    "global_offset_seconds": 10.021,
+    "baseline_output_DTS_seconds": 11.939,
+    "difference_seconds": 0.001,
+    "cause": "After demux seek, initial reordered packet DTS absent; muxer infers"
+  },
+  "after": {
+    "scope": "Only converted EAC3 path reads preceding cue before selecting target video packets",
+    "available_original_DTS_preserved": true,
+    "proof": "evidence/HOST-FINAL.json",
+    "unchanged_AAC": "Exact init/segment0 bytes match retained504 output; inherited rounding not changed"
+  },
+  "warning_remaining": "At actual source start initial two DTS may be absent; mux infers those as before. Strict monotonic output checked; no blanket warning suppression."
+}

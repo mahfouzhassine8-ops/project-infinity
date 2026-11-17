@@ -1,0 +1,84 @@
+{
+  "baseline_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+  "versions": {
+    "candidate": 2103506,
+    "recovery": 2103507
+  },
+  "generations": {
+    "candidate": 91,
+    "recovery": 92
+  },
+  "parent_generation": 90,
+  "parent_authority_sha256": "73b85029a01ea0faa7543439f25dec66504a1c9bbe423e9dea87f0a569b6429a",
+  "workflow_sha256": "9add6c9aa325aa5e4ba8b97019a7be7d68e68bddb19a2e4b7aaf372b76d74df9",
+  "source_bindings": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/release/register_audio.py": "563012e416327bc4f7b8b88450e7beb71adc8c85b023606de0e066a6fe687c6d",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/release/stage.py": "342a90f074afea44b4080fb949f65f036b78b658b0eb7df40b2e4ebab53f59a9",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/release/CATALOG-ROWS.json": "b7d3587ac8e79cdfad95e5f60eac1b571e2e9f72556fb05e9d4246b3fd983fa4",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/release/CATALOG-REVIEW.json": "89e5bed1afcb37de2b8b9f3ec1a7038a74d0e54af9e1846d48859679517dd03f",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/release/WORKFLOW-REVIEW.json": "0e04463912f127426d61582d567dbd9195d96ec5d0b4135369c2eb4d019ca11c"
+  },
+  "base": {
+    "id": 14239746699,
+    "name": "Infinity502-Consolidated-OriginalSigned-43895603388",
+    "digest": "sha256:e3fae14dc9321ad1d380856e557e10fc33b37c71abb82ad0ce6f4d241350166e",
+    "size_in_bytes": 330961493,
+    "run": 43895603388,
+    "source": "80506277145dcd4bbd66da3eaa02d9c085c1b437",
+    "workflow_id": 397702717,
+    "APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234"
+  },
+  "stage": {
+    "run": 44002020615,
+    "id": 14292956603,
+    "name": "Infinity504-Cast-NativeOnly-44002020615-UNSIGNED-NOT-INSTALLABLE",
+    "size_in_bytes": 646662192,
+    "digest": "sha256:f4fbe11935a0b4f0bde0455d21ab4f6e05fa3a4b7122839bff566d8597cc7100",
+    "source": "2cdf3a5d88d756c7426699a54aac6ff53857e9f6",
+    "workflow_id": 420817370
+  },
+  "owners": {
+    "run": 43893471436,
+    "id": 14238856037,
+    "name": "Infinity502-Consolidated-Registered-Preparation-43893471436",
+    "size_in_bytes": 1290609725,
+    "digest": "sha256:e3435df559ba84773e052ac67a2f83d7d51cf058e7fecafb70d4abca44f88011",
+    "source": "be61d96110d52b9a58ce9771c72be6c0ba9040cc",
+    "workflow_id": 397702717
+  },
+  "expected_changes": {
+    "candidate": {
+      "assets/experience-component-updates.properties": {
+        "before": "b690bfcbb745924813c2216931fdd0cdfdb9b252535e97ed3fac5a6b853ca87d",
+        "after": "2740e0aa4c14c44304ef0f18591a5d93c2bae72b2ec3d8212c5c0a24042408e1"
+      },
+      "AndroidManifest.xml": {
+        "before": "4cbbf714d5649fdb5ef7177446b117640447ebcb2623d7f3ccd458fa5e15308f",
+        "after": "f34629925677a9746289cf9a167945bd0ff96498268bb9d764ad4639e7ec86e0"
+      },
+      "lib/arm64-v8a/libinfinitycastremux.so": {
+        "before": "86a34a4976813f24280345561170b1dee47e96fb9c3b34642190ced2c2fe9ffd",
+        "after": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52"
+      }
+    },
+    "recovery": {
+      "assets/experience-component-updates.properties": {
+        "before": "b690bfcbb745924813c2216931fdd0cdfdb9b252535e97ed3fac5a6b853ca87d",
+        "after": "d17abd86b766440064956b3be079c3381a447e61bad1346218b2d6270a534325"
+      },
+      "AndroidManifest.xml": {
+        "before": "4cbbf714d5649fdb5ef7177446b117640447ebcb2623d7f3ccd458fa5e15308f",
+        "after": "409171069d796f2016608d01c72181860320f7832424bc53766c9c62193421fe"
+      }
+    }
+  },
+  "accepted_pointer_updated": false,
+  "known_limitations": [
+    "PhysicalTV playback, original receiverERROR4 resolution and ownerHEVC rendering NOT_VERIFIED; only synthetic H264/AAC Android playback plus HEVC extraction verified.",
+    "New multiplexed EAC3 audio becomes AAC-LC stereo192kbps at source32/44.1/48kHz; video bytes and timestamps retained. Other audio sample rates/format changes explicitly refused. Existing AAC/direct paths unchanged.",
+    "Actual phone return and postCast normal shutdown require owneracceptance; production Java lifecycle, engine and shutdown code unchanged; native cancellation/contexts0 verified.",
+    "All504 inherited limitations remain; no broader ContinuePlaying/EmptyShell/MarkWatched or profile repair included.",
+    "Forward507 restores signed504 payload with only higher manifest/versionlabel; no user data touched."
+  ],
+  "review_sha256": "7a8a446b2027e534e147dbbdf05ae0b71628c162c196c2197c5f36fdaf9ac06d"
+}

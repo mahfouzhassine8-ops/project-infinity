@@ -1,0 +1,32 @@
+{
+  "baseline": 2103504,
+  "baseline_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+  "source_checkpoint": "df2fab727635f8bd9e30f03202e86d028b861ed3",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "allowed_production_files": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "1923f27eb318377798ab0a21cada92349bb9ae0b26af1e51afd736a5d205fb6e",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "76d2b57c0a9377084e1631cb42e9dba0d819db2221072c50d29a9adb6f01bf3c",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "9e9d132d1fb0bb457e49b711ee77a624e1862b63499027f7316d2bf62518c623",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "2b8e321e6a544101ebe121d5a9d416b0931b24e49ddcfdfeb078a15d74c5f6e3",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8"
+  },
+  "new_Cast_owned_components": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "Isolated AAC audio conversion; bounded sample-clock/priming/canonical windows, no core FFmpeg replacement"
+  },
+  "selected_tests": [
+    "New AAC adapter host sample coverage/priming/seek/cache/cancellation tests and independent timestamp-warning attribution",
+    "Affected standalone Cast ARM64/JNI/relay Android tests; reuse existing Kodi and unchanged AAC/DEX evidence"
+  ],
+  "engine_rebuild": false,
+  "shutdown_test": false,
+  "protected": "All non-Cast payload, settings and user records frozen; no profile or database mutations",
+  "owner_implementation_authorized": true,
+  "build_and_test_only": [
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_native.py",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_android.py",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/run_android.py",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/tests",
+    ".github/workflows/infinity-504-cast-audio-native.yml",
+    ".github/workflows/infinity-504-cast-audio-android.yml"
+  ]
+}

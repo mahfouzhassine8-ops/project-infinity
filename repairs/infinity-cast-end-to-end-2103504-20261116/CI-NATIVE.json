@@ -1,0 +1,30 @@
+{
+  "case": "Cast_EAC3_AAC_ARM64_only",
+  "baseline": 2103504,
+  "Kodi_build": false,
+  "APK_build": false,
+  "DEX_build": false,
+  "source_commit": "720b1b280b7e20a1c8a0f2f80c8b0e722289f744",
+  "baseline_artifact": {
+    "id": 14239746699,
+    "name": "Infinity502-Consolidated-OriginalSigned-43895603388",
+    "digest": "sha256:e3fae14dc9321ad1d380856e557e10fc33b37c71abb82ad0ce6f4d241350166e",
+    "size_in_bytes": 330961493,
+    "run": 43895603388,
+    "source": "80506277145dcd4bbd66da3eaa02d9c085c1b437",
+    "workflow_id": 397702717,
+    "APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234"
+  },
+  "inputs": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_native.py": "92dea53e56c91708c8e29b72579bf3c0b41266b52c880c60e95f8f797ef7cdd8",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/SCOPE.json": "3126ad583fadbe97bdd4d081c33085eb65ba6c3eb607447bc13e839c9538eb67",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/AUDIO-SOURCE-REVIEW.json": "351954603a022756fb9c4087cf75eb66eac67e894d43735e702286f23da650a6",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24",
+    "repairs/infinity-cast-mkv-2103494-20261113/build.py": "f365c32cfcbba5d7b80b56a4ee928f3d9acb479fc45c393410be89ecbcc26e5b",
+    ".github/workflows/infinity-504-cast-audio-native.yml": "5f61045b1ed4dc089fc9afa4c42fed2c07a06d232d1e7fbbdc3a407c1e8f7715",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/AUDIO-INTEGRATION-REVIEW.json": "80815e3dd0169d535ba394fb25614c26b800d406b9ea19531c954abce337db96"
+  },
+  "selected_by": "Owner Cast audio repair: standalone native compile/link against reused exact504 engine; no owner data",
+  "previous_attempt": 43984653966
+}
