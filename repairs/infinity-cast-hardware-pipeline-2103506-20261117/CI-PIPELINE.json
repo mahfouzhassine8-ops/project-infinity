@@ -1,5 +1,5 @@
 {
-  "source_commit": "ddc7f7e31648f0976af6aee0b32591aec94da62f",
+  "source_commit": "1bedd1fac8d84463d74ce3bcc9fb4e99c41c6f98",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -12,9 +12,9 @@
   },
   "inputs": {
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "08f34599d5b54f89f70318d39a39825e6f79a1258fe9f9fae4ca3da47f86eaaf",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "1ddcf9459a807eeb4c0a76f885442af3c7ba0ca0adf2ca227c3c491c8a19ec43",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "18e63d3bb445c0b26baa16065b30520501c01f2b8ae14ddd76c097298dcd6756",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "fdd339d530bd13c8f41cb50a7415fb732cedfeaea35597853d90fcc2995b5aa5",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "aa9aec3907eda0bf7cf98de2a00515da69285a3f6eca1a6601f78d1de3b83f68",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "93018eafbac0095e0f09ec02c9174b2757a30d3748d2a4665988c5acdda702d5",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "527a0b1667975cbb2eff3e0a60c09b2ae84e116a4ff1a550b9c696361ff06bda",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/run_pipeline.py": "77fa5a7d6c7b58f7b819aec32173a68cb861ba93783f4d3429097df610afeaf3",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/tests/VideoContractTest.java": "a6e3c064cfa9216ab089d349f56c3285d99e684c331bde00b60504b18158cca8",
@@ -41,11 +41,20 @@
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/HlsServer.java": "76b4cf54529486c582a0b436bf834c281693bfb6555b372972a1c622fc53549f",
     "repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/MkvHlsPlayerProbe.java": "9b00aafb3518b433b4183beef89231389fe6126cd1f07754b7f1b9a7db7bcee8"
   },
-  "selected_case": "Corrected contiguous CI DEX; actual HLS2.5s seek; AAC equality; reviewed owner/partialGPU/JNI failure cleanup with CheckJNI. No engine build.",
+  "selected_case": "Fix negative fixture explicit JNI load; reuse exact compiled Cast bridge and engine; actual HLS/seek/AAC preservation plus selected cleanup negatives",
   "engine_build": false,
   "owner_APK": false,
   "shutdown": false,
   "previous_run_cancelled_before_compilation": 44034010331,
   "retained_first_pipeline_run": 44034181964,
-  "previous_HLS_harness_failure": 44035518520
+  "previous_HLS_harness_failure": 44035518520,
+  "reuse_native": {
+    "run": 44037322862,
+    "id": 14307773098,
+    "name": "Infinity506-MediaCodec-Pipeline-44037322862-EVIDENCE-ONLY",
+    "size_in_bytes": 1391204,
+    "digest": "sha256:68b02adc3323545f91794143d68d989db50c4c7b1be2a87ade71e5158862e998",
+    "source": "2b06a081ee19cb17d860835894070991384d1c36",
+    "workflow_id": 421009620
+  }
 }
