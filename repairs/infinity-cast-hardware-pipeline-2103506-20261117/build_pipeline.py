@@ -37,7 +37,7 @@ def main():
  run('ffmpeg','-nostdin','-v','error','-y','-f','lavfi','-i','testsrc2=size=320x180:rate=24','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','6.02','-c:v','libx265','-preset','ultrafast','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-color_range','tv','-x265-params','open-gop=0:pools=1:frame-threads=1:log-level=error:keyint=48:min-keyint=48:bframes=2:scenecut=0','-c:a','eac3','-b:a','192k',fixtures/'hevc-eac3.mkv')
  sdk=Path(os.environ['ANDROID_HOME']);bt=sdk/'build-tools/35.0.0';android=sdk/'platforms/android-35/android.jar';classes=OUT/'classes';classes.mkdir();dex=OUT/'dex';dex.mkdir()
  names=['InfinityCastRemux','InfinityCastRemuxNative','InfinityCastReceiverPolicy','InfinityCastDiagnostics','InfinityCastHardwareVideo','InfinityCastGpuSurface','InfinityCastVideoContract']
- sources=[CAST/'java/com/projectinfinity/kodi'/ (n+'.java') for n in names]+list((HERE/'android').glob('*.java'))
+ sources=[CAST/'java/com/projectinfinity/kodi'/ (n+'.java') for n in names]+list((HERE/'android').glob('*.java'))+[ROOT/'repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/MkvHlsPlayerProbe.java']
  run('javac','-source','8','-target','8','-bootclasspath',str(android)+':'+str(bt/'core-lambda-stubs.jar'),'-d',classes,*sources)
  jar=OUT/'pipeline-probe.jar'
  with ZipFile(jar,'w',ZIP_DEFLATED) as z:
@@ -45,14 +45,28 @@ def main():
  run('java','-cp',bt/'lib/d8.jar','com.android.tools.r8.D8','--min-api','30','--lib',android,'--output',dex,jar)
  loader=OUT/'libinfinitycastqaloader.so';ndk=sdk/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin'
  run(ndk/'aarch64-linux-android21-clang++','-shared','-fPIC',ROOT/'repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/loader.cpp','-ldl','-Wl,-z,max-page-size=16384','-o',loader)
- manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.castqa.pipeline" android:versionCode="1" android:versionName="CI-only"><uses-sdk android:minSdkVersion="30" android:targetSdkVersion="35"/><uses-permission android:name="android.permission.INTERNET"/><application android:extractNativeLibs="true" android:label="Cast pipeline CI only" android:theme="@android:style/Theme.Material.NoActionBar"><activity android:name="com.projectinfinity.kodi.InfinityCastProbeActivity" android:exported="true"/></application></manifest>''')
+ manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.castqa.pipeline" android:versionCode="1" android:versionName="CI-only"><uses-sdk android:minSdkVersion="30" android:targetSdkVersion="35"/><uses-permission android:name="android.permission.INTERNET"/><application android:extractNativeLibs="true" android:label="Cast pipeline CI only" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="true"><activity android:name="com.projectinfinity.kodi.InfinityCastProbeActivity" android:exported="true"/></application></manifest>''')
  shell=OUT/'shell.apk';run(bt/'aapt2','link','--manifest',manifest,'-I',android,'-o',shell)
  unsigned=OUT/'CI-ONLY-UNSIGNED.apk';native_hashes={}
  with ZipFile(unsigned,'w',ZIP_DEFLATED) as z,ZipFile(shell) as skeleton,ZipFile(apk) as base:
-  for n in skeleton.namelist():z.writestr(n,skeleton.read(n),compress_type=ZIP_STORED if n=='resources.arsc' else ZIP_DEFLATED)
+  for n in skeleton.namelist():
+   if n!='resources.arsc':z.writestr(n,skeleton.read(n))
+  # Reuse immutable baseline Media3 APIs for HLS playback, without invoking
+  # any Cobra entry point. Exclude the original Cast DEX to avoid shadowing.
+  sys.path.insert(0,str(CAST));from dex_contract import Dex
+  import re
+  indices=[];excluded=[]
+  for n in base.namelist():
+   if re.fullmatch(r'classes\d*\.dex',n):
+    indices.append(int(re.search(r'\d+',n).group()) if re.search(r'\d+',n) else 1)
+    raw=base.read(n)
+    if 'Lcom/projectinfinity/kodi/InfinityCastRemux;' in Dex(raw).classes:excluded.append(n)
+    else:z.writestr(n,raw)
+   elif n=='resources.arsc' or n.startswith('res/'):z.writestr(n,base.read(n),compress_type=ZIP_STORED if n=='resources.arsc' else ZIP_DEFLATED)
+  assert excluded==['classes6.dex'],excluded
   for lib in ('libkodi.so','libc++_shared.so','libshairplay.so'):
    n='lib/arm64-v8a/'+lib;data=base.read(n);z.writestr(n,data);native_hashes[lib]=hashlib.sha256(data).hexdigest()
-  z.write(native_work/'native/libinfinitycastremux.so','lib/arm64-v8a/libinfinitycastremux.so');z.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');z.write(dex/'classes.dex','classes.dex');z.write(fixtures/'hevc-eac3.mkv','assets/hevc-eac3.mkv')
+  z.write(native_work/'native/libinfinitycastremux.so','lib/arm64-v8a/libinfinitycastremux.so');z.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');z.write(dex/'classes.dex','classes'+str(max(indices)+1)+'.dex');z.write(fixtures/'hevc-eac3.mkv','assets/hevc-eac3.mkv')
  aligned=OUT/'aligned.apk';run(bt/'zipalign','-p','-f','4',unsigned,aligned);key=OUT/'CI-ONLY.keystore'
  run('keytool','-genkeypair','-alias','CI-only','-keyalg','RSA','-keystore',key,'-storepass','android','-keypass','android','-dname','CN=Disposable Cast Pipeline CI','-validity','2')
  run(bt/'apksigner','sign','--ks',key,'--ks-key-alias','CI-only','--ks-pass','pass:android','--key-pass','pass:android','--out',OUT/'CI-ONLY.apk',aligned)

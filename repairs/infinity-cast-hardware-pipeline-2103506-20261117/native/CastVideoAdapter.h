@@ -10,7 +10,11 @@ struct CastVideoResult {
   if(word()!=0x43564831)throw Failure("cast_hw_batch_version");CastVideoResult r;r.width=int(word());r.height=int(word());r.profile=int(word());r.level=int(word());
   if(r.width!=1280||r.height!=720||(r.profile!=66&&r.profile!=77&&r.profile!=100)||r.level<=0||r.level>41||word()!=1)throw Failure("cast_hw_batch_format");
   uint32_t size=word();if(size<7||size>65536||size>data.size()-at)throw Failure("cast_hw_batch_config");r.config.assign(data.begin()+at,data.begin()+at+size);at+=size;
-  if(r.config[0]!=1||(r.config[4]&3)!=3||r.config[1]!=r.profile||r.config[3]!=r.level)throw Failure("cast_hw_batch_config");
+  if(r.config[0]!=1||r.config[4]!=255||r.config[5]!=225||r.config[1]!=r.profile||r.config[3]!=r.level||r.config.size()<15)throw Failure("cast_hw_batch_config");
+  size_t sps=(size_t(r.config[6])<<8)|r.config[7];
+  if(sps<4||sps>r.config.size()-12||(r.config[8]&31)!=7||(r.config[8]&128)||(r.config[8]&96)==0||r.config[9]!=r.profile||r.config[11]!=r.level||r.config[8+sps]!=1)throw Failure("cast_hw_batch_config");
+  size_t pps=(size_t(r.config[9+sps])<<8)|r.config[10+sps];
+  if(pps<1||pps!=r.config.size()-11-sps||(r.config[11+sps]&31)!=8||(r.config[11+sps]&128)||(r.config[11+sps]&96)==0)throw Failure("cast_hw_batch_config");
   uint32_t count=word();if(!count||count>1000)throw Failure("cast_hw_batch_count");int64_t previous=-1;
   for(uint32_t n=0;n<count;n++){CastVideoPacket p;p.pts=wide();p.duration=wide();p.flags=int(word());uint32_t bytes=word();
    if(p.pts<begin||p.pts>=end||p.pts<=previous||p.duration<=0||p.duration>end-p.pts||p.flags<0||p.flags>1||bytes<5||bytes>data.size()-at)throw Failure("cast_hw_batch_packet");
