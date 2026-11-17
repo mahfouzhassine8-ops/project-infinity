@@ -9,10 +9,13 @@ public final class InfinityCastProbeActivity extends Activity {
  static void check(boolean ok,String reason)throws IOException{need(ok,reason);}
  static void need(boolean ok,String reason)throws IOException{if(!ok)throw new IOException(reason);}
  static final class Memory implements InfinityCastRemux.Input {
-  final byte[] data;long cursor,budget;volatile boolean closed;Memory(byte[] d){data=d;}
-  public int read(byte[] b,int n)throws IOException{need(!closed,"CI_input_closed");int count=(int)Math.min(n,data.length-cursor);need(count>=0&&count<=budget,"CI_input_budget");if(count==0)return 0;System.arraycopy(data,(int)cursor,b,0,count);cursor+=count;budget-=count;return count;}
-  public long seek(long at,int whence)throws IOException{need(!closed,"CI_input_closed");if((whence&0x10000)!=0)return data.length;whence&=~0x20000;long next=whence==0?at:whence==1?cursor+at:whence==2?data.length+at:-1;need(next>=0&&next<=data.length,"CI_input_seek");return cursor=next;}
-  public String failure(){return "";}public void budget(long n){budget=n;}public void close(){closed=true;}
+  final byte[] data;long cursor,remaining,used,seeks,limit;String problem="";boolean closed;
+  Memory(byte[] b){data=b;}
+  public void budget(long n){remaining=limit=n;used=seeks=0;problem="";}
+  public long[] usage(){return new long[]{used,seeks,0,remaining};}
+  public int read(byte[] b,int n)throws IOException{check(!closed,"mkv_cancelled");if(cursor==data.length)return 0;if(remaining<=0){problem="mkv_source_read_limit";throw new IOException(problem);}int got=(int)Math.min(Math.min(n,data.length-cursor),remaining);System.arraycopy(data,(int)cursor,b,0,got);cursor+=got;used+=got;remaining-=got;return got;}
+  public long seek(long at,int w)throws IOException{check(!closed,"mkv_cancelled");if((w&0x10000)!=0)return data.length;w&=~0x20000;long next=w==0?at:w==1?cursor+at:w==2?data.length+at:-1;check(next>=0&&next<=data.length,"mkv_invalid_source_seek");seeks++;return cursor=next;}
+  public String failure(){return problem;}public void close(){closed=true;}
  }
  InfinityCastHardwareVideo software()throws Exception{Constructor<InfinityCastHardwareVideo> c=InfinityCastHardwareVideo.class.getDeclaredConstructor(android.content.Context.class,boolean.class);c.setAccessible(true);return c.newInstance(this,true);}
  byte[] fixture()throws Exception{return fixture("hevc-eac3.mkv");}
