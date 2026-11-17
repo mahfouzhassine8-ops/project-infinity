@@ -1,0 +1,14 @@
+{
+  "run": 43993957683,
+  "source": "e58c3673",
+  "status": "FAIL_CI_PROBE_INSTALL_TIMEOUT_BEFORE_NATIVE_EXECUTION",
+  "failed_step": "adb install CI-ONLY.apk bounded by wrapper30s",
+  "native_encoder": "NOT_RUN",
+  "APK_compile_and_API_stub_guards": "PASS",
+  "preserved_failure_artifact": {
+    "id": 14288608680,
+    "digest": "sha256:499f2fd284c77ab96a524510a6312566bb6228a78f420635642e9e034ebc9a73",
+    "size_in_bytes": 4837770
+  },
+  "correction": "Only install transfer/extraction limit180s; all audio/relay deadlines unchanged; actualCastARM64artifact934bb reused"
+}

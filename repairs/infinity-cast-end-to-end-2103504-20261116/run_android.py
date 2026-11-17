@@ -2,12 +2,15 @@
 from pathlib import Path
 import json,re,subprocess,sys,time
 ROOT=Path(__file__).resolve().parents[2];WORK=ROOT/'cast504-android-work';OUT=ROOT/'cast504-android-results';OUT.mkdir(exist_ok=True)
-def adb(*args):return subprocess.check_output(['adb',*map(str,args)],text=True,stderr=subprocess.STDOUT,timeout=30)
-result=None
+def adb(*args,timeout=30):return subprocess.check_output(['adb',*map(str,args)],text=True,stderr=subprocess.STDOUT,timeout=timeout)
+result=None;stage='installation'
 try:
  abis=adb('shell','getprop','ro.product.cpu.abilist').strip();assert 'arm64-v8a' in abis,'ARM64_NATIVE_BRIDGE_REQUIRED'
- adb('install',WORK/'CI-ONLY.apk')
+ # APK extraction and multi-DEX verification are not connection/encoder timeouts.
+ adb('install',WORK/'CI-ONLY.apk',timeout=180)
+ stage='launch'
  (OUT/'LAUNCH.txt').write_text(adb('shell','am','start','-W','-n','com.projectinfinity.castqa/com.projectinfinity.kodi.InfinityCastProbeActivity'))
+ stage='probe_execution'
  deadline=time.monotonic()+180;next_update=0
  while time.monotonic()<deadline:
   raw=adb('logcat','-d','-v','brief','InfinityCastProbe:I','*:S')
@@ -40,7 +43,8 @@ try:
 except BaseException as error:
  if result is None:result={'pass':False}
  result['pass']=False
- result.update(status='FAIL_SELECTED_ANDROID_CAST_AUDIO',wrapper_failure=str(error));raise
+ result.update(status='FAIL_SELECTED_ANDROID_CAST_AUDIO',wrapper_failure=str(error),wrapper_stage=stage)
+ if stage=='installation':result['native_encoder_execution']='NOT_RUN';raise
 finally:
  try:(OUT/'LOGCAT.txt').write_text(adb('logcat','-d','-v','threadtime'))
  except Exception as error:(OUT/'LOGCAT-ERROR.txt').write_text(str(error))
