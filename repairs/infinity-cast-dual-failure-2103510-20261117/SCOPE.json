@@ -30,5 +30,10 @@
     "Owner hvcC bytes and receiver detailed error absent; result0 may represent null detailed code in current sender",
     "Current source reads below budget: no new budget exhaustion conclusion"
   ],
-  "safety": "Keep510 source quotas/time/packet/output/malformed-input/cancel protections. No fabricatedcodecmetadata or capabilityclaims."
+  "safety": "Keep510 source quotas/time/packet/output/malformed-input/cancel protections. No fabricatedcodecmetadata or capabilityclaims.",
+  "orchestration_allowed": [
+    ".github/workflows/infinity-506-cast-component.yml",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml"
+  ]
 }
