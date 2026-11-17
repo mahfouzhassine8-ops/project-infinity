@@ -1,0 +1,9 @@
+{
+  "reviewer": "Astra /astra_cast502; Codex decision",
+  "reference": "Android MediaFormat.KEY_PRIORITY and KEY_IMPORTANCE; AOSP Android15 ResourceTracker same-app reclaim policy",
+  "finding": "Default importance0 peers are excluded from normal same-process reclaim under the documented policy; no demonstrated current Cast-steals-phone defect. Importance1 would chiefly make Cast reclaimable by a later phone request; priority1 is a best-effort hint. Initialization occurs before configure applies preferences and OEM behavior remains unqualified.",
+  "decision": "Keep the already verified per-instance configuration for this QA; do not add an unverified late performance-policy change to manufacture a guarantee. Existing actual pair configuration, sample-throughput, thermal and cancellation gates remain. Lower-importance recommendation retained for evidence-driven physical resource qualification.",
+  "guaranteed_uninterrupted_physical_playback": false,
+  "physical_concurrency_and_thermal": "PENDING_OWNER_HARDWARE_QUALIFICATION",
+  "global_or_phone_codec_settings_changed": false
+}
