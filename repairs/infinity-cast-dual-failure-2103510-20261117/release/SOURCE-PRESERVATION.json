@@ -1,0 +1,43 @@
+{
+  "status": "PASS_FROZEN_CANONICAL_SOURCE_CAST_ONLY",
+  "canonical_parent": "0a568903a95afac2c7085caee658aff7a490a6e6",
+  "signed_content_baseline": 2103510,
+  "signed_content_source": "cd682193dc78da29cfcfef83c5b0d43dec5b89a2",
+  "changed_existing_production": {
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": {
+      "before": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
+      "after": "0404e0814d49ff434653e949b78dc94810f0d4721a43cbc27af3027f69449ca8"
+    },
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": {
+      "before": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9",
+      "after": "c6e9644be7ba3b48c08abbff6ee6b7c4eaa7c797b74c8dc5d1246488bc9707c0"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": {
+      "before": "42080c3705b432b2f33e695b65cd304c2d3c4f0a4630f32c9173428627cd5e02",
+      "after": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": {
+      "before": "cd81d223128e3bc1401533fbabee4305e980fbfbac27adc9a1c7b7dc6d9ee23b",
+      "after": "69913356f870ab4f9e1e2561979b8ef5ca4f4e672327b27b87995955d0768dca"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": {
+      "before": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a",
+      "after": "5db76e3a9365750d3f9e5cd3a9987edcdce13167f68df88e2176b060729ccea0"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": {
+      "before": "65b16cfa0628a9e6e328af9d404c981a024dc0bb49dd18cd7a9cd69ed40e4f8f",
+      "after": "cf41f1f690f97eff14533d0117cfc5306989dc8f9559d6e9f79961b98bb1cb39"
+    }
+  },
+  "changed_workflow_metadata": [
+    ".github/workflows/infinity-506-cast-component.yml",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml",
+    ".github/workflows/infinity-combined-release.yml"
+  ],
+  "new_files_only_under": "repairs/infinity-cast-dual-failure-2103510-20261117",
+  "protected_policy_roots_authority": "BYTE_UNCHANGED_BEFORE_REGISTRATION",
+  "Cobra_Kodi_Shutdown_Search_tracking_providers_settings": "NO_SOURCE_CHANGE",
+  "source_checks": "All6canonicalpreimagesmatchedsigned510 beforecopy; sourcehashesmatchindependentAstrareview andactualcomponent/native receipts",
+  "physical_acceptance": false
+}
