@@ -1,0 +1,69 @@
+{
+  "status": "PASS_UNSIGNED_NATIVE_ONLY504_STAGE",
+  "source": "2cdf3a5d88d756c7426699a54aac6ff53857e9f6",
+  "baseline_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+  "versions": {
+    "candidate": 2103506,
+    "recovery": 2103507
+  },
+  "payloads": {
+    "candidate": {
+      "APK_sha256": "875bd7d4661cd44e47dd7beb90111b9fac07b48c0cd2ac6f107ff239729fb122",
+      "versionCode": 2103506,
+      "changes": {
+        "assets/experience-component-updates.properties": {
+          "before": "b690bfcbb745924813c2216931fdd0cdfdb9b252535e97ed3fac5a6b853ca87d",
+          "after": "2740e0aa4c14c44304ef0f18591a5d93c2bae72b2ec3d8212c5c0a24042408e1"
+        },
+        "AndroidManifest.xml": {
+          "before": "4cbbf714d5649fdb5ef7177446b117640447ebcb2623d7f3ccd458fa5e15308f",
+          "after": "f34629925677a9746289cf9a167945bd0ff96498268bb9d764ad4639e7ec86e0"
+        },
+        "lib/arm64-v8a/libinfinitycastremux.so": {
+          "before": "86a34a4976813f24280345561170b1dee47e96fb9c3b34642190ced2c2fe9ffd",
+          "after": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52"
+        }
+      },
+      "unchanged_members": 7774
+    },
+    "recovery": {
+      "APK_sha256": "d27181e2328a3f81bf484ea0a4147d609165e922ed028cc1928adfd7113b6b78",
+      "versionCode": 2103507,
+      "changes": {
+        "assets/experience-component-updates.properties": {
+          "before": "b690bfcbb745924813c2216931fdd0cdfdb9b252535e97ed3fac5a6b853ca87d",
+          "after": "d17abd86b766440064956b3be079c3381a447e61bad1346218b2d6270a534325"
+        },
+        "AndroidManifest.xml": {
+          "before": "4cbbf714d5649fdb5ef7177446b117640447ebcb2623d7f3ccd458fa5e15308f",
+          "after": "409171069d796f2016608d01c72181860320f7832424bc53766c9c62193421fe"
+        }
+      },
+      "unchanged_members": 7775
+    }
+  },
+  "native_artifact": {
+    "run": 43993371947,
+    "id": 14288492703,
+    "name": "Infinity504-Cast-Audio-43993371947-COMPONENT-ONLY",
+    "size_in_bytes": 97693,
+    "digest": "sha256:44f8e584c8c291137b0ed710f27718550041ab6e796e48ee3503e26503da3cc2",
+    "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
+    "workflow_id": 420739373
+  },
+  "Android_artifact": {
+    "run": 44000750859,
+    "id": 14292277826,
+    "name": "Infinity504-Cast-AAC-Android-44000750859-EVIDENCE-ONLY",
+    "size_in_bytes": 8878871,
+    "digest": "sha256:f88eb6d8387aad81f9301984c92a66dd79d33eb141e4aa91eaf4644abff67799",
+    "source": "28dd58eda9718ecbc4f563e00629b29fd659dea5",
+    "workflow_id": 420781757
+  },
+  "Cobra": "UNCHANGED",
+  "module_signatures": "UNCHANGED",
+  "DEX": "UNCHANGED",
+  "Kodi": "UNCHANGED",
+  "owner_data": "NOT_ACCESSED",
+  "signed": false
+}
