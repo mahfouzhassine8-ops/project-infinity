@@ -1,5 +1,5 @@
 {
-  "source_commit": "c2867e02e0d745dddb6d4e600544fa47ae7c25a4",
+  "source_commit": "84e7677e8b59f718121a4fc0e546e5b394489ab2",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -13,8 +13,8 @@
   "inputs": {
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "59ae6ec3ccd8f35075c3c2624932d290ae91d9fb51d07234951241fce2d784e8",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "2e930834eba8c157d6f1b023730187c6bc9e5d016f2051ebbbb9e6ecedd44cf5",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "dabae25bd102ac716a59ff699379c6965c109ee6ea3a10a5eb5579ea1847e774",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "fd909e24b4fd17a16499d60a51a46db85128cad14f3ea2ae148c5060e6c5c1b0",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "e363f25b2ecb1d67fba94f7f5a17c7bada638adf15d470c8fc048f73430b1060",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/run_pipeline.py": "77fa5a7d6c7b58f7b819aec32173a68cb861ba93783f4d3429097df610afeaf3",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/tests/VideoContractTest.java": "a6e3c064cfa9216ab089d349f56c3285d99e684c331bde00b60504b18158cca8",
@@ -39,11 +39,11 @@
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "925267efe4d6b8be020ff474eea690eb439344bfb15b04653e6f8be71fef1225",
     ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/HlsServer.java": "76b4cf54529486c582a0b436bf834c281693bfb6555b372972a1c622fc53549f",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "15b709a0e150aac62193fddc0833d4f9578a846aeb79a76331926d0e49bc1435",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/Origin.java": "af60626c3369288206109ccb7aeb993813b4a52b46c35479ddd78235c36110a5",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/MkvHlsPlayerProbe.java": "1e0d772c3ca84bf56c32f36a786accdd46327fab1b5dbfd1b7d72fbe5e5078ed"
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/MkvHlsPlayerProbe.java": "882a07db979c46af9a372ad78e86f9a0f9f4f7666fd328baf4482d755baa7dea"
   },
-  "selected_case": "Production verified Cast DEX and privateRelay HLS playback+postseek video/audio advancement+Range+provider auth. Source changed only HighTier guard: compile Cast bridge only. Reuse Kodi and all DEX. Selected failure cleanup negatives.",
+  "selected_case": "Correct CI surface ownership after observed system resource-overlay Activity relaunch; actual productionRelay HLS playback+postseekvideo/audio; reuse exact CastSO993f andCastDEX1d18 andKodiB3, no native/R8 rebuild.",
   "engine_build": false,
   "owner_APK": false,
   "shutdown": false,
@@ -58,5 +58,14 @@
     "digest": "sha256:946e61bb6de4f6f64147fa6981a0e33b6b8fba61b86b18f0eb4d34cde2eaeb71",
     "source": "94bcfcee1601b4992b72734ca676d8bc83d61d0a",
     "workflow_id": 421031076
+  },
+  "reuse_native": {
+    "run": 44041704018,
+    "id": 14309961936,
+    "name": "Infinity506-MediaCodec-Pipeline-44041704018-EVIDENCE-ONLY",
+    "size_in_bytes": 5631317,
+    "digest": "sha256:ecfd15178f94e6bd38fb066fa8b39b8a1e45c436185814cc185661aa857d56bb",
+    "source": "176efe84c087a6ba628b68ad4dfe87d1875b6168",
+    "workflow_id": 421009620
   }
 }
