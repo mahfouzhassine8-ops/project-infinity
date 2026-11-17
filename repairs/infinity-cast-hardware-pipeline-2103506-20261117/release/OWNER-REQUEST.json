@@ -12,14 +12,15 @@
   "parent_authority_sha256": "d70693a838137b6519427add1dcc862ebf38f7d7f0b503f3c7906c2aa053e5c8",
   "workflow_sha256": "cd33922a249c4c6fe87047540e86bce4f4bc25c288847de2e11b85a785a69522",
   "source_bindings": {
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/register_hardware.py": "f66041db417a0869a38d44e3aa23be3138c66e831b7b1bbac12ce078f6a0e52d",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/register_hardware.py": "37ec72644d9bdf5507e50a9305d6226ef5ded17a301cac42455d8ab3306ffc76",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/owner_bundle.py": "c3fa354c8dacdd7d67a79967eb115bd5901b65701b80be8a45bb0cc86e17f705",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/CATALOG-ROWS.json": "d0b156d0bb3d3a53692c069487cd46ef5b66bdb9f46f046c7439416c3c49fdfb",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/CATALOG-REVIEW.json": "70e355e50cdf851c10de4727083f06dbaa6fe50fc56cc3bdcdfa15b86e650109",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/WORKFLOW-REVIEW.json": "63c5e50cb7c8568b0b3f5c88130a53847afc9e7661963074e32b33db3f09eeef",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/ROOTS-REVIEW.json": "fa16f646f4627cea706675ff3c729def576794857dfcee2ad0413b2d7cea543c",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/CAST-CLASS-DELTA.json": "893b04df56df95e61f71d2d78d7f4f533dce27d96a13b677fd62c34252066d5e",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9"
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/proposal_evidence.py": "f0c51beb193311457880d5ae9f40146077670aebd9f4ef42a0555da473207374"
   },
   "base": {
     "run": 44003667211,
@@ -88,5 +89,15 @@
     "Phone return and sustained TV playback pending consolidated owner acceptance. Shutdown NOT_SELECTED; protected engine/shutdown code unchanged.",
     "Recovery509 restores signed506 content at higher version, including prior Cast DEX/nativeSO. Protected504 unchanged, all prior artifacts retained."
   ],
-  "review_sha256": "5eea76311aef845201dfb3be7266d538fe9030833cb588e7179ac47162ae6c46"
+  "review_sha256": "49f9108ce3d9d5e4821e8b72cbdc3b64572989ea12f90c5581987a2dcd83203b",
+  "prepared": {
+    "run": 44052911061,
+    "id": 14314632371,
+    "name": "Infinity506-Cast-Hardware-Prepared-44052911061",
+    "size_in_bytes": 1284318024,
+    "digest": "sha256:8d754ea197ab183e0a6eb5a0184fdad6ee6303233e92a38b21ab32da4177b204",
+    "source": "0fc48e076de9cc80891ce9cf2fff59e15c003808",
+    "workflow_id": 397702717
+  },
+  "active_kind": "candidate"
 }

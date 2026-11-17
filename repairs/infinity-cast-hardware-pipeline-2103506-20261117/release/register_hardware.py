@@ -21,7 +21,7 @@ def request():
  assert r['baseline_APK_sha256']==BASE and r['accepted_pointer_updated'] is False and r['versions']=={'candidate':2103508,'recovery':2103509}
  assert r['generations']=={'candidate':93,'recovery':94} and r['parent_generation']==92
  assert c.sha(ROOT/c.WORKFLOW)==r['workflow_sha256']
- required={str((HERE/name).relative_to(ROOT)) for name in ('register_hardware.py','owner_bundle.py','CATALOG-ROWS.json','CATALOG-REVIEW.json','WORKFLOW-REVIEW.json','ROOTS-REVIEW.json')}
+ required={str((HERE/name).relative_to(ROOT)) for name in ('register_hardware.py','owner_bundle.py','CATALOG-ROWS.json','CATALOG-REVIEW.json','WORKFLOW-REVIEW.json','ROOTS-REVIEW.json','proposal_evidence.py')}
  required|={str((TASK/name).relative_to(ROOT)) for name in ('CAST-CLASS-DELTA.json','component_contract.py')}
  assert set(r['source_bindings'])==required,'EXACT_RELEASE_SOURCE_SET'
  for name,h in r['source_bindings'].items():assert c.sha(ROOT/name)==h,name
@@ -114,7 +114,10 @@ def prepare():
 def selected():
  r=request();kind=r['active_kind'];assert kind in ('candidate','recovery');a=c.load(ROOT/c.AUTHORITY)
  assert a['generation']==r['generations'][kind] and a['candidate_versionCode']==r['versions'][kind]
- prepared=c.obtain(r['prepared'],'cast506-registered-preparation')/kind;assert (prepared/'AUTHORITY-PROPOSAL.json').read_bytes()==(ROOT/c.AUTHORITY).read_bytes(),'EXACT_REVIEWED_REGISTERED_AUTHORITY'
+ prepared_root=c.obtain(r['prepared'],'cast506-registered-preparation');prepared=prepared_root/kind
+ from proposal_evidence import reconcile
+ corrected=reconcile((prepared_root/'candidate/AUTHORITY-PROPOSAL.json').read_bytes(),(prepared_root/'recovery/AUTHORITY-PROPOSAL.json').read_bytes())
+ assert corrected[kind]==(ROOT/c.AUTHORITY).read_bytes(),'EXACT_REVIEWED_METADATA_RECONCILED_AUTHORITY'
  apk=c.unique(prepared,'Infinity-'+str(r['versions'][kind])+'-UNSIGNED.apk');assert c.sha(apk)==a['owner_update_evidence']['unsigned_sha256']
  base=c.unique(c.obtain(r['base'],'cast506-sign-baseline'),'Infinity-2103506-Combined-Original-Signer.apk');assert c.sha(base)==BASE;preservation(base,apk,kind,r);c.jars()
  with Path(os.environ['GITHUB_OUTPUT']).open('a') as f:f.write('apk='+str(apk)+'\ngeneration='+str(a['generation'])+'\n')
