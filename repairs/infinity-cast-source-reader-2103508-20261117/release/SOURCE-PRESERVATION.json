@@ -1,0 +1,84 @@
+{
+  "status": "PASS_EXACT_CAST_READER_SOURCE_ALLOWLIST",
+  "source": "130439bcec516f7f92f6ac4ff963d01e2d2b6b63",
+  "release_parent": "691c889a90bf878e65038145d2ce4147f5d5b986",
+  "content_base": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16",
+  "production_changes": {
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": {
+      "before": "925267efe4d6b8be020ff474eea690eb439344bfb15b04653e6f8be71fef1225",
+      "after": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": {
+      "before": "95c9b802cd9c70872ebc9d0a3731adc839086b44cfc130e8d61f27af0f394c66",
+      "after": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": {
+      "before": "592e8d895691207aedba3a1b24985ed28e2b36caab8043df3459e7b335111f2a",
+      "after": "f290b56c78559285052e7e90ede3c60d976667a1db5c1230cc0342f4416dc329"
+    },
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": {
+      "before": "3874091368f56715da9b462ef7f2c3cca25b6ac63ee47ba398c133423a8b6446",
+      "after": "cd81d223128e3bc1401533fbabee4305e980fbfbac27adc9a1c7b7dc6d9ee23b"
+    },
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": {
+      "before": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+      "after": "61e826157514b1b0a3c75df5ff421346ddc46ce6744e5ca3674991a1397cc3a2"
+    }
+  },
+  "metadata_and_evidence_only": [
+    ".github/workflows/infinity-506-cast-component.yml",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml",
+    ".github/workflows/infinity-combined-release.yml",
+    "repairs/dual-experience-isolation-2103420/ownership-reviewed-roots.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/.gitignore",
+    "repairs/infinity-cast-source-reader-2103508-20261117/ANDROID-ARTIFACT.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/ANDROID-FIRST-TRANSPORT-FAILURE.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/ANDROID-MEDIA.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/ANDROID-RECOVERED.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/ARM64-FIRST.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/ASTRA-SOURCE-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/CAST-CLASS-DELTA.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/CAST508-READER-COMPONENT.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/CI-COMPONENT.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/CI-PIPELINE.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/CI-RECOVERY.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/COMPONENT-ARTIFACT.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/COMPONENT-RESULT.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/HOST-ALIGNMENT-FIRST.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/HOST-PLAN-NEGATIVES.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/HOST-REFERENCE-BYTES.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/HOST-REQUEST-SEQUENCES.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/RECOVERY-HOST-CHECKS.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/RECOVERY-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/SCOPE.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/InfinityCastProbeActivity.java",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/MkvHlsPlayerProbe.java",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/Origin.java",
+    "repairs/infinity-cast-source-reader-2103508-20261117/build_android.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/build_component.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/component_contract.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/recover_android.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/INSTALL-AND-LIMITATIONS.md",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/ORCHESTRATION-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/OWNER-REQUEST.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/OWNER-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/ROOTS-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/STAGE-REQUEST.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/STAGE-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/STAGING.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/WORKFLOW-REVIEW.json",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/install.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/owner_bundle.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/publish.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/register_reader.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/stage.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/run_android.py",
+    "repairs/infinity-cast-source-reader-2103508-20261117/tests/plan.cpp",
+    "repairs/infinity-cast-source-reader-2103508-20261117/tests/reader.cpp",
+    "repairs/infinity-cast-source-reader-2103508-20261117/verify_android_media.py"
+  ],
+  "Cobra_Kodi_shutdown_providers_other_features": "NO_SOURCE_CHANGES",
+  "owner_data": "NOT_ACCESSED",
+  "APK_preservation": "SEPARATE_STAGING_AND_SIGNING_RECEIPTS_REQUIRED"
+}
