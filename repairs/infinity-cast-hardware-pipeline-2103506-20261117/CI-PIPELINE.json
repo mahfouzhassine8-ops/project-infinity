@@ -1,5 +1,5 @@
 {
-  "source_commit": "d3bdfdf74d5d8a97375fc48b731a78d872a520f4",
+  "source_commit": "5639eff6464cdf065852e1da5f85d5adb67d218f",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -11,9 +11,8 @@
     "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
   },
   "inputs": {
-    ".github/workflows/infinity-504-cast-audio-android.yml": "a8ac6c3c270bef52563a4637cf40b564076e892c4fb75f42a1ebfd576937dd51",
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "906fb388be3a19c680f7ac266d24b8ac6fe7842e94f814f61abb2bf39d3ffda6",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "08f34599d5b54f89f70318d39a39825e6f79a1258fe9f9fae4ca3da47f86eaaf",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "c1f226fd844bf65cbc3a73da8032cacba80df025c9a520aa0230a206feec1077",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "2e4133875d0438c339239380b6bc88b925bacbda3e26888f0adc0fd02fab2076",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "45f1f1897a41e4a447ac3f2e78c1b27077041b59c15447da5836c91f86f1d93e",
@@ -37,10 +36,12 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "42080c3705b432b2f33e695b65cd304c2d3c4f0a4630f32c9173428627cd5e02",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java": "9475ee0bbe1b98fb33ad6e8cc59782de6621154f5f07ea4d4260221ffc322b8f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastVideoContract.java": "e10620da86baa7a8b1dfbbe3ccb6bf31dbd46a2d23aa93d90dc297b05a5692dc",
-    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a89f7fc22aa42e3692aea4f4afe71834ddce2cc8516e717b0adc4af64c1797b"
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a89f7fc22aa42e3692aea4f4afe71834ddce2cc8516e717b0adc4af64c1797b",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6"
   },
   "selected_case": "real ARM64 existing506 FFmpeg demux/AAC -> new MediaCodec EGL AVC -> fMP4 actual Android decode/seek/cancel; CI small software only",
   "engine_build": false,
   "owner_APK": false,
-  "shutdown": false
+  "shutdown": false,
+  "previous_run_cancelled_before_compilation": 44034010331
 }
