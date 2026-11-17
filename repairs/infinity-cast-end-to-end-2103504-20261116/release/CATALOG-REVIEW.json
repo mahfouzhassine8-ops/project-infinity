@@ -1,0 +1,30 @@
+{
+  "reviewer": "Astra",
+  "status": "PASS_EXACT_THREE_UNSIGNED_WORKFLOWS",
+  "rows_sha256": "1273ea861b8b08b678cbcf38bc2bee0300a2ca3bc02f87ca5b05b7177e84543a",
+  "workflows": [
+    {
+      "id": 420739373,
+      "path": ".github/workflows/infinity-504-cast-audio-native.yml",
+      "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
+      "workflow_sha256": "5f61045b1ed4dc089fc9afa4c42fed2c07a06d232d1e7fbbdc3a407c1e8f7715"
+    },
+    {
+      "id": 420781757,
+      "path": ".github/workflows/infinity-504-cast-audio-android.yml",
+      "source": "28dd58eda9718ecbc4f563e00629b29fd659dea5",
+      "workflow_sha256": "33b1dd4fd469938af8c4728ae0254ae99085055c4d7a75e36211b3cb26dc7ddc"
+    },
+    {
+      "id": 420817370,
+      "path": ".github/workflows/infinity-504-cast-audio-release.yml",
+      "source": "6edff20a11bd6e9fe94a4a3aef92226fc4b62955",
+      "workflow_sha256": "8ce000e5c5be3752ce8db5d97698702cb0b6df7efdbfd6bcc08d5a875f1220c2"
+    }
+  ],
+  "sole_original_key_workflow_id": 397702717,
+  "verification": "Independent read-only source/blob and authenticated GitHub ID/path/state review; all three workflows key-free. Existing signer policy retirement rows and original key route unchanged.",
+  "native_only_stage_source_sha256": "342a90f074afea44b4080fb949f65f036b78b658b0eb7df40b2e4ebab53f59a9",
+  "original397_workflow_review_sha256": "0e04463912f127426d61582d567dbd9195d96ec5d0b4135369c2eb4d019ca11c",
+  "Android_required": "Actual selected receipt PASS required before staging or keys; not inferred from workflow color."
+}
