@@ -1,0 +1,34 @@
+{
+  "foundation_versionCode": 2103510,
+  "foundation_APK_sha256": "8fd4d06d4a93b29764d4820bd6000795562411802fb52a402e1b3b2ddaa93ab0",
+  "foundation_signing_source": "cd682193dc78da29cfcfef83c5b0d43dec5b89a2",
+  "preserved_versions": [
+    2103508,
+    2103506,
+    2103504
+  ],
+  "allowed_source": {
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "42080c3705b432b2f33e695b65cd304c2d3c4f0a4630f32c9173428627cd5e02",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "cd81d223128e3bc1401533fbabee4305e980fbfbac27adc9a1c7b7dc6d9ee23b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a"
+  },
+  "scope": "DualCast failure only: verified bounded codec-private parsing correction; independent receiver/error/fragment outcome classification and proven media/lifecycle correction. No speculative receiver compatibility rules.",
+  "selected_tests": [
+    "Source-derived hvcC/parameter-set parsing positive and negative fixtures; actual pinnedFFmpeg demux observations and parser-state changes",
+    "Focused unchanged-quota direct HEVC/HLS fragments including fragment5, AAC synchronization/adjacent timestamps/ranges/cancellation and safe phone return/lifecycle tests",
+    "Changed Cast-only ARM64/JNI/Android media gates; real MediaCodec where environment supports, hardware limitations explicitly retained",
+    "Original signer, exact source/APK preservation, install-over and matching forward recovery"
+  ],
+  "engine_build": false,
+  "shutdown": false,
+  "owner_testing_requested": false,
+  "prohibited": "Kodi engine,Cobra,globalnetwork,providers,Search,tracking,settings,profiles,user data and unrelatedfeatures",
+  "unknowns": [
+    "Owner receiver exact SDKmodel absent from supplied report",
+    "Owner hvcC bytes and receiver detailed error absent; result0 may represent null detailed code in current sender",
+    "Current source reads below budget: no new budget exhaustion conclusion"
+  ],
+  "safety": "Keep510 source quotas/time/packet/output/malformed-input/cancel protections. No fabricatedcodecmetadata or capabilityclaims."
+}
