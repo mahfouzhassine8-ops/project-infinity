@@ -1,0 +1,43 @@
+{
+  "source_commit": "2f0d39ffdea9bcd0feea54c830538f07f469ff95",
+  "baseline": {
+    "run": 44054993516,
+    "id": 14315957113,
+    "name": "Infinity506-Cast-Hardware-OriginalSigned-44054993516-QA",
+    "size_in_bytes": 331012243,
+    "digest": "sha256:345a2455458eefdc352b3ec9412f83af72f2ea53aac821ad44c61912e052d685",
+    "source": "dfae0d04d29bbe6b3430ed304fc04de581f18566",
+    "workflow_id": 397702717,
+    "APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16"
+  },
+  "engine_build": false,
+  "owner_APK": false,
+  "shutdown": false,
+  "inputs": {
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "1cf640ee60feaa195fd9131cfc8d6ba025a5534bcf6518c58c37d2febad747be",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "61e826157514b1b0a3c75df5ff421346ddc46ce6744e5ca3674991a1397cc3a2",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
+    "repairs/infinity-cast-source-reader-2103508-20261117/SCOPE.json": "dc961765e14b4b7cdec5731c1d55cdc4bfc98fe6e52e04f83dbc42643173061d",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/InfinityCastProbeActivity.java": "05ce5bf1e0fc85065efc2c6e4bc7857fb1501a7d98331c4b946b38a506b550f5",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/MkvHlsPlayerProbe.java": "5a455afdb83f83dc11bc3473ab7d50d7958af8f06a691a8f37f2b7c8cfc67479",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/Origin.java": "af60626c3369288206109ccb7aeb993813b4a52b46c35479ddd78235c36110a5",
+    "repairs/infinity-cast-source-reader-2103508-20261117/build_android.py": "0e4410b804a5cc740ba9e531350f6f340ad925fe228ec0c25a3ccef66067d48a",
+    "repairs/infinity-cast-source-reader-2103508-20261117/build_component.py": "e30c4f55e76f540a2ad36780df742bba869c7500e421cd4750d901f644272eac",
+    "repairs/infinity-cast-source-reader-2103508-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
+    "repairs/infinity-cast-source-reader-2103508-20261117/run_android.py": "dc94bced9b1da6827251b47f36298aab9f7ae27a907bc84bded86a645aa3fe0c",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "cd81d223128e3bc1401533fbabee4305e980fbfbac27adc9a1c7b7dc6d9ee23b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "f290b56c78559285052e7e90ede3c60d976667a1db5c1230cc0342f4416dc329",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9"
+  },
+  "component": {
+    "run": 44065804643,
+    "id": 14319468350,
+    "name": "Infinity508-Cast-Source-Reader-Component-44065804643-NOT-INSTALLER",
+    "size_in_bytes": 837021,
+    "digest": "sha256:2afa3d092cbf84695583f434a47c39374607ff577b4a425ef545d7ed1a308b04",
+    "source": "556b54e0ec4d38416f50c3f96cdff10644c6217b",
+    "workflow_id": 421031076
+  },
+  "selected_case": "Highbitrate indexedsource-reader/nativeJNI, 32MiBnegative, boundedcold/sequential/random/cache-regeneration, privateauthenticatedRelay HTTP/ranges, actualAndroidHLS continuity+late seek, blockedsource cancellation/context0. Unknownreceiverdirect path, hardwareconversionNOT_EXERCISED."
+}
