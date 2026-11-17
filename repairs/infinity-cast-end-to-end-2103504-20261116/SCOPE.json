@@ -10,12 +10,15 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "2b8e321e6a544101ebe121d5a9d416b0931b24e49ddcfdfeb078a15d74c5f6e3",
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "7129d341bdc696e96d2fd106fa15bb00a2f2692a3efb5186d71867433f9103a8"
   },
-  "new_Cast_owned_components": "Require evidence-backed design and explicit per-file extension before inclusion",
+  "new_Cast_owned_components": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "Isolated AAC audio conversion; bounded sample-clock/priming/canonical windows, no core FFmpeg replacement"
+  },
   "selected_tests": [
-    "Actual504 native first-fragment codec-isolation matrix H264/AAC, H264/EAC3, HEVC Main10 L5.1/AAC, HEVC Main10 L5.1/EAC3; decode and timestamp inspection",
-    "Cast-only focused ARM64 and Android path tests only after justified implementation"
+    "New AAC adapter host sample coverage/priming/seek/cache/cancellation tests and independent timestamp-warning attribution",
+    "Affected standalone Cast ARM64/JNI/relay Android tests; reuse existing Kodi and unchanged AAC/DEX evidence"
   ],
   "engine_rebuild": false,
   "shutdown_test": false,
-  "protected": "All non-Cast payload, settings and user records frozen; no profile or database mutations"
+  "protected": "All non-Cast payload, settings and user records frozen; no profile or database mutations",
+  "owner_implementation_authorized": true
 }

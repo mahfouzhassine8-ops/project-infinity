@@ -69,11 +69,15 @@ void validateDolby(const AVPacket* packet,AVCodecID codec){
 }
 
 struct Input {virtual ~Input()=default;virtual int read(uint8_t*,int)=0;virtual int64_t seek(int64_t,int)=0;};
+struct Packet {AVPacket* value=api().av_packet_alloc();~Packet(){if(value)api().av_packet_free(&value);}Packet(){if(!value)throw Failure("mkv_memory_limit");}};
+} // namespace InfinityMkv
+#include "../../../infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h"
+namespace InfinityMkv {
 struct State {
  std::unique_ptr<Input> input;AVFormatContext* format=nullptr;AVIOContext* io=nullptr;
  std::atomic<bool> cancelled{false};Clock::time_point deadline;
  int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts;
- std::vector<uint8_t> init;std::string videoName,audioName,codecs;
+ std::vector<uint8_t> init;std::string videoName,audioName,codecs;std::unique_ptr<CastAudioAdapter> audioAdapter;
  explicit State(std::unique_ptr<Input> value):input(std::move(value)){api();}
  ~State(){if(format)api().avformat_close_input(&format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
  bool stopped()const{return cancelled.load() || Clock::now()>deadline;}
@@ -93,19 +97,20 @@ struct Output {
   for(int in:{s.video,s.audio})if(in>=0){
    auto* source=s.format->streams[in];if(api().avformat_query_codec(format->oformat,source->codecpar->codec_id,FF_COMPLIANCE_NORMAL)<=0)throw Failure("mkv_codec_not_mp4_compatible");
    auto* out=api().avformat_new_stream(format,nullptr);if(!out || api().avcodec_parameters_copy(out->codecpar,source->codecpar)<0)throw Failure("mkv_stream_copy_failed");
+   if(in==s.audio && s.audioAdapter)s.audioAdapter->parameters(out->codecpar);
    for(int k=0;k<source->nb_side_data;k++) {
     const auto& side=source->side_data[k];
     if(side.type==AV_PKT_DATA_MASTERING_DISPLAY_METADATA || side.type==AV_PKT_DATA_CONTENT_LIGHT_LEVEL || side.type==AV_PKT_DATA_DISPLAYMATRIX || side.type==AV_PKT_DATA_STEREO3D || side.type==AV_PKT_DATA_DOVI_CONF){
      if(side.size>65536)throw Failure("mkv_display_metadata_limit");auto* copy=api().av_stream_new_side_data(out,side.type,side.size);if(!copy)throw Failure("mkv_memory_limit");std::memcpy(copy,side.data,side.size);
     }
    }
-   out->codecpar->codec_tag=0;out->time_base=source->time_base;out->avg_frame_rate=source->avg_frame_rate;out->sample_aspect_ratio=source->sample_aspect_ratio;out->id=int(format->nb_streams);out->disposition=source->disposition;
+   out->codecpar->codec_tag=0;out->time_base=(in==s.audio && s.audioAdapter)?AVRational{1,s.audioAdapter->Rate}:source->time_base;out->avg_frame_rate=source->avg_frame_rate;out->sample_aspect_ratio=source->sample_aspect_ratio;out->id=int(format->nb_streams);out->disposition=source->disposition;
   }
   auto* buffer=static_cast<unsigned char*>(api().av_malloc(32768));if(!buffer)throw Failure("mkv_memory_limit");
   io=api().avio_alloc_context(buffer,32768,1,this,nullptr,write,nullptr);if(!io){api().av_free(buffer);throw Failure("mkv_memory_limit");}
   io->seekable=0;format->pb=io;format->flags|=AVFMT_FLAG_CUSTOM_IO;format->avoid_negative_ts=AVFMT_AVOID_NEG_TS_DISABLED;format->io_open=denyOpen;
   AVDictionary* options=nullptr;
-  packetHeader=s.audio>=0 && (s.format->streams[s.audio]->codecpar->codec_id==AV_CODEC_ID_AC3 || s.format->streams[s.audio]->codecpar->codec_id==AV_CODEC_ID_EAC3);
+  packetHeader=!s.audioAdapter && s.audio>=0 && (s.format->streams[s.audio]->codecpar->codec_id==AV_CODEC_ID_AC3 || s.format->streams[s.audio]->codecpar->codec_id==AV_CODEC_ID_EAC3);
   // Dolby MP4 dac3/dec3 configuration is derived by FFmpeg from REAL packets.
   // The unchanged AAC/MP3 path still emits its original immediate header.
   std::string flags="empty_moov+frag_custom+frag_discont+default_base_moof+omit_tfhd_offset+skip_trailer";
@@ -130,7 +135,7 @@ struct Output {
   throw Failure("mkv_delayed_init_invalid");
  }
 };
-struct Packet {AVPacket* value=api().av_packet_alloc();~Packet(){if(value)api().av_packet_free(&value);}Packet(){if(!value)throw Failure("mkv_memory_limit");}};
+
 // HEVC level 1 is encoded as 30, not 1 (FFmpeg6 H265 level table).
 // Only repair a reserved below-minimum declaration. Existing valid headers,
 // all NAL arrays and media packets remain untouched. The demuxer is Cast-owned.
@@ -231,6 +236,7 @@ void State::inspect(){
  if(keys.empty() || starts.front()>AV_TIME_BASE)throw Failure("mkv_first_cue_missing");starts.front()=0;starts.push_back(duration);
  for(size_t n=1;n<starts.size();n++)if(starts[n]<=starts[n-1] || starts[n]-starts[n-1]>30LL*AV_TIME_BASE)throw Failure("mkv_sparse_seek_index");
  repairReservedHevcLevel(stream->codecpar);
+ if(audio>=0 && format->streams[audio]->codecpar->codec_id==AV_CODEC_ID_EAC3)audioAdapter.reset(new CastAudioAdapter(format,audio,origin,duration,[this]{check();}));
  Output out;out.begin(*this);
  if(out.packetHeader){
   if(api().av_seek_frame(format,video,keys.front(),AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_header_seek_failed");
@@ -254,11 +260,14 @@ void State::inspect(){
 }
 std::vector<uint8_t> State::segment(int index){
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
+ std::vector<CastAudioAdapter::Encoded> converted;
+ if(audioAdapter)converted=audioAdapter->interval(starts[index],starts[index+1]);
  if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");
  Output out;out.begin(*this);if(!out.packetHeader && out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();Packet packet;int writtenVideo=0,writtenAudio=0;bool boundary=false;int64_t readPackets=0;
  const int64_t begin=starts[index]+origin,end=starts[index+1]+origin;
+ for(auto& encoded:converted){check();auto* p=packet.value;if(audioAdapter->a.av_new_packet(p,int(encoded.data.size()))<0)throw Failure("mkv_memory_limit");std::memcpy(p->data,encoded.data.data(),encoded.data.size());p->pts=p->dts=encoded.sample+10LL*audioAdapter->Rate;p->duration=encoded.duration;p->flags=encoded.flags;for(auto& side:encoded.side){auto* target=audioAdapter->a.av_packet_new_side_data(p,side.type,side.data.size());if(!target)throw Failure("mkv_memory_limit");std::memcpy(target,side.data.data(),side.data.size());}p->stream_index=1;p->pos=-1;if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_aac_packet_mux_failed");writtenAudio++;}
  for(;;){check();if(++readPackets>250000)throw Failure("mkv_packet_limit");int result=api().av_read_frame(format,packet.value);if(result==AVERROR_EOF)break;if(result<0)throw Failure("mkv_packet_read_failed");auto* p=packet.value;
-  int source=p->stream_index;if(source!=video && source!=audio){api().av_packet_unref(p);continue;}
+  int source=p->stream_index;if((source!=video && source!=audio) || (source==audio && audioAdapter)){api().av_packet_unref(p);continue;}
   auto* stream=format->streams[source];if(out.packetHeader && source==audio)validateDolby(p,stream->codecpar->codec_id);if(p->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");int64_t at=micros(p->pts,stream->time_base);
   if(source==video && (p->flags&AV_PKT_FLAG_KEY) && at>=end){if(boundary && at>end){api().av_packet_unref(p);break;}boundary=true;}
   if(at<begin || at>=end){api().av_packet_unref(p);continue;}
@@ -269,7 +278,7 @@ std::vector<uint8_t> State::segment(int index){
   if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_packet_mux_failed");
   if(source==video)writtenVideo++;else writtenAudio++;
  }
- if(!writtenVideo || (audio>=0 && !writtenAudio))throw Failure("mkv_empty_segment");
+ if(!writtenVideo || (audio>=0 && !audioAdapter && !writtenAudio))throw Failure("mkv_empty_segment");
  if(api().av_interleaved_write_frame(out.format,nullptr)<0 || api().av_write_frame(out.format,nullptr)<0 || api().av_write_trailer(out.format)<0)throw Failure("mkv_fragment_flush_failed");api().avio_flush(out.io);check();
  if(out.failure)throw Failure(out.failure);
  if(out.packetHeader){header=out.headerSize();if(std::vector<uint8_t>(out.bytes.begin(),out.bytes.begin()+header)!=init)throw Failure("mkv_init_changed");}

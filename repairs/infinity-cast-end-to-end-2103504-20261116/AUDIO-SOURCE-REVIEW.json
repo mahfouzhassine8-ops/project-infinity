@@ -1,0 +1,25 @@
+{
+  "reviewer": "Astra",
+  "status": "PROCEED_FOCUSED_STANDALONE_ARM64_ANDROID_NOT_SHIPMENT",
+  "reviewed_corrections": [
+    "Decoded layout/format/rate pinned before conversion",
+    "AAC flags and bounded side data preserved in mux",
+    "Empty EOF rejected",
+    "Shared block clock; fixed canonical windows",
+    "Encoder PTS sentinel check precedes addition"
+  ],
+  "remaining": [
+    "Actual Android encoder/JNI/relay execution",
+    "Complete affected host negative/preservation cases",
+    "Physical HEVC receiver support and playback"
+  ],
+  "source_hashes": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "5492a386abc301af1bd69db586ad3e22e726581047229bd26578bba5166c6ca9",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "9ddde4774a14d4b81c3d583093016678071a13db91148dc485f4317fff974686"
+  },
+  "builder_corrections": [
+    "Historical helper loaded from pinned git-show bytes, not assumed present in checkout",
+    "New audio APIs checked as defined externally visible dynamic functions"
+  ],
+  "review_limit": "Astra approved focused gate with these defensive corrections; no shipment approval"
+}
