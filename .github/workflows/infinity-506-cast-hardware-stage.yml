@@ -1,8 +1,8 @@
 name: Infinity506 Cast hardware exact unsigned staging - no rebuild
 on:
   push:
-    branches: [work/infinity-2103506-receiver-compatibility-20261117, work/infinity-2103508-cast-source-reader-20261117]
-    paths: [repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/STAGE-REQUEST.json, repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/INSTALL-REQUEST.json, repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/PUBLICATION-REQUEST.json, repairs/infinity-cast-source-reader-2103508-20261117/release/STAGE-REQUEST.json, repairs/infinity-cast-source-reader-2103508-20261117/release/INSTALL-REQUEST.json, repairs/infinity-cast-source-reader-2103508-20261117/release/PUBLICATION-REQUEST.json]
+    branches: [work/infinity-2103506-receiver-compatibility-20261117, work/infinity-2103508-cast-source-reader-20261117, work/infinity-2103510-cast-dual-failure-20261117]
+    paths: [repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/STAGE-REQUEST.json, repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/INSTALL-REQUEST.json, repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/PUBLICATION-REQUEST.json, repairs/infinity-cast-source-reader-2103508-20261117/release/STAGE-REQUEST.json, repairs/infinity-cast-source-reader-2103508-20261117/release/INSTALL-REQUEST.json, repairs/infinity-cast-source-reader-2103508-20261117/release/PUBLICATION-REQUEST.json, repairs/infinity-cast-dual-failure-2103510-20261117/release/STAGE-REQUEST.json, repairs/infinity-cast-dual-failure-2103510-20261117/release/INSTALL-REQUEST.json, repairs/infinity-cast-dual-failure-2103510-20261117/release/PUBLICATION-REQUEST.json]
 permissions: {contents: read, actions: read}
 concurrency: {group: infinity506-cast-hardware-stage, cancel-in-progress: false}
 jobs:
@@ -203,5 +203,105 @@ jobs:
         with:
           name: Infinity508-Cast-Source-Reader-QA-Publication-${{ github.run_id }}
           path: cast508-reader-publication/
+          if-no-files-found: error
+          retention-days: 90
+
+  dual-failure-stage:
+    if: startsWith(github.event.head_commit.message, 'Cast510 stage:') && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103510-cast-dual-failure-20261117'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.11.7'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '17'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Exact510 payload, compiled artifacts and genuine selected gate before staging
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python repairs/infinity-cast-dual-failure-2103510-20261117/release/stage.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with: {name: 'Infinity510-Cast-Dual-Failure-${{ github.run_id }}-UNSIGNED-NOT-INSTALLABLE', path: cast510-dual-stage/, if-no-files-found: error, retention-days: 90, compression-level: 6}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity510-Cast-Dual-Failure-Staging-${{ github.run_id }}-RECEIPTS-ONLY
+          path: |
+            cast510-dual-stage/STAGING.json
+            cast510-dual-stage/EXTERNAL-API.json
+            cast510-dual-stage/MEDIA.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  dual-failure-install:
+    if: startsWith(github.event.head_commit.message, 'Cast510 install:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    env: {PYTHONDONTWRITEBYTECODE: '1', GH_TOKEN: '${{ github.token }}'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.12'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Authenticate exact original-signed installers
+        run: |
+          python repairs/infinity-cast-dual-failure-2103510-20261117/release/install.py prepare
+          sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity510-cast-dual-install-only
+          disable-animations: false
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: python repairs/infinity-cast-dual-failure-2103510-20261117/release/install.py run
+      - name: Independently require install-over receipt
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('cast-final-install-results/INSTALL-OVER-AND-RECOVERY.json'))
+          assert r['status']=='PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY',r
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: Infinity510-Cast-Dual-Failure-Signed-Install-${{ github.run_id }}-EVIDENCE-ONLY
+          path: cast-final-install-results/
+          if-no-files-found: warn
+          retention-days: 90
+  dual-failure-publish:
+    if: startsWith(github.event.head_commit.message, 'Cast510 publish:')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    permissions: {contents: write, actions: read}
+    env: {PYTHONDONTWRITEBYTECODE: '1', GH_TOKEN: '${{ github.token }}'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.12'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Publish only independently reviewed original-signed install-tested pair
+        run: python repairs/infinity-cast-dual-failure-2103510-20261117/release/publish.py
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: Infinity510-Cast-Dual-Failure-QA-Publication-${{ github.run_id }}
+          path: cast510-dual-publication/
           if-no-files-found: error
           retention-days: 90
