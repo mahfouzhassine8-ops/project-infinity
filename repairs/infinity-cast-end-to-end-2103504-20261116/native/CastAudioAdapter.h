@@ -89,7 +89,7 @@ struct CastAudioAdapter {
      int64_t stampUs=api().av_rescale_q(frame->pts,source->time_base,AV_TIME_BASE_Q);
      if(stampUs==AV_NOPTS_VALUE || stampUs<origin-AV_TIME_BASE || stampUs>origin+duration+AV_TIME_BASE)throw Failure("mkv_audio_timestamp_range");
      int64_t stamp=samples(stampUs-origin);
-     if(clockAnchor==AV_NOPTS_VALUE){if(index!=0 || seekUs!=origin)throw Failure("mkv_audio_clock_unverified");clockAnchor=stamp;}
+     if(clockAnchor==AV_NOPTS_VALUE){if(index!=0 || seekUs!=origin)throw Failure("mkv_audio_clock_unverified");clockAnchor=stamp;if(clockAnchor>=samples(duration))throw Failure("mkv_audio_clock_unverified");}
      if(next==AV_NOPTS_VALUE){
       // EAC3 consists of 256-sample audio blocks (not a fixed packet size).
       // Decode from the single first-frame clock, recovering block position
@@ -115,9 +115,10 @@ struct CastAudioAdapter {
    }
    if(eof && next==AV_NOPTS_VALUE)throw Failure("mkv_audio_empty_decode");
    if(eof){knownEnd=observedEnd;last=std::min(last,knownEnd);if(last<=first){cleanup();return Window{};}}
-   // Only known leading silence before source time zero and bounded final
+   const int64_t feedEnd=eof?std::min(stop,std::min(total,knownEnd)):stop;
+   // Only the source-declared leading audio offset and bounded final
    // encoder padding may be synthesized. Missing interior PCM is never hidden.
-   for(size_t k=0;k<count;k++){int64_t at=warm+int64_t(k);if(!covered[k] && at>=0 && at<std::min(last,observedEnd))throw Failure("mkv_audio_sample_gap");}
+   for(size_t k=0;k<count;k++){int64_t at=warm+int64_t(k);if(!covered[k] && at>=std::max<int64_t>(0,clockAnchor) && at<std::min(feedEnd,observedEnd))throw Failure("mkv_audio_sample_gap");}
    if(!complete && !eof)throw Failure("mkv_audio_incomplete_window");
    enc=openEncoder();pcm->format=enc->sample_fmt;pcm->sample_rate=Rate;pcm->ch_layout=AV_CHANNEL_LAYOUT_STEREO;pcm->nb_samples=FrameSize;
    if(a.av_frame_get_buffer(pcm,0)<0)throw Failure("mkv_audio_frame_allocation");
@@ -125,14 +126,14 @@ struct CastAudioAdapter {
    auto encoded=[&]{for(;;){check();int code=a.avcodec_receive_packet(enc,packet.value);if(code==AVERROR(EAGAIN) || code==AVERROR_EOF)return;if(code<0)throw Failure("mkv_audio_encode_failed");
     auto* p=packet.value;
     if(p->pts==AV_NOPTS_VALUE || p->pts < -FrameSize || p->pts > stop-warm+FrameSize)throw Failure("mkv_audio_unverified_packet");int64_t at=p->pts+warm;
-    if( p->duration!=FrameSize || p->size<=0 || p->size>65536)throw Failure("mkv_audio_unverified_packet");
-    if(at>=first && at<last){Encoded item{{p->data,p->data+p->size},at,int(std::min<int64_t>(FrameSize,(knownEnd>=0?std::min(total,knownEnd):total)-at)),p->flags,{}};
+    if( (p->duration<=0 || p->duration>FrameSize) || p->size<=0 || p->size>65536)throw Failure("mkv_audio_unverified_packet");
+    if(at>=first && at<last){Encoded item{{p->data,p->data+p->size},at,int(std::min<int64_t>(p->duration,(knownEnd>=0?std::min(total,knownEnd):total)-at)),p->flags,{}};
      if(p->side_data_elems>16)throw Failure("mkv_audio_side_data_limit");size_t sideBytes=0;for(int k=0;k<p->side_data_elems;k++){sideBytes+=p->side_data[k].size;if(sideBytes>65536)throw Failure("mkv_audio_side_data_limit");item.side.push_back({p->side_data[k].type,{p->side_data[k].data,p->side_data[k].data+p->side_data[k].size}});}result.packets.push_back(std::move(item));}api().av_packet_unref(p);
    }};
-   for(int64_t at=warm;at+FrameSize<=stop;at+=FrameSize){check();if(a.av_frame_make_writable(pcm)<0)throw Failure("mkv_audio_frame_writable");
-    size_t offset=size_t(at-warm);std::memcpy(pcm->data[0],left.data()+offset,FrameSize*sizeof(float));std::memcpy(pcm->data[1],right.data()+offset,FrameSize*sizeof(float));pcm->pts=at-warm;
+   for(int64_t at=warm;at<feedEnd;at+=FrameSize){check();if(a.av_frame_make_writable(pcm)<0)throw Failure("mkv_audio_frame_writable");
+    size_t offset=size_t(at-warm);pcm->nb_samples=int(std::min<int64_t>(FrameSize,feedEnd-at));std::memcpy(pcm->data[0],left.data()+offset,pcm->nb_samples*sizeof(float));std::memcpy(pcm->data[1],right.data()+offset,pcm->nb_samples*sizeof(float));pcm->pts=at-warm;
     if(a.avcodec_send_frame(enc,pcm)<0)throw Failure("mkv_audio_encoder_admission_failed");encoded();}
-   if(eof){if(a.avcodec_send_frame(enc,nullptr)<0)throw Failure("mkv_audio_encoder_drain_failed");encoded();}
+   if(eof && feedEnd==std::min(total,knownEnd)){if(a.avcodec_send_frame(enc,nullptr)<0)throw Failure("mkv_audio_encoder_drain_failed");encoded();}
    const int64_t expected=(last-first+FrameSize-1)/FrameSize;
    if(int64_t(result.packets.size())!=expected)throw Failure("mkv_audio_packet_coverage");
    for(size_t k=0;k<result.packets.size();k++)if(result.packets[k].sample!=first+int64_t(k)*FrameSize)throw Failure("mkv_audio_packet_grid");

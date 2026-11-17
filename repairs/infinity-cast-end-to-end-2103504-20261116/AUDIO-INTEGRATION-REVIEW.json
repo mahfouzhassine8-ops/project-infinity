@@ -1,0 +1,20 @@
+{
+  "reviewer": "Astra",
+  "status": "PROCEED_FINAL_CAST_ONLY_ARM64_THEN_ANDROID_NOT_SHIPMENT",
+  "source_hashes": {
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef"
+  },
+  "reviewed": [
+    "EAC3-only prior-cue DTS recovery",
+    "Source-declared leading offset",
+    "Actual small final frame and real EOF flush",
+    "EOF within canonical lookahead corrected without changing packet ownership",
+    "Format/rate/layout changes refused",
+    "Packet flags/side metadata retained",
+    "Android probe isolation and stronger rendered/seek outcomes"
+  ],
+  "host_evidence": "evidence/HOST-FINAL.json",
+  "Android": "PENDING",
+  "physical_TV": "NOT_TESTED"
+}

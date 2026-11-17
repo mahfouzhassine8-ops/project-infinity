@@ -20,5 +20,13 @@
   "engine_rebuild": false,
   "shutdown_test": false,
   "protected": "All non-Cast payload, settings and user records frozen; no profile or database mutations",
-  "owner_implementation_authorized": true
+  "owner_implementation_authorized": true,
+  "build_and_test_only": [
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_native.py",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_android.py",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/run_android.py",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/tests",
+    ".github/workflows/infinity-504-cast-audio-native.yml",
+    ".github/workflows/infinity-504-cast-audio-android.yml"
+  ]
 }

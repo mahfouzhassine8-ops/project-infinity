@@ -262,7 +262,9 @@ std::vector<uint8_t> State::segment(int index){
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
  std::vector<CastAudioAdapter::Encoded> converted;
  if(audioAdapter)converted=audioAdapter->interval(starts[index],starts[index+1]);
- if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");
+ // Recover demuxer DTS before the requested cue; never infer new video DTS.
+ const size_t seekIndex=audioAdapter && index>0?size_t(index-1):size_t(index);
+ if(api().av_seek_frame(format,video,keys[seekIndex],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");
  Output out;out.begin(*this);if(!out.packetHeader && out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();Packet packet;int writtenVideo=0,writtenAudio=0;bool boundary=false;int64_t readPackets=0;
  const int64_t begin=starts[index]+origin,end=starts[index+1]+origin;
  for(auto& encoded:converted){check();auto* p=packet.value;if(audioAdapter->a.av_new_packet(p,int(encoded.data.size()))<0)throw Failure("mkv_memory_limit");std::memcpy(p->data,encoded.data.data(),encoded.data.size());p->pts=p->dts=encoded.sample+10LL*audioAdapter->Rate;p->duration=encoded.duration;p->flags=encoded.flags;for(auto& side:encoded.side){auto* target=audioAdapter->a.av_packet_new_side_data(p,side.type,side.data.size());if(!target)throw Failure("mkv_memory_limit");std::memcpy(target,side.data.data(),side.data.size());}p->stream_index=1;p->pos=-1;if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_aac_packet_mux_failed");writtenAudio++;}
@@ -286,7 +288,7 @@ std::vector<uint8_t> State::segment(int index){
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
 std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
-std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
+std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioAdapter?"aac":audioName)<<"\",\"audio_input\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
 } // namespace InfinityMkv
 #ifndef INFINITY_REMUX_HOST
 namespace {
