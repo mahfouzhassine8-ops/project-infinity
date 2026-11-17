@@ -1,5 +1,5 @@
 {
-  "source_commit": "1bedd1fac8d84463d74ce3bcc9fb4e99c41c6f98",
+  "source_commit": "c2867e02e0d745dddb6d4e600544fa47ae7c25a4",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -12,10 +12,10 @@
   },
   "inputs": {
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "fdd339d530bd13c8f41cb50a7415fb732cedfeaea35597853d90fcc2995b5aa5",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "aa9aec3907eda0bf7cf98de2a00515da69285a3f6eca1a6601f78d1de3b83f68",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "93018eafbac0095e0f09ec02c9174b2757a30d3748d2a4665988c5acdda702d5",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "527a0b1667975cbb2eff3e0a60c09b2ae84e116a4ff1a550b9c696361ff06bda",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "59ae6ec3ccd8f35075c3c2624932d290ae91d9fb51d07234951241fce2d784e8",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "2e930834eba8c157d6f1b023730187c6bc9e5d016f2051ebbbb9e6ecedd44cf5",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "dabae25bd102ac716a59ff699379c6965c109ee6ea3a10a5eb5579ea1847e774",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/run_pipeline.py": "77fa5a7d6c7b58f7b819aec32173a68cb861ba93783f4d3429097df610afeaf3",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/tests/VideoContractTest.java": "a6e3c064cfa9216ab089d349f56c3285d99e684c331bde00b60504b18158cca8",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastAdaptive.java": "aa0b978cf26910ace0919b221a7e03888b36602621cae117fe2b3a808dabce08",
@@ -39,22 +39,24 @@
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "925267efe4d6b8be020ff474eea690eb439344bfb15b04653e6f8be71fef1225",
     ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/HlsServer.java": "76b4cf54529486c582a0b436bf834c281693bfb6555b372972a1c622fc53549f",
-    "repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/MkvHlsPlayerProbe.java": "9b00aafb3518b433b4183beef89231389fe6126cd1f07754b7f1b9a7db7bcee8"
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "15b709a0e150aac62193fddc0833d4f9578a846aeb79a76331926d0e49bc1435",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/Origin.java": "af60626c3369288206109ccb7aeb993813b4a52b46c35479ddd78235c36110a5",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/MkvHlsPlayerProbe.java": "1e0d772c3ca84bf56c32f36a786accdd46327fab1b5dbfd1b7d72fbe5e5078ed"
   },
-  "selected_case": "Fix negative fixture explicit JNI load; reuse exact compiled Cast bridge and engine; actual HLS/seek/AAC preservation plus selected cleanup negatives",
+  "selected_case": "Production verified Cast DEX and privateRelay HLS playback+postseek video/audio advancement+Range+provider auth. Source changed only HighTier guard: compile Cast bridge only. Reuse Kodi and all DEX. Selected failure cleanup negatives.",
   "engine_build": false,
   "owner_APK": false,
   "shutdown": false,
   "previous_run_cancelled_before_compilation": 44034010331,
   "retained_first_pipeline_run": 44034181964,
   "previous_HLS_harness_failure": 44035518520,
-  "reuse_native": {
-    "run": 44037322862,
-    "id": 14307773098,
-    "name": "Infinity506-MediaCodec-Pipeline-44037322862-EVIDENCE-ONLY",
-    "size_in_bytes": 1391204,
-    "digest": "sha256:68b02adc3323545f91794143d68d989db50c4c7b1be2a87ade71e5158862e998",
-    "source": "2b06a081ee19cb17d860835894070991384d1c36",
-    "workflow_id": 421009620
+  "component": {
+    "run": 44039053105,
+    "id": 14308522648,
+    "name": "Infinity506-Cast-Component-44039053105-NOT-INSTALLER",
+    "size_in_bytes": 836098,
+    "digest": "sha256:946e61bb6de4f6f64147fa6981a0e33b6b8fba61b86b18f0eb4d34cde2eaeb71",
+    "source": "94bcfcee1601b4992b72734ca676d8bc83d61d0a",
+    "workflow_id": 421031076
   }
 }
