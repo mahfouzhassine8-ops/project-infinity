@@ -10,5 +10,6 @@ int main(){int checks=0;auto good=fixture();auto parsed=CastVideoResult::parse(g
  for(size_t n=0;n<good.size();n++)bad(std::vector<uint8_t>(good.begin(),good.begin()+n));
  for(size_t at:{size_t(0),size_t(4),size_t(8),size_t(12),size_t(16),size_t(20),size_t(24),size_t(28),size_t(32)}){auto b=good;b[at]^=0x80;bad(b);}
  auto trailing=good;trailing.push_back(0);bad(trailing);auto overflow=good;std::fill(overflow.begin()+50,overflow.begin()+58,255);bad(overflow);
+ std::vector<uint8_t> hvcc(23,0);hvcc[0]=1;hvcc[1]=1;hvcc[22]=1;hvcc.insert(hvcc.end(),{33,0,1,0,4,66,1,1,96});AVCodecParameters h{};h.codec_id=AV_CODEC_ID_HEVC;h.extradata=hvcc.data();h.extradata_size=int(hvcc.size());auto config=CastVideoSource::configuration(&h);if(config.first.empty())return 1;checks++;hvcc[1]|=32;try{CastVideoSource::configuration(&h);return 1;}catch(const Failure& e){if(std::string(e.what())!="cast_hw_source_high_tier_unsupported")return 1;checks++;}
  std::cout<<"PASS_NATIVE_VIDEO_BATCH_CONTRACT "<<checks<<"\n";
 }

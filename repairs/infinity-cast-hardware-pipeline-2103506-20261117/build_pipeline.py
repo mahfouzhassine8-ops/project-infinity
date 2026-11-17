@@ -51,17 +51,27 @@ def main():
  exports=set(native['exports']);old_exports={'open','inspect','init','segment','cancel','close','active'}
  assert exports=={'Java_com_projectinfinity_kodi_InfinityCastRemuxNative_'+n for n in old_exports|{'configureVideo'}}
  (OUT/'ARM64.json').write_text(json.dumps(native,indent=2)+'\n')
+ component=c.obtain(r['component'],'pipeline506-verified-production-component');compiled=json.loads(c.unique(component,'COMPONENT-RESULT.json').read_bytes());contract=json.loads(c.unique(component,'CAST506-COMPONENT.json').read_bytes());assert compiled['status']=='PASS_COMPONENT_COMPILE_AND_EXISTING_API_LINK_CONTRACT' and contract['status']=='PASS_CHANGED_CAST_COMPONENT_AND_EXTERNAL_API_CONTRACT'
+ assert compiled['baseline_APK_sha256']==r['baseline']['APK_sha256']
+ for name,digest in compiled['feature_Java_sha256'].items():assert sha(CAST/name)==digest,name
+ cast_dex=c.unique(component,'classes.dex');assert sha(cast_dex)==compiled['dex']['classes.dex']
+ sys.path.insert(0,str(HERE));from component_contract import verify as reverse_contract
+ (OUT/'EXTERNAL-API.json').write_text(json.dumps(reverse_contract(apk,cast_dex.parent),indent=2)+'\n')
  fixtures=OUT/'fixtures';fixtures.mkdir()
  # Explicit SDR709: neither Main10 nor an absent transfer field implies HDR.
  run('ffmpeg','-nostdin','-v','error','-y','-f','lavfi','-i','testsrc2=size=320x180:rate=24','-f','lavfi','-i','sine=frequency=440:sample_rate=48000','-t','6.02','-c:v','libx265','-preset','ultrafast','-pix_fmt','yuv420p','-color_primaries','bt709','-color_trc','bt709','-colorspace','bt709','-color_range','tv','-x265-params','open-gop=0:pools=1:frame-threads=1:log-level=error:keyint=48:min-keyint=48:bframes=2:scenecut=0','-c:a','eac3','-b:a','192k',fixtures/'hevc-eac3.mkv')
  sdk=Path(os.environ['ANDROID_HOME']);bt=sdk/'build-tools/35.0.0';android=sdk/'platforms/android-35/android.jar';classes=OUT/'classes';classes.mkdir();dex=OUT/'dex';dex.mkdir()
  names=['InfinityCastRemux','InfinityCastRemuxNative','InfinityCastReceiverPolicy','InfinityCastDiagnostics','InfinityCastHardwareVideo','InfinityCastGpuSurface','InfinityCastVideoContract']
- sources=[CAST/'java/com/projectinfinity/kodi'/ (n+'.java') for n in names]+list((HERE/'android').glob('*.java'))+[ROOT/'repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/MkvHlsPlayerProbe.java']
+ stubs=OUT/'stubs/com/projectinfinity/kodi';stubs.mkdir(parents=True)
+ (stubs/'InfinityCastSource.java').write_text('package com.projectinfinity.kodi; final class InfinityCastSource {static InfinityCastSource parse(String s){throw new AssertionError("compile only");}}')
+ (stubs/'InfinityCastRelay.java').write_text('package com.projectinfinity.kodi; import java.io.*;import java.net.*; final class InfinityCastRelay {interface Ready {void ready(InfinityCastRelay r,String mime,String failure);}static InfinityCastRelay start(InetAddress a,InfinityCastSource s,InfinityCastReceiverPolicy.Receiver p,InfinityCastHardwareVideo.Factory f,Ready r)throws IOException{throw new AssertionError("compile only");}String address(){throw new AssertionError();}long durationMs(){throw new AssertionError();}static boolean busy(){throw new AssertionError();}void closeWhenRetired(Runnable r){throw new AssertionError();}void close(){throw new AssertionError();}}')
+ sources=[CAST/'java/com/projectinfinity/kodi'/ (n+'.java') for n in names]+list((HERE/'android').glob('*.java'))+list(stubs.glob('*.java'))
  run('javac','-source','8','-target','8','-bootclasspath',str(android)+':'+str(bt/'core-lambda-stubs.jar'),'-d',classes,*sources)
- jar=OUT/'pipeline-probe.jar'
- with ZipFile(jar,'w',ZIP_DEFLATED) as z:
-  for p in classes.rglob('*.class'):z.write(p,p.relative_to(classes))
- run('java','-cp',bt/'lib/d8.jar','com.android.tools.r8.D8','--min-api','30','--lib',android,'--output',dex,jar)
+ jar=OUT/'pipeline-probe.jar';stubjar=OUT/'compile-only.jar';test_roots=('InfinityCastProbeActivity','Origin','MkvHlsPlayerProbe','HlsServer')
+ with ZipFile(jar,'w',ZIP_DEFLATED) as z,ZipFile(stubjar,'w',ZIP_DEFLATED) as compile_only:
+  for p in classes.rglob('*.class'):
+   root=p.name.split('$')[0].split('.')[0];(z if root in test_roots else compile_only).write(p,p.relative_to(classes))
+ run('java','-cp',bt/'lib/d8.jar','com.android.tools.r8.D8','--min-api','30','--lib',android,'--classpath',stubjar,'--output',dex,jar)
  loader=OUT/'libinfinitycastqaloader.so';ndk=sdk/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin'
  run(ndk/'aarch64-linux-android21-clang++','-shared','-fPIC',ROOT/'repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/loader.cpp','-ldl','-Wl,-z,max-page-size=16384','-o',loader)
  manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.castqa.pipeline" android:versionCode="1" android:versionName="CI-only"><uses-sdk android:minSdkVersion="30" android:targetSdkVersion="35"/><uses-permission android:name="android.permission.INTERNET"/><application android:extractNativeLibs="true" android:label="Cast pipeline CI only" android:theme="@android:style/Theme.Material.NoActionBar" android:usesCleartextTraffic="true"><activity android:name="com.projectinfinity.kodi.InfinityCastProbeActivity" android:exported="true"/></application></manifest>''')
@@ -85,7 +95,7 @@ def main():
   assert excluded==['classes6.dex'],excluded
   for lib in ('libkodi.so','libc++_shared.so','libshairplay.so'):
    n='lib/arm64-v8a/'+lib;data=base.read(n);z.writestr(n,data);native_hashes[lib]=hashlib.sha256(data).hexdigest()
-  z.write(native_work/'native/libinfinitycastremux.so','lib/arm64-v8a/libinfinitycastremux.so');z.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');z.write(dex/'classes.dex',excluded[0]);z.write(fixtures/'hevc-eac3.mkv','assets/hevc-eac3.mkv')
+  z.write(native_work/'native/libinfinitycastremux.so','lib/arm64-v8a/libinfinitycastremux.so');z.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');z.write(cast_dex,excluded[0]);z.write(dex/'classes.dex','classes'+str(max(indices)+1)+'.dex');z.write(fixtures/'hevc-eac3.mkv','assets/hevc-eac3.mkv')
  with ZipFile(unsigned) as z:
   dex_names=[n for n in z.namelist() if re.fullmatch(r'classes\d*\.dex',n)]
   sequence=sorted(int(re.search(r'\d+',n).group()) if re.search(r'\d+',n) else 1 for n in dex_names)

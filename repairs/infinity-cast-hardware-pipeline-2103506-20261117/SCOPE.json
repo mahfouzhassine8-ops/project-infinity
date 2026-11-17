@@ -31,7 +31,8 @@
     "Android small synthetic MediaCodec\u2192EGL\u2192AVC pipeline, AAC/fMP4 playback, adjacent/out-of-order/seek, cancellation and release; private separate CI package allows bounded small software backend for correctness only",
     "Production hardware-only codec/profile/raster/rate selection; concurrent configure, sample throughput and thermal checks with truthful physical qualification pending",
     "Focused Cast ARM64/JNI and exact source/APK preservation, original-signed install-over QA/recovery when justified",
-    "Changed Cast component compile/link with original pinned SDK/private dependency versions; verify external baseline APIs and no Cobra imports. All nonCast DEX and Kodi reused."
+    "Changed Cast component compile/link with original pinned SDK/private dependency versions; verify external baseline APIs and no Cobra imports. All nonCast DEX and Kodi reused.",
+    "Use the authenticated compiled production Cast DEX and actual private Relay for HTTP200/complete-fragment Range behavior, original provider authentication, actual HLS audio/video play and post-seek video/audio advancement; no Cast SDK or engine rebuild."
   ],
   "Kodi_rebuild": false,
   "unrelated_DEX_rebuild": false,
