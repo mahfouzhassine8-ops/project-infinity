@@ -35,10 +35,10 @@ struct CastAudioAdapter {
  struct Encoded {std::vector<uint8_t> data;int64_t sample;int duration;int flags;std::vector<Side> side;};
  struct Window {std::vector<Encoded> packets;};
  AudioApi a; AVFormatContext* input;int stream;int64_t origin,duration;
- std::function<void()> check;AVCodecContext* encoder=nullptr;
+ std::function<void()> check;std::function<bool(int64_t)> sourceSeek;AVCodecContext* encoder=nullptr;
  std::map<int64_t,Window> cache;int64_t knownEnd=-1,clockAnchor=AV_NOPTS_VALUE;
- CastAudioAdapter(AVFormatContext* input,int stream,int64_t origin,int64_t duration,std::function<void()> check)
-  :Rate(input->streams[stream]->codecpar->sample_rate),input(input),stream(stream),origin(origin),duration(duration),check(std::move(check)) {
+ CastAudioAdapter(AVFormatContext* input,int stream,int64_t origin,int64_t duration,std::function<void()> check,std::function<bool(int64_t)> sourceSeek={})
+  :Rate(input->streams[stream]->codecpar->sample_rate),input(input),stream(stream),origin(origin),duration(duration),check(std::move(check)),sourceSeek(std::move(sourceSeek)) {
   if(Rate!=32000 && Rate!=44100 && Rate!=48000)throw Failure("mkv_aac_sample_rate_unsupported");
   encoder=openEncoder();
  }
@@ -76,7 +76,11 @@ struct CastAudioAdapter {
    // Seek earlier than the warm-up boundary so decoder and resampler reach
    // steady state before the exact, source-anchored PCM extraction interval.
    const int64_t seekUs=origin+std::max<int64_t>(0,api().av_rescale_q(warm,{1,Rate},AV_TIME_BASE_Q)-AV_TIME_BASE/2);
-   if(api().av_seek_frame(input,stream,api().av_rescale_q(seekUs,AV_TIME_BASE_Q,source->time_base),AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_audio_seek_failed");
+   // Optional Cast-owned indexed source access; no PCM/sample-grid/encoder change.
+   // The callback must select a real cue no later than the same warm-up point.
+   if(!sourceSeek || !sourceSeek(seekUs)){
+    if(api().av_seek_frame(input,stream,api().av_rescale_q(seekUs,AV_TIME_BASE_Q,source->time_base),AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_audio_seek_failed");
+   }
    int64_t next=AV_NOPTS_VALUE,observedEnd=0;bool complete=false,eof=false;int packets=0;
    auto receive=[&]{
     for(;;){check();int code=a.avcodec_receive_frame(dec,frame);if(code==AVERROR(EAGAIN) || code==AVERROR_EOF)return;if(code<0)throw Failure("mkv_audio_decode_failed");

@@ -1,0 +1,47 @@
+{
+  "foundation_versionCode": 2103508,
+  "foundation_APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16",
+  "foundation_artifact": {
+    "run": 44054993516,
+    "id": 14315957113,
+    "name": "Infinity506-Cast-Hardware-OriginalSigned-44054993516-QA",
+    "size_in_bytes": 331012243,
+    "digest": "sha256:345a2455458eefdc352b3ec9412f83af72f2ea53aac821ad44c61912e052d685",
+    "source": "dfae0d04d29bbe6b3430ed304fc04de581f18566",
+    "workflow_id": 397702717,
+    "APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16"
+  },
+  "source_checkpoint": "caf4109e",
+  "preserved_baselines": [
+    2103506,
+    2103504
+  ],
+  "allowed_source": {
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "925267efe4d6b8be020ff474eea690eb439344bfb15b04653e6f8be71fef1225",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "95c9b802cd9c70872ebc9d0a3731adc839086b44cfc130e8d61f27af0f394c66",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "592e8d895691207aedba3a1b24985ed28e2b36caab8043df3459e7b335111f2a",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "3874091368f56715da9b462ef7f2c3cca25b6ac63ee47ba398c133423a8b6446",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef"
+  },
+  "scope": "Cast MKV source-read amplification only; AAC source-seek changes only if sparse-index scan reproduced. Preserve AAC sample/encoder algorithm, hardware pipeline and receiver compatibility policy.",
+  "selected_tests": [
+    "Before/after actual pinnedFFmpeg6 demux reads/seeks per bounded request: closedGOP highbitrate+EAC3, sequential/cold/random/regenerated; exactvideo bytes/PTS/DTS, exactAAC timeline/durations, decodedalignment and candidate determinism; planner-ceiling/readlimit/cancel negatives",
+    "Focused Cast-only component/JNI ARM64 build and realAndroid privateRelay/HLS continuation and seeking/cancellation; reuse originalKodi and allnonCastDEX; do not rerun completed hardware capability matrix",
+    "Required original signer, source/APK preservation, install-over/recovery and QA publication gates"
+  ],
+  "out_of_scope": "Cobra, Kodi engine/shared runtime, shutdown, receiver-policy/codec experiments, allotherInfinitycomponents, settings/profiles/userdata",
+  "source_budget_bytes": 33554432,
+  "budget_policy": "Remain bounded; no removal or unmeasured widening/resetting. Any adjustment requires source-backed accounting and independent review.",
+  "shutdown": false,
+  "engine_build": false,
+  "owner_testing_requested": false,
+  "read_budget_floor_bytes": 33554432,
+  "read_budget_ceiling_bytes": 134217728,
+  "read_budget_policy": "One checked, serialized request allowance from validated cue byte ranges and simulated uncached canonical AAC passes; no replenishment on seeks, no proportional buffer allocation. Reject above ceiling; retain15s deadline/output8MiB/packet250000/cancel guards. Unverified range plan keeps original32MiB behavior.",
+  "AAC_seek_justification": "Host coldseek measured65,271,291\u219251,750,554 sourcebytes with indexed video-cue access. PCM/sample-grid/encoder math unchanged; byte identity notclaimed, decodedalignment+determinism required.",
+  "orchestration_allowed": [
+    ".github/workflows/infinity-506-cast-component.yml",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml"
+  ]
+}

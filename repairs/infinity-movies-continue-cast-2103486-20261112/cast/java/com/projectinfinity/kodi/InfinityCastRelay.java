@@ -316,11 +316,11 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     }
     /** Native reads use the SAME authenticated, TLS-verifying origin policy. */
     final class RemuxInput implements InfinityCastRemux.Input {
-        private Response response;private InputStream body;private long position,total=-1,remaining;private String validator,problem="";
+        private Response response;private InputStream body;private long position,total=-1,remaining,consumed,seekCount,rangeRequests;private String validator,problem="";
         private void disconnect(){if(response!=null){release(response);response=null;body=null;}}
         private void connect(long target) throws IOException {
             disconnect();if(closed)throw new IOException("mkv_cancelled");
-            response=open(root,"GET","bytes="+target+"-");
+            rangeRequests++;response=open(root,"GET","bytes="+target+"-");
             long length=-1;String range=response.header("Content-Range");
             if(response.code()==206 && range!=null && range.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}")) {
                 String[] parts=range.substring(6).split("[-/]");if(Long.parseLong(parts[0])!=target)throw new IOException("mkv_invalid_source_range");length=Long.parseLong(parts[2]);
@@ -332,14 +332,15 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             total=length;position=target;if(response.body()==null)throw new IOException("mkv_source_body_missing");body=response.body().byteStream();
         }
         private IOException failed(IOException error){String code=error.getMessage();problem=code!=null && code.matches("[a-z][a-z0-9_]{0,63}")?code:"mkv_source_network_failure";return new IOException(problem);}
-        public void budget(long bytes){remaining=bytes;problem="";}
+        public void budget(long bytes){if(bytes<0 || bytes>134217728L)throw new IllegalArgumentException("mkv_source_budget_invalid");remaining=bytes;consumed=seekCount=rangeRequests=0;problem="";}
+        public long[] usage(){return new long[]{consumed,seekCount,rangeRequests,remaining};}
         public int read(byte[] target,int size) throws IOException {
-            try{if(closed)throw new IOException("mkv_cancelled");if(total>0 && position==total)return 0;if(remaining<=0)throw new IOException("mkv_source_read_limit");if(body==null)connect(position);int count=body.read(target,0,(int)Math.min(remaining,Math.min(size,target.length)));if(count>0){position+=count;remaining-=count;}return Math.max(0,count);}catch(IOException error){throw failed(error);}
+            try{if(closed)throw new IOException("mkv_cancelled");if(total>0 && position==total)return 0;if(remaining<=0)throw new IOException("mkv_source_read_limit");if(body==null)connect(position);int count=body.read(target,0,(int)Math.min(remaining,Math.min(size,target.length)));if(count>0){position+=count;remaining-=count;consumed+=count;}return Math.max(0,count);}catch(IOException error){throw failed(error);}
         }
         public long seek(long offset,int whence) throws IOException {
             try {
                 if(closed)throw new IOException("mkv_cancelled");if(total<0)connect(0);
-                if((whence&0x10000)!=0)return total;whence&=~0x20000;
+                if((whence&0x10000)!=0)return total;seekCount++;whence&=~0x20000;
                 long next=whence==0?offset:whence==1?position+offset:whence==2?total+offset:-1;
                 if(next<0 || next>total)throw new IOException("mkv_invalid_source_seek");if(next==position)return position;
                 if(next==total){disconnect();position=next;return next;}connect(next);return position;

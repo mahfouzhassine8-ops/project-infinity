@@ -1,0 +1,17 @@
+{
+  "status": "PASS_PLAN_BOUNDARY_AND_PRESERVATION_NEGATIVES",
+  "checks": 15,
+  "cases": [
+    "plannerperformsnoI/O",
+    "exact128MiB",
+    "onebyteover128MiBrejected",
+    "smallfile/singlecueEOF/lastseekscan",
+    "unverifiedplanretains32MiB",
+    "AVC5/HEVC20earlycut",
+    "HEVC19RADLretainsoldfallback",
+    "cancelbeforeI/O",
+    "nonadaptedaudiokeeps32MiB"
+  ],
+  "native_source_sha256": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9",
+  "engine_rebuilt": false
+}

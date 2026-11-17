@@ -14,6 +14,7 @@ final class InfinityCastRemux implements AutoCloseable {
         long seek(long offset,int whence) throws IOException;
         String failure();
         void budget(long bytes);
+        default long[] usage(){return new long[0];}
         @Override void close();
     }
     private final Input input;
@@ -64,10 +65,11 @@ final class InfinityCastRemux implements AutoCloseable {
             InfinityCastDiagnostics.event("receiver_policy",choice.reason,choice.path.ordinal());
             if(choice.path==InfinityCastReceiverPolicy.Path.HARDWARE_AVC_720_REQUIRED){
                 if(factory==null)throw new IOException("receiver_requires_hardware_avc_720");
-                hardwareVideo=factory.create();check();input.budget(32L*1024*1024);
+                hardwareVideo=factory.create();check();long readBudget=0;boolean budgetInstalled=false;
                 JSONObject output;
-                try{output=new JSONObject(InfinityCastRemuxNative.configureVideo(handle,hardwareVideo));}
-                catch(IOException error){throw failure(error);}catch(Exception invalid){throw new IOException("cast_hw_output_description");}
+                try{readBudget=InfinityCastRemuxNative.readBudget(handle,0);if(readBudget<33554432L || readBudget>134217728L)throw new IOException("mkv_source_budget_invalid");input.budget(readBudget);budgetInstalled=true;output=new JSONObject(InfinityCastRemuxNative.configureVideo(handle,hardwareVideo));}
+                catch(IOException error){throw budgetInstalled?failure(error):error;}catch(Exception invalid){throw new IOException("cast_hw_output_description");}
+                finally{reportSource(0,readBudget,budgetInstalled);}
                 video=output.optString("video");audio=output.optString("audio");codecs=output.optString("codecs");
                 if(!"h264".equals(video)||!codecs.matches("avc1\\.[0-9A-F]{6}(?:,mp4a\\.40\\.[0-9]+)?"))throw new IOException("cast_hw_output_codec");
                 initialization=InfinityCastRemuxNative.init(handle);if(initialization==null||initialization.length<16||initialization.length>1048576)throw new IOException("cast_hw_output_init");fragments.clear();master=null;
@@ -108,11 +110,24 @@ final class InfinityCastRemux implements AutoCloseable {
             if(!suffix.matches("[0-9]{1,4}\\.m4s"))throw new IOException("mkv_unknown_resource");
             int index=Integer.parseInt(suffix.substring(0,suffix.length()-4));if(starts==null || index>=starts.length-1)throw new IOException("mkv_segment_out_of_range");
             byte[] bytes=fragments.get(index);if(bytes!=null)return bytes;
-            try{input.budget(32L*1024*1024);bytes=InfinityCastRemuxNative.segment(handle,index);check();if(bytes==null || bytes.length==0 || bytes.length>8388608)throw new IOException("mkv_fragment_limit");}
-            catch(IOException error){throw failure(error);}
+            long readBudget=0;boolean budgetInstalled=false;
+            try{readBudget=InfinityCastRemuxNative.readBudget(handle,index);if(readBudget<33554432L || readBudget>134217728L)throw new IOException("mkv_source_budget_invalid");input.budget(readBudget);budgetInstalled=true;bytes=InfinityCastRemuxNative.segment(handle,index);check();if(bytes==null || bytes.length==0 || bytes.length>8388608)throw new IOException("mkv_fragment_limit");}
+            catch(IOException error){throw budgetInstalled?failure(error):error;}
+            finally{reportSource(index,readBudget,budgetInstalled);}
             while(fragments.size()>=2)fragments.remove(fragments.keySet().iterator().next());fragments.put(index,bytes);
             InfinityCastDiagnostics.event("mkv_fragment","copied",index);return bytes;
         }
+    }
+    /** Numeric-only, bounded best-effort outcome reporting; never masks the request failure. */
+    private void reportSource(int index,long budget,boolean budgetInstalled){
+        try{
+            long[] nativeStats=InfinityCastRemuxNative.sourceStats(handle),origin=budgetInstalled?input.usage():new long[0];
+            InfinityCastDiagnostics.event("mkv_source","fragment_index",index);
+            InfinityCastDiagnostics.event("mkv_source","read_budget_bytes",(int)budget);
+            if(origin.length==4){InfinityCastDiagnostics.event("mkv_source","bytes_consumed",(int)origin[0]);InfinityCastDiagnostics.event("mkv_source","seek_count",(int)Math.min(Integer.MAX_VALUE,origin[1]));InfinityCastDiagnostics.event("mkv_source","range_requests",(int)Math.min(Integer.MAX_VALUE,origin[2]));}
+            if(budgetInstalled && nativeStats!=null && nativeStats.length==7 && nativeStats[0]==index){String[] phases={"aac_bytes","preroll_bytes","selected_bytes","lookahead_bytes"};for(int n=0;n<4;n++)InfinityCastDiagnostics.event("mkv_source",phases[n],(int)nativeStats[n+1]);}
+            if(budgetInstalled && "mkv_source_read_limit".equals(input.failure()))InfinityCastDiagnostics.event("mkv_source","budget_exhausted",1);
+        }catch(IOException|RuntimeException|OutOfMemoryError unavailable){/* Logging cannot change playback/cancellation outcomes. */}
     }
     /** Called immediately on cancel; never waits for the worker/native mutex. */
     void cancel(){cancelled=true;InfinityCastHardwareVideo hw=hardwareVideo;if(hw!=null)hw.cancel();long current=handle;if(current!=0)InfinityCastRemuxNative.cancel(current);}
