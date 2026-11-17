@@ -1,0 +1,44 @@
+{
+  "status": "PASS_RETAINED_ACTUAL_ANDROID_READER_MEDIA",
+  "video_packets": 576,
+  "video_packet_data": "EXACT_SOURCE_MKV",
+  "video_PTS": "EXACT_SOURCE_PLUS_SINGLE_10S_TRANSPORT_EPOCH",
+  "DTS": "MONOTONIC_VIDEO_AND_AUDIO",
+  "AAC": "LC48k_stereo_exact1024_sample_grid_full_decode; FFprobe may omit first duration, established by nextPTS; allremainingdurations1024",
+  "audio_packets": 1125,
+  "fragments": [
+    {
+      "index": 0,
+      "bytes": 6924322,
+      "sha256": "6376326a14c9d2fad7b706b1bad564bcbfb1778aad43bb5b461b76ec2fd0eb21"
+    },
+    {
+      "index": 1,
+      "bytes": 7098527,
+      "sha256": "644d337c1e9bf7afd079d4d431f45010d0e3cd9cd2cdeda9ab8b6680998cf895"
+    },
+    {
+      "index": 2,
+      "bytes": 7098092,
+      "sha256": "ca6af9e2264390ca514a01eb523621cafea20d2319ad437fff223ea9b09e7bd3"
+    },
+    {
+      "index": 3,
+      "bytes": 7098583,
+      "sha256": "cd94557d63ac7077d3e05577449da6cd32da08f3e679a272f55874495ba98d46"
+    },
+    {
+      "index": 4,
+      "bytes": 7098046,
+      "sha256": "71776e7fedfb92438d87882a92f5680f1f2a27b2aa12964d37a2a1ebf2a4c8ba"
+    },
+    {
+      "index": 5,
+      "bytes": 7098020,
+      "sha256": "09e724173bedf5f60731f796f5e4b19ad591ecece32eda3582f7d4c47d2575b4"
+    }
+  ],
+  "source_duration_us": 24005000,
+  "hardware_conversion": "NOT_EXERCISED",
+  "physical_TV": "NOT_TESTED"
+}
