@@ -1,0 +1,62 @@
+{
+  "baseline_versionCode": 2103510,
+  "signing": false,
+  "registry_write": false,
+  "baseline": {
+    "run": 44075563292,
+    "id": 14325191057,
+    "name": "Infinity508-Cast-Source-Reader-OriginalSigned-44075563292-QA",
+    "size_in_bytes": 331020422,
+    "digest": "sha256:0f82cb32ce1fb2cb5b0696a7d124d23b7113ae50ca2154155e1097b6733c98fd",
+    "source": "cd682193dc78da29cfcfef83c5b0d43dec5b89a2",
+    "workflow_id": 397702717,
+    "APK_sha256": "8fd4d06d4a93b29764d4820bd6000795562411802fb52a402e1b3b2ddaa93ab0"
+  },
+  "Android": {
+    "run": 44108970398,
+    "id": 14341035587,
+    "name": "Infinity510-Cast-Dual-Failure-44108970398-EVIDENCE-ONLY",
+    "size_in_bytes": 11978327,
+    "digest": "sha256:4c9c32a5c1884621d09be1a4081fada9ca84de084b1758ca3ffabafd4055edbe",
+    "source": "10ba0a3bbd0beeaafec394e55ad8c892dc07e9b3",
+    "workflow_id": 421009620
+  },
+  "component": {
+    "run": 44103962682,
+    "id": 14336964280,
+    "name": "Infinity510-Cast-Dual-Failure-Component-44103962682-NOT-INSTALLER",
+    "size_in_bytes": 839499,
+    "digest": "sha256:c4a6cbf38717a863b690ddc601d482fdcd4851a99ff538b9fb21b930f8ba94b2",
+    "source": "e5875053d3a3a77e7af6f34f46cf8b6b8e9eb3eb",
+    "workflow_id": 421031076
+  },
+  "versions": {
+    "candidate": 2103512,
+    "recovery": 2103513
+  },
+  "parent_authority_sha256": "95c140a15224788fcfa5fa0c71644da1ca0be9d13c9c9392aa4452e6244f8d4d",
+  "known_limitations": {
+    "Main10_Android_decode": "UNVERIFIED_HARDWARE; CIcodec_inventoryunsupported_is_notPASS",
+    "physical_Fold_hardware": "UNVERIFIED_SUSTAINED_MAIN10_HARDWARE_AND_THERMAL_PERFORMANCE",
+    "physical_TV": "PENDING_OWNER; no actualTVplayback claim",
+    "exact_owner_source": "RawhvcC/NALs unavailable; provenvalidRADL/CSDclassdefects, notconfirmedownerfilecausality",
+    "unknown_receiver_HEVC": "UNVERIFIED; unknowncapabilitynotconvertedintoassumedsupport",
+    "phone_handoff": "Hostcallbackguardsverified; actualphone/receiverhandoffpendingowner",
+    "shutdown": "UNCHANGED_NOT_SELECTED; finalownerphysicalsessionpending",
+    "original_failures": "44104795798_FAIL_MAIN10_EMULATOR_CAPABILITY;44107060010_FAIL_CI_INPUT_ADAPTER_RETAINED"
+  },
+  "inputs": {
+    ".github/workflows/infinity-506-cast-hardware-stage.yml": "e7d77489501fb093bf214c059cd1c75a1d0d63b0b72e85412c7b4a705b550915",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/CAST-CLASS-DELTA.json": "59d4e921754c82497057cec288ce5a36eda05be076c211712a4ad01eea30106e",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/SCOPE.json": "1f5643d24664fcaafe1d9d6058c66fa83e6e775677c9cd3ca3e862db39fd39e9",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/release/stage.py": "24ec6e7796620e0e38d75a34a14b862fbef748c00d80e85c7a47f1e94c2dc61f",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/verify_android_media.py": "34660c9b58a9f32b596df3816446ca9d09adfb8b005b7dafacc313995f50d52b",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "61e826157514b1b0a3c75df5ff421346ddc46ce6744e5ca3674991a1397cc3a2",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "0404e0814d49ff434653e949b78dc94810f0d4721a43cbc27af3027f69449ca8",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "c6e9644be7ba3b48c08abbff6ee6b7c4eaa7c797b74c8dc5d1246488bc9707c0"
+  },
+  "class_delta_sha256": "59d4e921754c82497057cec288ce5a36eda05be076c211712a4ad01eea30106e",
+  "source_commit": "ad33a35a9fedd7d1958f397876ca8b8b7ffb6a71",
+  "review_sha256": "ca3debaf22d78a7683ef39e044d20ed69c53629aa01bf31da918c803f4481f41"
+}
