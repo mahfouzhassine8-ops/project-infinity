@@ -1,0 +1,72 @@
+{
+  "status": "PASS_UNSIGNED_CAST506_HARDWARE_STAGE",
+  "source": "e897508f5bfa4addd3e682f0def2ab9504875949",
+  "baseline_APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d",
+  "versions": {
+    "candidate": 2103508,
+    "recovery": 2103509
+  },
+  "payloads": {
+    "candidate": {
+      "APK_sha256": "743c078ddd6ba259b2975b5af498d9aa1f0c285a5c3026c0076171856e6be3e9",
+      "versionCode": 2103508,
+      "changes": {
+        "AndroidManifest.xml": {
+          "before": "f34629925677a9746289cf9a167945bd0ff96498268bb9d764ad4639e7ec86e0",
+          "after": "1edfe41b8e7eb2f088f79df238a1a5c6c8bd8750a233da86b98e195672321068"
+        },
+        "lib/arm64-v8a/libinfinitycastremux.so": {
+          "before": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52",
+          "after": "993f0106d77aaeb34ff178c87b73c8af5861d5c296f201933e07cb45fdd10da3"
+        },
+        "assets/experience-component-updates.properties": {
+          "before": "2740e0aa4c14c44304ef0f18591a5d93c2bae72b2ec3d8212c5c0a24042408e1",
+          "after": "c4045cc1ee967a9fc47c41afb57c0f107c2e347784a385e2bc0127bd6a99287a"
+        },
+        "classes6.dex": {
+          "before": "4360efcdf3af08a8388f18846c79353517ab3d7ee6a3c026838b7748c0914c98",
+          "after": "1d18a6e858b9315dad488957c3d3925eb6659c4a7279220184e6df4db4651546"
+        }
+      },
+      "unchanged_members": 7773
+    },
+    "recovery": {
+      "APK_sha256": "42ab8060abca445b2da4c22a2da26240b764bb48b5886c20ad587626e8c5fb2e",
+      "versionCode": 2103509,
+      "changes": {
+        "AndroidManifest.xml": {
+          "before": "f34629925677a9746289cf9a167945bd0ff96498268bb9d764ad4639e7ec86e0",
+          "after": "8927045ca6ec72d0bde4c789329e7db0e5ac7c01bf8929a093ea4b8fe30b2be3"
+        },
+        "assets/experience-component-updates.properties": {
+          "before": "2740e0aa4c14c44304ef0f18591a5d93c2bae72b2ec3d8212c5c0a24042408e1",
+          "after": "ed95bfcdcb62005c492092f2bd95c939d9e38ba1f1facca82e86bd46694211bc"
+        }
+      },
+      "unchanged_members": 7775
+    }
+  },
+  "Android_artifact": {
+    "run": 44044730674,
+    "id": 14310379586,
+    "name": "Infinity506-MediaCodec-Pipeline-44044730674-EVIDENCE-ONLY",
+    "size_in_bytes": 5632580,
+    "digest": "sha256:f21e72ea9b814adefff96e5da69fbd33dbb9e01c716024d230d2b6492c35066b",
+    "source": "8faf1a05c1093812493f4f205c867e373d9176a2",
+    "workflow_id": 421009620
+  },
+  "component_artifact": {
+    "run": 44039053105,
+    "id": 14308522648,
+    "name": "Infinity506-Cast-Component-44039053105-NOT-INSTALLER",
+    "size_in_bytes": 836098,
+    "digest": "sha256:946e61bb6de4f6f64147fa6981a0e33b6b8fba61b86b18f0eb4d34cde2eaeb71",
+    "source": "94bcfcee1601b4992b72734ca676d8bc83d61d0a",
+    "workflow_id": 421031076
+  },
+  "Cobra": "BYTE_UNCHANGED",
+  "Kodi_other_DEX_modules_resources": "BYTE_UNCHANGED",
+  "owner_data": "NOT_ACCESSED",
+  "signed": false,
+  "physical_hardware_TV": "PENDING_OWNER"
+}

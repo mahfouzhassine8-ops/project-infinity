@@ -1,0 +1,24 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_EXACT_CANDIDATE_REGISTRATION_AND_ORIGINAL_SIGNING",
+  "request_sha256": "32526db043c221276e36f22427f52bb31b59c14616bc162e49945f686b6430dc",
+  "original_preparation_run": 44052911061,
+  "original_proposal_SHA256": {
+    "candidate": "c8acb8457777438d3280c8e2d9ecc6affc69e273bf39ca5a821e2358ef6ed6ca",
+    "recovery": "11b366906a80c6a35a77daffb589e96a365f0c4a28bc126687de80fbb1d13e2f"
+  },
+  "corrected_proposal_SHA256": {
+    "candidate": "e96f56fa30400db72abb942cc513a6077b6a6f140dc3b0d49aa7b7b2f3181650",
+    "recovery": "e28aa0da5da83029265fec1b7637dc3ba4241692d8cbb0cb46bc894b40a09e41"
+  },
+  "correction": "Candidate inherited native-only unchanged_original_DEX:true; set false and unchanged_non_Cast_DEX:true. Recovery predecessor follows corrected candidate hash. No APK/bundle/payload mutation.",
+  "candidate_unsigned_APK_sha256": "743c078ddd6ba259b2975b5af498d9aa1f0c285a5c3026c0076171856e6be3e9",
+  "candidate_member_changes": 4,
+  "unchanged_candidate_members": 7773,
+  "Cobra_and_minimal_owner_archives": "EXACT_UNCHANGED",
+  "original_key_workflow_id": 397702717,
+  "accepted_pointer_updated": false,
+  "recovery_registration": "PENDING_CANDIDATE_POSTSIGN_REVIEW",
+  "physical_acceptance": "PENDING_OWNER"
+}
