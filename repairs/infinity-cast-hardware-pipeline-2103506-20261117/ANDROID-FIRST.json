@@ -1,0 +1,44 @@
+{
+  "decoded": {
+    "video": {
+      "packets_decoded": 144,
+      "first_pts_us": 0,
+      "last_pts_us": 5963000,
+      "seek_us": -1
+    },
+    "audio": {
+      "packets_decoded": 284,
+      "first_pts_us": 0,
+      "last_pts_us": 6037333,
+      "seek_us": -1
+    },
+    "seek_video": {
+      "packets_decoded": 144,
+      "first_pts_us": 0,
+      "last_pts_us": 5963000,
+      "seek_us": 12000000
+    },
+    "seek_audio": {
+      "packets_decoded": 284,
+      "first_pts_us": 0,
+      "last_pts_us": 6037333,
+      "seek_us": 12000000
+    }
+  },
+  "segments": 3,
+  "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-STREAM-INF:BANDWIDTH=2175474,CODECS=\"avc1.42C01F,mp4a.40.2\"\nhttp://127.0.0.1/fixture/mkv/media.m3u8\n",
+  "cancellation_ms": 160,
+  "pass": true,
+  "status": "PASS_ACTUAL_ARM64_MEDIACODEC_EGL_PIPELINE",
+  "owned_native_after_close": 0,
+  "backend": "CI private exact-package bounded small software; not hardware qualification",
+  "Fold_hardware_performance": "NOT_TESTED",
+  "TV_playback": "NOT_TESTED",
+  "phone_handoff": "existing protocol preserved, physical acceptance pending",
+  "shutdown": "NOT_SELECTED",
+  "events": "stage=receiver_policy outcome=receiver_hevc_not_documented result=1\nstage=hw_decoder outcome=c2_android_hevc_decoder result=1\nstage=hw_encoder outcome=c2_android_avc_encoder result=31\nstage=hw_source outcome=width result=320\nstage=hw_source outcome=height result=180\nstage=hw_source outcome=fps_milli result=24000\nstage=hw_source outcome=transfer result=1\nstage=hw_capability outcome=decoder_instances_declared result=32\nstage=hw_capability outcome=encoder_instances_declared result=32\nstage=hardware_video outcome=ci_small_software_backend result=0\nstage=mkv_context outcome=retired result=0",
+  "API": 36,
+  "emulator_ABIs": "x86_64,arm64-v8a",
+  "scope": "actual original506 ARM64 FFmpeg/JNI under native translation; small software MediaCodec/EGL correctness only",
+  "verification_limit": "Initial seek request12s did not assert mapped position against normalized6s timeline. NOT accepted as seek proof; targeted2.5s/HLS position assertion selected next."
+}

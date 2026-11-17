@@ -1,0 +1,12 @@
+{
+  "pipeline_run": 44037322862,
+  "pipeline_actual_result": "FAIL_IN_TEST_FIXTURE_BEFORE_JNI_LOAD",
+  "pipeline_correction": "New negative test invoked RemuxNative.open before explicit load(). Add load() after engine load. Production Remux constructor already loads correctly.",
+  "native_compilation": "PASS; reuse exact eaf1af9f011807e5a1e3b60c572ae981cdf616d997d378f6c475b7f70a0d5161 after pinned failed-producer compilation-only provenance validation; no test pass inferred.",
+  "component_run": 44037790025,
+  "component_actual_result": "Cast Java/R8 compile and existing API check PASS; strict resource blob preservation FAIL",
+  "component_correction": "Original established Cast SDK component builds link against Android34 using build-tools35. New wrapper mistakenly selected Android35. Restore Android34 and pin exact original compiler/resource tool hashes; keep strict original resource SHA gate.",
+  "owner_APK_modified": false,
+  "native_engine_rebuilt": false,
+  "Cobra_modified": false
+}

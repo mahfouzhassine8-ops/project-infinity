@@ -1,0 +1,46 @@
+{
+  "status": "SEPARATE_PACKAGE_PIPELINE_READY",
+  "foundation": {
+    "run": 44003667211,
+    "id": 14292668883,
+    "name": "Infinity504-Cast-Audio-OriginalSigned-44003667211-QA",
+    "size_in_bytes": 330974872,
+    "digest": "sha256:5c149a9a5bfac7cf1d8768c8f5824e2e6a60ee6848927f4110d1ea95a9ffbd1c",
+    "source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+    "workflow_id": 397702717,
+    "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
+  },
+  "native": {
+    "libkodi.so": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+    "libc++_shared.so": "f1ce8bc0759504421da60393b8654cce473973615416254e68255306ec913222",
+    "libshairplay.so": "ab402c0b2577c8f128695db53808c0e1b07b7f70d63125655eba37a0be18da9b"
+  },
+  "source": "8faf1a05c1093812493f4f205c867e373d9176a2",
+  "engine_rebuilt": false,
+  "SDK_rebuilt": false,
+  "production_DEX_rebuilt": false,
+  "production_Cast_DEX_sha256": "1d18a6e858b9315dad488957c3d3925eb6659c4a7279220184e6df4db4651546",
+  "external_API_contract": {
+    "status": "PASS_RETAINED_APK_CALLER_ACCESS_STATICNESS_AND_CAST_ENTRYPOINTS",
+    "external_types_checked": [],
+    "external_members_checked": [],
+    "added": [
+      "Lcom/projectinfinity/kodi/InfinityCastGpuSurface$Check;",
+      "Lcom/projectinfinity/kodi/InfinityCastGpuSurface;",
+      "Lcom/projectinfinity/kodi/InfinityCastHardwareVideo$Factory;",
+      "Lcom/projectinfinity/kodi/InfinityCastHardwareVideo;",
+      "Lcom/projectinfinity/kodi/InfinityCastReceiverPolicy$Choice;",
+      "Lcom/projectinfinity/kodi/InfinityCastReceiverPolicy$Media;",
+      "Lcom/projectinfinity/kodi/InfinityCastReceiverPolicy$Path;",
+      "Lcom/projectinfinity/kodi/InfinityCastReceiverPolicy$Receiver;",
+      "Lcom/projectinfinity/kodi/InfinityCastReceiverPolicy;",
+      "Lcom/projectinfinity/kodi/InfinityCastVideoContract$Packet;",
+      "Lcom/projectinfinity/kodi/InfinityCastVideoContract;",
+      "Lcom/projectinfinity/kodi/x;",
+      "Lcom/projectinfinity/kodi/y;"
+    ],
+    "removed": []
+  },
+  "owner_installer": false,
+  "new_Cast_library_sha256": "993f0106d77aaeb34ff178c87b73c8af5861d5c296f201933e07cb45fdd10da3"
+}

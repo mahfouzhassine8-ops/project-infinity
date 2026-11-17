@@ -1,0 +1,22 @@
+{
+  "reviewer": "/root/astra_cast502",
+  "scope": "Independent focused final failure-path source deltas, conditional on actual selected final-source build/test",
+  "addressed": [
+    "native matrix and verified color tuples",
+    "bounded AVC allocation and avcC records",
+    "decoder input accounting and encoder presentedPTS exact equality",
+    "nonaligned cue boundaries without dropped first picture",
+    "owner preserved while any live resource survives",
+    "GPU holder retained before initialization",
+    "successful EGL initialization/destruction tracked",
+    "independent cleanup attempts",
+    "JNI allocation pending exception cleared before callback and abort"
+  ],
+  "outcome": "No further concrete blocker in focused source review; selected build/test supported",
+  "not_approved": [
+    "owner packaging/signing release acceptance",
+    "physical hardware performance or HDR qualification",
+    "TV playback"
+  ],
+  "reviewer_builds": false
+}

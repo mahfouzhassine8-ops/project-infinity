@@ -85,6 +85,10 @@ public final class InfinityCastDialog extends Dialog implements InfinityCastSess
             });
         } catch(Exception ignored){}
     }
+    @Override public void onWindowFocusChanged(boolean focused) {
+        super.onWindowFocusChanged(focused);
+        cast.pickerVisibility(this,focused && isShowing());
+    }
     private int dp(int value){return Math.round(value*activity.getResources().getDisplayMetrics().density);}
     private TextView text(String value,int size,boolean bold) {
         TextView view=new TextView(activity);view.setText(value);view.setTextSize(size);view.setPadding(0,dp(4),0,dp(4));if(bold)view.setTypeface(Typeface.DEFAULT,Typeface.BOLD);return view;

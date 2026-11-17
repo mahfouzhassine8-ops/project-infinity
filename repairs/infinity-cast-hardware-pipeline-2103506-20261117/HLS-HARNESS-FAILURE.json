@@ -1,0 +1,10 @@
+{
+  "run": 44035518520,
+  "artifact": 14307303237,
+  "artifact_digest": "sha256:6b02ec7ad909b103a6a4b79b1808841b73dfe85e6d2df490412113055b885796",
+  "result": "FAIL_BEFORE_PROBE_ACTIVITY",
+  "confirmed_cause": "CI wrapper removed old classes6.dex and placed test code in classes8.dex. Android stops secondary DEX discovery at numbering gap, so Activity ClassNotFoundException. No actual converter/HLS result from this run.",
+  "correction": "Fill excluded classes6 slot with test DEX; require contiguous indices, no duplicate classes, activity definition before CI signing; catch CI runtime crash early.",
+  "owner_APK_affected": false,
+  "engine_rebuilt": false
+}

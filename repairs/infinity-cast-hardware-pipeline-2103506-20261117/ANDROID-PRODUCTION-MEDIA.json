@@ -1,0 +1,30 @@
+{
+  "status": "PASS_ACTUAL_ANDROID_OUTPUT_MEDIA",
+  "video_packets": 144,
+  "video_PTS": "exact original values plus one fixed10s HLS epoch; DTS monotonic/noB",
+  "audio": "AAC-LC48k stereo, full decode; existing continuous AAC adapter unchanged",
+  "color": "actual SPS/VUI SDR709 limited",
+  "adjacent_independent_fragments": [
+    {
+      "name": "0.m4s",
+      "video_packets": 48,
+      "first_pts_us": 10000000,
+      "last_pts_us": 11963000
+    },
+    {
+      "name": "1.m4s",
+      "video_packets": 48,
+      "first_pts_us": 12005000,
+      "last_pts_us": 13963000
+    },
+    {
+      "name": "2.m4s",
+      "video_packets": 48,
+      "first_pts_us": 14005000,
+      "last_pts_us": 15963000
+    }
+  ],
+  "GPU_frame_alignment_SSIM": 0.92496,
+  "HDR_hardware_performance": "NOT_TESTED",
+  "physical_TV": "NOT_TESTED"
+}

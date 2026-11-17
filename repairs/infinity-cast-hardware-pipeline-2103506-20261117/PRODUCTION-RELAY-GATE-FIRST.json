@@ -1,0 +1,17 @@
+{
+  "run": 44041704018,
+  "artifact": 14309961936,
+  "result": "FAIL_HLS_UI_IOException",
+  "positive_subresults": [
+    "actual production CastDEX/privateRelay auth and whole-fragment HTTP",
+    "actualNative/HWbridge smallsoftware video plusAAC conversion",
+    "144video/284AAC decoded",
+    "CheckJNI negative cleanup/owner tests",
+    "relay_native_retired0"
+  ],
+  "confirmed_CI_lifecycle_evidence": "07:55:21 ApplicationInfo.assets added system neutral/accent overlays; WindowManager finishDrawing of relaunch. Static admitted worker continued with original Activity instance whose outputSurface was cleared. HLS helper IOException occurs at actual_video_surface_valid check.",
+  "correction": "Keep a generation-checked static live SurfaceHolder/Surface for the single CI worker across Activity recreation; keep CI window awake; preserve cause in UI test exceptions. Owner lifecycle unchanged.",
+  "Native_rebuilt_next": false,
+  "Cast_DEX_rebuilt_next": false,
+  "physical_hardware_qualification": "NOT_TESTED"
+}

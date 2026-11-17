@@ -323,24 +323,45 @@
     },
     {
       "id": 420739373,
+      "original_key_access": false,
       "path": ".github/workflows/infinity-504-cast-audio-native.yml",
       "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
-      "workflow_sha256": "5f61045b1ed4dc089fc9afa4c42fed2c07a06d232d1e7fbbdc3a407c1e8f7715",
-      "original_key_access": false
+      "workflow_sha256": "5f61045b1ed4dc089fc9afa4c42fed2c07a06d232d1e7fbbdc3a407c1e8f7715"
     },
     {
       "id": 420781757,
+      "original_key_access": false,
       "path": ".github/workflows/infinity-504-cast-audio-android.yml",
       "source": "28dd58eda9718ecbc4f563e00629b29fd659dea5",
-      "workflow_sha256": "33b1dd4fd469938af8c4728ae0254ae99085055c4d7a75e36211b3cb26dc7ddc",
-      "original_key_access": false
+      "workflow_sha256": "33b1dd4fd469938af8c4728ae0254ae99085055c4d7a75e36211b3cb26dc7ddc"
     },
     {
       "id": 420817370,
+      "original_key_access": false,
       "path": ".github/workflows/infinity-504-cast-audio-release.yml",
       "source": "fcf9c40c645c8e4b50294887180b676d864e0e18",
-      "workflow_sha256": "a15e22cfb858d8c31c1774af6e2e89d5cbdcb7592f415cfaf1a519825539d13b",
-      "original_key_access": false
+      "workflow_sha256": "a15e22cfb858d8c31c1774af6e2e89d5cbdcb7592f415cfaf1a519825539d13b"
+    },
+    {
+      "id": 421009620,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+      "source": "8faf1a05c1093812493f4f205c867e373d9176a2",
+      "workflow_sha256": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6"
+    },
+    {
+      "id": 421031076,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-506-cast-component.yml",
+      "source": "94bcfcee1601b4992b72734ca676d8bc83d61d0a",
+      "workflow_sha256": "339576a4375bf0a9010b45f891379bdaafbd319ae9885cb4fc7fa5d5f63104d8"
+    },
+    {
+      "id": 421117469,
+      "original_key_access": false,
+      "path": ".github/workflows/infinity-506-cast-hardware-stage.yml",
+      "source": "e897508f5bfa4addd3e682f0def2ab9504875949",
+      "workflow_sha256": "e8a5bd36ef9ce6f170e39d93586ca39cb07e0654fbf7416061c402e1ad905982"
     }
   ],
   "audit_workflows": 644,
@@ -3114,7 +3135,10 @@
     420238273,
     420739373,
     420781757,
-    420817370
+    420817370,
+    421009620,
+    421031076,
+    421117469
   ],
   "schema": 1,
   "scope": "Retire historical workflows with access to the original permanent signing secret; preserve their files, runs, artifacts and every locked ref",

@@ -1,0 +1,15 @@
+{
+  "failed_run": 44039003067,
+  "result": "FAIL_actual_extractor_seek_target_RETAINED",
+  "positive_subresults": [
+    "CheckJNI callback exception and abort",
+    "wrong owner refused with holder retained",
+    "actual invalidSurface partialEGL initialization cleanup",
+    "actualNative/MediaCodec/EGL conversion and out-of-order generation"
+  ],
+  "scope_error": "Native Output uses empty_moov,frag_custom,frag_discont,skip_trailer for HLS segments; the concatenated inspection MP4 has no random-access index for MediaExtractor.seekTo. It is not the served HLS seek interface.",
+  "independent_review": "Astra confirms testcontract correction justified; retain failure and require actualHLSpostseekvideo rendering advancement.",
+  "replacement_gate": "Production Relay and production Cast DEX, baseline Media3HLS actual2500ms mapped seek, >=150ms advancement, video rendered buffers increase afterseek, audio buffers increase, no playback error.",
+  "gates_weakened": false,
+  "physical_TV": "PENDING_OWNER"
+}

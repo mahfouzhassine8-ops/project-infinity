@@ -1,0 +1,26 @@
+{
+  "reviewer": "/root/astra_502_review",
+  "status": "PASS_CAST_COMPONENT_OWNERSHIP_BOUNDARY",
+  "delta_sha256": "893b04df56df95e61f71d2d78d7f4f533dce27d96a13b677fd62c34252066d5e",
+  "signed506_gen91_baseline_classes_verified": 1037,
+  "authority_hash_mismatches": 0,
+  "baseline_owners": {
+    "INFINITY": 1037
+  },
+  "changed_existing_classes": 637,
+  "unchanged_existing_classes": 400,
+  "added": 13,
+  "removed": 0,
+  "protected_owner_deltas": [],
+  "new_project_roots_INIFINITY": [
+    "InfinityCastGpuSurface",
+    "InfinityCastHardwareVideo",
+    "InfinityCastReceiverPolicy",
+    "InfinityCastVideoContract",
+    "x",
+    "y"
+  ],
+  "x_y_provenance": "Artifact mapping.txt identifies synthesized InfinityCastSession lambda4/lambda6",
+  "SDK_emitted_bodies": "Changed during necessary Cast component link; NOT byte-identical. Dependency source/version locks and resource archive retained.",
+  "approval_limit": "Ownership boundary only, not functional release or signing approval"
+}
