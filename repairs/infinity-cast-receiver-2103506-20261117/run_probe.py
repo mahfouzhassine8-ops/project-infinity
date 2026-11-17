@@ -19,7 +19,9 @@ try:
  assert result['pass'] is True and result['status']=='PASS_SELECTED_CODEC_INVENTORY' and result['owned_codecs_after_close']==0,result
 except BaseException as e:
  if result is None:result={'pass':False}
- result.update(pass_=False,wrapper_failure=str(e));result['pass']=False;raise
+ result['wrapper_failure']=str(e);result['pass']=False
+ if isinstance(e,subprocess.CalledProcessError):result['command_output']=str(e.output)[-4096:]
+ raise
 finally:
  (OUT/'RESULT.json').write_text(json.dumps(result,indent=2)+'\n')
  if (WORK/'BUILD.json').exists():(OUT/'BUILD.json').write_bytes((WORK/'BUILD.json').read_bytes())

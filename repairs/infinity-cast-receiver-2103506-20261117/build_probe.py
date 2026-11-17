@@ -1,6 +1,6 @@
 """One selected key-free native/Android hardware inventory. No Kodi/DEX rebuild."""
 from pathlib import Path
-from zipfile import ZipFile,ZIP_DEFLATED
+from zipfile import ZipFile,ZIP_DEFLATED,ZIP_STORED
 import hashlib,json,os,subprocess,types,sys,re
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1];OUT=ROOT/'cast506-hardware-work'
 def sha(p):
@@ -14,22 +14,12 @@ def main():
  helper='repairs/infinity-movies-continue-cast-2103486-20261112/release/common_release.py';raw=subprocess.check_output(['git','show','21616dfa94bf7ca9ec52e40119edf95df5e64073:'+helper]);scope={'__file__':str(ROOT/helper),'__name__':'_retained_reader'};exec(compile(raw,str(ROOT/helper),'exec'),scope);c=types.SimpleNamespace(**scope)
  base=c.unique(c.obtain(r['baseline'],'receiver506-authenticated-baseline'),'Infinity-2103506-Combined-Original-Signer.apk');assert sha(base)==r['baseline']['APK_sha256']
  OUT.mkdir()
- # Retain the reviewed compile/link recipe; configure headers only, never FFmpeg/Kodi.
- recipe='repairs/infinity-cast-mkv-2103494-20261113/build.py'
- raw=subprocess.check_output(['git','show','1529c250:'+recipe]);assert raw==(ROOT/recipe).read_bytes()
- work=OUT/'native-verification';work.mkdir();sys.argv=[str(ROOT/recipe),'native',str(work),str(base)]
- scope={'__file__':str(ROOT/recipe),'__name__':'_retained_cast_native_recipe'};exec(compile(raw,str(ROOT/recipe),'exec'),scope)
- scope.update(BASE=r['baseline']['APK_sha256'],ENGINE='b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7',HERE=ROOT/'repairs/infinity-six-repairs-2103502-20261116/cast',ROOT=ROOT);scope['native']()
- sdk=Path(os.environ['ANDROID_HOME']);tool=sdk/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf'
- def abi(path):
-  raw=subprocess.check_output([tool,'--dyn-syms','--wide','-d',path],text=True);exports=[]
-  for line in raw.splitlines():
-   f=line.split()
-   if len(f)>=8 and f[4] in ('GLOBAL','WEAK') and f[5] in ('DEFAULT','PROTECTED') and f[6]!='UND':exports.append(f[7])
-  return sorted(exports),sorted(re.findall(r'Shared library: \[([^\]]+)\]',raw))
- assert sha(work/'base-native/libinfinitycastremux.so')=='934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52'
- assert abi(work/'base-native/libinfinitycastremux.so')==abi(work/'native/libinfinitycastremux.so')
- proof=json.loads((work/'CAST-MKV-NATIVE.json').read_bytes());proof.update(status='PASS_CAST506_METADATA_ARM64_ABI',baseline=2103506,scope='New sourcevideo facts only; AAC conversion/header and all nonCast engine unchanged; NOT a video transcode',reviewed_inputs=r['inputs']);(work/'CAST506-METADATA-ARM64.json').write_text(json.dumps(proof,indent=2)+'\n')
+ # Metadata-only Cast compilation already passed before prior CI install failed.
+ # Reuse the exact reviewed receipt; this probe executes the unchanged original engine.
+ proof=json.loads((HERE/'CAST506-METADATA-ARM64.json').read_bytes())
+ assert proof['status']=='PASS_CAST506_METADATA_ARM64_ABI' and proof['baseline']==2103506
+ for n,h in proof['source_hashes'].items():assert sha(ROOT/n)==h,n
+ assert proof['reviewed_inputs']['repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h']==sha(ROOT/'repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h')
  sdk=Path(os.environ['ANDROID_HOME']);bt=sdk/'build-tools/35.0.0';android=sdk/'platforms/android-35/android.jar';classes=OUT/'classes';classes.mkdir();dex=OUT/'dex';dex.mkdir();jar=OUT/'probe.jar'
  run('javac','-source','8','-target','8','-bootclasspath',str(android)+':'+str(bt/'core-lambda-stubs.jar'),'-d',classes,HERE/'android/ReceiverHardwareProbe.java')
  with ZipFile(jar,'w',ZIP_DEFLATED) as z:
@@ -39,11 +29,14 @@ def main():
  manifest=OUT/'AndroidManifest.xml';manifest.write_text('''<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.projectinfinity.castqa.receiver" android:versionCode="1" android:versionName="CI-only"><uses-sdk android:minSdkVersion="29" android:targetSdkVersion="35"/><application android:extractNativeLibs="true" android:label="Cast receiver CI only" android:theme="@android:style/Theme.Material.NoActionBar"><activity android:name="com.projectinfinity.castqa.ReceiverHardwareProbe" android:exported="true"/></application></manifest>''');shell=OUT/'shell.apk';run(bt/'aapt2','link','--manifest',manifest,'-I',android,'-o',shell)
  unsigned=OUT/'CI-ONLY-UNSIGNED.apk';native={}
  with ZipFile(unsigned,'w',ZIP_DEFLATED) as z,ZipFile(shell) as s,ZipFile(base) as baseline:
-  for name in s.namelist():z.writestr(name,s.read(name))
+  for name in s.namelist():z.writestr(name,s.read(name),compress_type=ZIP_STORED if name=='resources.arsc' else ZIP_DEFLATED)
   for lib in ('libkodi.so','libc++_shared.so','libshairplay.so'):
    name='lib/arm64-v8a/'+lib;data=baseline.read(name);z.writestr(name,data);native[lib]=hashlib.sha256(data).hexdigest()
   assert native['libkodi.so']=='b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7'
   z.write(loader,'lib/arm64-v8a/libcastreceiverqaloader.so');z.write(dex/'classes.dex','classes.dex')
+ with ZipFile(unsigned) as z:
+  if 'resources.arsc' in z.namelist():assert z.getinfo('resources.arsc').compress_type==ZIP_STORED
  aligned=OUT/'aligned.apk';run(bt/'zipalign','-p','-f','4',unsigned,aligned);key=OUT/'CI-ONLY.keystore';run('keytool','-genkeypair','-alias','CI-only','-keyalg','RSA','-keystore',key,'-storepass','android','-keypass','android','-dname','CN=Disposable Cast receiver CI','-validity','2');run(bt/'apksigner','sign','--ks',key,'--ks-key-alias','CI-only','--ks-pass','pass:android','--key-pass','pass:android','--out',OUT/'CI-ONLY.apk',aligned)
+ run(bt/'zipalign','-c','4',OUT/'CI-ONLY.apk')
  (OUT/'BUILD.json').write_text(json.dumps({'status':'SEPARATE_PACKAGE_HARDWARE_INVENTORY_READY','baseline':r['baseline'],'native':native,'source':os.environ['GITHUB_SHA'],'production_DEX_rebuilt':False,'engine_rebuilt':False,'owner_installer':False},indent=2)+'\n')
 if __name__=='__main__':main()
