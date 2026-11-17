@@ -12,6 +12,7 @@ final class InfinityCastRemuxNative {
     }
     static native long open(Object input) throws IOException;
     static native String inspect(long handle) throws IOException;
+    static native String configureVideo(long handle,Object video) throws IOException;
     static native byte[] init(long handle) throws IOException;
     static native byte[] segment(long handle,int index) throws IOException;
     static native void cancel(long handle);

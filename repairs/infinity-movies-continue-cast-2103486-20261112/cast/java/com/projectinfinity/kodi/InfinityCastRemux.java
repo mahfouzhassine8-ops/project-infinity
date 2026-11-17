@@ -26,6 +26,7 @@ final class InfinityCastRemux implements AutoCloseable {
     private String video,audio;
     private String codecs;
     private InfinityCastReceiverPolicy.Media inspectedVideo;
+    private volatile InfinityCastHardwareVideo hardwareVideo;
     private byte[] master;
     InfinityCastRemux(Input input) throws IOException {
         this.input=input;InfinityCastRemuxNative.load();handle=InfinityCastRemuxNative.open(input);
@@ -57,17 +58,28 @@ final class InfinityCastRemux implements AutoCloseable {
             }catch(IOException e){throw failure(e);}catch(Exception e){throw new IOException("mkv_inspection_failed");}
         }
     }
-    void requireReceiver(InfinityCastReceiverPolicy.Receiver receiver) throws IOException {
+    void requireReceiver(InfinityCastReceiverPolicy.Receiver receiver,InfinityCastHardwareVideo.Factory factory) throws IOException {
         synchronized(worker){check();if(inspectedVideo==null)throw new IOException("mkv_not_prepared");
             InfinityCastReceiverPolicy.Choice choice=InfinityCastReceiverPolicy.choose(receiver,inspectedVideo);
             InfinityCastDiagnostics.event("receiver_policy",choice.reason,choice.path.ordinal());
-            if(choice.path==InfinityCastReceiverPolicy.Path.HARDWARE_AVC_720_REQUIRED)throw new IOException("receiver_requires_hardware_avc_720");
+            if(choice.path==InfinityCastReceiverPolicy.Path.HARDWARE_AVC_720_REQUIRED){
+                if(factory==null)throw new IOException("receiver_requires_hardware_avc_720");
+                hardwareVideo=factory.create();check();input.budget(32L*1024*1024);
+                JSONObject output;
+                try{output=new JSONObject(InfinityCastRemuxNative.configureVideo(handle,hardwareVideo));}
+                catch(IOException error){throw failure(error);}catch(Exception invalid){throw new IOException("cast_hw_output_description");}
+                video=output.optString("video");audio=output.optString("audio");codecs=output.optString("codecs");
+                if(!"h264".equals(video)||!codecs.matches("avc1\\.[0-9A-F]{6}(?:,mp4a\\.40\\.[0-9]+)?"))throw new IOException("cast_hw_output_codec");
+                initialization=InfinityCastRemuxNative.init(handle);if(initialization==null||initialization.length<16||initialization.length>1048576)throw new IOException("cast_hw_output_init");fragments.clear();master=null;
+                InfinityCastDiagnostics.event("hardware_video","h264_aac_ready",720);
+            }
             // Unknown is an explicitly unverified existing direct attempt, never
             // advertised as supported. Existing transactional pause/return is unchanged.
         }
     }
     private IOException failure(IOException error){String reason=input.failure();return reason.isEmpty()?error:new IOException(reason);}
     private void check() throws IOException{if(cancelled || handle==0)throw new IOException("mkv_cancelled");}
+    boolean hardwareVideo(){return hardwareVideo!=null;}
     long durationMs(){return starts==null?0:starts[starts.length-1]/1000;}
     byte[] playlist(String base) throws IOException {
         synchronized(worker){
@@ -103,10 +115,10 @@ final class InfinityCastRemux implements AutoCloseable {
         }
     }
     /** Called immediately on cancel; never waits for the worker/native mutex. */
-    void cancel(){cancelled=true;long current=handle;if(current!=0)InfinityCastRemuxNative.cancel(current);}
+    void cancel(){cancelled=true;InfinityCastHardwareVideo hw=hardwareVideo;if(hw!=null)hw.cancel();long current=handle;if(current!=0)InfinityCastRemuxNative.cancel(current);}
     /** Relay invokes this only after every admitted probe/serve job retired. */
     @Override public void close(){
-        cancel();synchronized(worker){long current=handle;handle=0;if(current!=0)InfinityCastRemuxNative.close(current);input.close();fragments.clear();initialization=null;starts=null;master=null;codecs=null;}
+        cancel();synchronized(worker){if(hardwareVideo!=null){try{hardwareVideo.close();}catch(IOException unresolved){input.close();fragments.clear();initialization=null;master=null;throw new IllegalStateException("cast_hw_resources_not_retired",unresolved);}hardwareVideo=null;}long current=handle;handle=0;if(current!=0)InfinityCastRemuxNative.close(current);input.close();fragments.clear();initialization=null;starts=null;master=null;codecs=null;}
         InfinityCastDiagnostics.event("mkv_context","retired",InfinityCastRemuxNative.active());
     }
 }
