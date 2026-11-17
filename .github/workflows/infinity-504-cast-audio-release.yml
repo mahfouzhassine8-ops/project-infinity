@@ -32,6 +32,12 @@ jobs:
           path: cast504-stage/
           if-no-files-found: error
           retention-days: 90
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: Infinity504-Cast-NativeOnly-${{ github.run_id }}-STAGING-RECEIPT-ONLY
+          path: cast504-stage/STAGING.json
+          if-no-files-found: error
+          retention-days: 90
   install:
     if: startsWith(github.event.head_commit.message, 'Cast504 install:')
     runs-on: ubuntu-22.04

@@ -1,0 +1,109 @@
+{
+  "pass": true,
+  "baseline": 2103504,
+  "actual_ARM64_encoder_JNI_relay": true,
+  "cases": [
+    {
+      "video_packets": 384,
+      "AAC_packets": 750,
+      "name": "transients51",
+      "native_heap_before_bytes": 16081776,
+      "native_heap_after_conversion_bytes": 17970416,
+      "Java_heap_after_conversion_bytes": 14966432,
+      "HLS": {
+        "video_rendered_frames": 9,
+        "rendered_first_frame_events": 2,
+        "audio_rendered_buffers_before_seek": 6,
+        "audio_rendered_buffers": 30,
+        "duration_ms": 16005,
+        "seek_mapped_ms": 2500,
+        "seek_elapsed_ms": 634,
+        "seek_position_ms": 2729,
+        "isPlaying": true,
+        "actual_Android_HLS_playback": true,
+        "player": "immutable baseline Media3 APIs; CI package only, no Cobra entry point or production dependency"
+      },
+      "case_wall_ms": 19290,
+      "case_process_CPU_ms": 10788,
+      "native_heap_after_retirement_bytes": 16959920
+    },
+    {
+      "video_packets": 298,
+      "AAC_packets": 533,
+      "name": "44100-odd",
+      "native_heap_before_bytes": 16959920,
+      "native_heap_after_conversion_bytes": 18537408,
+      "Java_heap_after_conversion_bytes": 8781008,
+      "case_wall_ms": 8435,
+      "case_process_CPU_ms": 5942,
+      "native_heap_after_retirement_bytes": 16821952
+    },
+    {
+      "video_packets": 150,
+      "AAC_packets": 194,
+      "name": "32000",
+      "native_heap_before_bytes": 16821952,
+      "native_heap_after_conversion_bytes": 18522208,
+      "Java_heap_after_conversion_bytes": 10018000,
+      "case_wall_ms": 4902,
+      "case_process_CPU_ms": 2637,
+      "native_heap_after_retirement_bytes": 16887456
+    },
+    {
+      "video_packets": 96,
+      "AAC_packets": 188,
+      "name": "main10-eac3",
+      "native_heap_before_bytes": 16887456,
+      "native_heap_after_conversion_bytes": 18701440,
+      "Java_heap_after_conversion_bytes": 5135568,
+      "case_wall_ms": 2331,
+      "case_process_CPU_ms": 698,
+      "native_heap_after_retirement_bytes": 17314640
+    }
+  ],
+  "cancellation": true,
+  "native_contexts_after_close": 0,
+  "TV_receiver": "NOT_TESTED",
+  "Kodi_phone_handoff": "UNCHANGED_NOT_TESTED",
+  "shutdown": "NOT_SELECTED",
+  "API": 36,
+  "emulator_ABIs": "x86_64,arm64-v8a",
+  "scope": "Actual ARM64 binary under Android native translation, original504 engine and DEX; separate CI package; no physical receiver claim",
+  "status": "PASS_ACTUAL_ARM64_ANDROID_AAC_JNI_RELAY",
+  "output_proof": [
+    {
+      "case": "transients51",
+      "video_packets": 384,
+      "video_byte_exact": true,
+      "video_PTS_DTS_preserved": true,
+      "AAC_LC_stereo": true,
+      "monotonic_DTS": true
+    },
+    {
+      "case": "44100-odd",
+      "video_packets": 298,
+      "video_byte_exact": true,
+      "video_PTS_DTS_preserved": true,
+      "AAC_LC_stereo": true,
+      "monotonic_DTS": true
+    },
+    {
+      "case": "32000",
+      "video_packets": 150,
+      "video_byte_exact": true,
+      "video_PTS_DTS_preserved": true,
+      "AAC_LC_stereo": true,
+      "monotonic_DTS": true
+    },
+    {
+      "case": "main10-eac3",
+      "video_packets": 96,
+      "video_byte_exact": true,
+      "video_PTS_DTS_preserved": true,
+      "AAC_LC_stereo": true,
+      "monotonic_DTS": true
+    }
+  ],
+  "physical_TV": "NOT_TESTED",
+  "owner_data": "NOT_ACCESSED"
+}
