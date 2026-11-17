@@ -63,7 +63,7 @@ final class InfinityCastRemux implements AutoCloseable {
             InfinityCastDiagnostics.event("receiver_policy",choice.reason,choice.path.ordinal());
             if(choice.path==InfinityCastReceiverPolicy.Path.HARDWARE_AVC_720_REQUIRED)throw new IOException("receiver_requires_hardware_avc_720");
             // Unknown is an explicitly unverified existing direct attempt, never
-            // advertised as supported. Existing PLAYING confirmation still gates phone pause.
+            // advertised as supported. Existing transactional pause/return is unchanged.
         }
     }
     private IOException failure(IOException error){String reason=input.failure();return reason.isEmpty()?error:new IOException(reason);}

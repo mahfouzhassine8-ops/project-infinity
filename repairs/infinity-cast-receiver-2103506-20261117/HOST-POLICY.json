@@ -1,10 +1,11 @@
 {
   "status": "PASS_RECEIVER_POLICY",
-  "checks": 39,
+  "checks": 43,
   "actual_command": "java -m jdk.compiler/com.sun.tools.javac.Main -source8 -target8; java ReceiverPolicyTest",
   "scope": "KnownHubHEVCrequires720pAVC;4KdocumentedHEVCcopyretained;unknownnotadvertisedcompatible;limits/missingfacts/profile/HDRclassification. No actual hardwarevideo pipeline tested.",
   "inputs": {
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java": "6ea8119e1d5fc533dc9384c216eb3ddf6723df35c231a349e6a0a24f66b9886e",
-    "repairs/infinity-cast-receiver-2103506-20261117/tests/ReceiverPolicyTest.java": "d5f3cd430eaeda557c00bcae429ee903c4575c846c9c7665a10058714c5d2c2b"
-  }
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java": "400e82272970e1c78fde9fd0cb5efd77a236c1de6f476cd3f43f513b7074a8bf",
+    "repairs/infinity-cast-receiver-2103506-20261117/tests/ReceiverPolicyTest.java": "8174c836c70a4af77785b8e747c851e5a8940a32e78586dafd40aef1b384b1be"
+  },
+  "review_correction": "Astra: reject independently proven limits before missing-fact fallback. Four targeted regressions added; all43 checks pass. Existingunknown-model direct handling remains explicitly unverified."
 }

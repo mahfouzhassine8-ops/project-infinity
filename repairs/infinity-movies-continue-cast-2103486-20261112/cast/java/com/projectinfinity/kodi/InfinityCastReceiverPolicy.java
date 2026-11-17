@@ -38,13 +38,15 @@ final class InfinityCastReceiverPolicy {
     static Choice choose(Receiver receiver,Media media) {
         if(receiver.hevcLevel<0)return new Choice(Path.UNVERIFIED_DIRECT,"receiver_capability_unknown");
         if("hevc".equals(media.codec) && receiver.hevcLevel==0)return new Choice(Path.HARDWARE_AVC_720_REQUIRED,"receiver_hevc_not_documented");
-        if(!media.described())return new Choice(Path.UNVERIFIED_DIRECT,"source_video_limits_unverified");
-        boolean fits;
-        if("hevc".equals(media.codec))fits=(media.profile==1 || media.profile==2) && media.level<=receiver.hevcLevel && media.width<=3840 && media.height<=2160 && media.fps<=60;
+        if(receiver.hevcLevel==0 && media.hdr())return new Choice(Path.HARDWARE_AVC_720_REQUIRED,"receiver_hdr_not_documented");
+        // Known violations stay violations even when another source fact is absent.
+        boolean violation;
+        if("hevc".equals(media.codec))violation=(media.profile>=0 && media.profile!=1 && media.profile!=2) || media.level>receiver.hevcLevel || media.width>3840 || media.height>2160 || media.fps>60;
         else if("h264".equals(media.codec)) {
             int profile=media.profile&255;
-            fits=(profile==66 || profile==77 || profile==100) && media.level<=receiver.avcLevel && media.width<=receiver.avcWidth && media.height<=receiver.avcHeight && media.fps<=receiver.avcFps;
+            violation=(media.profile>=0 && profile!=66 && profile!=77 && profile!=100) || media.level>receiver.avcLevel || media.width>receiver.avcWidth || media.height>receiver.avcHeight || media.fps>receiver.avcFps;
         } else return new Choice(Path.UNVERIFIED_DIRECT,"source_codec_unverified");
-        return fits?new Choice(Path.DOCUMENTED_COPY_CANDIDATE,"documented_video_limits_match"):new Choice(Path.HARDWARE_AVC_720_REQUIRED,"receiver_video_limits_exceeded");
+        if(violation)return new Choice(Path.HARDWARE_AVC_720_REQUIRED,"receiver_video_limits_exceeded");
+        return media.described()?new Choice(Path.DOCUMENTED_COPY_CANDIDATE,"documented_video_limits_match"):new Choice(Path.UNVERIFIED_DIRECT,"source_video_limits_unverified");
     }
 }

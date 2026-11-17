@@ -1,0 +1,13 @@
+{
+  "baseline": 2103506,
+  "authority_sha256": "69c93000a1fa4d4d769240848638d10787d3229935504ebc1c15cc31cda6cd2c",
+  "existing_platform_libraries": {
+    "/transformer/": 0,
+    "/effect/": 0,
+    "/muxer/": 0,
+    "/exoplayer/": 1509
+  },
+  "native_ELF": "No ff_h264_mediacodec_encoder or ff_hevc_mediacodec_encoder/decoder or av_jni_set_java_vm symbols; actual runtime lookup independently selected in CI. Existing Kodi native MediaCodec playback wrappers are protected and not a Cast encoder pipeline.",
+  "no_platform_impossibility_claim": "Android MediaCodec may be usable through a separately implemented Cast-owned surface/GPU path. Neither its actualFold availability nor a full converter is established by these facts.",
+  "not_allowed": "No core rebuild to add codecs, no CPU4K conversion, no Cobra or global media callback changes."
+}

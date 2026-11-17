@@ -14,6 +14,10 @@ public final class ReceiverPolicyTest {
   for(String model:new String[]{"Onn 4k","Chromecast","Chromecast with Google TV","Bedroom Nest Hub","My Google TV 4K",null})check(path(model,hevc)==unknown,"unknown must notbeadvertisedcompatible");
   check(!hevc.hdr(),"Main10notHDR");check(video("hevc",2,153,3840,2160,24,16).hdr(),"PQrecognized");check(video("hevc",2,153,3840,2160,24,18).hdr(),"HLGrecognized");
   check(path("Chromecast Ultra",video("hevc",2,153,0,0,0,2))==unknown,"missingfacts");check(path("Chromecast Ultra",video("hevc",2,153,3840,2160,120,1))==hw,"fpslimit");check(path("Chromecast Ultra",video("hevc",2,153,7680,4320,24,1))==hw,"8knot4k");
+  check(path("Google Nest Hub",video("h264",100,41,1920,1080,0,1))==hw,"knownwidthcannotbypasswithmissingfps");
+  check(path("Google Nest Hub",video("h264",110,41,1280,720,0,1))==hw,"knownHigh10cannotbypasswithmissingfps");
+  check(path("Chromecast Ultra",video("hevc",-1,153,7680,4320,0,2))==hw,"known8kcannotbypassmissingprofilefps");
+  check(path("Google Nest Hub",video("h264",100,41,1280,720,30,16))==hw,"HDRneedsverifiedtonemap");
   System.out.println("PASS_RECEIVER_POLICY "+checks+"; no hardwarepipeline or physicalreceiverclaim");
  }
 }
