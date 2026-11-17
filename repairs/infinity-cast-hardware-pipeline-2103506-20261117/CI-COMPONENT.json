@@ -1,5 +1,5 @@
 {
-  "source_commit": "51e7fcc64f68aa8d5e844cc02c0a1601c6cd4d20",
+  "source_commit": "6b6b44c2dc803195ab29cbed050638e3728208da",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -11,9 +11,9 @@
     "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
   },
   "inputs": {
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_component.py": "7ab19aec8da5af3912fc9a970f30d89a72496982f905bc4a79d10d4c4807a7ba",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_component.py": "8448af8a7ee3bc1387207ff57f61a393ce088bc2978cd3139117f6d366d3982b",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "fdd339d530bd13c8f41cb50a7415fb732cedfeaea35597853d90fcc2995b5aa5",
-    ".github/workflows/infinity-506-cast-component.yml": "b9abc76e9ed9d8811f0d9756436c3c6a65505c663829fb04da6d7c0e316b1bea",
+    ".github/workflows/infinity-506-cast-component.yml": "339576a4375bf0a9010b45f891379bdaafbd319ae9885cb4fc7fa5d5f63104d8",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastResources.java": "0dd41e1f13162c0f9cb0c19b15f05b8c40561bfa7e0ae32f6b23a6d013f848c4",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java": "400e82272970e1c78fde9fd0cb5efd77a236c1de6f476cd3f43f513b7074a8bf",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
@@ -36,5 +36,6 @@
   "engine_build": false,
   "owner_APK": false,
   "shutdown": false,
-  "selected_case": "changed Cast component only, preserved dependencies and external API contract; no app behavior tests"
+  "selected_case": "Restore exact original Android34 resource/compiler inputs, retain strict506 resource identity. Required changed Cast component only.",
+  "previous_resource_gate_failure": 44037790025
 }
