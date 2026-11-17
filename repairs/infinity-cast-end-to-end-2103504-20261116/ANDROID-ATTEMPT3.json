@@ -1,0 +1,22 @@
+{
+  "pass": false,
+  "stage": "actual_H264_AAC_HLS_play_and_seek",
+  "reason": "actual_H264_video_rendered",
+  "API": 36,
+  "emulator_ABIs": "x86_64,arm64-v8a",
+  "scope": "Actual ARM64 binary under Android native translation, original504 engine and DEX; separate CI package; no physical receiver claim",
+  "status": "FAIL_SELECTED_ANDROID_CAST_AUDIO",
+  "wrapper_failure": "{'pass': False, 'stage': 'actual_H264_AAC_HLS_play_and_seek', 'reason': 'actual_H264_video_rendered', 'API': 36, 'emulator_ABIs': 'x86_64,arm64-v8a', 'scope': 'Actual ARM64 binary under Android native translation, original504 engine and DEX; separate CI package; no physical receiver claim'}",
+  "wrapper_stage": "probe_execution",
+  "artifact": {
+    "run": 43997770119,
+    "id": 14290144331,
+    "name": "Infinity504-Cast-AAC-Android-43997770119-EVIDENCE-ONLY",
+    "size_in_bytes": 5296035,
+    "digest": "sha256:8a3e4bcd115b404ca8b39d54ec2a6b1c22fb3ef31a48a6c6d091a0513720eb1c",
+    "source": "e99cde0333ff06be5763f416e363fc03c33218d4",
+    "workflow_id": 420781757
+  },
+  "workflow_conclusion": "success",
+  "workflow_conclusion_rejected": "Wrapper re-raised only CalledProcessError; assertion failure was recorded but not propagated. Fixed unconditional raise plus separate receipt gate. Test now awaits video/audio within same existing eight-second seek budget and uses ensureUpdated plus first-frame callback; failure retains renderer metrics and media."
+}

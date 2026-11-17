@@ -37,6 +37,14 @@ jobs:
           disable-animations: false
           emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
           script: python repairs/infinity-cast-end-to-end-2103504-20261116/run_android.py
+      - name: Require actual selected probe success, independently of emulator action exit
+        if: always()
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('cast504-android-results/ANDROID-CAST-AUDIO.json'))
+          assert r['pass'] is True and r['status']=='PASS_ACTUAL_ARM64_ANDROID_AAC_JNI_RELAY',r
+          PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always()
         with:

@@ -66,6 +66,6 @@ public final class InfinityCastProbeActivity extends Activity {
   final String address=relay.address();AtomicReference<Throwable> cancelled=new AtomicReference<>();Thread request=new Thread(()->{try{body(address);}catch(Throwable e){cancelled.set(e);}},"CastCancelledConversion");request.start();
   check(origin.stalled.await(5,TimeUnit.SECONDS),"actual_pending_AAC_JNI_source_read");retire(relay);relay=null;request.join(3000);check(!request.isAlive() && cancelled.get()!=null,"cancelled_conversion_retired");
   result.put("pass",true).put("baseline",2103504).put("actual_ARM64_encoder_JNI_relay",true).put("cases",cases).put("cancellation",true).put("native_contexts_after_close",InfinityCastRemuxNative.active()).put("TV_receiver","NOT_TESTED").put("Kodi_phone_handoff","UNCHANGED_NOT_TESTED").put("shutdown","NOT_SELECTED");
- }catch(Throwable e){try{result.put("pass",false).put("stage",stage).put("reason",e.getMessage()==null?e.getClass().getSimpleName():e.getMessage());}catch(Exception ignored){}}
+ }catch(Throwable e){try{result.put("pass",false).put("HLS_partial_evidence",MkvHlsPlayerProbe.lastEvidence.get()).put("stage",stage).put("reason",e.getMessage()==null?e.getClass().getSimpleName():e.getMessage());}catch(Exception ignored){}}
  finally{if(relay!=null)relay.close();if(origin!=null)origin.close();try{result.put("API",Build.VERSION.SDK_INT);}catch(Exception ignored){}android.util.Log.i("InfinityCastProbe",result.toString());}}
 }

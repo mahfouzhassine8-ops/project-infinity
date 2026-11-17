@@ -45,8 +45,15 @@ except BaseException as error:
  result['pass']=False
  result.update(status='FAIL_SELECTED_ANDROID_CAST_AUDIO',wrapper_failure=str(error),wrapper_stage=stage)
  if stage=='installation':result['native_encoder_execution']='NOT_RUN'
- if isinstance(error,subprocess.CalledProcessError):result['command_output']=str(error.output)[-2048:];raise
+ if isinstance(error,subprocess.CalledProcessError):result['command_output']=str(error.output)[-2048:]
+ raise
 finally:
+ # Retain any produced media even when a later rendering assertion fails.
+ for name in ('transients51','44100-odd','32000','main10-eac3'):
+  target=OUT/(name+'.mp4')
+  if not target.exists():
+   try:adb('pull','/sdcard/Android/data/com.projectinfinity.castqa/files/'+name+'.mp4',target)
+   except Exception:pass
  try:(OUT/'LOGCAT.txt').write_text(adb('logcat','-d','-v','threadtime'))
  except Exception as error:(OUT/'LOGCAT-ERROR.txt').write_text(str(error))
  (OUT/'ANDROID-CAST-AUDIO.json').write_text(json.dumps(result,indent=2)+'\n')
