@@ -1,0 +1,62 @@
+{
+  "baseline_versionCode": 2103508,
+  "signing": false,
+  "registry_write": false,
+  "baseline": {
+    "run": 44054993516,
+    "id": 14315957113,
+    "name": "Infinity506-Cast-Hardware-OriginalSigned-44054993516-QA",
+    "size_in_bytes": 331012243,
+    "digest": "sha256:345a2455458eefdc352b3ec9412f83af72f2ea53aac821ad44c61912e052d685",
+    "source": "dfae0d04d29bbe6b3430ed304fc04de581f18566",
+    "workflow_id": 397702717,
+    "APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16"
+  },
+  "Android": {
+    "run": 44071299408,
+    "id": 14321289402,
+    "name": "Infinity508-Cast-Reader-Recovered-44071299408-EVIDENCE-ONLY",
+    "digest": "sha256:639f969625f84a9fbfacb9fbca34e7fe6500d36cdd7e0b710cab70f132529f3a",
+    "size_in_bytes": 5989980,
+    "source": "f439ed40b8be6b7b68d402a3983b2b1e351a8a88",
+    "workflow_id": 421009620,
+    "execution_source": "e0b88457b2680f4e97fbc74645c2bdc2c1c144c2",
+    "execution_artifact": {
+      "run": 44067382846,
+      "id": 14321925801,
+      "name": "Infinity508-Cast-Source-Reader-44067382846-EVIDENCE-ONLY",
+      "digest": "sha256:527b2683e7db877bd10b263d7701b8de9015312312eb87e6428abfc33a1e5845",
+      "size_in_bytes": 3040213,
+      "source": "e0b88457b2680f4e97fbc74645c2bdc2c1c144c2",
+      "workflow_id": 421009620
+    }
+  },
+  "component": {
+    "run": 44065804643,
+    "id": 14319468350,
+    "name": "Infinity508-Cast-Source-Reader-Component-44065804643-NOT-INSTALLER",
+    "size_in_bytes": 837021,
+    "digest": "sha256:2afa3d092cbf84695583f434a47c39374607ff577b4a425ef545d7ed1a308b04",
+    "source": "556b54e0ec4d38416f50c3f96cdff10644c6217b",
+    "workflow_id": 421031076
+  },
+  "versions": {
+    "candidate": 2103510,
+    "recovery": 2103511
+  },
+  "inputs": {
+    "repairs/infinity-cast-source-reader-2103508-20261117/release/stage.py": "cf4abcebe34dafe1e79657780e9b7417c32909afdb64a2ca6b29a45275e26be5",
+    "repairs/infinity-cast-source-reader-2103508-20261117/SCOPE.json": "dc961765e14b4b7cdec5731c1d55cdc4bfc98fe6e52e04f83dbc42643173061d",
+    "repairs/infinity-cast-source-reader-2103508-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
+    "repairs/infinity-cast-source-reader-2103508-20261117/verify_android_media.py": "41c5d3e4b4cfcf5b631ea62d2f5e29985a8e1be9d756c7893946a0383303ed63",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
+    "repairs/infinity-cast-source-reader-2103508-20261117/CAST-CLASS-DELTA.json": "fbdf3b66d9b6e8b482cc3a9175dac44ae30efca96ca0321b2d4649c5900053fc",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "61e826157514b1b0a3c75df5ff421346ddc46ce6744e5ca3674991a1397cc3a2",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml": "d191c78f3f6ff12d584fe3d33232863606c3d79c2ab82e9180c3ca06cc7e5869"
+  },
+  "parent_authority_sha256": "e28aa0da5da83029265fec1b7637dc3ba4241692d8cbb0cb46bc894b40a09e41",
+  "class_delta_sha256": "fbdf3b66d9b6e8b482cc3a9175dac44ae30efca96ca0321b2d4649c5900053fc",
+  "source_commit": "87b7b3d765c9cf4ca58476bcb026df83b8486c70",
+  "review_sha256": "cdd07a2c25bc2b97ac2c14b7c1a2c3cf831d2820a0420e24f6ce1b36a6645069"
+}
