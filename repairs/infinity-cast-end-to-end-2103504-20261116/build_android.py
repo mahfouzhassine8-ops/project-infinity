@@ -1,6 +1,6 @@
 """Disposable separate-package JNI/relay probe. Never signs an owner installer."""
 from pathlib import Path
-from zipfile import ZipFile,ZIP_DEFLATED
+from zipfile import ZipFile,ZIP_DEFLATED,ZIP_STORED
 import hashlib,json,os,re,subprocess,sys,types,shutil
 HERE=Path(__file__).resolve().parent;ROOT=HERE.parents[1];WORK=ROOT/'cast504-android-work'
 BASE='ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234'
@@ -70,14 +70,16 @@ def main():
   indices=[]
   for n in baseline.namelist():
    if re.fullmatch(r'classes\d*\.dex',n):indices.append(int(re.search(r'\d+',n).group()) if re.search(r'\d+',n) else 1)
-   if re.fullmatch(r'classes\d*\.dex',n) or n=='resources.arsc' or n.startswith('res/') or (n.startswith('lib/arm64-v8a/') and n.endswith('.so') and not n.endswith('/libinfinitycastremux.so')):out.writestr(n,baseline.read(n))
+   if re.fullmatch(r'classes\d*\.dex',n) or n=='resources.arsc' or n.startswith('res/') or (n.startswith('lib/arm64-v8a/') and n.endswith('.so') and not n.endswith('/libinfinitycastremux.so')):out.writestr(n,baseline.read(n),compress_type=ZIP_STORED if n=='resources.arsc' else ZIP_DEFLATED)
   for i,p in enumerate(sorted(dex.glob('*.dex')),max(indices)+1):out.write(p,'classes'+str(i)+'.dex')
   out.write(loader,'lib/arm64-v8a/libinfinitycastqaloader.so');out.write(library,'lib/arm64-v8a/libinfinitycastremux.so')
   for p in fixtures.glob('*.mkv'):out.write(p,'assets/cast-fixtures/'+p.name)
+ with ZipFile(unsigned) as z:assert z.getinfo('resources.arsc').compress_type==ZIP_STORED,'ANDROID_R_REQUIRES_STORED_RESOURCE_TABLE'
  aligned=WORK/'aligned.apk';run([bt/'zipalign','-p','-f','4',unsigned,aligned])
  # Ephemeral key is for this separate CI test package only. Never used by owner releases.
  key=WORK/'CI-ONLY.keystore';run(['keytool','-genkeypair','-alias','CI-only','-keyalg','RSA','-keystore',key,'-storepass','android','-keypass','android','-dname','CN=Disposable Cast CI','-validity','2'])
  run([bt/'apksigner','sign','--ks',key,'--ks-key-alias','CI-only','--ks-pass','pass:android','--key-pass','pass:android','--out',WORK/'CI-ONLY.apk',aligned])
+ run([bt/'zipalign','-c','4',WORK/'CI-ONLY.apk'],stdout=subprocess.DEVNULL)
  (WORK/'BUILD.json').write_text(json.dumps({'status':'CI_ONLY_SEPARATE_PACKAGE_READY','original_signed504_sha256':BASE,'native_library_sha256':sha(library),'native_artifact':request['native'],'source':os.environ['GITHUB_SHA'],'baseline_DEX_recompiled':False,'owner_APK_built':False},indent=2)+'\n')
  print('CI_ONLY_ACTUAL504_DEX_AND_ENGINE_REUSED_NEW_CAST_JNI_NO_OWNER_APK')
 if __name__=='__main__':main()

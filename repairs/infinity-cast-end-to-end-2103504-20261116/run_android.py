@@ -44,7 +44,8 @@ except BaseException as error:
  if result is None:result={'pass':False}
  result['pass']=False
  result.update(status='FAIL_SELECTED_ANDROID_CAST_AUDIO',wrapper_failure=str(error),wrapper_stage=stage)
- if stage=='installation':result['native_encoder_execution']='NOT_RUN';raise
+ if stage=='installation':result['native_encoder_execution']='NOT_RUN'
+ if isinstance(error,subprocess.CalledProcessError):result['command_output']=str(error.output)[-2048:];raise
 finally:
  try:(OUT/'LOGCAT.txt').write_text(adb('logcat','-d','-v','threadtime'))
  except Exception as error:(OUT/'LOGCAT-ERROR.txt').write_text(str(error))
