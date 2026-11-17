@@ -1,0 +1,32 @@
+{
+  "reviewer": "Astra",
+  "status": "PASS_EXACT_NATIVE_ONLY504_REGISTRATION",
+  "preparation_run": 44002750819,
+  "producer_source": "e4dc5cbdf7500fc2058de687c698c4a5b8a5dcbf",
+  "prepared_artifact": {
+    "run": 44002750819,
+    "id": 14292448624,
+    "name": "Infinity504-Cast-Audio-Prepared-44002750819",
+    "size_in_bytes": 1284213595,
+    "digest": "sha256:b9d49008e6c71fe852e69ef15bff15de3616b939dc73fb40a266168d8a48d512",
+    "source": "e4dc5cbdf7500fc2058de687c698c4a5b8a5dcbf",
+    "workflow_id": 397702717
+  },
+  "baseline_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+  "candidate": {
+    "versionCode": 2103506,
+    "generation": 91,
+    "authority_sha256": "69c93000a1fa4d4d769240848638d10787d3229935504ebc1c15cc31cda6cd2c",
+    "unsigned_APK_sha256": "875bd7d4661cd44e47dd7beb90111b9fac07b48c0cd2ac6f107ff239729fb122",
+    "approved_action": "Register exact proposal then original397sign; all original gates mandatory"
+  },
+  "recovery": {
+    "versionCode": 2103507,
+    "generation": 92,
+    "authority_sha256": "d70693a838137b6519427add1dcc862ebf38f7d7f0b503f3c7906c2aa053e5c8",
+    "unsigned_APK_sha256": "d27181e2328a3f81bf484ea0a4147d609165e922ed028cc1928adfd7113b6b78",
+    "approved_action": "Proposal valid; registration/signing held until actual candidate signature PASS"
+  },
+  "preservation": "All504 class IDs/hashes/ownership identical; Cobra, Minimal, protectedcontracts, accepted pointer, proofs/exceptions, Kodi, module signatures and baseline classstreams unchanged. Only Castlib+label ownerpayload and typedmanifest version account for change.",
+  "physical_TV": "NOT_TESTED"
+}
