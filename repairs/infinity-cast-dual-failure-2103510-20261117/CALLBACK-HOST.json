@@ -1,0 +1,14 @@
+{
+  "status": "PASS_SOURCE_EXTRACTED_CALLBACK_ORDER",
+  "baseline": {
+    "source_sha256": "42080c3705b432b2f33e695b65cd304c2d3c4f0a4630f32c9173428627cd5e02",
+    "extracted_callback_sha256": "af0de03c6593bbba582aebfc16bfa573ea8dbbb1a67d49d3f6362d6c78e14db0",
+    "result": "REPRODUCED_BASELINE_PLAY_AFTER_RETURN"
+  },
+  "candidate": {
+    "source_sha256": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f",
+    "extracted_callback_sha256": "0b1bb245cc320378d5cb32e15649d061e959b2764dd4e701f8e92afab658a7b1",
+    "result": "PASS_ACTIVE_AND_STALE_SOURCE_CALLBACKS cases=10"
+  },
+  "claim": "Exact production seek/play continuations; controlled orderedSDKcallbacks. Not actualreceiver/phone acceptance."
+}

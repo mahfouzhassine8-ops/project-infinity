@@ -55,6 +55,7 @@ final class InfinityCastRemux implements AutoCloseable {
                 codecs=metadata.optString("codecs","");
                 if(!codecs.matches("(avc1\\.[0-9A-F]{6}|hev1\\.[ABC]?[0-9]+\\.[0-9A-F]+\\.[LH][0-9]+(?:\\.[0-9A-F]{2}){0,6})(?:,(?:mp4a\\.(?:40\\.[0-9]+|69|6B)|ac-3|ec-3))?"))throw new IOException("mkv_invalid_codec_description");
                 if("hevc".equals(video)){String descriptor=codecs.split(",")[0];String[] fields=descriptor.split("\\.");InfinityCastDiagnostics.event("mkv_video_profile","hevc",Integer.parseInt(fields[1].replaceAll("[ABC]","")));InfinityCastDiagnostics.event("mkv_video_level",fields[3].startsWith("H")?"high_tier":"main_tier",Integer.parseInt(fields[3].substring(1)));}
+                if("hevc".equals(video)){InfinityCastDiagnostics.event("mkv_csd","private_bytes",metadata.optInt("video_csd_bytes",-1));InfinityCastDiagnostics.event("mkv_csd","arrays",metadata.optInt("video_csd_arrays",-1));InfinityCastDiagnostics.event("mkv_csd","nal_length_bytes",metadata.optInt("video_nal_length_bytes",-1));}
                 check();InfinityCastDiagnostics.event("mkv_inspection","stream_copy_ready",starts.length-1);
             }catch(IOException e){throw failure(e);}catch(Exception e){throw new IOException("mkv_inspection_failed");}
         }
@@ -110,12 +111,23 @@ final class InfinityCastRemux implements AutoCloseable {
             if(!suffix.matches("[0-9]{1,4}\\.m4s"))throw new IOException("mkv_unknown_resource");
             int index=Integer.parseInt(suffix.substring(0,suffix.length()-4));if(starts==null || index>=starts.length-1)throw new IOException("mkv_segment_out_of_range");
             byte[] bytes=fragments.get(index);if(bytes!=null)return bytes;
-            long readBudget=0;boolean budgetInstalled=false;
+            long readBudget=0;boolean budgetInstalled=false;long entered=System.nanoTime();
+            InfinityCastDiagnostics.event("mkv_request","started",index);
             try{readBudget=InfinityCastRemuxNative.readBudget(handle,index);if(readBudget<33554432L || readBudget>134217728L)throw new IOException("mkv_source_budget_invalid");input.budget(readBudget);budgetInstalled=true;bytes=InfinityCastRemuxNative.segment(handle,index);check();if(bytes==null || bytes.length==0 || bytes.length>8388608)throw new IOException("mkv_fragment_limit");}
-            catch(IOException error){throw budgetInstalled?failure(error):error;}
-            finally{reportSource(index,readBudget,budgetInstalled);}
+            catch(IOException error){
+                IOException actual=budgetInstalled?failure(error):error;
+                String nativeCode=error.getMessage(),code=actual.getMessage();
+                boolean explicitCancel="mkv_cancelled".equals(nativeCode)||"cast_hw_video_cancelled".equals(nativeCode);
+                InfinityCastDiagnostics.event("mkv_request",cancelled?(explicitCancel?"cancelled_after_close":"failed_during_close"):"generation_failed",index);
+                InfinityCastDiagnostics.event("mkv_request","close_flag_observed",cancelled?1:0);
+                // Preserve both observed outcomes; concurrent close proves no cause.
+                if(nativeCode!=null&&nativeCode.matches("(?:mkv_|cast_hw_)[a-z0-9_]{1,55}"))InfinityCastDiagnostics.event("mkv_native_failure",nativeCode,index);
+                if(code!=null&&code.matches("(?:mkv_|cast_hw_)[a-z0-9_]{1,55}"))InfinityCastDiagnostics.event("mkv_failure",code,index);
+                throw actual;
+            }
+            finally{InfinityCastDiagnostics.event("mkv_request","elapsed_ms",(int)Math.min(Integer.MAX_VALUE,(System.nanoTime()-entered)/1000000));reportSource(index,readBudget,budgetInstalled);}
             while(fragments.size()>=2)fragments.remove(fragments.keySet().iterator().next());fragments.put(index,bytes);
-            InfinityCastDiagnostics.event("mkv_fragment","copied",index);return bytes;
+            InfinityCastDiagnostics.event("mkv_fragment","copied",index);InfinityCastDiagnostics.event("mkv_request","generated_bytes",bytes.length);return bytes;
         }
     }
     /** Numeric-only, bounded best-effort outcome reporting; never masks the request failure. */

@@ -87,12 +87,37 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         @Override public void onMetadataUpdated(){status();}
         @Override public void onMediaError(MediaError error){
             if(error==null || (!transferStarted && !handedOff))return;
-            int code=error.getDetailedErrorCode()==null?0:error.getDetailedErrorCode();
+            Integer detail=error.getDetailedErrorCode();int code=detail==null?-1:detail;
+            reportReceiver();
+            InfinityCastDiagnostics.event("receiver_error","detail_present",detail==null?0:1);
+            InfinityCastDiagnostics.event("receiver_error","type_"+mediaErrorCode(error.getType()),0);
+            InfinityCastDiagnostics.event("receiver_error","reason_"+mediaErrorCode(error.getReason()),0);
             InfinityCastDiagnostics.event("receiver_media","sdk_error",code);
+            if(returning||aborting||cleanupPending){InfinityCastDiagnostics.event("receiver_error","during_cleanup",0);return;}
             if(ownsMedia())fail("receiver_media","load_or_decode_failed",code,
-                relay!=null && !relay.failure().isEmpty()?mediaFailure(relay.failure()):"The TV reported a media error (code "+code+"). Returning to phone playback.");
+                receiverFailure("The TV reported a media error"+(detail==null?" (no detailed code)":" (code "+code+")")+". Returning to phone playback."));
         }
     };
+    private static String mediaErrorCode(String value){
+        if(value==null)return "absent";
+        switch(value){
+            case "LOAD_FAILED":return "load_failed";case "LOAD_CANCELLED":return "load_cancelled";
+            case "INVALID_REQUEST":return "invalid_request";case "INVALID_PLAYER_STATE":return "invalid_player_state";
+            case "INVALID_MEDIA_SESSION_ID":return "invalid_media_session_id";case "INVALID_PARAMS":return "invalid_params";
+            case "LOAD_INTERRUPTED":return "load_interrupted";case "MEDIA_ERROR":return "media_error";
+            case "ERROR":return "error";case "NOT_FOUND":return "not_found";default:return "other";
+        }
+    }
+    private void reportReceiver(){
+        CastDevice device=session==null?null:session.getCastDevice();if(device==null)return;
+        String model=device.getModelName();
+        // Static SDK model only; never friendly name, device ID or network address.
+        String code=model!=null&&model.matches("[A-Za-z0-9 _().-]{1,48}")?"model_"+model.toLowerCase(java.util.Locale.ROOT).replaceAll("[^a-z0-9]","_"):"model_unreported";
+        InfinityCastDiagnostics.event("receiver_model",code,0);
+        InfinityCastReceiverPolicy.Receiver policy=InfinityCastReceiverPolicy.receiver(model);
+        InfinityCastDiagnostics.event("receiver_capability",policy.family,policy.hevcLevel);
+    }
+    private boolean handoffActive(String expected){return expected.equals(token)&&!aborting&&!returning&&!cleanupPending;}
     private InfinityCastSession(Context context){this.context=context;}
     void attach(View value) {
         view=new WeakReference<>(value);
@@ -235,7 +260,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             device.getInetAddress()==null || device.getInetAddress().isLoopbackAddress()) {
             unavailable("This receiver has no supported local video transport. Phone playback is unchanged.");abortTransfer();return;
         }
-        remote.registerCallback(mediaEvents);
+        reportReceiver();remote.registerCallback(mediaEvents);
         final String expected=token;
         phone.request("snapshot",token,0,current->{
             if(!expected.equals(token) || session!=value)return;
@@ -305,14 +330,14 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         stage("phone_handoff",10000,"The phone handoff could not be confirmed. Returning to phone playback.");
         final String expected=token;
         phone.request("snapshot",token,0,value->{
-            if(!expected.equals(token))return;
-            if(!ok(value) || aborting){abortTransfer();return;}
+            if(!handoffActive(expected))return;
+            if(!ok(value)){abortTransfer();return;}
             source=value;phoneWasPaused=value.optBoolean("paused");
             commitPause(expected);
         });
     }
     private void commitPause(String expected) {
-        if(!expected.equals(token) || aborting)return;
+        if(!handoffActive(expected))return;
         mayHavePaused=true;
         message="Transferring playback…";changed();
         phone.request("pause",token,0,new InfinityCastGateway.Result(){
@@ -320,32 +345,33 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 if(!expected.equals(token))return;
                 if(!ok(value)){aborting=true;restorePhone(false);return;}
                 source=value;
-                if(aborting){restorePhone(false);return;}
+                if(aborting||returning||cleanupPending){restorePhone(false);return;}
                 confirmPaused(SystemClock.uptimeMillis()+2500,expected);
             }
             @Override public void pendingCommit(){if(expected.equals(token)){message="Phone handoff is pending; the receiver remains paused.";aborting=true;changed();}}
         });
     }
     private void confirmPaused(long deadline,String expected) {
-        if(!expected.equals(token))return;
+        if(!handoffActive(expected))return;
         if(SystemClock.uptimeMillis()>deadline){aborting=true;restorePhone(false);return;}
         if(phone.busy()){ui.postDelayed(()->confirmPaused(deadline,expected),50);return;}
         phone.request("snapshot",token,0,value->{
-            if(!expected.equals(token))return;
+            if(!handoffActive(expected))return;
             if(!ok(value) || SystemClock.uptimeMillis()>deadline){aborting=true;restorePhone(false);return;}
             if(!value.optBoolean("paused")){ui.postDelayed(()->confirmPaused(deadline,expected),50);return;}
+            if(!handoffActive(expected))return;
             source=value;
-            if(aborting){restorePhone(false);return;}
             final String expectedMedia=mediaToken;
             final RemoteMediaClient receiver=remote;
             if(receiver==null || !ownsMedia()){aborting=true;restorePhone(false);return;}
             stage("receiver_seek",8000,"The TV did not confirm its playback position. Returning to phone playback.");
+            final long seekSerial=stageSerial;
             receiver.seek(new MediaSeekOptions.Builder().setPosition(value.optLong("position_ms")).build()).setResultCallback(result->{
-                if(!expected.equals(token) || !expectedMedia.equals(mediaToken) || aborting)return;
+                if(!handoffActive(expected) || !expectedMedia.equals(mediaToken) || receiver!=remote || seekSerial!=stageSerial || !"receiver_seek".equals(stageName))return;
                 if(!result.getStatus().isSuccess()){fail("receiver_seek","rejected",result.getStatus().getStatusCode(),"The TV rejected the playback position. Returning to phone playback.");return;}
                 InfinityCastDiagnostics.event("receiver_seek","accepted",0);
                 handedOff=true;stage("receiver_start",8000,"Receiver playback did not start. Returning to phone playback.");receiver.play().setResultCallback(play->{
-                    if(!expected.equals(token) || !expectedMedia.equals(mediaToken) || returning)return;
+                    if(!handoffActive(expected) || !expectedMedia.equals(mediaToken) || receiver!=remote)return;
                     if(!play.getStatus().isSuccess())fail("receiver_start","rejected",play.getStatus().getStatusCode(),"The TV rejected playback (code "+play.getStatus().getStatusCode()+"). Returning to phone playback.");
                     else InfinityCastDiagnostics.event("receiver_start","accepted",0);
                 });
@@ -368,7 +394,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         if(ownsMedia()) {
             MediaStatus status=remote.getMediaStatus();
             if(status!=null) {
-                if(status.getPlayerState()==MediaStatus.PLAYER_STATE_PLAYING && handedOff) {
+                if(status.getPlayerState()==MediaStatus.PLAYER_STATE_PLAYING && handedOff && !returning && !aborting && !cleanupPending) {
                     if(!everPlayed){InfinityCastDiagnostics.event("receiver","playing_confirmed",0);stage("casting",0,"");}
                     everPlayed=true;if(!returning)message="Now Casting";
                 }
@@ -378,9 +404,10 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 finished=everPlayed && status.getPlayerState()==MediaStatus.PLAYER_STATE_IDLE &&
                     status.getIdleReason()==MediaStatus.IDLE_REASON_FINISHED;
                 if(finished && lastDuration>0)lastPosition=lastDuration;
-                if(!returning && status.getPlayerState()==MediaStatus.PLAYER_STATE_IDLE && status.getIdleReason()==MediaStatus.IDLE_REASON_ERROR) {
+                if(!returning && !aborting && !cleanupPending && status.getPlayerState()==MediaStatus.PLAYER_STATE_IDLE && status.getIdleReason()==MediaStatus.IDLE_REASON_ERROR) {
+                    reportReceiver();
                     InfinityCastDiagnostics.event("receiver","media_idle_error",status.getIdleReason());
-                    fail("receiver","media_idle_error",status.getIdleReason(),relay!=null && !relay.failure().isEmpty()?mediaFailure(relay.failure()):"TV playback failed. Returning to phone playback.");
+                    fail("receiver","media_idle_error",status.getIdleReason(),receiverFailure("TV playback failed. Returning to phone playback."));
                 }
             }
         } else if(handedOff)message="The receiver is playing different content. Return to phone playback.";
@@ -473,6 +500,14 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 mayHavePaused=false;phoneClockReady=true;leaveReceiver(true);message=lastFailure.isEmpty()?"Returned to phone playback.":lastFailure+" Returned to phone playback.";changed();
             } else ui.postDelayed(()->confirmReturn(position,paused,expected,returningOperation),100);
         });
+    }
+    private String receiverFailure(String explanation){
+        String delivery=relay==null?"":relay.failure();
+        if(!delivery.isEmpty()){
+            InfinityCastDiagnostics.event("receiver_error","separate_delivery_error",0);
+            explanation+=" Separate media-delivery outcome: "+delivery+".";
+        }
+        return explanation;
     }
     private String mediaFailure(String reason) {
         if(reason==null)return "Media preparation failed. Phone playback continues.";

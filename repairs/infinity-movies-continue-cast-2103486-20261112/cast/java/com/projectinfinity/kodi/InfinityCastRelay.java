@@ -362,7 +362,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         } catch(IOException stopped){}finally{close();cancelCalls();ownerDone=true;retired();}
     }
     private void serve(Socket client) {
-        Response response=null;
+        Response response=null;boolean downstream=false,receiverRequest=true;
         try {
             long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(2);client.setSoTimeout(2000);
             InputStream input=client.getInputStream();ByteArrayOutputStream header=new ByteArrayOutputStream();int value,tail=0;
@@ -374,12 +374,13 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             boolean converted=remux!=null && (first[1].equals(URI.create(address()).getRawPath()) || first[1].startsWith(path+"/mkv/"));
             if(resource==null && !converted)return;
             String method=first[0];OutputStream output=client.getOutputStream();
-            if(method.equals("OPTIONS")){reply(output,204,null,0,null);return;}
+            if(method.equals("OPTIONS")){downstream=true;reply(output,204,null,0,null);return;}
             if(!(method.equals("GET") || method.equals("HEAD")))return;
             String range=null;for(int i=1;i<lines.length;i++)if(lines[i].toLowerCase(Locale.ROOT).startsWith("range:")) {
                 if(range!=null)return;range=lines[i].substring(6).trim();if(!range.matches("bytes=[0-9]{0,16}-[0-9]{0,16}") || range.equals("bytes=-"))return;
             }
             if(requests.incrementAndGet()==1)InfinityCastDiagnostics.event("receiver_access","received",0);
+            receiverRequest=false;
             if(converted) {
                 boolean playlist=first[1].equals(URI.create(address()).getRawPath());
                 boolean media=first[1].equals(path+"/mkv/media.m3u8");String asset=playlist?"master":media?"media":first[1].endsWith("/init.mp4")?"init":"fragment";
@@ -387,9 +388,10 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
                 String type=playlist || media?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
                 boolean wholeHardware=asset.equals("fragment")&&remux.hardwareVideo();
                 if(range!=null && !playlist && !media && !wholeHardware){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
-                if(from>to || from>=data.length){reply(output,416,type,0,"bytes */"+data.length);InfinityCastDiagnostics.event("converted_http",asset+"_range_unsatisfied",416);return;}
+                if(from>to || from>=data.length){downstream=true;reply(output,416,type,0,"bytes */"+data.length);InfinityCastDiagnostics.event("converted_http",asset+"_range_unsatisfied",416);return;}
                 boolean diagnostic=reportedKinds.add("converted:"+asset+":"+method+":"+code);
                 if(diagnostic)InfinityCastDiagnostics.event("converted_http",asset+(method.equals("HEAD")?"_head":"_get"),code);
+                downstream=true;
                 reply(output,code,type,to-from+1,code==206?"bytes "+from+"-"+to+"/"+data.length:null,wholeHardware);
                 if(method.equals("GET")){try{output.write(data,(int)from,(int)(to-from+1));output.flush();delivered((int)(to-from+1));if(diagnostic)InfinityCastDiagnostics.event("converted_body",asset+"_written",(int)(to-from+1));}catch(IOException failed){InfinityCastDiagnostics.event("converted_body",asset+"_write_failed",0);throw failed;}}return;
             }
@@ -403,7 +405,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
                 if(response.body()==null || response.code()!=200)throw new IOException("invalid_manifest_response");
                 String manifestType=type!=null?type:resource.kind==InfinityCastAdaptive.Kind.DASH?"application/dash+xml":"application/vnd.apple.mpegurl";
                 byte[] translated=InfinityCastAdaptive.rewrite(read(response.body().byteStream(),InfinityCastAdaptive.LIMIT),manifestType,response.request().url().uri(),this);
-                reply(output,200,manifestType,translated.length,null);if(method.equals("GET")){output.write(translated);delivered(translated.length);}return;
+                downstream=true;reply(output,200,manifestType,translated.length,null);if(method.equals("GET")){output.write(translated);delivered(translated.length);}return;
             }
             if(type==null) {
                 String raw=contentType==null?"":contentType.split(";",2)[0].trim().toLowerCase(Locale.ROOT);
@@ -413,15 +415,20 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             }
             if(resource.kind==InfinityCastAdaptive.Kind.KEY && method.equals("GET")) {
                 byte[] key=read(response.body().byteStream(),16);if(key.length!=16)throw new IOException("unsupported_hls_key");
-                reply(output,200,"application/octet-stream",16,null);output.write(key);delivered(key.length);return;
+                downstream=true;reply(output,200,"application/octet-stream",16,null);output.write(key);delivered(key.length);return;
             }
             String contentRange=response.header("Content-Range");
             if(response.code()==206 && (contentRange==null || !contentRange.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}")))throw new IOException("invalid_source_range");
             long length=response.body()==null?-1:response.body().contentLength();String declared=response.header("Content-Length");
             if(method.equals("HEAD") && declared!=null && declared.matches("[0-9]{1,16}"))length=Long.parseLong(declared);
-            reply(output,response.code(),type,length,contentRange);
-            if(method.equals("GET") && response.body()!=null){InputStream body=response.body().byteStream();byte[] buffer=new byte[65536];int count;while(!closed && (count=body.read(buffer))!=-1){output.write(buffer,0,count);delivered(count);}}
-        } catch(IOException | RuntimeException failure){if(!closed)reason(failure);}
+            downstream=true;reply(output,response.code(),type,length,contentRange);downstream=false;
+            if(method.equals("GET") && response.body()!=null){InputStream body=response.body().byteStream();byte[] buffer=new byte[65536];int count;while(!closed && (count=body.read(buffer))!=-1){try{output.write(buffer,0,count);}catch(IOException failed){downstream=true;throw failed;}delivered(count);}}
+        } catch(IOException | RuntimeException failure){
+            if(closed)InfinityCastDiagnostics.event("relay_delivery","cancelled_after_close",0);
+            else if(downstream)InfinityCastDiagnostics.event("relay_delivery","receiver_write_failed",0);
+            else if(receiverRequest || "mkv_unknown_resource".equals(failure.getMessage()) || "mkv_segment_out_of_range".equals(failure.getMessage()))InfinityCastDiagnostics.event("relay_delivery","receiver_request_failed",0);
+            else reason(failure);
+        }
         finally{if(response!=null)release(response);}
     }
     private void delivered(int count){if(deliveredBytes.getAndAdd(count)==0)InfinityCastDiagnostics.event("receiver_access","body_written",count);}
@@ -438,7 +445,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     }
     private void cancelCalls(){for(Call call:new ArrayList<>(calls))call.cancel();upstream.connectionPool().evictAll();}
     @Override public synchronized void close() {
-        if(closed)return;closed=true;if(remux!=null)remux.cancel();try{listener.close();}catch(IOException ignored){}
+        if(closed)return;InfinityCastDiagnostics.event("relay_lifecycle","close_requested",0);closed=true;if(remux!=null)remux.cancel();try{listener.close();}catch(IOException ignored){}
         for(Socket client:new ArrayList<>(clients))try{client.close();}catch(IOException ignored){}
         // cancel() is nonblocking; do not queue it behind an accept() owner.
         for(Call call:new ArrayList<>(calls))call.cancel();

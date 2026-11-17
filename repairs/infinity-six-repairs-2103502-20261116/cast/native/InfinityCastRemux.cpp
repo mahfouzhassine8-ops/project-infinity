@@ -84,7 +84,7 @@ struct State {
  std::atomic<bool> cancelled{false};Clock::time_point deadline;
  int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts,positions;int64_t sourceLength=0;bool positionPlanValid=false;
  std::vector<uint8_t> init;std::string videoName,audioName,codecs;std::unique_ptr<CastAudioAdapter> audioAdapter;
- std::unique_ptr<CastVideoBridge> videoBridge;CastVideoResult videoFormat;std::vector<uint8_t> bootstrapVideo;bool videoConfigured=false;
+ std::unique_ptr<CastVideoBridge> videoBridge;CastVideoResult videoFormat;std::vector<uint8_t> bootstrapVideo,videoInputHeader,videoInputCsd;bool videoConfigured=false;
  explicit State(std::unique_ptr<Input> value):input(std::move(value)){api();}
  ~State(){if(format)api().avformat_close_input(&format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
  bool stopped()const{return cancelled.load() || Clock::now()>deadline;}
@@ -99,7 +99,7 @@ struct Output {
  AVFormatContext* format=nullptr;AVIOContext* io=nullptr;std::vector<uint8_t> bytes;const char* failure=nullptr;bool packetHeader=false;
  ~Output(){if(format)api().avformat_free_context(format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
  static int write(void* p,uint8_t* data,int n){auto& o=*static_cast<Output*>(p);if(n<0 || o.bytes.size()+size_t(n)>FragmentLimit){o.failure="mkv_fragment_limit";return AVERROR(ENOSPC);}try{o.bytes.insert(o.bytes.end(),data,data+n);return n;}catch(...){o.failure="mkv_memory_limit";return AVERROR(ENOMEM);}}
- void begin(State& s){
+ void begin(State& s,int index=0){
   if(api().avformat_alloc_output_context2(&format,nullptr,"mp4",nullptr)<0 || !format)throw Failure("mkv_mp4_muxer_unavailable");
   for(int in:{s.video,s.audio})if(in>=0){
    auto* source=s.format->streams[in];if(api().avformat_query_codec(format->oformat,source->codecpar->codec_id,FF_COMPLIANCE_NORMAL)<=0)throw Failure("mkv_codec_not_mp4_compatible");
@@ -130,6 +130,8 @@ struct Output {
   if(packetHeader)flags+="+delay_moov";
   api().av_dict_set(&options,"movflags",flags.c_str(),0);
   api().av_dict_set(&options,"use_editlist","0",0);
+  // Stable movie-fragment numbering, independent of request/cache order.
+  api().av_dict_set(&options,"fragment_index",std::to_string(index+1).c_str(),0);
   int code=api().avformat_write_header(format,&options);api().av_dict_free(&options);api().avio_flush(io);
   if(code<0 || failure)throw Failure(failure?failure:"mkv_mux_header_failed");if(!packetHeader && (bytes.empty() || bytes.size()>InitLimit))throw Failure("mkv_init_limit");
  }
@@ -335,7 +337,7 @@ std::vector<uint8_t> State::segment(int index){
  // Recover demuxer DTS before the requested cue; never infer new video DTS.
  const size_t seekIndex=audioAdapter && index>0?size_t(index-1):size_t(index);
  if(api().av_seek_frame(format,video,keys[seekIndex],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");
- Output out;out.begin(*this);if(!out.packetHeader && out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();Packet packet;int writtenVideo=0,writtenAudio=0;bool boundary=false;int64_t readPackets=0;
+ Output out;out.begin(*this,index);if(!out.packetHeader && out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();Packet packet;int writtenVideo=0,writtenAudio=0;bool boundary=false;int64_t readPackets=0;
  const int64_t begin=starts[index]+origin,end=starts[index+1]+origin;
  for(auto& encoded:converted){check();auto* p=packet.value;if(audioAdapter->a.av_new_packet(p,int(encoded.data.size()))<0)throw Failure("mkv_memory_limit");std::memcpy(p->data,encoded.data.data(),encoded.data.size());p->pts=p->dts=encoded.sample+10LL*audioAdapter->Rate;p->duration=encoded.duration;p->flags=encoded.flags;for(auto& side:encoded.side){auto* target=audioAdapter->a.av_packet_new_side_data(p,side.type,side.data.size());if(!target)throw Failure("mkv_memory_limit");std::memcpy(target,side.data.data(),side.data.size());}p->stream_index=1;p->pos=-1;if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_aac_packet_mux_failed");writtenAudio++;}
  for(;;){check();if(++readPackets>250000)throw Failure("mkv_packet_limit");int result=api().av_read_frame(format,packet.value);if(result==AVERROR_EOF)break;if(result<0)throw Failure("mkv_packet_read_failed");auto* p=packet.value;
@@ -378,14 +380,13 @@ std::vector<uint8_t> State::videoSegment(int index){
  input->reset(index);const auto workStarted=Clock::now();
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0||size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
  std::vector<CastAudioAdapter::Encoded> converted;if(audioAdapter){input->phase=Input::Audio;converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
- auto* source=format->streams[video];auto* p=source->codecpar;auto csd=CastVideoSource::configuration(p);auto fps=source->avg_frame_rate.num>0?source->avg_frame_rate:source->r_frame_rate;auto sar=source->sample_aspect_ratio.num>0?source->sample_aspect_ratio:p->sample_aspect_ratio;
+ auto* source=format->streams[video];auto* p=source->codecpar;auto fps=source->avg_frame_rate.num>0?source->avg_frame_rate:source->r_frame_rate;auto sar=source->sample_aspect_ratio.num>0?source->sample_aspect_ratio:p->sample_aspect_ratio;
  std::ostringstream descriptor;descriptor<<"{\"video\":\""<<(p->codec_id==AV_CODEC_ID_HEVC?"hevc":"h264")<<"\",\"width\":"<<p->width<<",\"height\":"<<p->height<<",\"profile\":"<<p->profile<<",\"level\":"<<p->level<<",\"transfer\":"<<p->color_trc<<",\"primaries\":"<<p->color_primaries<<",\"matrix\":"<<p->color_space<<",\"range\":"<<p->color_range<<",\"fps_num\":"<<fps.num<<",\"fps_den\":"<<fps.den<<",\"sar_num\":"<<sar.num<<",\"sar_den\":"<<sar.den<<"}";
  if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("cast_hw_video_seek_failed");
- CastVideoResult result;
+ CastVideoResult result;std::vector<uint8_t> pendingHeader,pendingCsd;
  struct AudioPacket{std::vector<uint8_t> data;int64_t pts,dts,duration;int flags;std::vector<CastAudioAdapter::Side> side;};std::vector<AudioPacket> passthrough;
  const int64_t begin=origin+starts[index],end=origin+starts[index+1];bool started=false,first=true,boundary=false;int packets=0;Packet packet;
  try{
-  check();std::string description=descriptor.str();description.pop_back();description+=",\"budget_ms\":"+std::to_string(std::max<int64_t>(0,std::chrono::duration_cast<std::chrono::milliseconds>(deadline-Clock::now()).count()-100))+"}";started=true;videoBridge->begin(description,csd.first,csd.second,starts[index],starts[index+1]);
   for(;;){check();if(++packets>250000)throw Failure("mkv_packet_limit");int code=api().av_read_frame(format,packet.value);if(code==AVERROR_EOF)break;if(code<0)throw Failure("mkv_packet_read_failed");auto* q=packet.value;
    int stream=q->stream_index;if(stream!=video&&stream!=audio){api().av_packet_unref(q);continue;}
    for(int n=0;n<q->side_data_elems;n++)if(q->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO||q->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
@@ -393,10 +394,22 @@ std::vector<uint8_t> State::videoSegment(int index){
    if(stream==video&&(q->flags&AV_PKT_FLAG_KEY)&&at>=end){if(boundary&&at>end){api().av_packet_unref(q);break;}boundary=true;}
    if(at>=end)input->phase=Input::Lookahead;else if(at>=begin)input->phase=Input::Selected;
    if(at<begin||at>=end){api().av_packet_unref(q);continue;}
-   if(stream==video){if(first){if(!(q->flags&AV_PKT_FLAG_KEY)||q->pts!=keys[index]||!closedPicture(q,p))throw Failure("mkv_open_gop_not_supported");first=false;}videoBridge->offer(CastVideoSource::accessUnit(p,q),at-origin);}
+   if(stream==video){if(first){if(!(q->flags&AV_PKT_FLAG_KEY)||q->pts!=keys[index]||!closedPicture(q,p))throw Failure("mkv_open_gop_not_supported");
+     // The current verified key AU supplies missing in-band CSD; no extra scan.
+     if(p->codec_id==AV_CODEC_ID_HEVC){
+      if(!p->extradata||p->extradata_size<23||p->extradata_size>65536)throw Failure("cast_hw_source_configuration_header");
+      pendingHeader.assign(p->extradata,p->extradata+p->extradata_size);
+      if(!videoInputHeader.empty()&&videoInputHeader!=pendingHeader)throw Failure("cast_hw_source_configuration_changed");
+     }
+     auto csd=CastVideoSource::configuration(p,q,videoConfigured&&!videoInputCsd.empty()?&videoInputCsd:nullptr);
+     if(p->codec_id==AV_CODEC_ID_HEVC){pendingCsd=csd.first;if(!videoInputCsd.empty()&&pendingCsd!=videoInputCsd)throw Failure("cast_hw_source_configuration_changed");}
+     check();std::string description=descriptor.str();description.pop_back();description+=",\"budget_ms\":"+std::to_string(std::max<int64_t>(0,std::chrono::duration_cast<std::chrono::milliseconds>(deadline-Clock::now()).count()-100))+"}";
+     started=true;videoBridge->begin(description,csd.first,csd.second,starts[index],starts[index+1]);first=false;
+    }videoBridge->offer(CastVideoSource::accessUnit(p,q),at-origin);}
    else if(!audioAdapter){if(q->size<=0||q->size>65536||passthrough.size()>2000)throw Failure("cast_hw_audio_packet_limit");AudioPacket a{std::vector<uint8_t>(q->data,q->data+q->size),q->pts,q->dts,q->duration,q->flags,{}};for(int k=0;k<q->side_data_elems;k++){auto& side=q->side_data[k];if(side.type==AV_PKT_DATA_NEW_EXTRADATA)throw Failure("cast_hw_audio_configuration_changed");if(side.size>65536||a.side.size()>16)throw Failure("cast_hw_audio_side_limit");a.side.push_back({side.type,std::vector<uint8_t>(side.data,side.data+side.size)});}passthrough.push_back(std::move(a));}
    api().av_packet_unref(q);
   }
+  if(!started||first)throw Failure("cast_hw_video_empty");
   result=CastVideoResult::parse(videoBridge->finish(),starts[index],starts[index+1]);started=false;
  }catch(...){if(started)try{videoBridge->abort();}catch(...){}throw;}
  if(first||result.packets.empty())throw Failure("cast_hw_video_empty");
@@ -404,7 +417,7 @@ std::vector<uint8_t> State::videoSegment(int index){
  videoFormat.width=result.width;videoFormat.height=result.height;videoFormat.profile=result.profile;videoFormat.level=result.level;videoFormat.config=result.config;
  AVCodecParameters proof{};proof.codec_id=AV_CODEC_ID_H264;proof.extradata=videoFormat.config.data();proof.extradata_size=int(videoFormat.config.size());
  for(size_t n=0;n<result.packets.size();n++){auto& item=result.packets[n];AVPacket checkPacket{};checkPacket.data=item.data.data();checkPacket.size=int(item.data.size());if(n==0&&(!(item.flags&AV_PKT_FLAG_KEY)||!closedPicture(&checkPacket,&proof)))throw Failure("cast_hw_first_picture_not_idr");}
- Output out;out.begin(*this);if(videoConfigured&&out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();
+ Output out;out.begin(*this,index);if(videoConfigured&&out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();
  struct MuxPacket{const std::vector<uint8_t>* data;int stream;int64_t pts,dts,duration;int flags;AVRational base;const std::vector<CastAudioAdapter::Side>* side;};std::vector<MuxPacket> mux;
  for(auto& v:result.packets)mux.push_back({&v.data,0,v.pts+TransportEpoch,v.pts+TransportEpoch,v.duration,v.flags,AV_TIME_BASE_Q,nullptr});
  for(auto& a:converted)mux.push_back({&a.data,1,a.sample+10LL*audioAdapter->Rate,a.sample+10LL*audioAdapter->Rate,a.duration,a.flags,{1,audioAdapter->Rate},&a.side});
@@ -413,11 +426,11 @@ std::vector<uint8_t> State::videoSegment(int index){
  AudioApi allocator;for(auto& item:mux){check();auto* q=packet.value;api().av_packet_unref(q);if(allocator.av_new_packet(q,int(item.data->size()))<0)throw Failure("mkv_memory_limit");std::copy(item.data->begin(),item.data->end(),q->data);q->pts=item.pts;q->dts=item.dts;q->duration=item.duration;q->flags=item.flags;q->stream_index=item.stream;q->pos=-1;if(item.side)for(auto& side:*item.side){auto* data=allocator.av_packet_new_side_data(q,side.type,side.data.size());if(!data)throw Failure("mkv_memory_limit");std::copy(side.data.begin(),side.data.end(),data);}api().av_packet_rescale_ts(q,item.base,out.format->streams[item.stream]->time_base);if(api().av_interleaved_write_frame(out.format,q)<0||out.failure)throw Failure("cast_hw_packet_mux_failed");}
  if(api().av_interleaved_write_frame(out.format,nullptr)<0||api().av_write_frame(out.format,nullptr)<0||api().av_write_trailer(out.format)<0)throw Failure("cast_hw_mux_flush_failed");api().avio_flush(out.io);check();if(out.failure||out.bytes.size()<=header)throw Failure("cast_hw_fragment_empty");
  videoBridge->qualifyDelivery(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-workStarted).count(),(starts[index+1]-starts[index])/1000);
- if(!videoConfigured){init.assign(out.bytes.begin(),out.bytes.begin()+header);codecs=codecDescription(out.format->streams[0]->codecpar);if(audio>=0)codecs+=","+codecDescription(out.format->streams[1]->codecpar);videoConfigured=true;}
+ if(!videoConfigured){videoInputHeader=std::move(pendingHeader);videoInputCsd=std::move(pendingCsd);init.assign(out.bytes.begin(),out.bytes.begin()+header);codecs=codecDescription(out.format->streams[0]->codecpar);if(audio>=0)codecs+=","+codecDescription(out.format->streams[1]->codecpar);videoConfigured=true;}
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
 std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
-std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoBridge?"h264":videoName)<<"\",\"audio\":\""<<safeName(audioAdapter?"aac":audioName)<<"\",\"audio_input\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]";if(format && video>=0){auto* stream=format->streams[video];auto* v=stream->codecpar;auto fps=stream->avg_frame_rate;out<<",\"video_profile\":"<<(videoConfigured?videoFormat.profile:v->profile)<<",\"video_level\":"<<(videoConfigured?videoFormat.level:v->level)<<",\"width\":"<<(videoConfigured?1280:v->width)<<",\"height\":"<<(videoConfigured?720:v->height)<<",\"fps_num\":"<<fps.num<<",\"fps_den\":"<<fps.den<<",\"color_transfer\":"<<(videoConfigured?int(AVCOL_TRC_BT709):int(v->color_trc))<<",\"input_color_transfer\":"<<v->color_trc;}out<<"}";return out.str();}
+std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoBridge?"h264":videoName)<<"\",\"audio\":\""<<safeName(audioAdapter?"aac":audioName)<<"\",\"audio_input\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]";if(format && video>=0){auto* stream=format->streams[video];auto* v=stream->codecpar;auto fps=stream->avg_frame_rate;out<<",\"video_profile\":"<<(videoConfigured?videoFormat.profile:v->profile)<<",\"video_level\":"<<(videoConfigured?videoFormat.level:v->level)<<",\"width\":"<<(videoConfigured?1280:v->width)<<",\"height\":"<<(videoConfigured?720:v->height)<<",\"fps_num\":"<<fps.num<<",\"fps_den\":"<<fps.den<<",\"color_transfer\":"<<(videoConfigured?int(AVCOL_TRC_BT709):int(v->color_trc))<<",\"input_color_transfer\":"<<v->color_trc;if(v->codec_id==AV_CODEC_ID_HEVC&&v->extradata&&v->extradata_size>=23){out<<",\"video_csd_bytes\":"<<v->extradata_size<<",\"video_csd_arrays\":"<<int(v->extradata[22])<<",\"video_nal_length_bytes\":"<<((v->extradata[21]&3)+1);}}out<<"}";return out.str();}
 } // namespace InfinityMkv
 #ifndef INFINITY_REMUX_HOST
 namespace {
