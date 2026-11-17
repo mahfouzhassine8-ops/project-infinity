@@ -1,0 +1,40 @@
+{
+  "baseline": {
+    "id": 14239746699,
+    "name": "Infinity502-Consolidated-OriginalSigned-43895603388",
+    "digest": "sha256:e3fae14dc9321ad1d380856e557e10fc33b37c71abb82ad0ce6f4d241350166e",
+    "size_in_bytes": 330961493,
+    "run": 43895603388,
+    "source": "80506277145dcd4bbd66da3eaa02d9c085c1b437",
+    "workflow_id": 397702717,
+    "APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234"
+  },
+  "case": "actual_ARM64_AAC_JNI_authenticated_relay_selected",
+  "Kodi_build": false,
+  "shutdown": false,
+  "owner_APK": false,
+  "source_commit": "36c5fb86466caf026fa1069c6ad301ca924d6d4e",
+  "native": {
+    "run": 43993371947,
+    "id": 14288492703,
+    "name": "Infinity504-Cast-Audio-43993371947-COMPONENT-ONLY",
+    "size_in_bytes": 97693,
+    "digest": "sha256:44f8e584c8c291137b0ed710f27718550041ab6e796e48ee3503e26503da3cc2",
+    "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
+    "workflow_id": 420739373
+  },
+  "inputs": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/build_android.py": "ac560cc893df14d256f2e9abd5bd8bd6541326ba4436026dcd490bba68bd096a",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/run_android.py": "48254732b091b99cfca0b861b2b4d96396a1f8d0044d9e93a08430ced5ec2edd",
+    ".github/workflows/infinity-504-cast-audio-android.yml": "50ccefc66e0f9e9969c7bf9083d07f11da7c6553a04f15308559cb8e9e96c6af",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/SCOPE.json": "3126ad583fadbe97bdd4d081c33085eb65ba6c3eb607447bc13e839c9538eb67",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/AUDIO-INTEGRATION-REVIEW.json": "80815e3dd0169d535ba394fb25614c26b800d406b9ea19531c954abce337db96",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/InfinityCastProbeActivity.java": "8d9e19f41e3d292c67e031cb35e1633bfeabfb036f037e7f84cbf1d299ec7f75",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/MkvHlsPlayerProbe.java": "58ebbd955a50d42bc65a18ea338bcf86347fe211a6c3ae022a70fa17d5bf8e38",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/loader.cpp": "3e47812cebf151ee1162a7841f3f5a3e33667963bee6983753ee004381b38347"
+  },
+  "selected_by": "Owner: actual encoder/priming/seek/relay/cancel, no owner install or unrelated lifecycle. Actual receiver remains physical acceptance.",
+  "baseline_versionCode": 2103504
+}
