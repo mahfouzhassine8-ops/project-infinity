@@ -1,0 +1,28 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_SOURCE_METADATA_FREEZE",
+  "workflows": [
+    {
+      "id": 421031076,
+      "path": ".github/workflows/infinity-506-cast-component.yml",
+      "before_sha256": "09c50d0866e65b81f7aaeee54e5e20189725aef700de66bcb8dc372754fcf698",
+      "after_sha256": "d8c8ee9ac5a88fdb09af278c54621f7fb0c789ed77e66325cefadc2b4e5bdfbe"
+    },
+    {
+      "id": 421009620,
+      "path": ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+      "before_sha256": "660cf84c4bc40e0f8170b8b0e51b2be67b7355015d43f7384affdc87d54d7f45",
+      "after_sha256": "3e20ee90501aa3721208ee9bd55154dfbf6bd72297865b196a26f13892597edd"
+    },
+    {
+      "id": 421117469,
+      "path": ".github/workflows/infinity-506-cast-hardware-stage.yml",
+      "before_sha256": "d191c78f3f6ff12d584fe3d33232863606c3d79c2ab82e9180c3ca06cc7e5869",
+      "after_sha256": "e7d77489501fb093bf214c059cd1c75a1d0d63b0b72e85412c7b4a705b550915"
+    }
+  ],
+  "scope": "ExistingIDsandpermissions/routes retained; only reviewed dualCast jobs/branch/cardpaths appended; no key route/noenginenativebuild in release",
+  "authority_registration_approved": false,
+  "physical_acceptance": false
+}

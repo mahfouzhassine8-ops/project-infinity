@@ -1,0 +1,30 @@
+{
+  "status": "PASS_REAL_MAIN10_EAC3_INBAND_RADL_FIXTURE_NO_DECODE_OR_TIMING_CHANGE",
+  "CRC": "ABSENT_BY_VERIFIED_FFMPEG_write_crc32_0",
+  "control_sha256": "acce6bb31a7463c0eff46464988a43c280eca528490bbf5cf5cbf6598650fc28",
+  "fixture_sha256": "06019df2d10595a20e3c8e1da29441232201863859a86fcacf2f2f48867b9332",
+  "RADL": "valid x265 radl=2 closed GOP, IDR_W_RADL19 and leading pictures",
+  "v_decoded_frames_and_timestamps_sha256": "e416d6636b665b60fb858ec95f0a2a3faaeac16ac349913acd3315cb719b5b81",
+  "a_decoded_frames_and_timestamps_sha256": "72082da6b747107743c4a2d08974eb866f847496b3ee945f1ade9dd0571c357e",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "hevc",
+        "profile": "Main 10",
+        "level": 153,
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "start_time": "0.000000",
+        "nb_read_packets": "288"
+      },
+      {
+        "codec_name": "eac3",
+        "start_time": "-0.005000",
+        "nb_read_packets": "376"
+      }
+    ]
+  }
+}

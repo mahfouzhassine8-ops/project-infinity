@@ -1,0 +1,8 @@
+from pathlib import Path
+import subprocess,os
+J='/usr/lib/jvm/java-21-openjdk-amd64/bin/java';root=Path('repairs/infinity-movies-continue-cast-2103486-20261112/cast/java');out=Path('/tmp/cast510-javac');jars=list(Path('/workspace/scratch/cast-sdk86/jars').glob('*.jar'))+list(Path('/workspace/scratch/cast-sdk86/provided-http').glob('*.jar'))+[Path('/workspace/scratch/cast-sdk86/tools/android.jar')];cp=os.pathsep.join(map(str,jars));extra=list(Path('/workspace/scratch/cast-sdk86/component-reuse86/generated').rglob('R.java'))+list(Path('/workspace/scratch/cast-sdk86/component-reuse86/stubs').rglob('*.java'));probe=Path('repairs/infinity-cast-dual-failure-2103510-20261117/tests/RelayFailureProbe.java');compiler=[J,'--module','jdk.compiler/com.sun.tools.javac.Main','-source','8','-target','8']
+subprocess.run(compiler+['-cp',cp,'-d',str(out)]+list(map(str,root.rglob('*.java')))+list(map(str,extra))+[str(probe)],check=True,capture_output=True,text=True)
+old=Path('/tmp/cast510-baseline-relay');src=old/'source/com/projectinfinity/kodi/InfinityCastRelay.java';src.parent.mkdir(parents=True,exist_ok=True);src.write_bytes(subprocess.check_output(['git','show','cd682193dc78da29cfcfef83c5b0d43dec5b89a2:'+str(root/'com/projectinfinity/kodi/InfinityCastRelay.java')]))
+subprocess.run(compiler+['-cp',str(out)+os.pathsep+cp,'-d',str(old),str(src)],check=True,capture_output=True,text=True)
+for base,args in [(str(old)+os.pathsep+str(out),['original']),(str(out),[])]:
+ p=subprocess.run([J,'-cp',base+os.pathsep+cp,'com.projectinfinity.kodi.RelayFailureProbe']+args,capture_output=True,text=True,timeout=30);print('exit',p.returncode,p.stdout);print(p.stderr[-1700:]);assert p.returncode==0

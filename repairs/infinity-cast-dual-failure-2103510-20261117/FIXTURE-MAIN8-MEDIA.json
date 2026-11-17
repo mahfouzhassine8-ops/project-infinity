@@ -1,0 +1,28 @@
+{
+  "status": "PASS_GENUINELY_ENCODED_MAIN8_RADL_FIXTURE",
+  "fixture_sha256": "9e29c90770ebbc270f2fba8388f3c24df4f93a531c2300dabdd2208f1db5213a",
+  "control_sha256": "0355b32903c135d3c1dd9a4e18c39a18d2f763c89ee7c3f3c83ae63797321b1d",
+  "v_decoded_frame_and_time_sha256": "9685ca264687d631d9241707d3f9e3ce51774076dcd02d030c37acd39f73040c",
+  "a_decoded_frame_and_time_sha256": "72082da6b747107743c4a2d08974eb866f847496b3ee945f1ade9dd0571c357e",
+  "probe": {
+    "programs": [],
+    "stream_groups": [],
+    "streams": [
+      {
+        "codec_name": "hevc",
+        "profile": "Main",
+        "level": 90,
+        "color_space": "bt709",
+        "color_transfer": "bt709",
+        "color_primaries": "bt709",
+        "start_time": "0.000000",
+        "nb_read_packets": "288"
+      },
+      {
+        "codec_name": "eac3",
+        "start_time": "-0.005000",
+        "nb_read_packets": "376"
+      }
+    ]
+  }
+}

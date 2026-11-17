@@ -1,0 +1,38 @@
+{
+  "status": "REPRODUCED_SOURCE_DEFECTS_OWNER_CAUSES_NOT_YET_CONFIRMED",
+  "signed_foundation": 2103510,
+  "normal_HEVC_EAC3_control": "Real2451bytehvcC4arrays accepted; unchanged afterAAC interval andsequentialsegments",
+  "inband_HEVC_AAC_fixture": {
+    "path": "/tmp/cast510-inband-aac.mkv",
+    "sha256": "b12e836f255c25e63b6fc6fa23b1a6028bc22993a9e6b14a58a488d671a82178",
+    "bytes": 106349,
+    "origin": "Retained genuineHEVC/AAC packets andactualVPS/SPS/PPS, test-onlyMatroskamux,23bytehvcC0arrays; no fabricatedcodecmetadata",
+    "FFmpeg_full_decode": "PASS",
+    "native_inspect_and_direct_segments": "PASS",
+    "source_hardware_configuration": "FAIL_cast_hw_source_configuration_before_bridge"
+  },
+  "fragment_numbering": {
+    "source": "Retained actualAndroid/host510sixfragments",
+    "moofs_per_fragment": 1,
+    "observed_sequences": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "reason": "FreshFFmpegmovcontexts defaultfragment_index1",
+    "scope": "Continuousmovie numbering consistency/interoperability; not proof ofactualCAF error"
+  },
+  "handoff_race": "Receiver-seek result cancallplay afterreturning=true; source-proven",
+  "receiver_error": "Detailedcode null currentlyreported0; type/reason omitted; downstreamwritefailure maymask receivererror explanation",
+  "owner_evidence_gaps": [
+    "ExactreceiverSDKmodel",
+    "ActualownerhvcC/firstAU",
+    "ActualSDKerror type/reason/detailedpresence",
+    "Independentfragment5failure-before-cancel evidence"
+  ],
+  "physical_TV": "NOT_TESTED",
+  "hardware_performance": "NOT_TESTED"
+}

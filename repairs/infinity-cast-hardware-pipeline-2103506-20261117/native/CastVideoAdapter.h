@@ -33,13 +33,61 @@ struct CastVideoBridge {
  virtual void qualifyDelivery(int64_t,int64_t)=0;
 };
 struct CastVideoSource {
- static std::pair<std::vector<uint8_t>,std::vector<uint8_t>> configuration(const AVCodecParameters* p){
+ // CSD is copied only from real parameter NALs. No guessed decoder metadata.
+ // Empty hev1 arrays may carry their complete sets before the first VCL AU.
+ static std::pair<std::vector<uint8_t>,std::vector<uint8_t>> configuration(const AVCodecParameters* p,const AVPacket* initial=nullptr,const std::vector<uint8_t>* verified=nullptr){
   const uint8_t* b=p->extradata;size_t size=size_t(p->extradata_size),at;std::vector<uint8_t> first,second;
-  if(!b||size<7||size>65536||b[0]!=1)throw Failure("cast_hw_source_configuration");
-  auto nal=[&](std::vector<uint8_t>& out){if(size-at<2)throw Failure("cast_hw_source_configuration");size_t n=(size_t(b[at])<<8)|b[at+1];at+=2;if(n<2||n>size-at||out.size()+n+4>65536)throw Failure("cast_hw_source_configuration");out.insert(out.end(),{0,0,0,1});out.insert(out.end(),b+at,b+at+n);at+=n;};
-  if(p->codec_id==AV_CODEC_ID_HEVC){if(size<23)throw Failure("cast_hw_source_configuration");if(b[1]&32)throw Failure("cast_hw_source_high_tier_unsupported");at=23;unsigned count=0;for(unsigned n=0;n<b[22];n++){if(size-at<3)throw Failure("cast_hw_source_configuration");unsigned type=b[at++]&63;unsigned units=(unsigned(b[at])<<8)|b[at+1];at+=2;for(unsigned k=0;k<units;k++){if(++count>1024)throw Failure("cast_hw_source_configuration");std::vector<uint8_t> temp;nal(temp);if(type==32||type==33||type==34)first.insert(first.end(),temp.begin(),temp.end());}}if(at!=size||first.empty())throw Failure("cast_hw_source_configuration");}
-  else if(p->codec_id==AV_CODEC_ID_H264){at=6;for(unsigned n=0;n<(b[5]&31);n++)nal(first);if(at>=size)throw Failure("cast_hw_source_configuration");unsigned count=b[at++];for(unsigned n=0;n<count;n++)nal(second);if(first.empty()||second.empty())throw Failure("cast_hw_source_configuration");}
-  else throw Failure("cast_hw_source_codec");return {std::move(first),std::move(second)};
+  if(!b||p->extradata_size<7||size>65536||b[0]!=1)throw Failure("cast_hw_source_configuration_header");
+  if(p->codec_id==AV_CODEC_ID_HEVC){
+   if(size<23)throw Failure("cast_hw_source_configuration_header");
+   if(b[1]&32)throw Failure("cast_hw_source_high_tier_unsupported");
+   unsigned count=0,sets=0;at=23;
+   auto validate=[&](const uint8_t* n,size_t length,unsigned type){
+    if(length<2||(n[0]&128)||((n[0]>>1)&63)!=type||!(n[1]&7))throw Failure("cast_hw_source_configuration_nal_header");
+    if((n[0]&1)||(n[1]>>3))throw Failure("cast_hw_source_multilayer_unsupported");
+    if(type>=32&&type<=34&&(n[1]&7)!=1)throw Failure("cast_hw_source_configuration_nal_header");
+   };
+   auto append=[&](const uint8_t* n,size_t length,unsigned type){
+    if(type<32||type>34)return;
+    if(first.size()>65536-4||length>65536-4-first.size())throw Failure("cast_hw_source_configuration_output_limit");
+    first.insert(first.end(),{0,0,0,1});first.insert(first.end(),n,n+length);sets|=1u<<(type-32);
+   };
+   for(unsigned array=0;array<b[22];array++){
+    if(size-at<3)throw Failure("cast_hw_source_configuration_truncated");
+    unsigned header=b[at++];if(header&64)throw Failure("cast_hw_source_configuration_nal_header");
+    unsigned type=header&63,units=(unsigned(b[at])<<8)|b[at+1];at+=2;
+    for(unsigned k=0;k<units;k++){
+     if(++count>1024)throw Failure("cast_hw_source_configuration_count_limit");
+     if(size-at<2)throw Failure("cast_hw_source_configuration_truncated");
+     size_t length=(size_t(b[at])<<8)|b[at+1];at+=2;
+     if(length<2||length>size-at)throw Failure("cast_hw_source_configuration_nal_length");
+     validate(b+at,length,type);append(b+at,length,type);at+=length;
+    }
+   }
+   if(at!=size)throw Failure("cast_hw_source_configuration_trailing");
+   // Never merge partial out-of-band sets with potentially conflicting updates.
+   if(sets&&sets!=7)throw Failure("cast_hw_source_configuration_partial_sets");
+   if(!sets){
+    if(!initial||!initial->data||initial->size<=0||initial->size>4*1024*1024)throw Failure("cast_hw_source_configuration_inband_missing");
+    const size_t total=size_t(initial->size);const unsigned width=(b[21]&3)+1;size_t offset=0;bool vcl=false;
+    while(offset<total){
+     if(++count>1024)throw Failure("cast_hw_source_configuration_count_limit");
+     if(total-offset<width)throw Failure("cast_hw_source_configuration_nal_length");
+     uint32_t length=0;for(unsigned j=0;j<width;j++)length=(length<<8)|initial->data[offset++];
+     if(length<2||length>total-offset)throw Failure("cast_hw_source_configuration_nal_length");
+     const auto* nal=initial->data+offset;unsigned type=(nal[0]>>1)&63;validate(nal,length,type);
+     if(type<=31)vcl=true;
+     else if(type>=32&&type<=34){if(vcl)throw Failure("cast_hw_source_configuration_late_sets");append(nal,length,type);}
+     offset+=length;
+    }
+    if(!vcl)throw Failure("cast_hw_source_configuration_inband_missing");
+    if(!sets&&verified&&!verified->empty()&&verified->size()<=65536)first=*verified;
+    else if(sets!=7)throw Failure("cast_hw_source_configuration_inband_missing");
+   }
+  }else if(p->codec_id==AV_CODEC_ID_H264){
+   auto nal=[&](std::vector<uint8_t>& out){if(size-at<2)throw Failure("cast_hw_source_configuration");size_t n=(size_t(b[at])<<8)|b[at+1];at+=2;if(n<2||n>size-at||out.size()+n+4>65536)throw Failure("cast_hw_source_configuration");out.insert(out.end(),{0,0,0,1});out.insert(out.end(),b+at,b+at+n);at+=n;};
+   at=6;for(unsigned n=0;n<(b[5]&31);n++)nal(first);if(at>=size)throw Failure("cast_hw_source_configuration");unsigned count=b[at++];for(unsigned n=0;n<count;n++)nal(second);if(first.empty()||second.empty())throw Failure("cast_hw_source_configuration");
+  }else throw Failure("cast_hw_source_codec");return {std::move(first),std::move(second)};
  }
  static std::vector<uint8_t> accessUnit(const AVCodecParameters* p,const AVPacket* packet){
   if(packet->size<=0||packet->size>4*1024*1024)throw Failure("cast_hw_source_packet_limit");int bytes=p->codec_id==AV_CODEC_ID_H264?(p->extradata[4]&3)+1:(p->extradata[21]&3)+1;std::vector<uint8_t> out;size_t at=0,total=size_t(packet->size);

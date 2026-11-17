@@ -1,0 +1,80 @@
+{
+  "status": "PASS_ACTUAL_NATIVE_HARDWARE_FEED_RADL_WINDOWS",
+  "rows": [
+    {
+      "index": 0,
+      "begin": 0,
+      "end": 2005000,
+      "read_bytes": 393216,
+      "budget": 33554432,
+      "partial_finish_aborted": true,
+      "decoded_pictures": 49,
+      "render_window_pictures": 48,
+      "preroll_pictures": 0,
+      "postroll_pictures": 1
+    },
+    {
+      "index": 1,
+      "begin": 2005000,
+      "end": 4005000,
+      "read_bytes": 425984,
+      "budget": 33554432,
+      "partial_finish_aborted": true,
+      "decoded_pictures": 51,
+      "render_window_pictures": 48,
+      "preroll_pictures": 2,
+      "postroll_pictures": 1
+    },
+    {
+      "index": 2,
+      "begin": 4005000,
+      "end": 6005000,
+      "read_bytes": 851968,
+      "budget": 33554432,
+      "partial_finish_aborted": true,
+      "decoded_pictures": 51,
+      "render_window_pictures": 48,
+      "preroll_pictures": 2,
+      "postroll_pictures": 1
+    },
+    {
+      "index": 3,
+      "begin": 6005000,
+      "end": 8005000,
+      "read_bytes": 851968,
+      "budget": 33554432,
+      "partial_finish_aborted": true,
+      "decoded_pictures": 51,
+      "render_window_pictures": 48,
+      "preroll_pictures": 2,
+      "postroll_pictures": 1
+    },
+    {
+      "index": 4,
+      "begin": 8005000,
+      "end": 10005000,
+      "read_bytes": 1224165,
+      "budget": 33554432,
+      "partial_finish_aborted": true,
+      "decoded_pictures": 51,
+      "render_window_pictures": 48,
+      "preroll_pictures": 2,
+      "postroll_pictures": 1
+    },
+    {
+      "index": 5,
+      "begin": 10005000,
+      "end": 12032000,
+      "read_bytes": 881895,
+      "budget": 33554432,
+      "partial_finish_aborted": true,
+      "decoded_pictures": 50,
+      "render_window_pictures": 48,
+      "preroll_pictures": 2,
+      "postroll_pictures": 0
+    }
+  ],
+  "all_window_source_frames": "Every288sourceframeexactlyonce; allofferedAUsdecodewithsourcepixels",
+  "partial_finish_aborted": true,
+  "backend": "Nativeproductionfeed + FFmpegdecodeofrealAnnexB; notMediaCodec/hardwarequalification"
+}

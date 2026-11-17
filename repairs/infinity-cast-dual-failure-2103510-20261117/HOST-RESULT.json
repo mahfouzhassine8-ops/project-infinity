@@ -1,0 +1,50 @@
+{
+  "status": "PASS_UPDATED_RADL_HOST_AND_CSD_ANDROID_PENDING",
+  "source_hashes": {
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "0404e0814d49ff434653e949b78dc94810f0d4721a43cbc27af3027f69449ca8",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "c6e9644be7ba3b48c08abbff6ee6b7c4eaa7c797b74c8dc5d1246488bc9707c0",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "69913356f870ab4f9e1e2561979b8ef5ca4f4e672327b27b87995955d0768dca",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "5db76e3a9365750d3f9e5cd3a9987edcdce13167f68df88e2176b060729ccea0",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "cf41f1f690f97eff14533d0117cfc5306989dc8f9559d6e9f79961b98bb1cb39"
+  },
+  "gates": {
+    "genuine_HVCC_prefix_negatives": 2456,
+    "inband_negatives_and_nonzero_cue": 14,
+    "ASAN_UBSAN": "PASS_NEW_CSD_PATH",
+    "exact_source_callback_order": {
+      "status": "PASS_SOURCE_EXTRACTED_CALLBACK_ORDER",
+      "baseline": {
+        "source_sha256": "42080c3705b432b2f33e695b65cd304c2d3c4f0a4630f32c9173428627cd5e02",
+        "extracted_callback_sha256": "af0de03c6593bbba582aebfc16bfa573ea8dbbb1a67d49d3f6362d6c78e14db0",
+        "result": "REPRODUCED_BASELINE_PLAY_AFTER_RETURN"
+      },
+      "candidate": {
+        "source_sha256": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f",
+        "extracted_callback_sha256": "0b1bb245cc320378d5cb32e15649d061e959b2764dd4e701f8e92afab658a7b1",
+        "result": "PASS_ACTIVE_AND_STALE_SOURCE_CALLBACKS cases=10"
+      },
+      "claim": "Exact production seek/play continuations; controlled orderedSDKcallbacks. Not actualreceiver/phone acceptance."
+    },
+    "relay_original_vs_candidate": "PASS_REAL_HTTP_AND_CONTROLLED_CLIENT_SOCKET_FAILURES; true503retained; safeerrorenumtests",
+    "six_media_fragments": "ONLY_mfhd_n_plus_1_changed;exactinit_and_media_payloads",
+    "sequential_random_requests": 14,
+    "source_planner": "BYTE_IDENTICAL_TO_SIGNED510",
+    "full_Cast_Java_original_SDK_compile": "PASS"
+  },
+  "caveats": [
+    "Nonzero-cue cache host fixture explicitly assumes completed bootstrap; actual successful MediaCodec bootstrap/cache commit still required in selected Android gate",
+    "Exactowner4Kmediafailure notconfirmed; no budgetexhaustion/no codec-capability claim",
+    "NativeBridge CSDpositive uses stopped testbridge toverify bytes/admission/partialabort, not hardwaredecode"
+  ],
+  "engine_rebuilt": false,
+  "physical_TV": "NOT_TESTED",
+  "release_ready": false,
+  "additional_RADL_gate": "RADL-HOST.json",
+  "genuine_RADL_fixture_CSD_checks": 2571,
+  "sanitizers": "ASAN_UBSAN2571 checksPASSED",
+  "component_first_pass": "44096934999 preserved preHardwareVideochange; affectedDEXonlyrerunrequired",
+  "updated_non_RADL_high_bitrate": "NON-RADL-HOST.json:10 sequential/randomrequests,alloutputbytesidentical",
+  "quota_planner": "BYTE_IDENTICAL_TO_SIGNED510",
+  "hardware_boundary_feed": "PREROLL-HOST.json: nativeproductionfeed,288 windowframesexactlyonce,allofferedpixelsandtimingverified; actualMediaCodec stillpending"
+}

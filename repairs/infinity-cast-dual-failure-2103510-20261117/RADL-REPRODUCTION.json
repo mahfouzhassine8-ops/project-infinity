@@ -1,0 +1,142 @@
+{
+  "status": "REPRODUCED_MEDIA_FAILURE_BELOW_QUOTA",
+  "source_CPP_sha256": "a87e9374d91c7acf459293388f6be533df4e71a406a35ff7012f10e32c758dba",
+  "source_sha256": "79bc553132fc1dd7a32c780d8a66e4d1ac8ba74e96dd21f92097b97a55ccabc9",
+  "requests": [
+    {
+      "index": 0,
+      "bytes": 491520,
+      "budget": 33554432,
+      "exhausted": false,
+      "phase_bytes": [
+        262144,
+        32768,
+        98304,
+        98304
+      ],
+      "seeks": 2,
+      "output": 106898,
+      "reason": "none",
+      "sha256": "1afda04373fe991dd56173dd226e72db0fa8273517528af74412ba373cb40881"
+    },
+    {
+      "index": 1,
+      "bytes": 360448,
+      "budget": 33554432,
+      "exhausted": false,
+      "phase_bytes": [
+        0,
+        131072,
+        131072,
+        98304
+      ],
+      "seeks": 1,
+      "output": 118441,
+      "reason": "none",
+      "sha256": "f89c1c7d1e89306247025abeca1546ad4d0e735fe758f9cb71046b0cc94758fc"
+    },
+    {
+      "index": 2,
+      "bytes": 786432,
+      "budget": 33554432,
+      "exhausted": false,
+      "phase_bytes": [
+        393216,
+        131072,
+        131072,
+        131072
+      ],
+      "seeks": 2,
+      "output": 117688,
+      "reason": "none",
+      "sha256": "60cfd4acb1df35700ee098dda1bd4764ee33b31b61ffaeb53d7d09562deaaba0"
+    },
+    {
+      "index": 3,
+      "bytes": 393216,
+      "budget": 33554432,
+      "exhausted": false,
+      "phase_bytes": [
+        0,
+        131072,
+        131072,
+        131072
+      ],
+      "seeks": 1,
+      "output": 128209,
+      "reason": "none",
+      "sha256": "5f4ed00f9193c659d94459d5dbde70fc7dd22e631449c459e23fb39ee9c3fa6f"
+    },
+    {
+      "index": 4,
+      "bytes": 729208,
+      "budget": 33554432,
+      "exhausted": false,
+      "phase_bytes": [
+        364604,
+        163840,
+        98304,
+        102460
+      ],
+      "seeks": 2,
+      "output": 115400,
+      "reason": "none",
+      "sha256": "3b2b31f6eaf777ad529d81085a484bf1e3d493f20221520b9be1d4cff9b4c8ff"
+    },
+    {
+      "index": 5,
+      "bytes": 236975,
+      "budget": 33554432,
+      "exhausted": false,
+      "phase_bytes": [
+        0,
+        131072,
+        105903,
+        0
+      ],
+      "seeks": 1,
+      "output": 115005,
+      "reason": "none",
+      "sha256": "d950acfe5726f3bf62192c121c670c6cb67364df0c3af3396706de0a7fc5c6af"
+    }
+  ],
+  "decoder_exit": 0,
+  "decoder_error_text": "[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[hevc @ 0x5650291399c0] Duplicate POC in a sequence: 0.\n[hevc @ 0x56502913c2c0] Could not find ref with POC 0\n[hevc @ 0x5650291418c0] Could not find ref with POC 0\n[hevc @ 0x565029424f80] Could not find ref with POC 0\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 47 >= 46\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 47 >= 44\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 47 >= 45\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[hevc @ 0x5650291399c0] Duplicate POC in a sequence: 0.\n[hevc @ 0x56502913c2c0] Could not find ref with POC 0\n[hevc @ 0x5650291418c0] Could not find ref with POC 0\n[hevc @ 0x565029424f80] Could not find ref with POC 0\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 95 >= 94\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 95 >= 92\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 95 >= 93\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[hevc @ 0x5650291399c0] Duplicate POC in a sequence: 0.\n[hevc @ 0x56502913c2c0] Could not find ref with POC 0\n[hevc @ 0x5650291418c0] Could not find ref with POC 0\n[hevc @ 0x565029424f80] Could not find ref with POC 0\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 143 >= 142\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 143 >= 140\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 143 >= 141\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[hevc @ 0x5650291399c0] Duplicate POC in a sequence: 0.\n[hevc @ 0x56502913c2c0] Could not find ref with POC 0\n[hevc @ 0x5650291418c0] Could not find ref with POC 0\n[hevc @ 0x565029424f80] Could not find ref with POC 0\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 191 >= 190\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 191 >= 188\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 191 >= 189\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[hevc @ 0x5650291399c0] Duplicate POC in a sequence: 0.\n[hevc @ 0x56502913c2c0] Could not find ref with POC 0\n[hevc @ 0x5650291418c0] Could not find ref with POC 0\n[hevc @ 0x565029424f80] Could not find ref with POC 0\n[hevc @ 0x5650294e3540] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 239 >= 238\n[hevc @ 0x5650295a1c40] Could not find ref with POC 0\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 239 >= 236\n[null @ 0x56502912c0c0] Application provided invalid, non monotonically increasing dts to muxer in stream 0: 239 >= 237\n",
+  "decode_DTS_regressions": [
+    [
+      48,
+      11.922,
+      11.838
+    ],
+    [
+      96,
+      13.922,
+      13.838
+    ],
+    [
+      144,
+      15.922,
+      15.838
+    ],
+    [
+      192,
+      17.922,
+      17.838
+    ],
+    [
+      240,
+      19.922,
+      19.838
+    ]
+  ],
+  "strict_result": "FAIL despiteFFmpegexit0; do notaccept exitcodealone",
+  "mechanism": "PTSfilterexcludesnextIDR19butadmitsitsRADLto previousfragment; nextfragmentdropssameleadingpictures",
+  "reviewers": [
+    "/root/astra_cast502",
+    "/root/astra_502_review"
+  ],
+  "approved_sixth_file": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java",
+  "approved_preimage": "65b16cfa0628a9e6e328af9d404c981a024dc0bb49dd18cd7a9cd69ed40e4f8f",
+  "scope": "ExistingCastHEVC19/decoder bookkeeping only",
+  "owner_actual_NALs": "UNAVAILABLE; representative valid-source defect, notconfirmedownerfile"
+}

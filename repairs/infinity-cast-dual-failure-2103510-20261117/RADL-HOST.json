@@ -1,0 +1,44 @@
+{
+  "status": "PASS_RADL_DECODE_ORDER_AND_INDEPENDENT_FRAGMENTS",
+  "source_sha256": "79bc553132fc1dd7a32c780d8a66e4d1ac8ba74e96dd21f92097b97a55ccabc9",
+  "source_video_packets": 288,
+  "compressed_video_packets_and_PTS": "BYTE_EXACT_IN_DECODE_ORDER",
+  "source_origin_us": -5000,
+  "known_source_DTS": "EXACT_MINUS_VERIFIED_SOURCE_ORIGIN_PLUS_EXISTING10s_TRANSPORT_EPOCH",
+  "cross_fragment_DTS": "STRICTLY_INCREASING",
+  "decoded_frames": "EXACT_SOURCE_PIXELS",
+  "independent": [
+    {
+      "index": 0,
+      "video_packets": 46,
+      "decode": "PASS_EMPTY_ERROR_STDERR"
+    },
+    {
+      "index": 1,
+      "video_packets": 48,
+      "decode": "PASS_EMPTY_ERROR_STDERR"
+    },
+    {
+      "index": 2,
+      "video_packets": 48,
+      "decode": "PASS_EMPTY_ERROR_STDERR"
+    },
+    {
+      "index": 3,
+      "video_packets": 48,
+      "decode": "PASS_EMPTY_ERROR_STDERR"
+    },
+    {
+      "index": 4,
+      "video_packets": 48,
+      "decode": "PASS_EMPTY_ERROR_STDERR"
+    },
+    {
+      "index": 5,
+      "video_packets": 50,
+      "decode": "PASS_EMPTY_ERROR_STDERR"
+    }
+  ],
+  "quota": "UNCHANGED",
+  "owner_source_NALs": "UNAVAILABLE; synthetic supported-family reproduction"
+}
