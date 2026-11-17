@@ -12,14 +12,16 @@
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "42080c3705b432b2f33e695b65cd304c2d3c4f0a4630f32c9173428627cd5e02",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "cd81d223128e3bc1401533fbabee4305e980fbfbac27adc9a1c7b7dc6d9ee23b",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a"
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "65b16cfa0628a9e6e328af9d404c981a024dc0bb49dd18cd7a9cd69ed40e4f8f"
   },
   "scope": "DualCast failure only: verified bounded codec-private parsing correction; independent receiver/error/fragment outcome classification and proven media/lifecycle correction. No speculative receiver compatibility rules.",
   "selected_tests": [
     "Source-derived hvcC/parameter-set parsing positive and negative fixtures; actual pinnedFFmpeg demux observations and parser-state changes",
     "Focused unchanged-quota direct HEVC/HLS fragments including fragment5, AAC synchronization/adjacent timestamps/ranges/cancellation and safe phone return/lifecycle tests",
     "Changed Cast-only ARM64/JNI/Android media gates; real MediaCodec where environment supports, hardware limitations explicitly retained",
-    "Original signer, exact source/APK preservation, install-over and matching forward recovery"
+    "Original signer, exact source/APK preservation, install-over and matching forward recovery",
+    "ValidHEVCMain10L153radl2: exactsourcepacket partition, monotonicDTS, cleanindependent/full decode, hardwarepreroll inputs consumedwithunchangedrenderwindow/encodedframeguards"
   ],
   "engine_build": false,
   "shutdown": false,
@@ -35,5 +37,6 @@
     ".github/workflows/infinity-506-cast-component.yml",
     ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
     ".github/workflows/infinity-506-cast-hardware-stage.yml"
-  ]
+  ],
+  "scope_amendment": "Source-derived validclosedHEVCIDR_W_RADL19 packets areassigned towrongfragments byPTS, reversingDTS belowquota. Correctexisting admittedHEVC19 support bydecode-order ownership; hardwaredecodepreroll needs allsubmitted decodedPTSconsumed independently ofrender window. Cast-only six-file scope; noencoding/scaling/capability/quota/engine change."
 }
