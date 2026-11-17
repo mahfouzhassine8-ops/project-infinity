@@ -4,8 +4,8 @@ import android.app.Activity;import android.os.*;import android.media.*;import an
 /** Disposable exact-package small-software correctness probe; no owner profile. */
 public final class InfinityCastProbeActivity extends Activity {
  static native boolean loadExistingEngine();
- static final AtomicBoolean admitted=new AtomicBoolean();volatile Surface outputSurface;
- public void onCreate(Bundle state){super.onCreate(state);SurfaceView view=new SurfaceView(this);view.getHolder().addCallback(new SurfaceHolder.Callback(){public void surfaceCreated(SurfaceHolder h){outputSurface=h.getSurface();if(admitted.compareAndSet(false,true))new Thread(()->probe(),"CastPipelineProbe").start();}public void surfaceChanged(SurfaceHolder h,int f,int w,int height){}public void surfaceDestroyed(SurfaceHolder h){outputSurface=null;}});setContentView(view);}
+ static final AtomicBoolean admitted=new AtomicBoolean();static volatile Surface outputSurface;static volatile SurfaceHolder currentHolder;
+ public void onCreate(Bundle state){super.onCreate(state);getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);SurfaceView view=new SurfaceView(this);view.getHolder().addCallback(new SurfaceHolder.Callback(){public void surfaceCreated(SurfaceHolder h){currentHolder=h;outputSurface=h.getSurface();android.util.Log.i("InfinityPipelineLifecycle","CI_surface_created");if(admitted.compareAndSet(false,true))new Thread(()->probe(),"CastPipelineProbe").start();}public void surfaceChanged(SurfaceHolder h,int f,int w,int height){}public void surfaceDestroyed(SurfaceHolder h){if(currentHolder==h){currentHolder=null;outputSurface=null;}android.util.Log.i("InfinityPipelineLifecycle","CI_surface_destroyed");}});setContentView(view);}
  static void check(boolean ok,String reason)throws IOException{need(ok,reason);}
  static void need(boolean ok,String reason)throws IOException{if(!ok)throw new IOException(reason);}
  static final class Memory implements InfinityCastRemux.Input {

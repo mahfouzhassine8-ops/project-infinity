@@ -53,7 +53,13 @@ def verify(apk,component):
     match=resolve(parent,name,signature,kind,seen)
     if match:return match
   return None
+ checked_types=set()
  for d in external:
+  for descriptor in d.types:
+   owner=descriptor.lstrip('[')
+   if owner in old:
+    assert owner in new and (original_flags[0][owner]&0x201)==(candidate_flags[0][owner]&0x201),('retained type access/interface changed',owner)
+    checked_types.add(owner)
   for kind,refs in [('methods',d.methods),('fields',d.fields)]:
    for owner,name,signature in refs:
     if owner not in old:continue
@@ -66,7 +72,11 @@ def verify(apk,component):
      if before&4:assert after[1]&5,('protected access reduced',owner,name)
     checked.append([kind,owner,name,signature])
  # JNI/reflection names are intentionally kept by the established Cast rules.
- for name,signature in [('begin','(Ljava/lang/String;[B[BJJ)V'),('offer','([BJ)V'),('finish','()[B'),('abortSegment','()V'),('qualifyDelivery','(JJ)V')]:assert (name,signature) in new['Lcom/projectinfinity/kodi/InfinityCastHardwareVideo;']['methods']
+ for name,signature in [('begin','(Ljava/lang/String;[B[BJJ)V'),('offer','([BJ)V'),('finish','()[B'),('abortSegment','()V'),('qualifyDelivery','(JJ)V')]:
+  owner='Lcom/projectinfinity/kodi/InfinityCastHardwareVideo;';assert (name,signature) in new[owner]['methods'] and not candidate_flags[1][(owner,name,signature)]&8
+ native='Lcom/projectinfinity/kodi/InfinityCastRemuxNative;'
+ for name,signature in new[native]['methods']:
+  if name in ('open','inspect','configureVideo','init','segment','cancel','close','active'):assert candidate_flags[1][(native,name,signature)]&0x108==0x108,('JNI static/native entrypoint changed',name)
  for root in ('InfinityCastOptions','InfinityCastDialog','InfinityCastSession','InfinityCastNative','InfinityCastRemuxNative'):assert 'Lcom/projectinfinity/kodi/'+root+';' in new
- return {'status':'PASS_RETAINED_APK_CALLER_ACCESS_STATICNESS_AND_CAST_ENTRYPOINTS','external_members_checked':checked,'added':sorted(set(new)-set(old)),'removed':sorted(set(old)-set(new))}
+ return {'status':'PASS_RETAINED_APK_CALLER_ACCESS_STATICNESS_AND_CAST_ENTRYPOINTS','external_types_checked':sorted(checked_types),'external_members_checked':checked,'added':sorted(set(new)-set(old)),'removed':sorted(set(old)-set(new))}
 if __name__=='__main__':print(json.dumps(verify(sys.argv[1],sys.argv[2]),indent=2))

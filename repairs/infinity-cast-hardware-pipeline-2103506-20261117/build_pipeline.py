@@ -28,7 +28,7 @@ def reuse_native(c,row,work):
  proof=json.loads(c.unique(original,'ARM64.json').read_bytes());assert proof['status']=='PASS_CAST506_HARDWARE_PIPELINE_ARM64_LINK' and proof['baseline']==2103506 and proof['engine_rebuilt'] is False
  for n in ('repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp','repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h','repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h'):assert sha(ROOT/n)==proof['source_hashes'][n],n
  library=c.unique(original,'libinfinitycastremux.so');assert sha(library)==proof['new_library_sha256'];target=work/'native';target.mkdir();shutil.copyfile(library,target/library.name)
- ndk=Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin';elf=subprocess.check_output([ndk/'llvm-readelf','-h','-d','--dyn-syms','--wide',target/library.name],text=True);assert 'AArch64' in elf and all(n in elf for n in proof['exports']);proof['reused_compilation']=row;proof['historical_run_outcome']='FAIL_TEST_FIXTURE_BEFORE_JNI_LOAD; native compilation passed; no functional pass assumed'
+ ndk=Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin';elf=subprocess.check_output([ndk/'llvm-readelf','-h','-d','--dyn-syms','--wide',target/library.name],text=True);assert 'AArch64' in elf and all(n in elf for n in proof['exports']);proof['reused_compilation']=row;proof['historical_run_outcome']='FAIL_SELECTED_VERIFICATION_RETAINED; native compilation passed; no functional pass assumed'
  return proof
 def main():
  assert os.environ['GITHUB_ACTIONS']=='true' and os.environ['GITHUB_REPOSITORY']=='mahfouzhassine8-ops/project-infinity'
@@ -108,5 +108,5 @@ def main():
  run('keytool','-genkeypair','-alias','CI-only','-keyalg','RSA','-keystore',key,'-storepass','android','-keypass','android','-dname','CN=Disposable Cast Pipeline CI','-validity','2')
  run(bt/'apksigner','sign','--ks',key,'--ks-key-alias','CI-only','--ks-pass','pass:android','--key-pass','pass:android','--out',OUT/'CI-ONLY.apk',aligned)
  run(bt/'zipalign','-c','4',OUT/'CI-ONLY.apk')
- (OUT/'BUILD.json').write_text(json.dumps({'status':'SEPARATE_PACKAGE_PIPELINE_READY','foundation':r['baseline'],'native':native_hashes,'source':os.environ['GITHUB_SHA'],'engine_rebuilt':False,'SDK_rebuilt':False,'production_DEX_rebuilt':False,'owner_installer':False,'new_Cast_library_sha256':native['new_library_sha256']},indent=2)+'\n')
+ (OUT/'BUILD.json').write_text(json.dumps({'status':'SEPARATE_PACKAGE_PIPELINE_READY','foundation':r['baseline'],'native':native_hashes,'source':os.environ['GITHUB_SHA'],'engine_rebuilt':False,'SDK_rebuilt':False,'production_DEX_rebuilt':False,'production_Cast_DEX_sha256':sha(cast_dex),'external_API_contract':json.loads((OUT/'EXTERNAL-API.json').read_bytes()),'owner_installer':False,'new_Cast_library_sha256':native['new_library_sha256']},indent=2)+'\n')
 if __name__=='__main__':main()

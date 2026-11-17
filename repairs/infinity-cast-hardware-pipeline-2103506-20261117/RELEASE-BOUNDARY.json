@@ -1,0 +1,37 @@
+{
+  "status": "REVIEWED_BOUNDARY_NOT_RELEASE_APPROVAL",
+  "content_baseline": 2103506,
+  "content_authority": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2 gen91",
+  "allocator_parent": "2d5a2d7d5a58c657ac8aca13d5c1de12e724ca39 gen92; recheck live before reservation",
+  "provisional_versions_only": {
+    "candidate": 2103508,
+    "recovery": 2103509
+  },
+  "versions_reserved": false,
+  "candidate_member_allowlist": [
+    "AndroidManifest.xml",
+    "assets/experience-component-updates.properties",
+    "classes6.dex",
+    "lib/arm64-v8a/libinfinitycastremux.so"
+  ],
+  "recovery_content": "Exact506 with only typedmanifest/Infinitylabel higher versions",
+  "original_key_workflow_only": 397702717,
+  "owner_preparation": "Update exact reviewed Cast class identities; payload uses class identities, not member:classes6.dex. INFINITY owner DEX slot must match actual final CastDEX class hashes. Copy COBRA/MINIMAL bundles unchanged.",
+  "new_roots_reviewed_INIFINITY": [
+    "InfinityCastGpuSurface",
+    "InfinityCastHardwareVideo",
+    "InfinityCastReceiverPolicy",
+    "InfinityCastVideoContract",
+    "x",
+    "y"
+  ],
+  "metadata_review": "Astra six-root ownership and boundary reviewed; actual unsigned/signed proposals still require review",
+  "required_remaining": [
+    "passing actual productionRelay HLS seek/cleanup gate",
+    "exactsource/component/native proofs bound",
+    "strict source/APK preservation and updated ownerbundles",
+    "original signing registry request/proposal gates",
+    "inplace package install-over and forward recovery",
+    "physical Fold/hardware/TV acceptance pendingowner"
+  ]
+}

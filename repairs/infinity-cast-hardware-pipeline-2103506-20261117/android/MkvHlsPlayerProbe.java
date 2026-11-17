@@ -18,7 +18,7 @@ final class MkvHlsPlayerProbe {
   CountDownLatch done=new CountDownLatch(1);AtomicReference<Object> value=new AtomicReference<>();AtomicReference<Throwable> failure=new AtomicReference<>();
   new Handler(Looper.getMainLooper()).post(()->{try{value.set(task.run());}catch(Throwable e){failure.set(e);}finally{done.countDown();}});
   InfinityCastProbeActivity.check(done.await(4,TimeUnit.SECONDS),"HLS_UI_call_deadline");
-  if(failure.get()!=null)throw new Exception("HLS_UI_"+failure.get().getClass().getSimpleName());return value.get();
+  if(failure.get()!=null)throw new Exception("HLS_UI_"+failure.get().getClass().getSimpleName(),failure.get());return value.get();
  }
  static final AtomicReference<JSONObject> lastEvidence=new AtomicReference<>();
  static int count(Object player,String kind)throws Exception {
