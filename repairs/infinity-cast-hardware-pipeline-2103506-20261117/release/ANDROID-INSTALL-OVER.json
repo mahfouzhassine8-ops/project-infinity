@@ -1,0 +1,51 @@
+{
+  "Fold_acceptance": "NOT_RUN",
+  "application_launch": false,
+  "application_startup": "NOT_SELECTED",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "data_preservation": "PackageManager retained UID, dataDir and firstInstallTime. No owner profile/database opened or modified.",
+  "data_reset": false,
+  "emulator_abis": "x86_64,arm64-v8a",
+  "forced_downgrade": false,
+  "playback": "OWNER_QA_AFTER_SIGNING",
+  "schema": 1,
+  "shutdown": "OWNER_QA_AFTER_SIGNING",
+  "source": "807366d73f022a1d7bc7f1e3891ded97e2e65b09",
+  "status": "PASS_ACTUAL_ANDROID_IN_PLACE_INSTALL_AND_FORWARD_RECOVERY",
+  "steps": [
+    {
+      "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d",
+      "kind": "baseline",
+      "package": {
+        "dataDir": "/data/user/0/com.projectinfinity.kodi",
+        "firstInstallTime": "2026-11-17 09:38:42",
+        "uid": "10216",
+        "versionCode": 2103506
+      },
+      "status": "PASS"
+    },
+    {
+      "APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16",
+      "kind": "candidate",
+      "package": {
+        "dataDir": "/data/user/0/com.projectinfinity.kodi",
+        "firstInstallTime": "2026-11-17 09:38:42",
+        "uid": "10216",
+        "versionCode": 2103508
+      },
+      "status": "PASS"
+    },
+    {
+      "APK_sha256": "675c5cbc473a522e24c5144cc5e22a0ab3e2c135c70ee1f95409befc1632a430",
+      "kind": "recovery",
+      "package": {
+        "dataDir": "/data/user/0/com.projectinfinity.kodi",
+        "firstInstallTime": "2026-11-17 09:38:42",
+        "uid": "10216",
+        "versionCode": 2103509
+      },
+      "status": "PASS"
+    }
+  ],
+  "uninstall": false
+}

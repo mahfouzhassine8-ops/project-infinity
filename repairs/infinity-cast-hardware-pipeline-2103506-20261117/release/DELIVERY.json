@@ -1,0 +1,103 @@
+{
+  "status": "PUBLISHED_ORIGINAL_SIGNED_QA_PENDING_PHYSICAL_ACCEPTANCE",
+  "foundation_versionCode": 2103506,
+  "protected_baseline": 2103504,
+  "candidate": {
+    "run": 44054993516,
+    "id": 14315957113,
+    "name": "Infinity506-Cast-Hardware-OriginalSigned-44054993516-QA",
+    "size_in_bytes": 331012243,
+    "digest": "sha256:345a2455458eefdc352b3ec9412f83af72f2ea53aac821ad44c61912e052d685",
+    "source": "dfae0d04d29bbe6b3430ed304fc04de581f18566",
+    "workflow_id": 397702717,
+    "APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16"
+  },
+  "recovery": {
+    "run": 44055859018,
+    "id": 14315109816,
+    "name": "Infinity506-Cast-Hardware-OriginalSigned-44055859018-QA",
+    "size_in_bytes": 330975191,
+    "digest": "sha256:6215ca0e972392baf8bb3e57fe5a8f9fb2d2bd7d5456e11d75fc6ae2fa78b0e2",
+    "source": "8311607d31fc7461079e9a8e545274a828e996c8",
+    "workflow_id": 397702717,
+    "APK_sha256": "675c5cbc473a522e24c5144cc5e22a0ab3e2c135c70ee1f95409befc1632a430"
+  },
+  "source_commits": {
+    "pipeline": "8faf1a05c1093812493f4f205c867e373d9176a2",
+    "unsigned_staging": "e897508f5bfa4addd3e682f0def2ab9504875949",
+    "owner_preparation": "0fc48e076de9cc80891ce9cf2fff59e15c003808",
+    "candidate_signing": "dfae0d04d29bbe6b3430ed304fc04de581f18566",
+    "recovery_signing": "8311607d31fc7461079e9a8e545274a828e996c8"
+  },
+  "successful_runs": {
+    "production_Cast_component": 44039053105,
+    "actual_ARM64_MediaCodec_EGL_HLS": 44044730674,
+    "exact_member_staging": 44052030761,
+    "owner_preparation": 44052911061,
+    "original_signed_QA": 44054993516,
+    "original_signed_recovery": 44055859018,
+    "Android_install_over": 44056863289,
+    "QA_publication": 44058017851
+  },
+  "original_certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signature_v1_v2_v3": true,
+  "package": "com.projectinfinity.kodi",
+  "candidate_APK_members": {
+    "changed": 4,
+    "unchanged": 7773,
+    "changes": [
+      "AndroidManifest.xml",
+      "assets/experience-component-updates.properties",
+      "classes6.dex",
+      "lib/arm64-v8a/libinfinitycastremux.so"
+    ]
+  },
+  "recovery_APK_members": {
+    "changed": 2,
+    "unchanged": 7775,
+    "restores": 2103506
+  },
+  "Cobra": "EXACT_UNCHANGED_2103445",
+  "Kodi_engine": "EXACT_REUSED_NO_REBUILD",
+  "all_other_DEX_modules_resources": "BYTE_UNCHANGED",
+  "AAC_adapter": "SOURCE_UNCHANGED_AND_PACKET_BYTES_PTS_DTS_PRESERVED",
+  "independent_review": "Astra approved source/media/ownership, exact actual proposals, original signatures, signed pair, package install inputs and exact QA publication. Physical acceptance pending.",
+  "Android_install_over": "PASS506_TO508_TO509_SAME_UID_DATADIR_FIRST_INSTALL_TIME",
+  "application_startup_shutdown": "NOT_SELECTED",
+  "Fold_hardware_concurrency_HDR_sustained_performance_thermal": "PENDING_PHYSICAL_QUALIFICATION",
+  "actual_TV_playback_sound_controls_and_phone_return": "PENDING_OWNER",
+  "accepted_baseline_promoted": false,
+  "release_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/tag/infinity-2103508-fast-qa",
+  "assets": [
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103508-fast-qa/Infinity-2103508-Combined-Original-Signer.apk",
+      "digest": "sha256:9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16",
+      "name": "Infinity-2103508-Combined-Original-Signer.apk",
+      "size": 785585932
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103508-fast-qa/INFINITY-2103508-QA-VERIFICATION.zip",
+      "digest": "sha256:396800b90b68eb60e486b0601805ee7dfe1691ec28b4d91180960c0be7afb8f4",
+      "name": "INFINITY-2103508-QA-VERIFICATION.zip",
+      "size": 1755076
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103508-fast-qa/Infinity-2103509-Combined-Original-Signer.apk",
+      "digest": "sha256:675c5cbc473a522e24c5144cc5e22a0ab3e2c135c70ee1f95409befc1632a430",
+      "name": "Infinity-2103509-Combined-Original-Signer.apk",
+      "size": 785524492
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103508-fast-qa/INSTALL-AND-RECOVERY.md",
+      "digest": "sha256:65c63a456b9b57f0e88a4c16eb15664b9683eebe1ed08fce1d43fc492de19d1f",
+      "name": "INSTALL-AND-RECOVERY.md",
+      "size": 3141
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103508-fast-qa/SHA256SUMS",
+      "digest": "sha256:064f28a1f40032cc3db00f4df5b65ec1ad997e82140bd22d2cdf4f03297ef93a",
+      "name": "SHA256SUMS",
+      "size": 224
+    }
+  ]
+}
