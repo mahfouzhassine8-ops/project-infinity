@@ -30,6 +30,7 @@ def main():
  assert gate['SDK_error_fields']['null_vs_zero'] is True and gate['SDK_error_fields']['safe_reason'] is True and gate['SDK_error_fields']['real_SDK_object'] is True
  direct=gate['direct_HEVC'];assert direct['fragment5_complete'] is True and direct['AAC'] is True and direct['Main10_level']==153
  if direct['HLS']['actual_Android_HLS_playback'] is not True:
+  assert direct['HLS']['actual_Android_HLS_playback'] is False
   inventory=direct['codec_inventory'];assert direct['HLS']['status']=='NOT_SUPPORTED_BY_ACTUAL_CI_CODEC_INVENTORY' and inventory['supported_decoders']==0 and inventory['decoders'] and all(v['format_supported'] is False for v in inventory['decoders'])
   assert r['known_limitations']['Main10_Android_decode']=='UNVERIFIED_HARDWARE; CIcodec_inventoryunsupported_is_notPASS'
  assert gate['hardware_input_fixture']=='genuine_HEVC_Main8_L3_RADL_inband; not_Main10_hardware_qualification'
