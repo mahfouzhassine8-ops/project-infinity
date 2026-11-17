@@ -1,16 +1,11 @@
 {
   "status": "PASS_AFFECTED_CAST_JAVA_COMPILE",
   "inputs": {
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java": "6ea8119e1d5fc533dc9384c216eb3ddf6723df35c231a349e6a0a24f66b9886e",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java": "400e82272970e1c78fde9fd0cb5efd77a236c1de6f476cd3f43f513b7074a8bf",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "3923a17c829a97f69538c75c180c3e63e63a6ca5161a774830e0e04d66280e49",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "38a71d4801bce6c5eede7b6dcc1541ebb15855e77d56dea1ed270a97f38efd16",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "91904ea45297778523d95ee5d45a614179dfd02be285751d52a8eb42b11f353c",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "fcf697d125a596173be726e7674b8f1a2698f218fa8433559a88a211992fa4d8"
   },
-  "basis": "Retained realSDK21.3/MediaRouter1.3 jars, original providedHTTP API jars and verified compiled interfaces. No DEX build or ownerAPK.",
-  "new_hardware_video_pipeline": "NOT_IMPLEMENTED",
-  "post_compile_comment_only_change": {
-    "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java",
-    "current_sha256": "91904ea45297778523d95ee5d45a614179dfd02be285751d52a8eb42b11f353c",
-    "reason": "Astra correction: receiverPAUSED readiness can trigger transactional phone pause beforePLAYING; comment corrected, executable code unchanged. Actual phone handoff remains untested."
-  }
+  "basis": "Compile affectedsource after Astra known-violation and handoff-comment corrections using retained realSDK21.3/MediaRouter1.3/providedHTTP jars/interfaces. No productionDEX or ownerAPK.",
+  "hardware_video_pipeline": "NOT_IMPLEMENTED"
 }

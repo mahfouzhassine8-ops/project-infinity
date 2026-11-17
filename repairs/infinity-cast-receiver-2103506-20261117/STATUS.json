@@ -1,0 +1,43 @@
+{
+  "status": "BLOCKED_HARDWARE_VIDEO_PIPELINE_UNIMPLEMENTED_AND_UNQUALIFIED",
+  "foundation": 2103506,
+  "protected_baseline": 2103504,
+  "completed": [
+    "Cast-only documented receiver policy and MKVadmission source changes",
+    "43hostpolicychecks including knownbounds with incompletefacts",
+    "AffectedCastJava compilation; readonlyMain/Main10L153 sourcefacts",
+    "ChangedCastmetadata ARM64compile/link/unchanged7JNIexports+4dependencies; no enginebuild",
+    "Actual signed506-engine lookup and Android codec inventory, contexts0"
+  ],
+  "hardware_blocker": {
+    "existing_engine": "AACencoder present; h264/hevc_mediacodec encoders andhevc_mediacodecdecoder unavailable. CurrentCast has no video converter.",
+    "verified_environment": "API36emulator: nohardwareAVCencoder; goldfishHEVCdecoder rejects requestedMain10/L51/3840x2160/24format.",
+    "required_missing": "Cast-owned actual HEVCdecode\u2192GPUscale/verifiedHDRtoSDRwhenneeded\u2192H264720hardwareencode and fragment integration, with concurrent resource/throughput/thermal/seek/cancel/phone-return evidence.",
+    "not_a_phone_hardware_conclusion": "No physicalFold hardware configuration or sustained throughput was verified. Separate AndroidMediaCodec implementation may be possible; lack of FFmpegwrappers alone doesnotrule itout."
+  },
+  "unverified_or_not_implemented": [
+    "hardwarevideo conversion",
+    "H264outputinitialization/fragments",
+    "convertedvideoAACsync",
+    "hardwareseek/cancellation",
+    "HDRtoneMapping",
+    "physicalthermalperformance",
+    "ReturnToPhonewithconvertedvideo",
+    "actualTVacceptance"
+  ],
+  "preservation": "No installed APK, user profile, core engine, AAC adapter, Cobra, providers, UI, tracking or shutdown changed. Sourcebranch-only Cast delta.",
+  "successor_APK_signed": false,
+  "release_registry_changed": false,
+  "new_version_reserved": false,
+  "new_recovery_built": false,
+  "baseline_promoted": false,
+  "Android_inventory_artifact": {
+    "run": 44023632394,
+    "id": 14302556294,
+    "name": "Infinity506-Receiver-Capability-44023632394-EVIDENCE-ONLY",
+    "size_in_bytes": 793076,
+    "digest": "sha256:b8087702e32aea7e07e8b730df73c1cf3dd6ad047abf8b7b452aeada7694f53a",
+    "source": "a3f4f3942c60583af642545b3665ad6539b542dc",
+    "workflow_id": 420781757
+  }
+}

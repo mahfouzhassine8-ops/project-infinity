@@ -1,0 +1,77 @@
+{
+  "pass": true,
+  "status": "PASS_SELECTED_CODEC_INVENTORY",
+  "original_engine": {
+    "engine_loaded": true,
+    "aac_encoder": true,
+    "h264_mediacodec_encoder": false,
+    "hevc_mediacodec_encoder": false,
+    "hevc_mediacodec_decoder": false,
+    "software_hevc_decoder": true
+  },
+  "codec_inventory": [
+    {
+      "name": "c2.goldfish.h264.decoder",
+      "mime": "video/avc",
+      "encoder": false,
+      "hardware": true,
+      "software_only": false,
+      "requested_format_supported": true
+    },
+    {
+      "name": "c2.goldfish.hevc.decoder",
+      "mime": "video/hevc",
+      "encoder": false,
+      "hardware": true,
+      "software_only": false,
+      "requested_format_supported": false
+    },
+    {
+      "name": "c2.android.avc.decoder",
+      "mime": "video/avc",
+      "encoder": false,
+      "hardware": false,
+      "software_only": true,
+      "requested_format_supported": true
+    },
+    {
+      "name": "c2.android.avc.encoder",
+      "mime": "video/avc",
+      "encoder": true,
+      "hardware": false,
+      "software_only": true,
+      "requested_format_supported": true
+    },
+    {
+      "name": "c2.android.hevc.decoder",
+      "mime": "video/hevc",
+      "encoder": false,
+      "hardware": false,
+      "software_only": true,
+      "requested_format_supported": false
+    },
+    {
+      "name": "c2.android.hevc.encoder",
+      "mime": "video/hevc",
+      "encoder": true,
+      "hardware": false,
+      "software_only": true,
+      "requested_format_supported": false
+    }
+  ],
+  "hardware_HEVC_Main10_4K24_decoders": [],
+  "hardware_AVC_720p30_encoders": [],
+  "encoder_surface_configuration": [],
+  "owned_codecs_after_close": 0,
+  "thermal_status_before": 0,
+  "thermal_status_after": 0,
+  "sustained_throughput": "NOT_VERIFIED",
+  "HDR_to_SDR": "NOT_VERIFIED",
+  "end_to_end_video_pipeline": "NOT_IMPLEMENTED_NOT_VERIFIED",
+  "physical_Fold_TV": "NOT_TESTED",
+  "engine_rebuilt": false,
+  "owner_data": "NOT_ACCESSED",
+  "API": 36,
+  "scope": "API36 emulator, actual original506 ARM64 engine under native translation; codec inventory only, not physical hardware qualification",
+  "emulator_ABIs": "x86_64,arm64-v8a"
+}
