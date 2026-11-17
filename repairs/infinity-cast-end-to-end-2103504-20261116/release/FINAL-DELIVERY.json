@@ -1,0 +1,77 @@
+{
+  "accepted_pointer_updated": false,
+  "assets": [
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103506-fast-qa/Infinity-2103506-Combined-Original-Signer.apk",
+      "digest": "sha256:2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d",
+      "name": "Infinity-2103506-Combined-Original-Signer.apk",
+      "size": 785524492
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103506-fast-qa/INFINITY-2103506-QA-VERIFICATION.zip",
+      "digest": "sha256:da62c437dac51b5244cd7280b932bc47a155c9c2e11337c8c1e8a33961638c79",
+      "name": "INFINITY-2103506-QA-VERIFICATION.zip",
+      "size": 1753794
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103506-fast-qa/Infinity-2103507-Combined-Original-Signer.apk",
+      "digest": "sha256:8dfc798d14bd1352b59366922693e3c462c8a62807759eee93e17e92efb79341",
+      "name": "Infinity-2103507-Combined-Original-Signer.apk",
+      "size": 785487628
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103506-fast-qa/INSTALL-AND-RECOVERY.md",
+      "digest": "sha256:ddcc2527853b7358449ca75a1231c059325f91f0fa1fbe9cb5a5e8709e554566",
+      "name": "INSTALL-AND-RECOVERY.md",
+      "size": 2391
+    },
+    {
+      "browser_download_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103506-fast-qa/SHA256SUMS",
+      "digest": "sha256:c9975bbf626f49bd077b3ab8b6d5b92655f28cf2997c628e2c1769e51f2c7efe",
+      "name": "SHA256SUMS",
+      "size": 224
+    }
+  ],
+  "physical_acceptance": "PENDING_OWNER",
+  "release_url": "https://github.com/mahfouzhassine8-ops/project-infinity/releases/tag/infinity-2103506-fast-qa",
+  "status": "DELIVERED_ORIGINAL_SIGNED_CAST_AUDIO_ENGINEERING_QA",
+  "baseline": 2103504,
+  "baseline_APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234",
+  "candidate_versionCode": 2103506,
+  "recovery_versionCode": 2103507,
+  "candidate_source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+  "recovery_source": "2d5a2d7d5a58c657ac8aca13d5c1de12e724ca39",
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "signature_schemes": [
+    "v1",
+    "v2",
+    "v3"
+  ],
+  "verification_runs": {
+    "ARM64": 43993371947,
+    "Android_encoder_JNI_relay_playback": 44000750859,
+    "unsigned_preservation": 44002020615,
+    "owner_preparation": 44002750819,
+    "candidate_original_signer": 44003667211,
+    "recovery_original_signer": 44004258589,
+    "actual_install_over_recovery": 44005057424,
+    "publication": 44006034716
+  },
+  "native_engine_rebuilt": false,
+  "production_DEX_rebuilt": false,
+  "Cobra": "UNCHANGED_2103445",
+  "out_of_scope_payload": "UNCHANGED",
+  "candidate_changed_payload_members": 3,
+  "candidate_unchanged_payload_members": 7774,
+  "recovery_changed_payload_members": 2,
+  "recovery_unchanged_payload_members": 7775,
+  "owner_data": "NOT_ACCESSED_RESET_OR_MIGRATED",
+  "accepted_registry_sha256_before_and_after": "8eeded20e02d4617b05be1702b536de68607a52fde6cadbb863d39293f0d00e1",
+  "Astra_final_review": "PASS_ENGINEERING_QA_DELIVERY: authenticated actual receipts/live five asset digests/sizes/URLs, source tag, prerelease/notlatest and unchanged accepted registry independently checked. No fullAPK redownload by reviewer claimed.",
+  "pending_physical_acceptance": [
+    "TVvideo_and_sound_on_actualHEVC_receiver",
+    "Return_to_Phone_and_position",
+    "NormalpostCastExit_relaunch_with_ownerprofile"
+  ],
+  "historical_Android_false_green": "43997770119 retainedFAIL; corrected wrapper/counters, actual44000750859 PASS; no falsePASS promoted."
+}

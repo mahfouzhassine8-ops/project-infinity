@@ -42,3 +42,9 @@ No physical-TV success is claimed. HEVC evidence establishes packet preservation
 Original-signed2103507 forward recovery run44004258589, source `2d5a2d7d5a58c657ac8aca13d5c1de12e724ca39`, SHA256 `8dfc798d14bd1352b59366922693e3c462c8a62807759eee93e17e92efb79341`; original v1/v2/v3 certificate verified. Exact2-member preservation passed.
 
 Run44005057424's actual PackageManager receipt passed504→506→507 with the same UID10216, dataDir and firstInstallTime. No uninstall, reset, forced downgrade, app launch or owner-data access. This is install-over compatibility evidence, not physical Fold data or functional acceptance.
+
+## Delivered engineering QA
+
+Published prerelease: https://github.com/mahfouzhassine8-ops/project-infinity/releases/tag/infinity-2103506-fast-qa . Workflow44006034716 passed; all five public asset digests match the signed installers/receipts. Astra independently verified final live publication, tag/source, package pair and unchanged accepted registry. Full download/checksum/source/run details: `FINAL-DELIVERY.json`.
+
+This is completed engineering QA delivery, not a declaration of physical-TV success or owner baseline acceptance.
