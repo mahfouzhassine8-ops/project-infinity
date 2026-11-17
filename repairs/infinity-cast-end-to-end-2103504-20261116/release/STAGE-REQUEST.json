@@ -1,0 +1,46 @@
+{
+  "baseline_versionCode": 2103504,
+  "signing": false,
+  "registry_write": false,
+  "versions": {
+    "candidate": 2103506,
+    "recovery": 2103507
+  },
+  "baseline": {
+    "id": 14239746699,
+    "name": "Infinity502-Consolidated-OriginalSigned-43895603388",
+    "digest": "sha256:e3fae14dc9321ad1d380856e557e10fc33b37c71abb82ad0ce6f4d241350166e",
+    "size_in_bytes": 330961493,
+    "run": 43895603388,
+    "source": "80506277145dcd4bbd66da3eaa02d9c085c1b437",
+    "workflow_id": 397702717,
+    "APK_sha256": "ab9104471c729751d6127cc4dfc6e98d8bb4c916212c356ce9c0295b2a0c5234"
+  },
+  "native": {
+    "run": 43993371947,
+    "id": 14288492703,
+    "name": "Infinity504-Cast-Audio-43993371947-COMPONENT-ONLY",
+    "size_in_bytes": 97693,
+    "digest": "sha256:44f8e584c8c291137b0ed710f27718550041ab6e796e48ee3503e26503da3cc2",
+    "source": "a699abf76448d739420fc5beced3fb0ea537d7a0",
+    "workflow_id": 420739373
+  },
+  "Android": {
+    "run": 44000750859,
+    "id": 14292277826,
+    "name": "Infinity504-Cast-AAC-Android-44000750859-EVIDENCE-ONLY",
+    "size_in_bytes": 8878871,
+    "digest": "sha256:f88eb6d8387aad81f9301984c92a66dd79d33eb141e4aa91eaf4644abff67799",
+    "source": "28dd58eda9718ecbc4f563e00629b29fd659dea5",
+    "workflow_id": 420781757
+  },
+  "parent_authority_sha256": "73b85029a01ea0faa7543439f25dec66504a1c9bbe423e9dea87f0a569b6429a",
+  "inputs": {
+    "repairs/infinity-cast-end-to-end-2103504-20261116/release/stage.py": "342a90f074afea44b4080fb949f65f036b78b658b0eb7df40b2e4ebab53f59a9",
+    ".github/workflows/infinity-504-cast-audio-release.yml": "a15e22cfb858d8c31c1774af6e2e89d5cbdcb7592f415cfaf1a519825539d13b",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24"
+  },
+  "source_commit": "9242cde2a30c31f9c535ff2dc7148c062af1db5b",
+  "review_sha256": "7a2420d18b708b2f1e02aab52e10c729d281293885c9e3ce4df0c66a29eb69be"
+}
