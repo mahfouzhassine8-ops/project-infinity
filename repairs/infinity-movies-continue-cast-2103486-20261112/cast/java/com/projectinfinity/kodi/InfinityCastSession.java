@@ -248,7 +248,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 channel=new InfinityCastChannel(token,current.getString("file_sha256"),current.getString("origin_sha256"));
                 publish();phone.request("channel",token,0,registered->{if(!ok(registered))InfinityCastDiagnostics.event("observer","registration_unavailable",0);});
                 message="Checking supported media; phone playback continues.";changed();
-                relay=InfinityCastRelay.start(device.getInetAddress(),privateSource,(owner,type,failure)->ui.post(()->{
+                relay=InfinityCastRelay.start(device.getInetAddress(),privateSource,InfinityCastReceiverPolicy.receiver(device.getModelName()),(owner,type,failure)->ui.post(()->{
                     if(!expected.equals(token) || session!=value || !transferStarted || aborting) {owner.close();return;}
                     if(failure!=null || type==null || owner.closed()){lastFailure=mediaFailure(failure);message=lastFailure;abortTransfer();return;}
                     relay=owner;mime=type;
@@ -476,6 +476,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
     }
     private String mediaFailure(String reason) {
         if(reason==null)return "Media preparation failed. Phone playback continues.";
+        if(reason.equals("receiver_requires_hardware_avc_720"))return "This receiver requires hardware H.264 video conversion within 720p limits. That delivery path is not verified in this build. Phone playback continues.";
         if(reason.equals("drm_or_unsupported_encryption"))return "This source uses DRM or unsupported encryption; Cast cannot transfer it. Phone playback continues.";
         if(reason.startsWith("mkv_unsupported_audio_"))return "This MKV's "+reason.substring("mkv_unsupported_audio_".length()).toUpperCase(java.util.Locale.ROOT)+" audio cannot be stream-copied to this Cast path. Phone playback continues.";
         if(reason.startsWith("mkv_unsupported_video_"))return "This MKV's "+reason.substring("mkv_unsupported_video_".length()).toUpperCase(java.util.Locale.ROOT)+" video cannot be stream-copied to this Cast path. Phone playback continues.";

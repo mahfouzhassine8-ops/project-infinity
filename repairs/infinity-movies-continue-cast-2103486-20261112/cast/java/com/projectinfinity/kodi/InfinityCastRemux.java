@@ -25,6 +25,7 @@ final class InfinityCastRemux implements AutoCloseable {
     private byte[] initialization;
     private String video,audio;
     private String codecs;
+    private InfinityCastReceiverPolicy.Media inspectedVideo;
     private byte[] master;
     InfinityCastRemux(Input input) throws IOException {
         this.input=input;InfinityCastRemuxNative.load();handle=InfinityCastRemuxNative.open(input);
@@ -44,6 +45,7 @@ final class InfinityCastRemux implements AutoCloseable {
                     if(error.equals("mkv_unsupported_audio_codec"))error="mkv_unsupported_audio_"+audio;
                     throw new IOException(error);
                 }
+                inspectedVideo=new InfinityCastReceiverPolicy.Media(video,metadata.optInt("video_profile",-1),metadata.optInt("video_level",-1),metadata.optInt("width",0),metadata.optInt("height",0),metadata.optLong("fps_num",0),metadata.optLong("fps_den",0),metadata.optInt("color_transfer",0));
                 JSONArray times=metadata.getJSONArray("starts_us");if(times.length()<2 || times.length()>8193)throw new IOException("mkv_seek_index_limit");
                 starts=new long[times.length()];for(int n=0;n<starts.length;n++){starts[n]=times.getLong(n);if(starts[n]<0 || (n>0 && starts[n]<=starts[n-1]))throw new IOException("mkv_invalid_seek_index");}
                 if(starts[0]!=0 || starts[starts.length-1]!=metadata.getLong("duration_us"))throw new IOException("mkv_unverified_timeline");
@@ -53,6 +55,15 @@ final class InfinityCastRemux implements AutoCloseable {
                 if("hevc".equals(video)){String descriptor=codecs.split(",")[0];String[] fields=descriptor.split("\\.");InfinityCastDiagnostics.event("mkv_video_profile","hevc",Integer.parseInt(fields[1].replaceAll("[ABC]","")));InfinityCastDiagnostics.event("mkv_video_level",fields[3].startsWith("H")?"high_tier":"main_tier",Integer.parseInt(fields[3].substring(1)));}
                 check();InfinityCastDiagnostics.event("mkv_inspection","stream_copy_ready",starts.length-1);
             }catch(IOException e){throw failure(e);}catch(Exception e){throw new IOException("mkv_inspection_failed");}
+        }
+    }
+    void requireReceiver(InfinityCastReceiverPolicy.Receiver receiver) throws IOException {
+        synchronized(worker){check();if(inspectedVideo==null)throw new IOException("mkv_not_prepared");
+            InfinityCastReceiverPolicy.Choice choice=InfinityCastReceiverPolicy.choose(receiver,inspectedVideo);
+            InfinityCastDiagnostics.event("receiver_policy",choice.reason,choice.path.ordinal());
+            if(choice.path==InfinityCastReceiverPolicy.Path.HARDWARE_AVC_720_REQUIRED)throw new IOException("receiver_requires_hardware_avc_720");
+            // Unknown is an explicitly unverified existing direct attempt, never
+            // advertised as supported. Existing PLAYING confirmation still gates phone pause.
         }
     }
     private IOException failure(IOException error){String reason=input.failure();return reason.isEmpty()?error:new IOException(reason);}

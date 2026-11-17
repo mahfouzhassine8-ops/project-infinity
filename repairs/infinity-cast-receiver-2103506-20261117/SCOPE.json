@@ -1,0 +1,34 @@
+{
+  "baseline": 2103506,
+  "baseline_APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d",
+  "signer_source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+  "baseline_artifact": {
+    "run": 44003667211,
+    "id": 14292668883,
+    "name": "Infinity504-Cast-Audio-OriginalSigned-44003667211-QA",
+    "size_in_bytes": 330974872,
+    "digest": "sha256:5c149a9a5bfac7cf1d8768c8f5824e2e6a60ee6848927f4110d1ea95a9ffbd1c",
+    "source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+    "workflow_id": 397702717,
+    "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
+  },
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "protected_baseline": 2103504,
+  "before": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "1923f27eb318377798ab0a21cada92349bb9ae0b26af1e51afd736a5d205fb6e",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "76d2b57c0a9377084e1631cb42e9dba0d819db2221072c50d29a9adb6f01bf3c",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "9e9d132d1fb0bb457e49b711ee77a624e1862b63499027f7316d2bf62518c623",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24"
+  },
+  "Java_source_provenance": "Verified compiled component receipt ae28a27a CAST-COMPONENT featureJava hashes, retained byte-identically through signed502/504/506; canonical signing metadata tree alone is not Java provenance.",
+  "new_production": [
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java"
+  ],
+  "selected_verification": [
+    "Host exact receiver-model/codec/profile/level/raster/fps policy; preserve known4Kcopy; unknown not reported supported.",
+    "Separate Android codec inventory/configuration plus exact506 native engine encoder lookup. No owner install, app startup, shutdown or profile access.",
+    "Only changed Cast components compiled; no Kodi engine or unrelated DEX rebuild."
+  ],
+  "release_gate": "No CPU4K fallback; no claim of verified hardware video delivery without actual pipeline/throughput/HDR evidence.",
+  "preserved": "ExistingAACadapter/engine/Cobra/allnonCast source and payload, data/settings; no resets."
+}

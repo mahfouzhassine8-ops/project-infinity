@@ -288,7 +288,7 @@ std::vector<uint8_t> State::segment(int index){
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
 std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
-std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioAdapter?"aac":audioName)<<"\",\"audio_input\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]}";return out.str();}
+std::string State::describe()const{std::ostringstream out;out<<"{\"video\":\""<<safeName(videoName)<<"\",\"audio\":\""<<safeName(audioAdapter?"aac":audioName)<<"\",\"audio_input\":\""<<safeName(audioName)<<"\",\"codecs\":\""<<codecs<<"\",\"origin_us\":"<<origin<<",\"duration_us\":"<<duration<<",\"starts_us\":[";for(size_t n=0;n<starts.size();n++){if(n)out<<',';out<<starts[n];}out<<"]";if(format && video>=0){auto* stream=format->streams[video];auto* v=stream->codecpar;auto fps=stream->avg_frame_rate;out<<",\"video_profile\":"<<v->profile<<",\"video_level\":"<<v->level<<",\"width\":"<<v->width<<",\"height\":"<<v->height<<",\"fps_num\":"<<fps.num<<",\"fps_den\":"<<fps.den<<",\"color_transfer\":"<<v->color_trc;}out<<"}";return out.str();}
 } // namespace InfinityMkv
 #ifndef INFINITY_REMUX_HOST
 namespace {

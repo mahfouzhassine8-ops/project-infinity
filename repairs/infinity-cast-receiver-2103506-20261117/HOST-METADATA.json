@@ -1,0 +1,54 @@
+{
+  "status": "PASS_ACTUAL_NATIVE_METADATA",
+  "cases": [
+    {
+      "case": "Main",
+      "inspection": {
+        "video": "hevc",
+        "audio": "aac",
+        "audio_input": "eac3",
+        "codecs": "hev1.1.6.L30.90,mp4a.40.2",
+        "origin_us": -5000,
+        "duration_us": 4032000,
+        "starts_us": [
+          0,
+          2026000,
+          4032000
+        ],
+        "video_profile": 1,
+        "video_level": 30,
+        "width": 160,
+        "height": 96,
+        "fps_num": 24,
+        "fps_den": 1,
+        "color_transfer": 2
+      }
+    },
+    {
+      "case": "Main10",
+      "inspection": {
+        "video": "hevc",
+        "audio": "aac",
+        "audio_input": "eac3",
+        "codecs": "hev1.2.4.L153.90,mp4a.40.2",
+        "origin_us": 0,
+        "duration_us": 4005000,
+        "starts_us": [
+          0,
+          2005000,
+          4005000
+        ],
+        "video_profile": 2,
+        "video_level": 153,
+        "width": 320,
+        "height": 180,
+        "fps_num": 24,
+        "fps_den": 1,
+        "color_transfer": 2
+      }
+    }
+  ],
+  "native_source_sha256": "a6a5f5a6b4a181b96fbe849fbdb20fed82edab19c90a2e7fdb3abcdbc67fb879",
+  "initial_fixture_correction": "First expectation was Main10 but retainedsmallHEVCfixture is Main; corrected by using actualMain10L153 fixture separately, no production patch or weakened check.",
+  "existing_audio_video_regressions": "Source diff adds JSON facts only; no fragment-generation or AACadapter change. Prior passing corpus retained, not rerun."
+}

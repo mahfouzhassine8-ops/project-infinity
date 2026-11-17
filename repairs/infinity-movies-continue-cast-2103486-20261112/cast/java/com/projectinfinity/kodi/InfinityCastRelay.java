@@ -55,6 +55,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         Template(String value,String[] names){this.value=value;this.names=names;this.suffix=suffix(URI.create(value),InfinityCastAdaptive.Kind.MEDIA);}
     }
     private final InfinityCastSource source;
+    private final InfinityCastReceiverPolicy.Receiver receiverPolicy;
     private final InetAddress receiver;
     private final ServerSocket listener;
     private final String path;
@@ -111,8 +112,8 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private volatile boolean hlsFmp4,hlsSeparateAudio;
     String hlsVideoFormat(){return hlsFmp4?"fmp4":null;}
     String hlsAudioFormat(){return hlsFmp4 && !hlsSeparateAudio?"fmp4":null;}
-    private InfinityCastRelay(InetAddress receiver,InetAddress local,InfinityCastSource source) throws IOException {
-        this.receiver=receiver;this.source=source;
+    private InfinityCastRelay(InetAddress receiver,InetAddress local,InfinityCastSource source,InfinityCastReceiverPolicy.Receiver policy) throws IOException {
+        this.receiver=receiver;this.source=source;this.receiverPolicy=policy;
         path="/"+UUID.randomUUID().toString().replace("-","");root=new Resource(source.uri,InfinityCastAdaptive.Kind.MEDIA,source.hint);
         upstream=new OkHttpClient.Builder().cookieJar(cookies).authenticator(Authenticator.NONE)
             .proxyAuthenticator(Authenticator.NONE).followRedirects(false).followSslRedirects(false)
@@ -123,9 +124,12 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
         try{listener.bind(new InetSocketAddress(local,0),8);}catch(IOException failed){listener.close();throw failed;}
     }
     static synchronized InfinityCastRelay start(InetAddress receiver,InfinityCastSource source,Ready callback) throws IOException {
+        return start(receiver,source,InfinityCastReceiverPolicy.receiver(null),callback);
+    }
+    static synchronized InfinityCastRelay start(InetAddress receiver,InfinityCastSource source,InfinityCastReceiverPolicy.Receiver policy,Ready callback) throws IOException {
         if(active!=null)throw new IOException("previous_transport_draining");
         if(!(receiver instanceof Inet4Address) || receiver.isAnyLocalAddress() || source==null)throw new IOException("unsupported_receiver_route");
-        InfinityCastRelay relay=new InfinityCastRelay(receiver,localAddress(receiver),source);active=relay;relay.jobs.incrementAndGet();
+        InfinityCastRelay relay=new InfinityCastRelay(receiver,localAddress(receiver),source,policy);active=relay;relay.jobs.incrementAndGet();
         try {
             io.execute(()->{
                 String problem=null,type=null;
@@ -283,7 +287,7 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if("matroska".equals(InfinityCastSource.ebmlDocType(sample))) {
                 release(response);response=null;if(closed)throw new IOException("transport_closed");
                 remux=new InfinityCastRemux(new RemuxInput());if(closed){remux.cancel();throw new IOException("transport_closed");}
-                remux.prepare();hlsFmp4=true;hlsSeparateAudio=false;return "application/vnd.apple.mpegurl";
+                remux.prepare();remux.requireReceiver(receiverPolicy);hlsFmp4=true;hlsSeparateAudio=false;return "application/vnd.apple.mpegurl";
             }
             type=InfinityCastSource.sniff(sample,response.header("Content-Type"),source.hint);
             if(InfinityCastAdaptive.adaptive(type)) {
