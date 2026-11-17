@@ -1,0 +1,39 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_SIGNED_PAIR_REVIEW",
+  "candidate": {
+    "run": 44075563292,
+    "id": 14325191057,
+    "name": "Infinity508-Cast-Source-Reader-OriginalSigned-44075563292-QA",
+    "size_in_bytes": 331020422,
+    "digest": "sha256:0f82cb32ce1fb2cb5b0696a7d124d23b7113ae50ca2154155e1097b6733c98fd",
+    "source": "cd682193dc78da29cfcfef83c5b0d43dec5b89a2",
+    "workflow_id": 397702717,
+    "APK_sha256": "8fd4d06d4a93b29764d4820bd6000795562411802fb52a402e1b3b2ddaa93ab0"
+  },
+  "recovery": {
+    "run": 44076463563,
+    "id": 14325387626,
+    "name": "Infinity508-Cast-Source-Reader-OriginalSigned-44076463563-QA",
+    "size_in_bytes": 331012274,
+    "digest": "sha256:528ebc5a123d8d58c1e863f6c7eea90711799acf922f2461d862f3fc6be97b76",
+    "source": "90d159ce84a9142ba7809741c7f55f094877262e",
+    "workflow_id": 397702717,
+    "APK_sha256": "db39ee4b6b1749657ae4a705ef7036fbd5191dbc293b6d658951d1753a57c3ca"
+  },
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "v1_v2_v3": true,
+  "candidate_changed_unchanged": [
+    4,
+    7773
+  ],
+  "recovery_changed_unchanged": [
+    2,
+    7775
+  ],
+  "Cobra_other_features": "UNCHANGED",
+  "recovery_restores": 2103508,
+  "accepted_pointer_updated": false,
+  "physical_acceptance": false
+}
