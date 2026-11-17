@@ -36,3 +36,9 @@ All DEX, Kodi, Cobra2103445, modules, Search/providers, Watchlist, Continue Play
 ## Physical acceptance
 
 No physical-TV success is claimed. HEVC evidence establishes packet preservation/extraction, not HEVC rendering on the owner's receiver. Actual provider-movie video/audio, receiver compatibility, Return to Phone and normal post-Cast Exit/relaunch remain the consolidated owner acceptance session. Existing504 limitations outside this Cast repair remain unchanged.
+
+## Final signed-pair and install-over result
+
+Original-signed2103507 forward recovery run44004258589, source `2d5a2d7d5a58c657ac8aca13d5c1de12e724ca39`, SHA256 `8dfc798d14bd1352b59366922693e3c462c8a62807759eee93e17e92efb79341`; original v1/v2/v3 certificate verified. Exact2-member preservation passed.
+
+Run44005057424's actual PackageManager receipt passed504→506→507 with the same UID10216, dataDir and firstInstallTime. No uninstall, reset, forced downgrade, app launch or owner-data access. This is install-over compatibility evidence, not physical Fold data or functional acceptance.
