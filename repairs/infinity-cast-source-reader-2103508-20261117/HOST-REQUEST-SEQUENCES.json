@@ -1,0 +1,286 @@
+{
+  "status": "PASS_BOUNDED_SEQUENTIAL_COLD_RANDOM_AND_REGENERATED_FRAGMENTS",
+  "fixture_sha256": "13e8361df214dc70cf9ff91abf46f8b075ad8c545c5465c5e90699676d4c890b",
+  "fixture_bytes": 42989977,
+  "rows": {
+    "sequential": [
+      {
+        "index": 0,
+        "bytes": 14511202,
+        "budget": 35743528,
+        "exhausted": false,
+        "phase_bytes": [
+          7421696,
+          32768,
+          7056738,
+          0
+        ],
+        "seeks": 2,
+        "output": 6924318,
+        "reason": "none",
+        "sha256": "22454f40df9be6f7e1bc23143f51120aba70ebb71318b97ec5e3541dc663ee39"
+      },
+      {
+        "index": 1,
+        "bytes": 29123932,
+        "budget": 50130551,
+        "exhausted": false,
+        "phase_bytes": [
+          14840537,
+          7089506,
+          7193889,
+          0
+        ],
+        "seeks": 2,
+        "output": 7098536,
+        "reason": "none",
+        "sha256": "86befe57129d422c2ac4ca6dcad47b89ae9e4f182342147938774f03619a222e"
+      },
+      {
+        "index": 2,
+        "bytes": 29632158,
+        "budget": 50488295,
+        "exhausted": false,
+        "phase_bytes": [
+          15169891,
+          7268378,
+          7193889,
+          0
+        ],
+        "seeks": 2,
+        "output": 7098084,
+        "reason": "none",
+        "sha256": "133f9eb41ce3c65a060647ee62ff6c231e3cf8a7dcc31a1fd5d9c21ea625c2a1"
+      },
+      {
+        "index": 3,
+        "bytes": 29781097,
+        "budget": 50493055,
+        "exhausted": false,
+        "phase_bytes": [
+          15318830,
+          7268378,
+          7193889,
+          0
+        ],
+        "seeks": 2,
+        "output": 7098590,
+        "reason": "none",
+        "sha256": "07c521d7b0672f1ba6a0ba4a528c6b90cc4b68082811a016ad8fec6bc5d55bbe"
+      },
+      {
+        "index": 4,
+        "bytes": 30006049,
+        "budget": 43303926,
+        "exhausted": false,
+        "phase_bytes": [
+          15543782,
+          7268378,
+          7193889,
+          0
+        ],
+        "seeks": 2,
+        "output": 7098060,
+        "reason": "none",
+        "sha256": "c23101838161c338400ac43da5b4111cecb6f8f6454dab8b6850c870fb8ea2d6"
+      },
+      {
+        "index": 5,
+        "bytes": 28785076,
+        "budget": 33554432,
+        "exhausted": false,
+        "phase_bytes": [
+          14392538,
+          7268378,
+          7124160,
+          0
+        ],
+        "seeks": 2,
+        "output": 7098022,
+        "reason": "none",
+        "sha256": "976193cec5d137d23324f93a4edda1f72466d058c9fb82ffaf2d326e72b2402b"
+      }
+    ],
+    "random": [
+      {
+        "index": 5,
+        "bytes": 51750554,
+        "budget": 64843308,
+        "exhausted": false,
+        "phase_bytes": [
+          37358016,
+          7268378,
+          7124160,
+          0
+        ],
+        "seeks": 4,
+        "output": 7098022,
+        "reason": "none",
+        "sha256": "976193cec5d137d23324f93a4edda1f72466d058c9fb82ffaf2d326e72b2402b"
+      },
+      {
+        "index": 2,
+        "bytes": 44472695,
+        "budget": 71956626,
+        "exhausted": false,
+        "phase_bytes": [
+          30010428,
+          7268378,
+          7193889,
+          0
+        ],
+        "seeks": 3,
+        "output": 7098084,
+        "reason": "none",
+        "sha256": "133f9eb41ce3c65a060647ee62ff6c231e3cf8a7dcc31a1fd5d9c21ea625c2a1"
+      },
+      {
+        "index": 0,
+        "bytes": 14511202,
+        "budget": 35743528,
+        "exhausted": false,
+        "phase_bytes": [
+          7421696,
+          32768,
+          7056738,
+          0
+        ],
+        "seeks": 2,
+        "output": 6924318,
+        "reason": "none",
+        "sha256": "22454f40df9be6f7e1bc23143f51120aba70ebb71318b97ec5e3541dc663ee39"
+      },
+      {
+        "index": 4,
+        "bytes": 45324879,
+        "budget": 64951129,
+        "exhausted": false,
+        "phase_bytes": [
+          30862612,
+          7268378,
+          7193889,
+          0
+        ],
+        "seeks": 3,
+        "output": 7098060,
+        "reason": "none",
+        "sha256": "c23101838161c338400ac43da5b4111cecb6f8f6454dab8b6850c870fb8ea2d6"
+      },
+      {
+        "index": 1,
+        "bytes": 36545628,
+        "budget": 64405748,
+        "exhausted": false,
+        "phase_bytes": [
+          22262233,
+          7089506,
+          7193889,
+          0
+        ],
+        "seeks": 3,
+        "output": 7098536,
+        "reason": "none",
+        "sha256": "86befe57129d422c2ac4ca6dcad47b89ae9e4f182342147938774f03619a222e"
+      },
+      {
+        "index": 3,
+        "bytes": 44950988,
+        "budget": 72140258,
+        "exhausted": false,
+        "phase_bytes": [
+          30488721,
+          7268378,
+          7193889,
+          0
+        ],
+        "seeks": 3,
+        "output": 7098590,
+        "reason": "none",
+        "sha256": "07c521d7b0672f1ba6a0ba4a528c6b90cc4b68082811a016ad8fec6bc5d55bbe"
+      },
+      {
+        "index": 5,
+        "bytes": 29936320,
+        "budget": 36110037,
+        "exhausted": false,
+        "phase_bytes": [
+          15543782,
+          7268378,
+          7124160,
+          0
+        ],
+        "seeks": 2,
+        "output": 7098022,
+        "reason": "none",
+        "sha256": "976193cec5d137d23324f93a4edda1f72466d058c9fb82ffaf2d326e72b2402b"
+      },
+      {
+        "index": 0,
+        "bytes": 14511202,
+        "budget": 35743528,
+        "exhausted": false,
+        "phase_bytes": [
+          7421696,
+          32768,
+          7056738,
+          0
+        ],
+        "seeks": 2,
+        "output": 6924318,
+        "reason": "none",
+        "sha256": "22454f40df9be6f7e1bc23143f51120aba70ebb71318b97ec5e3541dc663ee39"
+      }
+    ],
+    "cold0": {
+      "index": 0,
+      "bytes": 14511202,
+      "budget": 35743528,
+      "exhausted": false,
+      "phase_bytes": [
+        7421696,
+        32768,
+        7056738,
+        0
+      ],
+      "seeks": 2,
+      "output": 6924318,
+      "reason": "none",
+      "sha256": "22454f40df9be6f7e1bc23143f51120aba70ebb71318b97ec5e3541dc663ee39"
+    },
+    "cold2": {
+      "index": 2,
+      "bytes": 51894391,
+      "budget": 86231823,
+      "exhausted": false,
+      "phase_bytes": [
+        37432124,
+        7268378,
+        7193889,
+        0
+      ],
+      "seeks": 4,
+      "output": 7098084,
+      "reason": "none",
+      "sha256": "133f9eb41ce3c65a060647ee62ff6c231e3cf8a7dcc31a1fd5d9c21ea625c2a1"
+    },
+    "cold5": {
+      "index": 5,
+      "bytes": 51750554,
+      "budget": 64843308,
+      "exhausted": false,
+      "phase_bytes": [
+        37358016,
+        7268378,
+        7124160,
+        0
+      ],
+      "seeks": 4,
+      "output": 7098022,
+      "reason": "none",
+      "sha256": "976193cec5d137d23324f93a4edda1f72466d058c9fb82ffaf2d326e72b2402b"
+    }
+  },
+  "quotas_replenished_on_seek": false,
+  "video_or_AAC_algorithm_replaced": false,
+  "source": "actualpinnedFFmpeg6.0.1 customIO demux; notphysicalreceiver"
+}

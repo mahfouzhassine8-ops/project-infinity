@@ -1,0 +1,29 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_SOURCE_METADATA_FREEZE",
+  "workflows": [
+    {
+      "id": 421031076,
+      "path": ".github/workflows/infinity-506-cast-component.yml",
+      "before_sha256": "339576a4375bf0a9010b45f891379bdaafbd319ae9885cb4fc7fa5d5f63104d8",
+      "after_sha256": "09c50d0866e65b81f7aaeee54e5e20189725aef700de66bcb8dc372754fcf698"
+    },
+    {
+      "id": 421009620,
+      "path": ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+      "before_sha256": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6",
+      "after_sha256": "660cf84c4bc40e0f8170b8b0e51b2be67b7355015d43f7384affdc87d54d7f45"
+    },
+    {
+      "id": 421117469,
+      "path": ".github/workflows/infinity-506-cast-hardware-stage.yml",
+      "before_sha256": "e8a5bd36ef9ce6f170e39d93586ca39cb07e0654fbf7416061c402e1ad905982",
+      "after_sha256": "d191c78f3f6ff12d584fe3d33232863606c3d79c2ab82e9180c3ca06cc7e5869"
+    }
+  ],
+  "sole_original_signer": 397702717,
+  "policy": "BYTE_IDENTICAL_TO_PARENT",
+  "new_signing_routes": false,
+  "source": "9e095fbe4aa0c8a205f68ca119bf1825151b9a7e"
+}

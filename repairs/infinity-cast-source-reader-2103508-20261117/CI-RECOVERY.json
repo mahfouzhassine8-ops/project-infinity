@@ -1,0 +1,55 @@
+{
+  "engine_build": false,
+  "Android_rerun": false,
+  "owner_APK": false,
+  "shutdown": false,
+  "execution": {
+    "run": 44067382846,
+    "id": 14321925801,
+    "name": "Infinity508-Cast-Source-Reader-44067382846-EVIDENCE-ONLY",
+    "digest": "sha256:527b2683e7db877bd10b263d7701b8de9015312312eb87e6428abfc33a1e5845",
+    "size_in_bytes": 3040213,
+    "source": "e0b88457b2680f4e97fbc74645c2bdc2c1c144c2",
+    "workflow_id": 421009620
+  },
+  "baseline": {
+    "run": 44054993516,
+    "id": 14315957113,
+    "name": "Infinity506-Cast-Hardware-OriginalSigned-44054993516-QA",
+    "size_in_bytes": 331012243,
+    "digest": "sha256:345a2455458eefdc352b3ec9412f83af72f2ea53aac821ad44c61912e052d685",
+    "source": "dfae0d04d29bbe6b3430ed304fc04de581f18566",
+    "workflow_id": 397702717,
+    "APK_sha256": "9de2cb84b8c9c58e751b3fc6691337d31da224c62884383ed1fed98975782a16"
+  },
+  "log_sha256": "401d4395350ded00854828c09b5ed7edd8ebd09a9dd8df30852d5193a62391c6",
+  "final_record_sha256": "ae86ea9dcf12d1c5b1e69a9b7d47890dc0fb377f046e2a2aff67610e6cee215d",
+  "library_sha256": "a852d6b5e8eabd85c77a1e9e8d0209830f0b7e9392d9864b7b6ae07ebb8ae6f3",
+  "Cast_DEX_sha256": "c013492e2f2fdf8e950d57519d0dca8af3a7fb4a116482fdff73689cf9e976ee",
+  "native_inputs": [
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h"
+  ],
+  "execution_source_files": {
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/InfinityCastProbeActivity.java": "05ce5bf1e0fc85065efc2c6e4bc7857fb1501a7d98331c4b946b38a506b550f5",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/Origin.java": "af60626c3369288206109ccb7aeb993813b4a52b46c35479ddd78235c36110a5",
+    "repairs/infinity-cast-source-reader-2103508-20261117/android/MkvHlsPlayerProbe.java": "5a455afdb83f83dc11bc3473ab7d50d7958af8f06a691a8f37f2b7c8cfc67479",
+    "repairs/infinity-cast-source-reader-2103508-20261117/build_android.py": "0e4410b804a5cc740ba9e531350f6f340ad925fe228ec0c25a3ccef66067d48a",
+    "repairs/infinity-cast-source-reader-2103508-20261117/run_android.py": "dc94bced9b1da6827251b47f36298aab9f7ae27a907bc84bded86a645aa3fe0c"
+  },
+  "inputs": {
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "660cf84c4bc40e0f8170b8b0e51b2be67b7355015d43f7384affdc87d54d7f45",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "61e826157514b1b0a3c75df5ff421346ddc46ce6744e5ca3674991a1397cc3a2",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
+    "repairs/infinity-cast-source-reader-2103508-20261117/SCOPE.json": "dc961765e14b4b7cdec5731c1d55cdc4bfc98fe6e52e04f83dbc42643173061d",
+    "repairs/infinity-cast-source-reader-2103508-20261117/recover_android.py": "51709ce87fc64436912a11617779e5706dc73831d43e7fcfdb3a9a9086cd4fba",
+    "repairs/infinity-cast-source-reader-2103508-20261117/verify_android_media.py": "41c5d3e4b4cfcf5b631ea62d2f5e29985a8e1be9d756c7893946a0383303ed63",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "cd81d223128e3bc1401533fbabee4305e980fbfbac27adc9a1c7b7dc6d9ee23b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "c6c31f64c959d87205bfbb85dcb94358b0b5c47227df2fc064558bc9bfdf285a",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "f290b56c78559285052e7e90ede3c60d976667a1db5c1230cc0342f4416dc329",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "79c12cc4f8620fa8e6342686620df925483db3c5a0e60965e559a8445edd51d9"
+  },
+  "source_commit": "c38d7d923bcef82df4e06d96b86158f319077454",
+  "review_sha256": "7fed6d9ee0e32b51ad2c588a1166e3521e0ab32606c1492d7065aee0ef739f06"
+}

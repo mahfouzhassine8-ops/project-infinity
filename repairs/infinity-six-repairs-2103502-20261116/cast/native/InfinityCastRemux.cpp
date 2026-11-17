@@ -68,7 +68,12 @@ void validateDolby(const AVPacket* packet,AVCodecID codec){
  }
 }
 
-struct Input {virtual ~Input()=default;virtual int read(uint8_t*,int)=0;virtual int64_t seek(int64_t,int)=0;};
+struct Input {
+ enum Phase{Audio=0,SeekPreroll=1,Selected=2,Lookahead=3};
+ int phase=SeekPreroll,fragment=-1;std::array<uint64_t,4> consumed{};uint64_t seeks=0,errors=0;
+ void reset(int index){fragment=index;phase=SeekPreroll;consumed.fill(0);seeks=errors=0;}
+ virtual ~Input()=default;virtual int read(uint8_t*,int)=0;virtual int64_t seek(int64_t,int)=0;
+};
 struct Packet {AVPacket* value=api().av_packet_alloc();~Packet(){if(value)api().av_packet_free(&value);}Packet(){if(!value)throw Failure("mkv_memory_limit");}};
 } // namespace InfinityMkv
 #include "../../../infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h"
@@ -77,7 +82,7 @@ namespace InfinityMkv {
 struct State {
  std::unique_ptr<Input> input;AVFormatContext* format=nullptr;AVIOContext* io=nullptr;
  std::atomic<bool> cancelled{false};Clock::time_point deadline;
- int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts;
+ int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts,positions;int64_t sourceLength=0;bool positionPlanValid=false;
  std::vector<uint8_t> init;std::string videoName,audioName,codecs;std::unique_ptr<CastAudioAdapter> audioAdapter;
  std::unique_ptr<CastVideoBridge> videoBridge;CastVideoResult videoFormat;std::vector<uint8_t> bootstrapVideo;bool videoConfigured=false;
  explicit State(std::unique_ptr<Input> value):input(std::move(value)){api();}
@@ -85,10 +90,10 @@ struct State {
  bool stopped()const{return cancelled.load() || Clock::now()>deadline;}
  void check()const{if(cancelled.load())throw Failure("mkv_cancelled");if(Clock::now()>deadline)throw Failure("mkv_deadline");}
  static int interrupt(void* p){return static_cast<State*>(p)->stopped();}
- static int read(void* p,uint8_t* data,int n){auto& s=*static_cast<State*>(p);if(s.stopped())return AVERROR_EXIT;int r=s.input->read(data,n);return r==0?AVERROR_EOF:r;}
- static int64_t seek(void* p,int64_t at,int whence){auto& s=*static_cast<State*>(p);if(s.stopped())return AVERROR_EXIT;return s.input->seek(at,whence);}
+ static int read(void* p,uint8_t* data,int n){auto& s=*static_cast<State*>(p);if(s.stopped())return AVERROR_EXIT;int r=s.input->read(data,n);if(r>0)s.input->consumed[s.input->phase]+=uint64_t(r);else if(r<0)s.input->errors++;return r==0?AVERROR_EOF:r;}
+ static int64_t seek(void* p,int64_t at,int whence){auto& s=*static_cast<State*>(p);if(s.stopped())return AVERROR_EXIT;if(!(whence&AVSEEK_SIZE))s.input->seeks++;return s.input->seek(at,whence);}
  int64_t micros(int64_t t,AVRational base)const{return api().av_rescale_q(t,base,AV_TIME_BASE_Q);}
- void inspect();std::vector<uint8_t> segment(int index);std::vector<uint8_t> videoSegment(int index);void configureVideo(std::unique_ptr<CastVideoBridge>);std::string describe()const;
+ void inspect();uint64_t readBudget(int index)const;std::vector<uint8_t> segment(int index);std::vector<uint8_t> videoSegment(int index);void configureVideo(std::unique_ptr<CastVideoBridge>);std::string describe()const;
 };
 struct Output {
  AVFormatContext* format=nullptr;AVIOContext* io=nullptr;std::vector<uint8_t> bytes;const char* failure=nullptr;bool packetHeader=false;
@@ -209,14 +214,14 @@ int select(AVFormatContext* f,AVMediaType kind){
  if(count<=1)return first;if(defaults==1)return defaultIndex;throw Failure(kind==AVMEDIA_TYPE_AUDIO?"mkv_ambiguous_audio_tracks":"mkv_ambiguous_video_tracks");
 }
 // A true closed random-access picture is required for independent JIT chunks.
-bool closedPicture(const AVPacket* packet,const AVCodecParameters* codec){
+bool closedPicture(const AVPacket* packet,const AVCodecParameters* codec,bool noLeading=false){
  if(!codec->extradata || codec->extradata_size<6 || codec->extradata[0]!=1)return false;
  int bytes=codec->codec_id==AV_CODEC_ID_H264?(codec->extradata[4]&3)+1:codec->extradata_size>21?(codec->extradata[21]&3)+1:0;
  if(bytes<1 || bytes>4)return false;
  for(int at=0;at+bytes<packet->size;){uint32_t n=0;for(int j=0;j<bytes;j++)n=(n<<8)|packet->data[at++];if(!n || n>uint32_t(packet->size-at))return false;
   int type=codec->codec_id==AV_CODEC_ID_H264?packet->data[at]&31:(packet->data[at]>>1)&63;
   if(codec->codec_id==AV_CODEC_ID_H264 && type>=1 && type<=5)return type==5;
-  if(codec->codec_id==AV_CODEC_ID_HEVC && type<=31)return type==19 || type==20;
+  if(codec->codec_id==AV_CODEC_ID_HEVC && type<=31)return type==20 || (!noLeading && type==19);
   at+=int(n);
  }return false;
 }
@@ -237,14 +242,20 @@ void State::inspect(){
  origin=format->start_time;if(origin==AV_NOPTS_VALUE || origin< -30LL*24*3600*AV_TIME_BASE || origin>30LL*24*3600*AV_TIME_BASE)throw Failure("mkv_unverified_timeline");duration=format->duration;if(duration<=0 || duration>30LL*24*3600*AV_TIME_BASE)throw Failure("mkv_unverified_duration");
  auto* stream=format->streams[video];int64_t middle=api().av_rescale_q(origin+duration/2,AV_TIME_BASE_Q,stream->time_base);
  if(api().av_seek_frame(format,video,middle,AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_seek_index_unavailable");check();
+ sourceLength=input->seek(0,AVSEEK_SIZE);positionPlanValid=sourceLength>0 && sourceLength<=1099511627776LL;
  int count=api().avformat_index_get_entries_count(stream);if(count<=0 || count>IndexLimit)throw Failure("mkv_seek_index_limit");
  for(int n=0;n<count;n++){const auto* key=api().avformat_index_get_entry(stream,n);if(!key || !(key->flags&AVINDEX_KEYFRAME))continue;int64_t us=micros(key->timestamp,stream->time_base)-origin;
-  if(us<0 || us>=duration)continue;if(!keys.empty() && key->timestamp<=keys.back())throw Failure("mkv_invalid_seek_index");keys.push_back(key->timestamp);starts.push_back(us);
+  if(us<0 || us>=duration)continue;if(!keys.empty() && key->timestamp<=keys.back())throw Failure("mkv_invalid_seek_index");if(key->pos<0 || key->pos>=sourceLength || (!positions.empty() && key->pos<positions.back()))positionPlanValid=false;keys.push_back(key->timestamp);starts.push_back(us);positions.push_back(key->pos);
  }
  if(keys.empty() || starts.front()>AV_TIME_BASE)throw Failure("mkv_first_cue_missing");starts.front()=0;starts.push_back(duration);
  for(size_t n=1;n<starts.size();n++)if(starts[n]<=starts[n-1] || starts[n]-starts[n-1]>30LL*AV_TIME_BASE)throw Failure("mkv_sparse_seek_index");
  repairReservedHevcLevel(stream->codecpar);
- if(audio>=0 && format->streams[audio]->codecpar->codec_id==AV_CODEC_ID_EAC3)audioAdapter.reset(new CastAudioAdapter(format,audio,origin,duration,[this]{check();}));
+ if(audio>=0 && format->streams[audio]->codecpar->codec_id==AV_CODEC_ID_EAC3)audioAdapter.reset(new CastAudioAdapter(format,audio,origin,duration,[this]{check();},[this](int64_t seekUs){
+  check();if(!positionPlanValid || seekUs<=origin)return false;auto* track=format->streams[video];
+  auto cue=std::upper_bound(keys.begin(),keys.end(),seekUs,[&](int64_t at,int64_t stamp){return at<micros(stamp,track->time_base);});
+  if(cue==keys.begin())return false;--cue;if(cue+1==keys.end() && cue!=keys.begin())--cue;
+  if(api().av_seek_frame(format,video,*cue,AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_audio_indexed_seek_failed");check();return true;
+ }));
  Output out;out.begin(*this);
  if(out.packetHeader){
   if(api().av_seek_frame(format,video,keys.front(),AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_header_seek_failed");
@@ -266,12 +277,61 @@ void State::inspect(){
  }else init=out.bytes;
  codecs=codecDescription(out.format->streams[0]->codecpar);if(audio>=0)codecs+=","+codecDescription(out.format->streams[1]->codecpar);check();
 }
+// Bound total work for the *whole* request, including repeated canonical AAC
+// passes. These are I/O allowances, never buffer sizes or per-seek resets.
+uint64_t State::readBudget(int index)const{
+ constexpr uint64_t Floor=32ULL*1024*1024,Ceiling=128ULL*1024*1024,Slack=65536;
+ if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
+ // Unverified cue extents retain the original bounded reader/seek behavior.
+ // Only a verified adapted-EAC3 plan may raise the request allowance.
+ if(!audioAdapter || !positionPlanValid || positions.size()!=keys.size())return Floor;
+ uint64_t required=0;auto charge=[&](uint64_t n){if(n>Ceiling-required)throw Failure("mkv_source_working_set_limit");required+=n;};
+ auto* track=format->streams[video];
+ auto cueBefore=[&](int64_t us){auto it=std::upper_bound(keys.begin(),keys.end(),us,[&](int64_t at,int64_t stamp){return at<micros(stamp,track->time_base);});return it==keys.begin()?size_t(0):size_t(it-keys.begin()-1);};
+ auto afterPosition=[&](size_t cue){size_t at=cue+1;while(at<positions.size() && positions[at]<=positions[cue])++at;return at<positions.size()?positions[at]:sourceLength;};
+ auto pass=[&](size_t first,int64_t endUs,bool anchor){
+  size_t endCue=cueBefore(endUs);int64_t end=afterPosition(endCue),begin=anchor?0:positions[first];
+  if(end<begin)throw Failure("mkv_invalid_cue_position");charge(uint64_t(end-begin));charge(Slack);
+  // FFmpeg scans forward when seeking to the last index entry, before
+  // seeking back. Count that tail if it cannot be avoided.
+  if(!anchor && first+1==keys.size()){charge(uint64_t(sourceLength-positions[first]));charge(Slack);}
+ };
+ std::vector<int64_t> cached;for(auto& row:audioAdapter->cache)cached.push_back(row.first);
+ bool anchored=audioAdapter->clockAnchor!=AV_NOPTS_VALUE;
+ auto audioPass=[&](int64_t window){
+  const int64_t first=window*CastAudioAdapter::WindowFrames*CastAudioAdapter::FrameSize;
+  const int64_t total=audioAdapter->samples(duration),last=std::min(total,first+CastAudioAdapter::WindowFrames*CastAudioAdapter::FrameSize);
+  if(first<0 || first>=total)throw Failure("mkv_audio_window_range");
+  int64_t warm=first-CastAudioAdapter::WarmupFrames*CastAudioAdapter::FrameSize;
+  int64_t seekUs=origin+std::max<int64_t>(0,api().av_rescale_q(warm,{1,audioAdapter->Rate},AV_TIME_BASE_Q)-AV_TIME_BASE/2);
+  size_t start=cueBefore(seekUs);if(start+1==keys.size() && start>0)--start;
+  int64_t stopUs=origin+api().av_rescale_q(last+CastAudioAdapter::FrameSize*2,{1,audioAdapter->Rate},AV_TIME_BASE_Q);
+  pass(start,stopUs,window==0);anchored=true;
+ };
+ int64_t first=(audioAdapter->samples(starts[index])+CastAudioAdapter::FrameSize-1)/CastAudioAdapter::FrameSize;
+ int64_t last=(audioAdapter->samples(starts[index+1])+CastAudioAdapter::FrameSize-1)/CastAudioAdapter::FrameSize;
+ if(audioAdapter->knownEnd>=0)last=std::min(last,(audioAdapter->knownEnd+CastAudioAdapter::FrameSize-1)/CastAudioAdapter::FrameSize);
+ for(int64_t frame=first;frame<last;){int64_t window=frame/CastAudioAdapter::WindowFrames;
+  if(!std::binary_search(cached.begin(),cached.end(),window)){
+   while(cached.size()>=2)cached.erase(cached.begin());
+   if(window>0&&!anchored){audioPass(0);if(!std::binary_search(cached.begin(),cached.end(),0))cached.insert(std::lower_bound(cached.begin(),cached.end(),0),0);}
+   audioPass(window);cached.insert(std::lower_bound(cached.begin(),cached.end(),window),window);
+  }
+  frame=std::min(last,(window+1)*CastAudioAdapter::WindowFrames);
+ }
+ // Retain a conservative allowance for the old two-key lookahead fallback.
+ size_t start=videoBridge?size_t(index):(index>0?size_t(index-1):size_t(index));
+ size_t boundary=std::min(keys.size()-1,size_t(index)+2);
+ pass(start,micros(keys[boundary],track->time_base),false);
+ return std::max(Floor,required);
+}
 std::vector<uint8_t> State::segment(int index){
+ input->reset(index);
  deadline=Clock::now()+std::chrono::seconds(15);
  if(videoBridge){if(index==0&&!bootstrapVideo.empty()){check();return std::move(bootstrapVideo);}return videoSegment(index);}
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
  std::vector<CastAudioAdapter::Encoded> converted;
- if(audioAdapter)converted=audioAdapter->interval(starts[index],starts[index+1]);
+ if(audioAdapter){input->phase=Input::Audio;converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
  // Recover demuxer DTS before the requested cue; never infer new video DTS.
  const size_t seekIndex=audioAdapter && index>0?size_t(index-1):size_t(index);
  if(api().av_seek_frame(format,video,keys[seekIndex],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");
@@ -281,7 +341,14 @@ std::vector<uint8_t> State::segment(int index){
  for(;;){check();if(++readPackets>250000)throw Failure("mkv_packet_limit");int result=api().av_read_frame(format,packet.value);if(result==AVERROR_EOF)break;if(result<0)throw Failure("mkv_packet_read_failed");auto* p=packet.value;
   int source=p->stream_index;if((source!=video && source!=audio) || (source==audio && audioAdapter)){api().av_packet_unref(p);continue;}
   auto* stream=format->streams[source];if(out.packetHeader && source==audio)validateDolby(p,stream->codecpar->codec_id);if(p->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");int64_t at=micros(p->pts,stream->time_base);
-  if(source==video && (p->flags&AV_PKT_FLAG_KEY) && at>=end){if(boundary && at>end){api().av_packet_unref(p);break;}boundary=true;}
+  if(source==video && (p->flags&AV_PKT_FLAG_KEY) && at>=end){
+   // Adapted audio is already complete. AVC IDR / HEVC IDR_N_LP cannot
+   // leave earlier pictures after this exact next cue. HEVC RADL stays on
+   // the original lookahead path; preserve preceding-cue DTS recovery.
+   if(audioAdapter && size_t(index+1)<keys.size() && p->pts==keys[index+1] && closedPicture(p,stream->codecpar,true)){api().av_packet_unref(p);break;}
+   if(boundary && at>end){api().av_packet_unref(p);break;}boundary=true;
+  }
+  if(at>=end)input->phase=Input::Lookahead;else if(at>=begin)input->phase=Input::Selected;
   if(at<begin || at>=end){api().av_packet_unref(p);continue;}
   if(source==video && writtenVideo==0){if(!(p->flags&AV_PKT_FLAG_KEY) || p->pts!=keys[index])throw Failure("mkv_keyframe_mismatch");if(!closedPicture(p,stream->codecpar))throw Failure("mkv_open_gop_not_supported");}
   for(int n=0;n<p->side_data_elems;n++)if(p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO || p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
@@ -308,9 +375,9 @@ void State::configureVideo(std::unique_ptr<CastVideoBridge> bridge){
  videoBridge=std::move(bridge);videoConfigured=false;bootstrapVideo=videoSegment(0);
 }
 std::vector<uint8_t> State::videoSegment(int index){
- const auto workStarted=Clock::now();
+ input->reset(index);const auto workStarted=Clock::now();
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0||size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
- std::vector<CastAudioAdapter::Encoded> converted;if(audioAdapter)converted=audioAdapter->interval(starts[index],starts[index+1]);
+ std::vector<CastAudioAdapter::Encoded> converted;if(audioAdapter){input->phase=Input::Audio;converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
  auto* source=format->streams[video];auto* p=source->codecpar;auto csd=CastVideoSource::configuration(p);auto fps=source->avg_frame_rate.num>0?source->avg_frame_rate:source->r_frame_rate;auto sar=source->sample_aspect_ratio.num>0?source->sample_aspect_ratio:p->sample_aspect_ratio;
  std::ostringstream descriptor;descriptor<<"{\"video\":\""<<(p->codec_id==AV_CODEC_ID_HEVC?"hevc":"h264")<<"\",\"width\":"<<p->width<<",\"height\":"<<p->height<<",\"profile\":"<<p->profile<<",\"level\":"<<p->level<<",\"transfer\":"<<p->color_trc<<",\"primaries\":"<<p->color_primaries<<",\"matrix\":"<<p->color_space<<",\"range\":"<<p->color_range<<",\"fps_num\":"<<fps.num<<",\"fps_den\":"<<fps.den<<",\"sar_num\":"<<sar.num<<",\"sar_den\":"<<sar.den<<"}";
  if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("cast_hw_video_seek_failed");
@@ -324,6 +391,7 @@ std::vector<uint8_t> State::videoSegment(int index){
    for(int n=0;n<q->side_data_elems;n++)if(q->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO||q->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
    if(q->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");auto* track=format->streams[stream];int64_t at=micros(q->pts,track->time_base);
    if(stream==video&&(q->flags&AV_PKT_FLAG_KEY)&&at>=end){if(boundary&&at>end){api().av_packet_unref(q);break;}boundary=true;}
+   if(at>=end)input->phase=Input::Lookahead;else if(at>=begin)input->phase=Input::Selected;
    if(at<begin||at>=end){api().av_packet_unref(q);continue;}
    if(stream==video){if(first){if(!(q->flags&AV_PKT_FLAG_KEY)||q->pts!=keys[index]||!closedPicture(q,p))throw Failure("mkv_open_gop_not_supported");first=false;}videoBridge->offer(CastVideoSource::accessUnit(p,q),at-origin);}
    else if(!audioAdapter){if(q->size<=0||q->size>65536||passthrough.size()>2000)throw Failure("cast_hw_audio_packet_limit");AudioPacket a{std::vector<uint8_t>(q->data,q->data+q->size),q->pts,q->dts,q->duration,q->flags,{}};for(int k=0;k<q->side_data_elems;k++){auto& side=q->side_data[k];if(side.type==AV_PKT_DATA_NEW_EXTRADATA)throw Failure("cast_hw_audio_configuration_changed");if(side.size>65536||a.side.size()>16)throw Failure("cast_hw_audio_side_limit");a.side.push_back({side.type,std::vector<uint8_t>(side.data,side.data+side.size)});}passthrough.push_back(std::move(a));}
@@ -393,6 +461,8 @@ extern "C" JNIEXPORT jlong JNICALL Java_com_projectinfinity_kodi_InfinityCastRem
 extern "C" JNIEXPORT jstring JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_inspect(JNIEnv* e,jclass,jlong h){try{auto s=get(h);std::string problem;try{s->inspect();}catch(const Failure& f){problem=f.what();}std::string result=s->describe();result.pop_back();result+=",\"status\":\""+std::string(problem.empty()?"ok":"error")+"\",\"reason\":\""+problem+"\"}";return e->NewStringUTF(result.c_str());}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT jstring JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_configureVideo(JNIEnv* e,jclass,jlong h,jobject video){try{auto s=get(h);s->configureVideo(std::unique_ptr<CastVideoBridge>(new JniVideo(e,video)));return e->NewStringUTF(s->describe().c_str());}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT jbyteArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init(JNIEnv* e,jclass,jlong h){try{return bytes(e,get(h)->init);}catch(const std::exception& x){error(e,x.what());return nullptr;}}
+extern "C" JNIEXPORT jlong JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_readBudget(JNIEnv* e,jclass,jlong h,jint n){try{auto s=get(h);if(s->cancelled.load())throw Failure("mkv_cancelled");s->input->reset(n);return jlong(s->readBudget(n));}catch(const std::exception& x){error(e,x.what());return 0;}}
+extern "C" JNIEXPORT jlongArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_sourceStats(JNIEnv* e,jclass,jlong h){try{auto s=get(h);auto& i=*s->input;jlong values[]={i.fragment,jlong(i.consumed[0]),jlong(i.consumed[1]),jlong(i.consumed[2]),jlong(i.consumed[3]),jlong(i.seeks),jlong(i.errors)};auto result=e->NewLongArray(7);if(result)e->SetLongArrayRegion(result,0,7,values);return result;}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT jbyteArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment(JNIEnv* e,jclass,jlong h,jint n){try{return bytes(e,get(h)->segment(n));}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT void JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel(JNIEnv*,jclass,jlong h){try{get(h)->cancelled=true;}catch(...) {}}
 extern "C" JNIEXPORT void JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close(JNIEnv*,jclass,jlong h){std::shared_ptr<State> last;{std::lock_guard<std::mutex> lock(handlesMutex);auto i=handles.find(h);if(i==handles.end())return;last=i->second;last->cancelled=true;handles.erase(i);}}
