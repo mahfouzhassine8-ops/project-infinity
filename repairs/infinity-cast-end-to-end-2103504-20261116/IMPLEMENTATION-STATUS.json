@@ -12,7 +12,7 @@
   "initial_ARM64_run": 43984653966,
   "initial_ARM64_artifact": 14284442661,
   "initial_ARM64_status": "PASS for initial source; superseded by later cue-DTS fix, not final release input",
-  "next": "Updated Cast-only ARM64 link then separate-package Android encoder/JNI/relay test",
+  "next": "Actual Android encoder/JNI/relay gate",
   "DEX_rebuilt": false,
   "Kodi_rebuilt": false,
   "owner_APK_signed": false,
@@ -21,5 +21,9 @@
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a592c6459b75a257b834dd5fd6a404e022f63b0f77664da35116c1e52ff2c24",
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef"
   },
-  "EOF_lookahead_case": "PASS198144source_samples; two-packetpartialwindow, final512samples"
+  "EOF_lookahead_case": "PASS198144source_samples; two-packetpartialwindow, final512samples",
+  "final_ARM64_run": 43993371947,
+  "final_ARM64_artifact": 14288492703,
+  "final_ARM64_status": "PASS_CAST_AUDIO_ARM64_LINK_AND_EXACT504_ABI",
+  "new_library_sha256": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52"
 }
