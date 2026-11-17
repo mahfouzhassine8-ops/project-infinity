@@ -1,5 +1,5 @@
 {
-  "source_commit": "5639eff6464cdf065852e1da5f85d5adb67d218f",
+  "source_commit": "0872617fc6befe4bfa2d093076dc55326c671c2a",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -13,9 +13,9 @@
   "inputs": {
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "08f34599d5b54f89f70318d39a39825e6f79a1258fe9f9fae4ca3da47f86eaaf",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "c1f226fd844bf65cbc3a73da8032cacba80df025c9a520aa0230a206feec1077",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "2e4133875d0438c339239380b6bc88b925bacbda3e26888f0adc0fd02fab2076",
-    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "45f1f1897a41e4a447ac3f2e78c1b27077041b59c15447da5836c91f86f1d93e",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/InfinityCastProbeActivity.java": "d279da2ce1510767d92863484e9861c0df34a50cbebd48789c88e31c42e96d11",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_pipeline.py": "507f384d1ca1c1dd6d97365d76ce27b3dce08b73c0f1d4742ac48533e87b199b",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "527a0b1667975cbb2eff3e0a60c09b2ae84e116a4ff1a550b9c696361ff06bda",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/run_pipeline.py": "8c2b45e4e8e2debe4fea7e02a77f0ff07287668dd927b13baa8ac58a0426157e",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/tests/VideoContractTest.java": "a6e3c064cfa9216ab089d349f56c3285d99e684c331bde00b60504b18158cca8",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastAdaptive.java": "aa0b978cf26910ace0919b221a7e03888b36602621cae117fe2b3a808dabce08",
@@ -37,11 +37,14 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java": "9475ee0bbe1b98fb33ad6e8cc59782de6621154f5f07ea4d4260221ffc322b8f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastVideoContract.java": "e10620da86baa7a8b1dfbbe3ccb6bf31dbd46a2d23aa93d90dc297b05a5692dc",
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "8a89f7fc22aa42e3692aea4f4afe71834ddce2cc8516e717b0adc4af64c1797b",
-    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6"
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "7e232f2964ec8ba9ff27c4259963308ee2cf860507edaf393f4d3f4dcd20f2f6",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/android/HlsServer.java": "76b4cf54529486c582a0b436bf834c281693bfb6555b372972a1c622fc53549f",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/tests/android/MkvHlsPlayerProbe.java": "9b00aafb3518b433b4183beef89231389fe6126cd1f07754b7f1b9a7db7bcee8"
   },
-  "selected_case": "real ARM64 existing506 FFmpeg demux/AAC -> new MediaCodec EGL AVC -> fMP4 actual Android decode/seek/cancel; CI small software only",
+  "selected_case": "Actual HLS playback and2.5s seek mapping, AAC packet equality, current bounded avcC parser; retain first conversion/cancel evidence",
   "engine_build": false,
   "owner_APK": false,
   "shutdown": false,
-  "previous_run_cancelled_before_compilation": 44034010331
+  "previous_run_cancelled_before_compilation": 44034010331,
+  "retained_first_pipeline_run": 44034181964
 }
