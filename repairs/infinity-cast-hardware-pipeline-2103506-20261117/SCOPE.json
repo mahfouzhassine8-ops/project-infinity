@@ -1,0 +1,45 @@
+{
+  "foundation": 2103506,
+  "foundation_APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d",
+  "baseline_artifact": {
+    "run": 44003667211,
+    "id": 14292668883,
+    "name": "Infinity504-Cast-Audio-OriginalSigned-44003667211-QA",
+    "size_in_bytes": 330974872,
+    "digest": "sha256:5c149a9a5bfac7cf1d8768c8f5824e2e6a60ee6848927f4110d1ea95a9ffbd1c",
+    "source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+    "workflow_id": 397702717,
+    "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
+  },
+  "protected_baseline": 2103504,
+  "checkpoint": "8da1eb3b",
+  "existing_allowed": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "3923a17c829a97f69538c75c180c3e63e63a6ca5161a774830e0e04d66280e49",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "fcf697d125a596173be726e7674b8f1a2698f218fa8433559a88a211992fa4d8",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "91904ea45297778523d95ee5d45a614179dfd02be285751d52a8eb42b11f353c",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "a6a5f5a6b4a181b96fbe849fbdb20fed82edab19c90a2e7fdb3abcdbc67fb879",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "2b8e321e6a544101ebe121d5a9d416b0931b24e49ddcfdfeb078a15d74c5f6e3"
+  },
+  "new_Cast_owned": [
+    "InfinityCastHardwareVideo.java",
+    "InfinityCastGpuSurface.java",
+    "CastVideoAdapter.h",
+    "InfinityCastVideoContract.java"
+  ],
+  "selected_tests": [
+    "Host packet/config parsing, timestamp/frame-selection/fragment mux integration and unchanged direct-copy/AAC preservation",
+    "Android small synthetic MediaCodec\u2192EGL\u2192AVC pipeline, AAC/fMP4 playback, adjacent/out-of-order/seek, cancellation and release; private separate CI package allows bounded small software backend for correctness only",
+    "Production hardware-only codec/profile/raster/rate selection; concurrent configure, sample throughput and thermal checks with truthful physical qualification pending",
+    "Focused Cast ARM64/JNI and exact source/APK preservation, original-signed install-over QA/recovery when justified"
+  ],
+  "Kodi_rebuild": false,
+  "unrelated_DEX_rebuild": false,
+  "shutdown_test": false,
+  "owner_data_access": false,
+  "software_4K_conversion": false,
+  "physical_TV_success": "NOT_CLAIMED",
+  "orchestration_allowed": [
+    ".github/workflows/infinity-504-cast-audio-android.yml"
+  ],
+  "orchestration_reason": "Add only selected pipeline probe; do not rerun prior inventory/audio jobs. No app behavior from workflow."
+}
