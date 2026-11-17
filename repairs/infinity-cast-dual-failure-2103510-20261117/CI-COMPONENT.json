@@ -15,8 +15,8 @@
   "inputs": {
     ".github/workflows/infinity-506-cast-component.yml": "d8c8ee9ac5a88fdb09af278c54621f7fb0c789ed77e66325cefadc2b4e5bdfbe",
     "repairs/infinity-cast-dual-failure-2103510-20261117/COMPONENT-WORKFLOW-REVIEW.json": "4c9f7bc862e69d72a618b15628bea42f19f93c89c2ac4748379ef58892633a5c",
-    "repairs/infinity-cast-dual-failure-2103510-20261117/SCOPE.json": "2eac4c5dc882aa10ed4e595a19224b3977f646df20b25a2feb1af05163ed4143",
-    "repairs/infinity-cast-dual-failure-2103510-20261117/SOURCE-REVIEW.json": "01d8b5fdd61b8cc9f50127ccfa1b98bddcb0e07582128b12eedc9d62582fc202",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/SCOPE.json": "1f5643d24664fcaafe1d9d6058c66fa83e6e775677c9cd3ca3e862db39fd39e9",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/SOURCE-REVIEW.json": "bce24c910442262abc9708bd4726a67778622e193813ea37fc70f6fdd5dc4398",
     "repairs/infinity-cast-dual-failure-2103510-20261117/build_component.py": "70a45eb1b8c59ebf757c6cc6fcc1f8f81a97e3ff633c627bef5c4e8580afd209",
     "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "61e826157514b1b0a3c75df5ff421346ddc46ce6744e5ca3674991a1397cc3a2",
     "repairs/infinity-cast-hardware-pipeline-2103506-20261117/build_component.py": "8448af8a7ee3bc1387207ff57f61a393ce088bc2978cd3139117f6d366d3982b",
@@ -27,7 +27,7 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastDialog.java": "a9c48ec8cd46a71bc5eebb59feee0a4dd787ab119fad3dbfbf40aaedf2e39509",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGateway.java": "16fbce1a967ebc837d058897c85426a016cce7717b98130936c6ce7c1d2bcbb6",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGpuSurface.java": "18df824f76be2c304ce94e45c37235e4cb95b5ec072e0e2b27a81b4566639c81",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "65b16cfa0628a9e6e328af9d404c981a024dc0bb49dd18cd7a9cd69ed40e4f8f",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "cf41f1f690f97eff14533d0117cfc5306989dc8f9559d6e9f79961b98bb1cb39",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastNative.java": "5dd3337db1223b8a0c4fd5d7d848831eca9366f8eeb947ace8d6b044f5992e9f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastOptions.java": "25dd3ed885327e665c6541206cc08889dfddd33c15e60c428ad736c604bd8415",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastReceiverPolicy.java": "400e82272970e1c78fde9fd0cb5efd77a236c1de6f476cd3f43f513b7074a8bf",
@@ -39,8 +39,9 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSource.java": "9475ee0bbe1b98fb33ad6e8cc59782de6621154f5f07ea4d4260221ffc322b8f",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastVideoContract.java": "e10620da86baa7a8b1dfbbe3ccb6bf31dbd46a2d23aa93d90dc297b05a5692dc",
-    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "a87e9374d91c7acf459293388f6be533df4e71a406a35ff7012f10e32c758dba"
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "c6e9644be7ba3b48c08abbff6ee6b7c4eaa7c797b74c8dc5d1246488bc9707c0",
+    "repairs/infinity-cast-dual-failure-2103510-20261117/RADL-REVIEW.json": "9331a6282c1558c5ba7bb5163f0657602aebf5d5d916c4b54fc08e97e6c8e946"
   },
-  "selected": "Changed Cast DEX only; exact signed510 baseline, original SDK/resource/dependency pins and external API checks; no engine/native compilation or signing.",
-  "source_commit": "b829d90cc3eff8a478952a0247d25fd4dd5a9e92"
+  "selected": "Affected Cast DEX rebuild required by reviewed HardwareVideo receipt correction; exact510 original resources/dependencies/API; noengine/native/signing.",
+  "source_commit": "4ee28517c53c4cd03447bc85b93b70ffab37e68f"
 }
