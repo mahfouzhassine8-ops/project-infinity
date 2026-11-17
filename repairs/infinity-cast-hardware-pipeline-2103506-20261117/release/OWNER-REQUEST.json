@@ -1,0 +1,92 @@
+{
+  "baseline_APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d",
+  "versions": {
+    "candidate": 2103508,
+    "recovery": 2103509
+  },
+  "generations": {
+    "candidate": 93,
+    "recovery": 94
+  },
+  "parent_generation": 92,
+  "parent_authority_sha256": "d70693a838137b6519427add1dcc862ebf38f7d7f0b503f3c7906c2aa053e5c8",
+  "workflow_sha256": "cd33922a249c4c6fe87047540e86bce4f4bc25c288847de2e11b85a785a69522",
+  "source_bindings": {
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/register_hardware.py": "f66041db417a0869a38d44e3aa23be3138c66e831b7b1bbac12ce078f6a0e52d",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/owner_bundle.py": "c3fa354c8dacdd7d67a79967eb115bd5901b65701b80be8a45bb0cc86e17f705",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/CATALOG-ROWS.json": "d0b156d0bb3d3a53692c069487cd46ef5b66bdb9f46f046c7439416c3c49fdfb",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/CATALOG-REVIEW.json": "70e355e50cdf851c10de4727083f06dbaa6fe50fc56cc3bdcdfa15b86e650109",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/WORKFLOW-REVIEW.json": "63c5e50cb7c8568b0b3f5c88130a53847afc9e7661963074e32b33db3f09eeef",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/ROOTS-REVIEW.json": "fa16f646f4627cea706675ff3c729def576794857dfcee2ad0413b2d7cea543c",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/CAST-CLASS-DELTA.json": "893b04df56df95e61f71d2d78d7f4f533dce27d96a13b677fd62c34252066d5e",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9"
+  },
+  "base": {
+    "run": 44003667211,
+    "id": 14292668883,
+    "name": "Infinity504-Cast-Audio-OriginalSigned-44003667211-QA",
+    "size_in_bytes": 330974872,
+    "digest": "sha256:5c149a9a5bfac7cf1d8768c8f5824e2e6a60ee6848927f4110d1ea95a9ffbd1c",
+    "source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+    "workflow_id": 397702717,
+    "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
+  },
+  "stage": {
+    "run": 44052030761,
+    "id": 14313483704,
+    "name": "Infinity506-Cast-Hardware-44052030761-UNSIGNED-NOT-INSTALLABLE",
+    "size_in_bytes": 646714182,
+    "digest": "sha256:75a6c84002f089dfa8c5923f52fa53e33e14f58de8075afbbc281646d01725f3",
+    "source": "e897508f5bfa4addd3e682f0def2ab9504875949",
+    "workflow_id": 421117469
+  },
+  "owners": {
+    "run": 44002750819,
+    "id": 14292448624,
+    "name": "Infinity504-Cast-Audio-Prepared-44002750819",
+    "size_in_bytes": 1284213595,
+    "digest": "sha256:b9d49008e6c71fe852e69ef15bff15de3616b939dc73fb40a266168d8a48d512",
+    "source": "e4dc5cbdf7500fc2058de687c698c4a5b8a5dcbf",
+    "workflow_id": 397702717
+  },
+  "expected_changes": {
+    "candidate": {
+      "AndroidManifest.xml": {
+        "before": "f34629925677a9746289cf9a167945bd0ff96498268bb9d764ad4639e7ec86e0",
+        "after": "1edfe41b8e7eb2f088f79df238a1a5c6c8bd8750a233da86b98e195672321068"
+      },
+      "lib/arm64-v8a/libinfinitycastremux.so": {
+        "before": "934bb1dab8d0cfd8ede7fc8cb692aefc887cf34df89b75875d7d81b1d1095a52",
+        "after": "993f0106d77aaeb34ff178c87b73c8af5861d5c296f201933e07cb45fdd10da3"
+      },
+      "assets/experience-component-updates.properties": {
+        "before": "2740e0aa4c14c44304ef0f18591a5d93c2bae72b2ec3d8212c5c0a24042408e1",
+        "after": "c4045cc1ee967a9fc47c41afb57c0f107c2e347784a385e2bc0127bd6a99287a"
+      },
+      "classes6.dex": {
+        "before": "4360efcdf3af08a8388f18846c79353517ab3d7ee6a3c026838b7748c0914c98",
+        "after": "1d18a6e858b9315dad488957c3d3925eb6659c4a7279220184e6df4db4651546"
+      }
+    },
+    "recovery": {
+      "AndroidManifest.xml": {
+        "before": "f34629925677a9746289cf9a167945bd0ff96498268bb9d764ad4639e7ec86e0",
+        "after": "8927045ca6ec72d0bde4c789329e7db0e5ac7c01bf8929a093ea4b8fe30b2be3"
+      },
+      "assets/experience-component-updates.properties": {
+        "before": "2740e0aa4c14c44304ef0f18591a5d93c2bae72b2ec3d8212c5c0a24042408e1",
+        "after": "ed95bfcdcb62005c492092f2bd95c939d9e38ba1f1facca82e86bd46694211bc"
+      }
+    }
+  },
+  "accepted_pointer_updated": false,
+  "known_limitations": [
+    "Physical Fold hardware throughput/concurrent codecs, OEM HDR-to-SDR behavior, thermal sustainability and actual TV playback NOT_VERIFIED. Runtime selects genuine hardware codecs and fails closed on unsupported or insufficient performance; no CPU4K fallback.",
+    "Selected actual Android production DEX/privateRelay/HLS output media and seek/cancel passed on emulator with bounded test-only software backend. This is media/lifecycle evidence, not Fold hardware qualification.",
+    "Known SDR709 supported. HDR conversion requires confirmed source HDR metadata and supported decoder SDR709 tone mapping; Main10 alone is not classified as HDR. Unsupported/ambiguous colors fail closed.",
+    "Actual provider HEVC profile/level/raster/FPS plus concurrent hardware configure and measured segment budget must qualify on physical device. Compatible4K direct HEVC preserved; H264 conversion targets720p<=30fps only when necessary.",
+    "Phone return and sustained TV playback pending consolidated owner acceptance. Shutdown NOT_SELECTED; protected engine/shutdown code unchanged.",
+    "Recovery509 restores signed506 content at higher version, including prior Cast DEX/nativeSO. Protected504 unchanged, all prior artifacts retained."
+  ],
+  "review_sha256": "5eea76311aef845201dfb3be7266d538fe9030833cb588e7179ac47162ae6c46"
+}
