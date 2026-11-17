@@ -1,0 +1,72 @@
+{
+  "status": "PASS_UNSIGNED_CAST510_DUAL_STAGE",
+  "source": "3441607e2356d8c1077b0ad20ab629f00b29c6d3",
+  "baseline_APK_sha256": "8fd4d06d4a93b29764d4820bd6000795562411802fb52a402e1b3b2ddaa93ab0",
+  "versions": {
+    "candidate": 2103512,
+    "recovery": 2103513
+  },
+  "payloads": {
+    "candidate": {
+      "APK_sha256": "870cdeec746825c70e7f3bb0f51ccb603e5fc9069a337efaef5ee72545d22a8e",
+      "versionCode": 2103512,
+      "changes": {
+        "lib/arm64-v8a/libinfinitycastremux.so": {
+          "before": "a852d6b5e8eabd85c77a1e9e8d0209830f0b7e9392d9864b7b6ae07ebb8ae6f3",
+          "after": "fcd75bd6b331b0dde303c1abb8b52960157bebe1375824eaa85e39103d683a84"
+        },
+        "classes6.dex": {
+          "before": "c013492e2f2fdf8e950d57519d0dca8af3a7fb4a116482fdff73689cf9e976ee",
+          "after": "685d744bfcb9ecc28f0e948a9c8882cb835dff2e9d0a494c7b6768bff30b01ee"
+        },
+        "assets/experience-component-updates.properties": {
+          "before": "5b8367e6855730c3aa64715e40ec837c4eed9710a93e463d23b73fd76c27c500",
+          "after": "fdcc9eb7500c3386f8534da9097638bd2b154f10e7e22368439bc1ebf084aae3"
+        },
+        "AndroidManifest.xml": {
+          "before": "6c32e6eb125fbbfe4146ac650fcffaaadc4be5a066c7b148feb5f99162b7d1fb",
+          "after": "fb61752b0603ec3609f57dcee9fd09704cea5b811fc21d6b1c53d5558ffaf547"
+        }
+      },
+      "unchanged_members": 7773
+    },
+    "recovery": {
+      "APK_sha256": "cf6293193761a9aea734d6802d322050108f8d30f4dde5d0cbf84e4a720bc770",
+      "versionCode": 2103513,
+      "changes": {
+        "assets/experience-component-updates.properties": {
+          "before": "5b8367e6855730c3aa64715e40ec837c4eed9710a93e463d23b73fd76c27c500",
+          "after": "14b8ccce226dbface7e6bb40104db70d707c73727c2e08d95397f1201d86651c"
+        },
+        "AndroidManifest.xml": {
+          "before": "6c32e6eb125fbbfe4146ac650fcffaaadc4be5a066c7b148feb5f99162b7d1fb",
+          "after": "379c46e5311e9718723ff337d63273ca94a70c31f27069512931f6b93749e552"
+        }
+      },
+      "unchanged_members": 7775
+    }
+  },
+  "Android_artifact": {
+    "run": 44108970398,
+    "id": 14341035587,
+    "name": "Infinity510-Cast-Dual-Failure-44108970398-EVIDENCE-ONLY",
+    "size_in_bytes": 11978327,
+    "digest": "sha256:4c9c32a5c1884621d09be1a4081fada9ca84de084b1758ca3ffabafd4055edbe",
+    "source": "10ba0a3bbd0beeaafec394e55ad8c892dc07e9b3",
+    "workflow_id": 421009620
+  },
+  "component_artifact": {
+    "run": 44103962682,
+    "id": 14336964280,
+    "name": "Infinity510-Cast-Dual-Failure-Component-44103962682-NOT-INSTALLER",
+    "size_in_bytes": 839499,
+    "digest": "sha256:c4a6cbf38717a863b690ddc601d482fdcd4851a99ff538b9fb21b930f8ba94b2",
+    "source": "e5875053d3a3a77e7af6f34f46cf8b6b8e9eb3eb",
+    "workflow_id": 421031076
+  },
+  "Cobra": "BYTE_UNCHANGED",
+  "Kodi_other_DEX_modules_resources": "BYTE_UNCHANGED",
+  "owner_data": "NOT_ACCESSED",
+  "signed": false,
+  "physical_hardware_TV": "PENDING_OWNER"
+}
