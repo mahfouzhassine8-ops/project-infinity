@@ -1,0 +1,52 @@
+{
+  "baseline_versionCode": 2103506,
+  "signing": false,
+  "registry_write": false,
+  "baseline": {
+    "run": 44003667211,
+    "id": 14292668883,
+    "name": "Infinity504-Cast-Audio-OriginalSigned-44003667211-QA",
+    "size_in_bytes": 330974872,
+    "digest": "sha256:5c149a9a5bfac7cf1d8768c8f5824e2e6a60ee6848927f4110d1ea95a9ffbd1c",
+    "source": "39d29d6a1d92c71ac3e6f4746d82ae5467dc7db2",
+    "workflow_id": 397702717,
+    "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
+  },
+  "Android": {
+    "run": 44044730674,
+    "id": 14310379586,
+    "name": "Infinity506-MediaCodec-Pipeline-44044730674-EVIDENCE-ONLY",
+    "size_in_bytes": 5632580,
+    "digest": "sha256:f21e72ea9b814adefff96e5da69fbd33dbb9e01c716024d230d2b6492c35066b",
+    "source": "8faf1a05c1093812493f4f205c867e373d9176a2",
+    "workflow_id": 421009620
+  },
+  "component": {
+    "run": 44039053105,
+    "id": 14308522648,
+    "name": "Infinity506-Cast-Component-44039053105-NOT-INSTALLER",
+    "size_in_bytes": 836098,
+    "digest": "sha256:946e61bb6de4f6f64147fa6981a0e33b6b8fba61b86b18f0eb4d34cde2eaeb71",
+    "source": "94bcfcee1601b4992b72734ca676d8bc83d61d0a",
+    "workflow_id": 421031076
+  },
+  "versions": {
+    "candidate": 2103508,
+    "recovery": 2103509
+  },
+  "inputs": {
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/release/stage.py": "69584b56a54aa2e8a5b3666c0cad016b08935dfb4a11dea4be53f5623453a306",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/SCOPE.json": "19564371de791d42830bbf9b6fbd4ba8ac9fcb5cca9d9329803c3b30de0acdc7",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/tests/verify_android_media.py": "a23559ff1d88344443c717f84ef89df7cdadb1ca8aefb00ed4ac359891429f27",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "519c3690d43853ca2f9d41e8ba6984b12d04e02659da10456bb56173439d8bc1",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/CAST-CLASS-DELTA.json": "893b04df56df95e61f71d2d78d7f4f533dce27d96a13b677fd62c34252066d5e",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "925267efe4d6b8be020ff474eea690eb439344bfb15b04653e6f8be71fef1225",
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml": "e8a5bd36ef9ce6f170e39d93586ca39cb07e0654fbf7416061c402e1ad905982"
+  },
+  "parent_authority_sha256": "d70693a838137b6519427add1dcc862ebf38f7d7f0b503f3c7906c2aa053e5c8",
+  "class_delta_sha256": "893b04df56df95e61f71d2d78d7f4f533dce27d96a13b677fd62c34252066d5e",
+  "source_commit": "63173718a346a0c98005a1e56b64a8e51034ca32",
+  "review_sha256": "a316f36cf3ca73490732ae709991cb66b51f1088dc03b8a7f58e649828b530bd"
+}
