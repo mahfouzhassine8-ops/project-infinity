@@ -1,5 +1,5 @@
 {
-  "source_commit": "005f8f774a27633a6aff929e5e3625107f4d8593",
+  "source_commit": "46f5ee992f292e24c388f1d4a2cfdfe358b81522",
   "baseline": {
     "run": 44003667211,
     "id": 14292668883,
@@ -11,17 +11,19 @@
     "APK_sha256": "2d0f6fa80926243934270816fdfc5f83e7ba5f421fd7882a352686999a9eae1d"
   },
   "inputs": {
-    "repairs/infinity-cast-receiver-2103506-20261117/build_probe.py": "dedb7f506f407e84f30af0441519b84ea3a7ac537cce84cce5a433a4f8e92539",
-    "repairs/infinity-cast-receiver-2103506-20261117/run_probe.py": "91e84ef3163f4df80bc54a1fe7979dea1aa6063b81df23c11d80292182e723fa",
+    "repairs/infinity-cast-receiver-2103506-20261117/build_probe.py": "ad4904126d7e14f8eb4192f75058778ba2eccb990b61cc2c10277643733b8eeb",
+    "repairs/infinity-cast-receiver-2103506-20261117/run_probe.py": "f80bbe0056397cc80121e20663f9f0fb0aa578d156631362ea1d25d3317c7118",
     "repairs/infinity-cast-receiver-2103506-20261117/android/ReceiverHardwareProbe.java": "f47715664330faec577b38563a18788e91538e02a90b1ca9e4447abfaa80fdb5",
     "repairs/infinity-cast-receiver-2103506-20261117/android/loader.cpp": "22a2302d68e067c1f3fb80240ae7053caf0955fee33119ffcc69ca837f5e6000",
     "repairs/infinity-cast-receiver-2103506-20261117/SCOPE.json": "c79a4a95a0c264bcbe328f3b71e32f15e2433f366a320a81e86c15b37cc2d0ba",
     ".github/workflows/infinity-504-cast-audio-android.yml": "44e3178ce3b05bc2217163c67eae7bb9cb7ea15b38b5b64e0038325ec803b647",
     "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "a6a5f5a6b4a181b96fbe849fbdb20fed82edab19c90a2e7fdb3abcdbc67fb879",
-    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef"
+    "repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h": "1375ad90dcfa5271291d884f6fbac6867508f7ae56fe56f9046d5c505b61b6ef",
+    "repairs/infinity-cast-receiver-2103506-20261117/CAST506-METADATA-ARM64.json": "15a615f76765d5cebae2feed01940464385416fe8759485c7f9baff78eb237a7"
   },
   "selected_case": "Actual506_engine_codecs_and_Android_hardware_inventory_only",
   "owner_APK": false,
   "shutdown": false,
-  "engine_build": false
+  "engine_build": false,
+  "previous_run": 44022664950
 }
