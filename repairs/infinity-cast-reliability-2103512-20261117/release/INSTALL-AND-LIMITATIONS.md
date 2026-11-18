@@ -6,8 +6,9 @@ One Fold/receiver acceptance session:
 
 1. Play the provider movie, select Onn 4K, and confirm sustained television video and sound through several fragments. Exercise pause/resume and a distant seek.
 2. Repeat on Nest Hub Max. Check the 720p hardware path, synchronization and sustained delivery. Codec, thermal, read and resource guards remain enforced.
-3. Use Return to Phone, then check position, local controls and Continue Watching. Check cancellation and disconnect after an interrupted transfer.
-4. Perform normal Exit and same-profile relaunch. Confirm existing settings/add-ons/data and Cobra remain intact.
+3. Use Return to Phone, then check position and local controls. Check cancellation and disconnect after an interrupted transfer.
+
+Shutdown/relaunch and broader non-Cast physical checks were not selected in this engineering run. Their code and packaged members remain preserved; their physical behavior is not claimed verified by these tests.
 
 Engineering checks passed for complete 14 MB resources, authenticated HTTP/ranges, target prebuffer ownership, coalesced seeks, native cancellation, source video timestamps and the canonical AAC sample clock. The Kodi engine was reused unchanged. Tests used actual ARM64/JNI and Android MediaCodec/EGL with explicitly bounded CI media; they do not qualify physical Fold Main10 throughput, thermal behavior or television playback.
 
