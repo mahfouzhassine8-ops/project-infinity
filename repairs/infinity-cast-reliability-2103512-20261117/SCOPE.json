@@ -13,7 +13,8 @@
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "5db76e3a9365750d3f9e5cd3a9987edcdce13167f68df88e2176b060729ccea0",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "cf41f1f690f97eff14533d0117cfc5306989dc8f9559d6e9f79961b98bb1cb39",
     "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastVideoContract.java": "e10620da86baa7a8b1dfbbe3ccb6bf31dbd46a2d23aa93d90dc297b05a5692dc",
-    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGpuSurface.java": "18df824f76be2c304ce94e45c37235e4cb95b5ec072e0e2b27a81b4566639c81"
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastGpuSurface.java": "18df824f76be2c304ce94e45c37235e4cb95b5ec072e0e2b27a81b4566639c81",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "f290b56c78559285052e7e90ede3c60d976667a1db5c1230cc0342f4416dc329"
   },
   "scope": "IntegratedCastreliabilityonly. BeforeadditionalCastfileeditamendexplicitallowlist. No symptom-release ordiagnostic-onlyAPK. Preservepreviousverifiedcorrections.",
   "selected_tests": [
@@ -26,5 +27,15 @@
   "engine_rebuild": false,
   "shutdown": false,
   "prohibited": "Cobra,Search,Watchlist,ContinuePlaying,shutdown,VideoLock,UIoutsideCast,settings,data,globalnetwork,providers,unrelatedengine/runtime",
-  "safety": "Keep128MiBrequestsourceceiling,actualreadaccounting,packet/deadline/malformed/DRM/auth/TLS guards; no quotaresetsperseek orCPU-only4K fallback. Boundedresourcearchitecturemustbeindependentlyreviewed. No physicalperformance/pass claimfromemulator."
+  "safety": "Keep128MiBrequestsourceceiling,actualreadaccounting,packet/deadline/malformed/DRM/auth/TLS guards; no quotaresetsperseek orCPU-only4K fallback. Boundedresourcearchitecturemustbeindependentlyreviewed. No physicalperformance/pass claimfromemulator.",
+  "new_allowed_Cast_source": [
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastResource.java"
+  ],
+  "storage_policy": "RAM-onlyimmutable64KiBresourcepages,64MiBaggregate includingunpublished/pinned;32MiBsourcecache;no ownerfiles/databases/diskcache",
+  "origin_budget_policy": "128MiBwhole-requestphysicaloriginingress cap unchanged; cachedreplay separatelybounded512MiB/time/packetguards, neverresetbyseek; reportallseparately",
+  "orchestration_allowed": [
+    ".github/workflows/infinity-506-cast-component.yml",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml"
+  ]
 }
