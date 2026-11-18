@@ -12,7 +12,7 @@
 - **APK SHA-256:** `4bfe67cf9d3edefdc1d3e04accc826089b314e043a8dd98dba206cd1924a1d8c`
 - **Release:** https://github.com/mahfouzhassine8-ops/project-infinity/releases/tag/infinity-2103514-fast-qa
 - **Direct APK:** https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103514-fast-qa/Infinity-2103514-Combined-Original-Signer.apk
-- **Immutable release/source tag ref:** `refs/tags/infinity-2103514-fast-qa` → source/authority commit `a70aaaec062eac447556d22325affef9d8d496ec` at the time of this lock
+- **Recorded release/source tag ref:** `refs/tags/infinity-2103514-fast-qa` → source/authority commit `a70aaaec062eac447556d22325affef9d8d496ec` at the time of this lock
 - **Original signing certificate SHA-256:** `d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7`; reported v1/v2/v3 verification PASS
 - **Verification bundle:** https://github.com/mahfouzhassine8-ops/project-infinity/releases/download/infinity-2103514-fast-qa/INFINITY-2103514-QA-VERIFICATION.zip
 - **ARM64 / selected Android media workflow:** https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/44230184774 — PASS
