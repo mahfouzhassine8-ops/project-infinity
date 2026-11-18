@@ -21,7 +21,16 @@ def reuse(c,row,work):
  assert proof['status']=='PASS_CAST512_INTEGRATED_ARM64_LINK' and proof['baseline']==2103512 and proof['engine_rebuilt'] is False
  root=Path(__file__).resolve().parents[2]
  for p in ['repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp','repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h','repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h']:
-  assert hashlib.sha256((root/p).read_bytes()).hexdigest()==proof['source_hashes'][p],p
+  actual=hashlib.sha256((root/p).read_bytes()).hexdigest()
+  if p in proof['source_hashes']:assert actual==proof['source_hashes'][p],p
+  else:
+   # The first receipt bound modified inputs. Bind this unchanged included
+   # header to BOTH the exact compilation commit and signed512 source.
+   assert p=='repairs/infinity-cast-end-to-end-2103504-20261116/native/CastAudioAdapter.h'
+   historical=subprocess.check_output(['git','show',row['source']+':'+p],cwd=root)
+   baseline=subprocess.check_output(['git','show','c169b2fb7c91fccf7efdde4e4660f8462dec6d2e:'+p],cwd=root)
+   assert hashlib.sha256(historical).hexdigest()==hashlib.sha256(baseline).hexdigest()==actual
+   proof['immutable_AAC_header']={'path':p,'sha256':actual,'compile_commit':row['source'],'signed512_source':'c169b2fb7c91fccf7efdde4e4660f8462dec6d2e'}
  assert hashlib.sha256(library).hexdigest()==proof['new_library_sha256']=='adb23e4b49be9bdb7bc487a8be7f8c3735c9877be077ec3451ed43474bd5df91'
  target=work/'native';target.mkdir();path=target/'libinfinitycastremux.so';path.write_bytes(library)
  tool=Path(os.environ['ANDROID_HOME'])/'ndk/21.4.7075529/toolchains/llvm/prebuilt/linux-x86_64/bin/llvm-readelf';elf=subprocess.check_output([tool,'-h','-d','--dyn-syms','--wide',path],text=True)
