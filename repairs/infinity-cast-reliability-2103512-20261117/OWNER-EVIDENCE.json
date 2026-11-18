@@ -1,0 +1,54 @@
+{
+  "status": "OWNER_PHYSICAL_FAILURE_EVIDENCE",
+  "inputs": "FourownerattachedCastDetailsscreenshots inthisconversation; privateimagesnotuploadedpublicly",
+  "Onn_fragment18": {
+    "error": "mkv_fragment_flush_failed",
+    "close_flag_observed": 0,
+    "elapsed_ms": 8112,
+    "read_budget_bytes": 95209397,
+    "bytes_consumed": 65070712,
+    "AAC_bytes": 37827076,
+    "preroll_bytes": 13952380,
+    "selected_bytes": 13291256,
+    "causality": "Generationfailedbeforecancel; quotaNOTexhausted; selectedbytesaredemuxinputNOToutputsize"
+  },
+  "Onn_working_set": {
+    "fragments": [
+      7,
+      9
+    ],
+    "error": "mkv_source_working_set_limit",
+    "elapsed_ms": 0,
+    "read_budget_bytes": 0,
+    "close_flag_observed": 0,
+    "causality": "PlannerrefusalbeforeI/O; repeatedreceiverrequestsrefused; laterSDKdetailed310reportedseparately"
+  },
+  "Onn_cancellation": {
+    "fragment": 20,
+    "outcome": "cancelled_after_close",
+    "bytes_consumed": 0,
+    "causality": "Downstreamcleanup; notinitialfragment18cause"
+  },
+  "NestHubMax": {
+    "receiver_model": "google_nest_hub_max",
+    "video": "HEVCMain10MainTierL153",
+    "width": 3840,
+    "height": 2160,
+    "fps": 24,
+    "color_transfer": 1,
+    "CSD_bytes": 23,
+    "CSD_arrays": 0,
+    "decoder": "c2_qti_hevc_decoder",
+    "encoder": "c2_qti_avc_encoder",
+    "codec_pair": "configured",
+    "video_stage_sample_ms": 332,
+    "read_budget_bytes": 33554432,
+    "bytes_consumed": 7897303,
+    "AAC_bytes": 4156442,
+    "selected_bytes": 3665096,
+    "error": "cast_hw_delivery_not_realtime",
+    "body_bytes_written": 0,
+    "causality": "Actualphysicalcodecsconfiguredandvideoactiveguardpassed; totaldeliveryguardfailed; totalandphaseelapsedtimesnotshown. No inferencehardwaretooslowfromthisalone."
+  },
+  "acceptance": "BothphysicalreceivertrialsFAIL; ownerclarifiedbothdevices. NotreplacedbyemulatorPASS"
+}
