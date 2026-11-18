@@ -20,7 +20,9 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
  private boolean decoderStarted,encoderStarted,decoderEos,encoderEos,signalledEncoder,requestSdr,decoderFormatVerified;
  private final Set<Long> inputTimestamps=new HashSet<>();
  private final ArrayDeque<Long> presentedTimestamps=new ArrayDeque<>();private double sourceFps;
- private long deliveredSpan,deliveredTime;
+ private static final class Delivery {final long end;long millis;Delivery(long end,long millis){this.end=end;this.millis=millis;}}
+ private final TreeMap<Long,Delivery> delivery=new TreeMap<>();
+ private long setupNanos,feedNanos;
  private long owner=-1,deadline,begin,end,lastSlot,lastDecoded,lastEncoded,activeNanos,frames,totalSpan,totalActive;
  private int inputWidth,inputHeight,bytes,thermalSamples;
  private byte[] avcc;private final List<InfinityCastVideoContract.Packet> packets=new ArrayList<>();
@@ -93,13 +95,13 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
    begin=beginUs;end=endUs;lastSlot=InfinityCastVideoContract.firstSlot(begin)-1;lastDecoded=lastEncoded=-1;frames=bytes=0;activeNanos=0;packets.clear();avcc=null;decoderEos=encoderEos=signalledEncoder=decoderFormatVerified=false;inputTimestamps.clear();presentedTimestamps.clear();
    InfinityCastDiagnostics.event("hardware_video",ciSoftware?"ci_small_software_backend":"hardware_pair_configured",0);
   }catch(Throwable e){try{releaseSegment();}catch(IOException cleanup){e.addSuppressed(cleanup);}if(e instanceof IOException)throw (IOException)e;if(e instanceof Error)throw (Error)e;throw new IOException("cast_hw_codec_configure");}
-  finally{activeNanos+=System.nanoTime()-entered;}
+  finally{long used=System.nanoTime()-entered;activeNanos+=used;setupNanos=used;feedNanos=0;InfinityCastDiagnostics.event("hw_profile","setup_ms",(int)(used/1000000));}
  }
  void offer(byte[] accessUnit,long ptsUs)throws IOException {
   long entered=System.nanoTime();try{owner();check();need(accessUnit!=null&&accessUnit.length>0&&accessUnit.length<=4*1024*1024,"cast_hw_input_limit");int index;
    while((index=decoder.dequeueInputBuffer(0))<0){pump();check();pause();}
    ByteBuffer target=decoder.getInputBuffer(index);need(target!=null&&target.capacity()>=accessUnit.length,"cast_hw_decoder_input_capacity");target.clear();target.put(accessUnit);need(inputTimestamps.add(ptsUs)&&inputTimestamps.size()<=2000,"cast_hw_source_duplicate_pts");decoder.queueInputBuffer(index,0,accessUnit.length,ptsUs,0);pump();
-  }catch(RuntimeException e){throw new IOException("cast_hw_codec_feed");}finally{activeNanos+=System.nanoTime()-entered;}
+  }catch(RuntimeException e){throw new IOException("cast_hw_codec_feed");}finally{long used=System.nanoTime()-entered;activeNanos+=used;feedNanos+=used;}
  }
  private void pause()throws IOException{try{Thread.sleep(1);}catch(InterruptedException e){Thread.currentThread().interrupt();throw new IOException("cast_hw_interrupted");}}
  private void pump()throws IOException {
@@ -136,21 +138,37 @@ final class InfinityCastHardwareVideo implements AutoCloseable {
    // Emulator software correctness never qualifies production throughput.
    if(!ciSoftware){need(span>=100000000L&&active*4<=span*3,"cast_hw_sample_not_realtime");need(totalActive*10<=totalSpan*9,"cast_hw_sustained_not_realtime");}
    byte[] output=InfinityCastVideoContract.batch(avcc,packets,begin,end);InfinityCastDiagnostics.event("hardware_video",ciSoftware?"ci_correctness_only":"video_stage_sample",(int)Math.min(Integer.MAX_VALUE,active/1000000));return output;
-  }catch(RuntimeException e){throw new IOException("cast_hw_codec_drain");}finally{releaseSegment();}
+  }catch(RuntimeException e){throw new IOException("cast_hw_codec_drain");}finally{InfinityCastDiagnostics.event("hw_profile","feed_ms",(int)(feedNanos/1000000));InfinityCastDiagnostics.event("hw_profile","drain_ms",(int)((System.nanoTime()-entered)/1000000));releaseSegment();}
  }
  void qualifyDelivery(long elapsedMs,long spanMs)throws IOException {
-  if(ciSoftware)return;need(elapsedMs>=0&&spanMs>0&&elapsedMs*10<=spanMs*9,"cast_hw_delivery_not_realtime");deliveredTime+=elapsedMs;deliveredSpan+=spanMs;need(deliveredTime*10<=deliveredSpan*9,"cast_hw_delivery_not_realtime");InfinityCastDiagnostics.event("hardware_video",deliveredSpan>=30000?"cumulative_delivery_samples":"delivery_sample",(int)Math.min(Integer.MAX_VALUE,elapsedMs));
+  need(elapsedMs>=0&&spanMs>0&&spanMs==(end-begin)/1000,"cast_hw_delivery_sample_invalid");
+  Delivery old=delivery.get(begin);if(old!=null){need(old.end==end,"cast_hw_delivery_sample_changed");old.millis=Math.max(old.millis,elapsedMs);}
+  else{need(delivery.size()<8192,"cast_hw_delivery_sample_limit");delivery.put(begin,new Delivery(end,elapsedMs));}
+  // A cold two-second cue does not establish sustained throughput. Measure
+  // unique contiguous production over at least eight seconds; no cache-hit credit.
+  long at=end,span=0,time=0;for(Map.Entry<Long,Delivery> item:delivery.headMap(begin,true).descendingMap().entrySet()){
+   Delivery d=item.getValue();if(d.end!=at)break;time+=d.millis;span+=d.end-item.getKey();at=item.getKey();if(span>=8000000)break;
+  }
+  if(!ciSoftware&&span>=8000000)need(time*10000<=span*9,"cast_hw_delivery_not_realtime");
+  InfinityCastDiagnostics.event("hardware_video","delivery_sample",(int)Math.min(Integer.MAX_VALUE,elapsedMs));
+ }
+ void requireDelivery(long startUs,long bufferedEndUs,long targetUs,long movieEndUs)throws IOException {
+  long at=startUs,span=0,time=0,required=Math.min(8000000,movieEndUs-targetUs);
+  need(required>0&&targetUs>=startUs&&targetUs<bufferedEndUs&&bufferedEndUs-targetUs>=required,"cast_hw_delivery_window_invalid");
+  while(at<bufferedEndUs){Delivery d=delivery.get(at);need(d!=null&&d.end>at,"cast_hw_delivery_not_buffered");time+=d.millis;span+=d.end-at;at=d.end;}
+  need(at==bufferedEndUs,"cast_hw_delivery_window_invalid");if(!ciSoftware)need(time*10000<=span*9,"cast_hw_delivery_not_realtime");
+  InfinityCastDiagnostics.event("hardware_video","qualified_window_ms",(int)(span/1000));
  }
  boolean idle(){return decoder==null&&encoder==null&&gpu==null&&encoderInput==null;}
  /** All release operations stay on the converter owner, never UI/cancel threads. */
  void abortSegment()throws IOException{owner();releaseSegment();}
  private void releaseSegment()throws IOException {
-  IOException problem=null;
+  long entered=System.nanoTime();IOException problem=null;
   if(decoder!=null){try{if(decoderStarted)decoder.stop();}catch(Throwable e){problem=new IOException("cast_hw_decoder_stop");}finally{try{decoder.release();decoder=null;decoderStarted=false;}catch(Throwable e){problem=new IOException("cast_hw_decoder_release");}}}
   if(encoder!=null){try{if(encoderStarted)encoder.stop();}catch(Throwable e){problem=new IOException("cast_hw_encoder_stop");}finally{try{encoder.release();encoder=null;encoderStarted=false;}catch(Throwable e){problem=new IOException("cast_hw_encoder_release");}}}
   if(gpu!=null){try{gpu.close();gpu=null;}catch(Throwable e){problem=new IOException("cast_hw_gpu_release",e);}}
   try{if(encoderInput!=null){encoderInput.release();encoderInput=null;}}catch(Throwable e){problem=new IOException("cast_hw_encoder_surface_release",e);}packets.clear();avcc=null;
-  if(problem!=null)throw problem;
+  InfinityCastDiagnostics.event("hw_profile","release_ms",(int)((System.nanoTime()-entered)/1000000));if(problem!=null)throw problem;
  }
  @Override public void close()throws IOException{cancel();if(!idle()&&owner!=Thread.currentThread().getId())throw new IOException("cast_hw_wrong_cleanup_owner");releaseSegment();}
 }

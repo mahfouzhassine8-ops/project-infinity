@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -148,6 +149,18 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             });
         } catch(RuntimeException unavailable){relay.jobs.decrementAndGet();relay.close();throw new IOException("transport_busy");}
         return relay;
+    }
+    private static final class WarmRequest {final long position,generation;final Ready callback;WarmRequest(long p,long g,Ready c){position=p;generation=g;callback=c;}}
+    private final java.util.concurrent.atomic.AtomicLong warmGeneration=new java.util.concurrent.atomic.AtomicLong();
+    private WarmRequest pendingWarm;private boolean warmRunning;
+    /** Latest-target coalescing; one admitted preparation job, no stale seek queue. */
+    void warm(long positionMs,Ready callback){
+        synchronized(this){if(closed){callback.ready(this,mime,"mkv_cancelled");return;}pendingWarm=new WarmRequest(positionMs,warmGeneration.incrementAndGet(),callback);if(warmRunning)return;warmRunning=true;jobs.incrementAndGet();}
+        try{io.execute(()->{boolean normal=false;try{for(;;){WarmRequest request;synchronized(this){request=pendingWarm;pendingWarm=null;if(request==null||closed){warmRunning=false;normal=true;return;}}
+            String failure=null;try{InfinityCastRemux current=remux;if(current!=null)current.warm(request.position,()->!closed&&warmGeneration.get()==request.generation);}catch(Exception error){if(warmGeneration.get()==request.generation&&!closed)failure=reason(error);}
+            if(!closed&&warmGeneration.get()==request.generation)try{request.callback.ready(this,mime,failure);}catch(RuntimeException ignored){/* Callback cannot strand Cast ownership. */}
+        }}finally{if(!normal)synchronized(this){warmRunning=false;pendingWarm=null;}jobs.decrementAndGet();retired();}});}
+        catch(RejectedExecutionException busy){synchronized(this){warmRunning=false;pendingWarm=null;}jobs.decrementAndGet();retired();callback.ready(this,mime,"mkv_owner_busy");}
     }
     private String reason(Exception error) {
         String code=error.getMessage();if(code==null || !code.matches("[a-z][a-z0-9_]{0,63}"))code="source_network_or_transport_failure";
@@ -316,38 +329,58 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     }
     /** Native reads use the SAME authenticated, TLS-verifying origin policy. */
     final class RemuxInput implements InfinityCastRemux.Input {
-        private Response response;private InputStream body;private long position,total=-1,remaining,consumed,seekCount,rangeRequests;private String validator,problem="";
+        private static final int PAGE=65536,PAGES=512;
+        private final class Page {final byte[] bytes=new byte[PAGE];int low=PAGE,high;}
+        private final java.util.LinkedHashMap<Long,Page> cache=new java.util.LinkedHashMap<>(16,.75f,true);
+        private Response response;private InputStream body;
+        private long position,livePosition,total=-1,remaining,consumed,seekCount,rangeRequests,replayed,logical;
+        private String validator,problem="";
         private void disconnect(){if(response!=null){release(response);response=null;body=null;}}
         private void connect(long target) throws IOException {
             disconnect();if(closed)throw new IOException("mkv_cancelled");
+            // Without a strong validator, bytes cannot be mixed across responses.
+            if(validator==null)cache.clear();
             rangeRequests++;response=open(root,"GET","bytes="+target+"-");
             long length=-1;String range=response.header("Content-Range");
             if(response.code()==206 && range!=null && range.matches("bytes [0-9]{1,16}-[0-9]{1,16}/[0-9]{1,16}")) {
-                String[] parts=range.substring(6).split("[-/]");if(Long.parseLong(parts[0])!=target)throw new IOException("mkv_invalid_source_range");length=Long.parseLong(parts[2]);
+                String[] parts=range.substring(6).split("[-/]");long first=Long.parseLong(parts[0]),last=Long.parseLong(parts[1]);length=Long.parseLong(parts[2]);
+                if(first!=target||last<first||last!=length-1||(response.body()!=null&&response.body().contentLength()>=0&&response.body().contentLength()!=last-first+1))throw new IOException("mkv_invalid_source_range");
             } else if(response.code()==200 && target==0 && response.body()!=null)length=response.body().contentLength();
             else if(response.code()==200)throw new IOException("mkv_source_not_range_seekable");else throw new IOException("source_http_"+response.code());
             if(length<=0 || length>1099511627776L || (total>0 && total!=length))throw new IOException("mkv_source_changed_or_unknown_length");
             String etag=response.header("ETag");if(validator!=null && !validator.equals(etag))throw new IOException("mkv_source_changed_during_remux");
-            if(total<0 && etag!=null && etag.length()<=256 && !etag.startsWith("W/"))validator=etag;
-            total=length;position=target;if(response.body()==null)throw new IOException("mkv_source_body_missing");body=response.body().byteStream();
+            if(total<0 && etag!=null && etag.length()<=256 && etag.startsWith("\"")&&etag.endsWith("\""))validator=etag;
+            total=length;livePosition=target;if(response.body()==null)throw new IOException("mkv_source_body_missing");body=response.body().byteStream();
         }
         private IOException failed(IOException error){String code=error.getMessage();problem=code!=null && code.matches("[a-z][a-z0-9_]{0,63}")?code:"mkv_source_network_failure";return new IOException(problem);}
-        public void budget(long bytes){if(bytes<0 || bytes>134217728L)throw new IllegalArgumentException("mkv_source_budget_invalid");remaining=bytes;consumed=seekCount=rangeRequests=0;problem="";}
-        public long[] usage(){return new long[]{consumed,seekCount,rangeRequests,remaining};}
+        public void budget(long bytes){if(bytes<0 || bytes>134217728L)throw new IllegalArgumentException("mkv_source_budget_invalid");remaining=bytes;consumed=seekCount=rangeRequests=replayed=logical=0;problem="";}
+        public long[] usage(){return new long[]{consumed,seekCount,rangeRequests,remaining,replayed,logical};}
         public int read(byte[] target,int size) throws IOException {
-            try{if(closed)throw new IOException("mkv_cancelled");if(total>0 && position==total)return 0;if(remaining<=0)throw new IOException("mkv_source_read_limit");if(body==null)connect(position);int count=body.read(target,0,(int)Math.min(remaining,Math.min(size,target.length)));if(count>0){position+=count;remaining-=count;consumed+=count;}return Math.max(0,count);}catch(IOException error){throw failed(error);}
+            try{
+                if(closed)throw new IOException("mkv_cancelled");if(target==null||size<0||size>target.length)throw new IOException("mkv_source_read_invalid");if(size==0)return 0;
+                if(total<0)connect(position);if(position==total)return 0;
+                if(logical>=536870912L)throw new IOException("mkv_source_replay_limit");
+                long key=position/PAGE;int at=(int)(position%PAGE),want=(int)Math.min(Math.min(size,PAGE-at),Math.min(total-position,536870912L-logical));Page page=cache.get(key);
+                if(page!=null&&at>=page.low&&at<page.high){int count=Math.min(want,page.high-at);System.arraycopy(page.bytes,at,target,0,count);position+=count;logical+=count;replayed+=count;return count;}
+                if(remaining<=0)throw new IOException("mkv_source_read_limit");
+                if(body==null||livePosition!=position)connect(position);
+                int count=body.read(target,0,(int)Math.min(remaining,want));
+                if(count<0)throw new IOException("mkv_source_truncated");if(count==0)throw new IOException("mkv_source_stalled");
+                page=cache.get(key);if(page==null){while(cache.size()>=PAGES)cache.remove(cache.keySet().iterator().next());page=new Page();cache.put(key,page);}
+                if(page.high==0||at>page.high||at+count<page.low){page.low=at;page.high=at+count;}else{page.low=Math.min(page.low,at);page.high=Math.max(page.high,at+count);}
+                System.arraycopy(target,0,page.bytes,at,count);position+=count;livePosition+=count;remaining-=count;consumed+=count;logical+=count;return count;
+            }catch(IOException error){throw failed(error);}
         }
         public long seek(long offset,int whence) throws IOException {
             try {
                 if(closed)throw new IOException("mkv_cancelled");if(total<0)connect(0);
                 if((whence&0x10000)!=0)return total;seekCount++;whence&=~0x20000;
                 long next=whence==0?offset:whence==1?position+offset:whence==2?total+offset:-1;
-                if(next<0 || next>total)throw new IOException("mkv_invalid_source_seek");if(next==position)return position;
-                if(next==total){disconnect();position=next;return next;}connect(next);return position;
+                if(next<0 || next>total)throw new IOException("mkv_invalid_source_seek");position=next;return next;
             }catch(IOException error){throw failed(error);}
         }
         public String failure(){return problem;}
-        public void close(){disconnect();}
+        public void close(){disconnect();cache.clear();}
     }
     private void accept() {
         try {
@@ -384,16 +417,21 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
             if(converted) {
                 boolean playlist=first[1].equals(URI.create(address()).getRawPath());
                 boolean media=first[1].equals(path+"/mkv/media.m3u8");String asset=playlist?"master":media?"media":first[1].endsWith("/init.mp4")?"init":"fragment";
-                byte[] data=playlist?remux.playlist(base()):media?remux.mediaPlaylist(base()):remux.resource(first[1].substring((path+"/mkv/").length()));
-                String type=playlist || media?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=data.length-1;int code=200;
-                boolean wholeHardware=asset.equals("fragment")&&remux.hardwareVideo();
-                if(range!=null && !playlist && !media && !wholeHardware){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,data.length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
-                if(from>to || from>=data.length){downstream=true;reply(output,416,type,0,"bytes */"+data.length);InfinityCastDiagnostics.event("converted_http",asset+"_range_unsatisfied",416);return;}
-                boolean diagnostic=reportedKinds.add("converted:"+asset+":"+method+":"+code);
-                if(diagnostic)InfinityCastDiagnostics.event("converted_http",asset+(method.equals("HEAD")?"_head":"_get"),code);
-                downstream=true;
-                reply(output,code,type,to-from+1,code==206?"bytes "+from+"-"+to+"/"+data.length:null,wholeHardware);
-                if(method.equals("GET")){try{output.write(data,(int)from,(int)(to-from+1));output.flush();delivered((int)(to-from+1));if(diagnostic)InfinityCastDiagnostics.event("converted_body",asset+"_written",(int)(to-from+1));}catch(IOException failed){InfinityCastDiagnostics.event("converted_body",asset+"_write_failed",0);throw failed;}}return;
+                InfinityCastResource.Lease lease=null;
+                try{
+                    byte[] data=null;long length;
+                    if(asset.equals("fragment")){lease=remux.resourceView(first[1].substring((path+"/mkv/").length()));length=lease.length();}
+                    else{data=playlist?remux.playlist(base()):media?remux.mediaPlaylist(base()):remux.resource("init.mp4");length=data.length;}
+                    String type=playlist || media?"application/vnd.apple.mpegurl":"video/mp4";long from=0,to=length-1;int code=200;
+                    boolean wholeHardware=asset.equals("fragment")&&remux.hardwareVideo();
+                    if(range!=null && !playlist && !media && !wholeHardware){String[] part=range.substring(6).split("-",-1);if(part[0].isEmpty()){from=Math.max(0,length-Long.parseLong(part[1]));}else{from=Long.parseLong(part[0]);if(!part[1].isEmpty())to=Math.min(to,Long.parseLong(part[1]));}code=206;}
+                    if(from>to || from>=length){downstream=true;reply(output,416,type,0,"bytes */"+length);InfinityCastDiagnostics.event("converted_http",asset+"_range_unsatisfied",416);return;}
+                    boolean diagnostic=reportedKinds.add("converted:"+asset+":"+method+":"+code);
+                    if(diagnostic)InfinityCastDiagnostics.event("converted_http",asset+(method.equals("HEAD")?"_head":"_get"),code);
+                    downstream=true;
+                    reply(output,code,type,to-from+1,code==206?"bytes "+from+"-"+to+"/"+length:null,wholeHardware);
+                    if(method.equals("GET")){try{if(lease!=null)lease.copyTo(output,from,to-from+1);else output.write(data,(int)from,(int)(to-from+1));output.flush();delivered((int)(to-from+1));if(lease!=null&&from==0&&to==length-1)remux.consume(first[1].substring((path+"/mkv/").length()));if(diagnostic)InfinityCastDiagnostics.event("converted_body",asset+"_written",(int)(to-from+1));}catch(IOException failed){InfinityCastDiagnostics.event("converted_body",asset+"_write_failed",0);throw failed;}}
+                }finally{if(lease!=null)lease.close();}return;
             }
             boolean knownManifest=resource.kind==InfinityCastAdaptive.Kind.HLS || resource.kind==InfinityCastAdaptive.Kind.DASH || (resource==root && InfinityCastAdaptive.adaptive(mime));
             response=open(resource,knownManifest?"GET":method,knownManifest?null:range);
@@ -460,7 +498,11 @@ final class InfinityCastRelay implements AutoCloseable,InfinityCastAdaptive.Link
     private void retired() {
         if(!closed || !ownerDone || jobs.get()!=0)return;
         synchronized(this){if(fullyRetired || retiring)return;retiring=true;}
-        if(remux!=null){remux.close();remux=null;}
+        InfinityCastRemux current=remux;
+        if(current!=null){current.closeAsync(()->{remux=null;finishRetired();});return;}
+        finishRetired();
+    }
+    private void finishRetired(){
         Runnable completed;
         synchronized(InfinityCastRelay.class){if(active==this){cookies.clear();active=null;}}
         synchronized(this){fullyRetired=true;completed=retirementCallback;retirementCallback=null;}

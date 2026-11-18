@@ -29,6 +29,10 @@ namespace InfinityMkv {
 using Clock=std::chrono::steady_clock;
 constexpr size_t FragmentLimit=8*1024*1024,InitLimit=1024*1024;
 constexpr int IndexLimit=8192;
+constexpr size_t ResourceLimit=64*1024*1024, MuxPayloadLimit=4*1024*1024;
+constexpr unsigned ResourceSequences=32;
+struct ChunkSink {virtual ~ChunkSink()=default;virtual void write(const uint8_t*,size_t)=0;};
+struct Measure {uint64_t& value;Clock::time_point entered=Clock::now();~Measure(){value+=uint64_t(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-entered).count());}};
 // One fixed MPEG presentation epoch for the ENTIRE HLS rendition. This is a
 // timestamp origin, never a wait/delay. HLS maps its first presentation to zero.
 // Positive DTS avoids negative-CTS/edit-list ambiguities with B-frame video.
@@ -70,8 +74,8 @@ void validateDolby(const AVPacket* packet,AVCodecID codec){
 
 struct Input {
  enum Phase{Audio=0,SeekPreroll=1,Selected=2,Lookahead=3};
- int phase=SeekPreroll,fragment=-1;std::array<uint64_t,4> consumed{};uint64_t seeks=0,errors=0;
- void reset(int index){fragment=index;phase=SeekPreroll;consumed.fill(0);seeks=errors=0;}
+ int phase=SeekPreroll,fragment=-1;std::array<uint64_t,4> consumed{};uint64_t seeks=0,errors=0;std::array<uint64_t,10> metrics{};
+ void reset(int index){fragment=index;phase=SeekPreroll;consumed.fill(0);seeks=errors=0;metrics.fill(0);}
  virtual ~Input()=default;virtual int read(uint8_t*,int)=0;virtual int64_t seek(int64_t,int)=0;
 };
 struct Packet {AVPacket* value=api().av_packet_alloc();~Packet(){if(value)api().av_packet_free(&value);}Packet(){if(!value)throw Failure("mkv_memory_limit");}};
@@ -84,7 +88,7 @@ struct State {
  std::atomic<bool> cancelled{false};Clock::time_point deadline;
  int video=-1,audio=-1;int64_t origin=0,duration=0;std::vector<int64_t> keys,starts,positions;int64_t sourceLength=0;bool positionPlanValid=false;
  std::vector<uint8_t> init;std::string videoName,audioName,codecs;std::unique_ptr<CastAudioAdapter> audioAdapter;
- std::unique_ptr<CastVideoBridge> videoBridge;CastVideoResult videoFormat;std::vector<uint8_t> bootstrapVideo,videoInputHeader,videoInputCsd;bool videoConfigured=false;
+ std::unique_ptr<CastVideoBridge> videoBridge;CastVideoResult videoFormat;std::vector<uint8_t> bootstrapVideo,videoInputHeader,videoInputCsd,outputVideoCsd;bool videoConfigured=false;ChunkSink* outputSink=nullptr;mutable bool budgetSaturated=false;
  explicit State(std::unique_ptr<Input> value):input(std::move(value)){api();}
  ~State(){if(format)api().avformat_close_input(&format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
  bool stopped()const{return cancelled.load() || Clock::now()>deadline;}
@@ -98,13 +102,43 @@ struct State {
 struct Output {
  AVFormatContext* format=nullptr;AVIOContext* io=nullptr;std::vector<uint8_t> bytes;const char* failure=nullptr;bool packetHeader=false;
  ~Output(){if(format)api().avformat_free_context(format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
- static int write(void* p,uint8_t* data,int n){auto& o=*static_cast<Output*>(p);if(n<0 || o.bytes.size()+size_t(n)>FragmentLimit){o.failure="mkv_fragment_limit";return AVERROR(ENOSPC);}try{o.bytes.insert(o.bytes.end(),data,data+n);return n;}catch(...){o.failure="mkv_memory_limit";return AVERROR(ENOMEM);}}
+ ChunkSink* sink=nullptr;State* state=nullptr;uint64_t emitted=0,payload=0;unsigned flushes=0;char sinkFailure[65]{};
+ static int write(void* p,uint8_t* data,int n){auto& o=*static_cast<Output*>(p);
+  try{
+   if(n<0)throw Failure("mkv_mux_write_size");
+   if(o.sink){size_t at=0;
+    // The exact already-verified init remains bounded and is never re-published
+    // as part of a media resource, including delayed Dolby headers.
+    while(at<size_t(n)&&o.bytes.size()<o.state->init.size()){
+     size_t count=std::min(size_t(n)-at,o.state->init.size()-o.bytes.size());
+     if(!std::equal(data+at,data+at+count,o.state->init.begin()+o.bytes.size()))throw Failure("mkv_init_changed");
+     o.bytes.insert(o.bytes.end(),data+at,data+at+count);at+=count;
+    }
+    if(size_t(n)-at>ResourceLimit-o.emitted)throw Failure("mkv_resource_output_limit");
+    while(at<size_t(n)){o.state->check();size_t count=std::min(size_t(n)-at,size_t(65536));o.sink->write(data+at,count);at+=count;o.emitted+=count;}
+   }else{if(o.bytes.size()+size_t(n)>FragmentLimit)throw Failure("mkv_fragment_limit");o.bytes.insert(o.bytes.end(),data,data+n);}
+   return n;
+  }catch(const Failure& e){std::strncpy(o.sinkFailure,e.what(),64);o.sinkFailure[64]=0;o.failure=o.sinkFailure;return AVERROR(ENOSPC);}
+   catch(...){o.failure="mkv_memory_limit";return AVERROR(ENOMEM);}
+ }
+ void result(int code,unsigned phase){if(code<0||failure){if(state){state->input->metrics[8]=phase;state->input->metrics[9]=uint64_t(int64_t(code));}throw Failure(failure?failure:"mkv_fragment_flush_failed");}}
+ void flushChunk(){result(api().av_interleaved_write_frame(format,nullptr),1);result(api().av_write_frame(format,nullptr),2);api().avio_flush(io);result(io->error,3);payload=0;if(++flushes>=ResourceSequences)throw Failure("mkv_resource_moof_limit");}
+ void put(AVPacket* packet){
+  Measure time{state->input->metrics[3]};
+  if(sink){if(packet->size<0||size_t(packet->size)>FragmentLimit)throw Failure("mkv_mux_packet_limit");if(payload&&size_t(packet->size)>MuxPayloadLimit-std::min(payload,uint64_t(MuxPayloadLimit)))flushChunk();payload+=uint64_t(packet->size);state->input->metrics[6]=std::max(state->input->metrics[6],payload);}
+  result(api().av_interleaved_write_frame(format,packet),4);
+ }
+ void finish(){Measure time{state->input->metrics[3]};result(api().av_interleaved_write_frame(format,nullptr),5);result(api().av_write_frame(format,nullptr),6);result(api().av_write_trailer(format),7);api().avio_flush(io);result(io->error,8);if(sink){state->input->metrics[5]=emitted;if(emitted==0)throw Failure("mkv_empty_fragment");}}
  void begin(State& s,int index=0){
+  state=&s;sink=s.outputSink;
   if(api().avformat_alloc_output_context2(&format,nullptr,"mp4",nullptr)<0 || !format)throw Failure("mkv_mp4_muxer_unavailable");
   for(int in:{s.video,s.audio})if(in>=0){
    auto* source=s.format->streams[in];if(api().avformat_query_codec(format->oformat,source->codecpar->codec_id,FF_COMPLIANCE_NORMAL)<=0)throw Failure("mkv_codec_not_mp4_compatible");
    auto* out=api().avformat_new_stream(format,nullptr);if(!out || api().avcodec_parameters_copy(out->codecpar,source->codecpar)<0)throw Failure("mkv_stream_copy_failed");
    if(in==s.audio && s.audioAdapter)s.audioAdapter->parameters(out->codecpar);
+   if(in==s.video&&!s.videoBridge&&!s.outputVideoCsd.empty()){
+    auto* p=out->codecpar;api().av_freep(&p->extradata);p->extradata_size=int(s.outputVideoCsd.size());p->extradata=static_cast<uint8_t*>(api().av_malloc(size_t(p->extradata_size)+AV_INPUT_BUFFER_PADDING_SIZE));if(!p->extradata)throw Failure("mkv_memory_limit");std::memset(p->extradata,0,size_t(p->extradata_size)+AV_INPUT_BUFFER_PADDING_SIZE);std::copy(s.outputVideoCsd.begin(),s.outputVideoCsd.end(),p->extradata);
+   }
    if(in==s.video && s.videoBridge){
     auto* p=out->codecpar;api().av_freep(&p->extradata);p->extradata_size=int(s.videoFormat.config.size());p->extradata=static_cast<uint8_t*>(api().av_malloc(size_t(p->extradata_size)+AV_INPUT_BUFFER_PADDING_SIZE));if(!p->extradata)throw Failure("mkv_memory_limit");std::memset(p->extradata,0,size_t(p->extradata_size)+AV_INPUT_BUFFER_PADDING_SIZE);std::copy(s.videoFormat.config.begin(),s.videoFormat.config.end(),p->extradata);
     p->codec_id=AV_CODEC_ID_H264;p->width=1280;p->height=720;p->profile=s.videoFormat.profile;p->level=s.videoFormat.level;p->format=AV_PIX_FMT_YUV420P;p->video_delay=0;p->bit_rate=2000000;p->sample_aspect_ratio={1,1};p->color_primaries=AVCOL_PRI_BT709;p->color_trc=AVCOL_TRC_BT709;p->color_space=AVCOL_SPC_BT709;p->color_range=AVCOL_RANGE_MPEG;p->field_order=AV_FIELD_PROGRESSIVE;p->bits_per_raw_sample=8;p->bits_per_coded_sample=8;
@@ -131,7 +165,8 @@ struct Output {
   api().av_dict_set(&options,"movflags",flags.c_str(),0);
   api().av_dict_set(&options,"use_editlist","0",0);
   // Stable movie-fragment numbering, independent of request/cache order.
-  api().av_dict_set(&options,"fragment_index",std::to_string(index+1).c_str(),0);
+  api().av_dict_set(&options,"fragment_index",std::to_string(sink?uint64_t(index)*ResourceSequences+1:uint64_t(index)+1).c_str(),0);
+  if(sink)api().av_dict_set(&options,"frag_size",std::to_string(MuxPayloadLimit).c_str(),0);
   int code=api().avformat_write_header(format,&options);api().av_dict_free(&options);api().avio_flush(io);
   if(code<0 || failure)throw Failure(failure?failure:"mkv_mux_header_failed");if(!packetHeader && (bytes.empty() || bytes.size()>InitLimit))throw Failure("mkv_init_limit");
  }
@@ -263,6 +298,30 @@ void State::inspect(){
  if(keys.empty() || starts.front()>AV_TIME_BASE)throw Failure("mkv_first_cue_missing");starts.front()=0;starts.push_back(duration);
  for(size_t n=1;n<starts.size();n++)if(starts[n]<=starts[n-1] || starts[n]-starts[n-1]>30LL*AV_TIME_BASE)throw Failure("mkv_sparse_seek_index");
  repairReservedHevcLevel(stream->codecpar);
+ // An empty hev1 hvcC may legitimately keep parameter sets only at the first
+ // key. Every independently requested HLS resource still needs those real sets.
+ auto* videoParameters=stream->codecpar;
+ if(videoParameters->codec_id==AV_CODEC_ID_HEVC&&videoParameters->extradata_size==23&&videoParameters->extradata[22]==0){
+  if(api().av_seek_frame(format,video,keys.front(),AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_configuration_seek_failed");
+  Packet first;bool found=false;
+  for(int n=0;n<250000;n++){check();int code=api().av_read_frame(format,first.value);if(code<0)throw Failure("mkv_configuration_key_missing");auto* packet=first.value;
+   if(packet->stream_index!=video){api().av_packet_unref(packet);continue;}
+   if(packet->pts!=keys.front()||!(packet->flags&AV_PKT_FLAG_KEY)||!closedPicture(packet,videoParameters))throw Failure("mkv_configuration_key_mismatch");
+   for(int j=0;j<packet->side_data_elems;j++)if(packet->side_data[j].type==AV_PKT_DATA_ENCRYPTION_INFO||packet->side_data[j].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
+   auto parameters=CastVideoSource::configuration(videoParameters,packet,nullptr,false).first;
+   std::array<std::vector<std::vector<uint8_t>>,3> sets;
+   for(size_t at=0;at<parameters.size();){
+    if(parameters.size()-at<6||parameters[at]||parameters[at+1]||parameters[at+2]||parameters[at+3]!=1)throw Failure("mkv_configuration_nal_bounds");size_t begin=at+4,end=begin+2;
+    while(end+3<parameters.size()&&!(parameters[end]==0&&parameters[end+1]==0&&parameters[end+2]==0&&parameters[end+3]==1))end++;
+    if(end+3>=parameters.size())end=parameters.size();unsigned type=(parameters[begin]>>1)&63;if(type<32||type>34||end-begin>65535)throw Failure("mkv_configuration_nal_bounds");
+    sets[type-32].emplace_back(parameters.begin()+begin,parameters.begin()+end);at=end;
+   }
+   size_t length=23;for(auto& array:sets){if(array.empty()||array.size()>1024)throw Failure("mkv_configuration_sets_missing");length+=3;for(auto& nal:array)length+=2+nal.size();}if(length>65536)throw Failure("mkv_codec_private_limit");
+   outputVideoCsd.assign(videoParameters->extradata,videoParameters->extradata+23);outputVideoCsd[22]=3;
+   for(unsigned j=0;j<3;j++){auto& array=sets[j];outputVideoCsd.push_back(uint8_t(32+j));outputVideoCsd.push_back(uint8_t(array.size()>>8));outputVideoCsd.push_back(uint8_t(array.size()));for(auto& nal:array){outputVideoCsd.push_back(uint8_t(nal.size()>>8));outputVideoCsd.push_back(uint8_t(nal.size()));outputVideoCsd.insert(outputVideoCsd.end(),nal.begin(),nal.end());}}
+   found=true;break;
+  }if(!found)throw Failure("mkv_configuration_key_missing");
+ }
  if(audio>=0 && format->streams[audio]->codecpar->codec_id==AV_CODEC_ID_EAC3)audioAdapter.reset(new CastAudioAdapter(format,audio,origin,duration,[this]{check();},[this](int64_t seekUs){
   check();if(!positionPlanValid || seekUs<=origin)return false;auto* track=format->streams[video];
   auto cue=std::upper_bound(keys.begin(),keys.end(),seekUs,[&](int64_t at,int64_t stamp){return at<micros(stamp,track->time_base);});
@@ -298,7 +357,7 @@ uint64_t State::readBudget(int index)const{
  // Unverified cue extents retain the original bounded reader/seek behavior.
  // Only a verified adapted-EAC3 plan may raise the request allowance.
  if(!audioAdapter || !positionPlanValid || positions.size()!=keys.size())return Floor;
- uint64_t required=0;auto charge=[&](uint64_t n){if(n>Ceiling-required)throw Failure("mkv_source_working_set_limit");required+=n;};
+ budgetSaturated=false;uint64_t required=0;auto charge=[&](uint64_t n){if(n>Ceiling-required){required=Ceiling;budgetSaturated=true;}else required+=n;};
  auto* track=format->streams[video];
  auto cueBefore=[&](int64_t us){auto it=std::upper_bound(keys.begin(),keys.end(),us,[&](int64_t at,int64_t stamp){return at<micros(stamp,track->time_base);});return it==keys.begin()?size_t(0):size_t(it-keys.begin()-1);};
  auto afterPosition=[&](size_t cue){size_t at=cue+1;while(at<positions.size() && positions[at]<=positions[cue])++at;return at<positions.size()?positions[at]:sourceLength;};
@@ -339,18 +398,19 @@ uint64_t State::readBudget(int index)const{
  return std::max(Floor,required);
 }
 std::vector<uint8_t> State::segment(int index){
- input->reset(index);
- deadline=Clock::now()+std::chrono::seconds(15);
  if(videoBridge){if(index==0&&!bootstrapVideo.empty()){check();return std::move(bootstrapVideo);}return videoSegment(index);}
+ input->reset(index);input->metrics[7]=budgetSaturated?1:0;Measure totalTime{input->metrics[4]};
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0 || size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
  std::vector<CastAudioAdapter::Encoded> converted;
- if(audioAdapter){input->phase=Input::Audio;converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
+ if(audioAdapter){input->phase=Input::Audio;Measure time{input->metrics[0]};converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
  // Recover demuxer DTS before the requested cue; never infer new video DTS.
  const size_t seekIndex=audioAdapter && index>0?size_t(index-1):size_t(index);
- if(api().av_seek_frame(format,video,keys[seekIndex],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");
+ {Measure time{input->metrics[1]};if(api().av_seek_frame(format,video,keys[seekIndex],AVSEEK_FLAG_BACKWARD)<0)throw Failure("mkv_segment_seek_failed");}
  Output out;out.begin(*this,index);if(!out.packetHeader && out.bytes!=init)throw Failure("mkv_init_changed");size_t header=out.bytes.size();Packet packet;int writtenVideo=0,writtenAudio=0;bool boundary=false;int64_t readPackets=0;
  const int64_t begin=starts[index]+origin,end=starts[index+1]+origin;
- for(auto& encoded:converted){check();auto* p=packet.value;if(audioAdapter->a.av_new_packet(p,int(encoded.data.size()))<0)throw Failure("mkv_memory_limit");std::memcpy(p->data,encoded.data.data(),encoded.data.size());p->pts=p->dts=encoded.sample+10LL*audioAdapter->Rate;p->duration=encoded.duration;p->flags=encoded.flags;for(auto& side:encoded.side){auto* target=audioAdapter->a.av_packet_new_side_data(p,side.type,side.data.size());if(!target)throw Failure("mkv_memory_limit");std::memcpy(target,side.data.data(),side.data.size());}p->stream_index=1;p->pos=-1;if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_aac_packet_mux_failed");writtenAudio++;}
+ Packet encodedPacket;size_t convertedAt=0;
+ auto audioUntil=[&](int64_t normalizedDts){while(convertedAt<converted.size() && api().av_rescale_q(converted[convertedAt].sample,{1,audioAdapter->Rate},AV_TIME_BASE_Q)<=normalizedDts){auto& encoded=converted[convertedAt++];
+check();auto* p=encodedPacket.value;if(audioAdapter->a.av_new_packet(p,int(encoded.data.size()))<0)throw Failure("mkv_memory_limit");std::memcpy(p->data,encoded.data.data(),encoded.data.size());p->pts=p->dts=encoded.sample+10LL*audioAdapter->Rate;p->duration=encoded.duration;p->flags=encoded.flags;for(auto& side:encoded.side){auto* target=audioAdapter->a.av_packet_new_side_data(p,side.type,side.data.size());if(!target)throw Failure("mkv_memory_limit");std::memcpy(target,side.data.data(),side.data.size());}p->stream_index=1;p->pos=-1;out.put(p);writtenAudio++;api().av_packet_unref(encodedPacket.value);}};
  for(;;){check();if(++readPackets>250000)throw Failure("mkv_packet_limit");int result=api().av_read_frame(format,packet.value);if(result==AVERROR_EOF)break;if(result<0)throw Failure("mkv_packet_read_failed");auto* p=packet.value;
   int source=p->stream_index;if((source!=video && source!=audio) || (source==audio && audioAdapter)){api().av_packet_unref(p);continue;}
   auto* stream=format->streams[source];if(out.packetHeader && source==audio)validateDolby(p,stream->codecpar->codec_id);if(p->pts==AV_NOPTS_VALUE)throw Failure("mkv_missing_packet_timestamp");int64_t at=micros(p->pts,stream->time_base);
@@ -364,15 +424,18 @@ std::vector<uint8_t> State::segment(int index){
   if(source==video ? (boundary || (!writtenVideo && at<begin)) : (at<begin || at>=end)){api().av_packet_unref(p);continue;}
   if(source==video && writtenVideo==0){if(!(p->flags&AV_PKT_FLAG_KEY) || p->pts!=keys[index])throw Failure("mkv_keyframe_mismatch");if(!closedPicture(p,stream->codecpar))throw Failure("mkv_open_gop_not_supported");}
   for(int n=0;n<p->side_data_elems;n++)if(p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INFO || p->side_data[n].type==AV_PKT_DATA_ENCRYPTION_INIT_INFO)throw Failure("drm_or_unsupported_encryption");
+  if(audioAdapter)audioUntil(micros(p->dts==AV_NOPTS_VALUE?p->pts:p->dts,stream->time_base)-origin);
   int mapped=source==video?0:1;int64_t offset=api().av_rescale_q(origin-TransportEpoch,AV_TIME_BASE_Q,stream->time_base);p->pts-=offset;if(p->dts!=AV_NOPTS_VALUE){p->dts-=offset;if(p->dts<0)throw Failure("mkv_unsupported_decode_preroll");}
   api().av_packet_rescale_ts(p,stream->time_base,out.format->streams[mapped]->time_base);p->stream_index=mapped;p->pos=-1;
-  if(api().av_interleaved_write_frame(out.format,p)<0 || out.failure)throw Failure(out.failure?out.failure:"mkv_packet_mux_failed");
+  out.put(p);
   if(source==video)writtenVideo++;else writtenAudio++;
  }
+ if(audioAdapter)audioUntil(INT64_MAX);
  if(!writtenVideo || (audio>=0 && !audioAdapter && !writtenAudio))throw Failure("mkv_empty_segment");
- if(api().av_interleaved_write_frame(out.format,nullptr)<0 || api().av_write_frame(out.format,nullptr)<0 || api().av_write_trailer(out.format)<0)throw Failure("mkv_fragment_flush_failed");api().avio_flush(out.io);check();
+ out.finish();check();
  if(out.failure)throw Failure(out.failure);
  if(out.packetHeader){header=out.headerSize();if(std::vector<uint8_t>(out.bytes.begin(),out.bytes.begin()+header)!=init)throw Failure("mkv_init_changed");}
+ if(out.sink)return {};
  if(out.bytes.size()<=header)throw Failure("mkv_empty_fragment");
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
@@ -387,12 +450,12 @@ void State::configureVideo(std::unique_ptr<CastVideoBridge> bridge){
  videoBridge=std::move(bridge);videoConfigured=false;bootstrapVideo=videoSegment(0);
 }
 std::vector<uint8_t> State::videoSegment(int index){
- input->reset(index);const auto workStarted=Clock::now();
+ input->reset(index);input->metrics[7]=budgetSaturated?1:0;Measure totalTime{input->metrics[4]};const auto workStarted=Clock::now();
  deadline=Clock::now()+std::chrono::seconds(15);check();if(index<0||size_t(index)>=keys.size())throw Failure("mkv_segment_out_of_range");
- std::vector<CastAudioAdapter::Encoded> converted;if(audioAdapter){input->phase=Input::Audio;converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
+ std::vector<CastAudioAdapter::Encoded> converted;if(audioAdapter){input->phase=Input::Audio;Measure time{input->metrics[0]};converted=audioAdapter->interval(starts[index],starts[index+1]);}input->phase=Input::SeekPreroll;
  auto* source=format->streams[video];auto* p=source->codecpar;auto fps=source->avg_frame_rate.num>0?source->avg_frame_rate:source->r_frame_rate;auto sar=source->sample_aspect_ratio.num>0?source->sample_aspect_ratio:p->sample_aspect_ratio;
  std::ostringstream descriptor;descriptor<<"{\"video\":\""<<(p->codec_id==AV_CODEC_ID_HEVC?"hevc":"h264")<<"\",\"width\":"<<p->width<<",\"height\":"<<p->height<<",\"profile\":"<<p->profile<<",\"level\":"<<p->level<<",\"transfer\":"<<p->color_trc<<",\"primaries\":"<<p->color_primaries<<",\"matrix\":"<<p->color_space<<",\"range\":"<<p->color_range<<",\"fps_num\":"<<fps.num<<",\"fps_den\":"<<fps.den<<",\"sar_num\":"<<sar.num<<",\"sar_den\":"<<sar.den<<"}";
- if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("cast_hw_video_seek_failed");
+ {Measure time{input->metrics[1]};if(api().av_seek_frame(format,video,keys[index],AVSEEK_FLAG_BACKWARD)<0)throw Failure("cast_hw_video_seek_failed");}
  CastVideoResult result;std::vector<uint8_t> pendingHeader,pendingCsd;
  struct AudioPacket{std::vector<uint8_t> data;int64_t pts,dts,duration;int flags;std::vector<CastAudioAdapter::Side> side;};std::vector<AudioPacket> passthrough;
  const int64_t begin=origin+starts[index],end=origin+starts[index+1];bool started=false,first=true,boundary=false,videoDone=false;int packets=0;Packet packet;
@@ -428,13 +491,13 @@ std::vector<uint8_t> State::videoSegment(int index){
      auto csd=CastVideoSource::configuration(p,q,videoConfigured&&!videoInputCsd.empty()?&videoInputCsd:nullptr);
      if(p->codec_id==AV_CODEC_ID_HEVC){pendingCsd=csd.first;if(!videoInputCsd.empty()&&pendingCsd!=videoInputCsd)throw Failure("cast_hw_source_configuration_changed");}
      check();std::string description=descriptor.str();description.pop_back();description+=",\"budget_ms\":"+std::to_string(std::max<int64_t>(0,std::chrono::duration_cast<std::chrono::milliseconds>(deadline-Clock::now()).count()-100))+"}";
-     started=true;videoBridge->begin(description,csd.first,csd.second,starts[index],starts[index+1]);first=false;
-    }videoBridge->offer(CastVideoSource::accessUnit(p,q),at-origin);}
+     started=true;{Measure time{input->metrics[2]};videoBridge->begin(description,csd.first,csd.second,starts[index],starts[index+1]);}first=false;
+    }{Measure time{input->metrics[2]};videoBridge->offer(CastVideoSource::accessUnit(p,q),at-origin);}}
    else if(!audioAdapter){if(q->size<=0||q->size>65536||passthrough.size()>2000)throw Failure("cast_hw_audio_packet_limit");AudioPacket a{std::vector<uint8_t>(q->data,q->data+q->size),q->pts,q->dts,q->duration,q->flags,{}};for(int k=0;k<q->side_data_elems;k++){auto& side=q->side_data[k];if(side.type==AV_PKT_DATA_NEW_EXTRADATA)throw Failure("cast_hw_audio_configuration_changed");if(side.size>65536||a.side.size()>16)throw Failure("cast_hw_audio_side_limit");a.side.push_back({side.type,std::vector<uint8_t>(side.data,side.data+side.size)});}passthrough.push_back(std::move(a));}
    api().av_packet_unref(q);
   }
   if(!started||first)throw Failure("cast_hw_video_empty");
-  result=CastVideoResult::parse(videoBridge->finish(),starts[index],starts[index+1]);started=false;
+  {Measure time{input->metrics[2]};result=CastVideoResult::parse(videoBridge->finish(),starts[index],starts[index+1]);}started=false;
  }catch(...){if(started)try{videoBridge->abort();}catch(...){}throw;}
  if(first||result.packets.empty())throw Failure("cast_hw_video_empty");
  if(videoConfigured&&videoFormat.config!=result.config)throw Failure("cast_hw_avc_configuration_changed");
@@ -447,10 +510,11 @@ std::vector<uint8_t> State::videoSegment(int index){
  for(auto& a:converted)mux.push_back({&a.data,1,a.sample+10LL*audioAdapter->Rate,a.sample+10LL*audioAdapter->Rate,a.duration,a.flags,{1,audioAdapter->Rate},&a.side});
  if(!passthrough.empty()){auto* track=format->streams[audio];int64_t offset=api().av_rescale_q(origin-TransportEpoch,AV_TIME_BASE_Q,track->time_base);for(auto& a:passthrough)mux.push_back({&a.data,1,a.pts-offset,a.dts==AV_NOPTS_VALUE?a.dts:a.dts-offset,a.duration,a.flags,track->time_base,&a.side});}
  std::stable_sort(mux.begin(),mux.end(),[&](const MuxPacket& a,const MuxPacket& b){return micros(a.dts==AV_NOPTS_VALUE?a.pts:a.dts,a.base)<micros(b.dts==AV_NOPTS_VALUE?b.pts:b.dts,b.base);});
- AudioApi allocator;for(auto& item:mux){check();auto* q=packet.value;api().av_packet_unref(q);if(allocator.av_new_packet(q,int(item.data->size()))<0)throw Failure("mkv_memory_limit");std::copy(item.data->begin(),item.data->end(),q->data);q->pts=item.pts;q->dts=item.dts;q->duration=item.duration;q->flags=item.flags;q->stream_index=item.stream;q->pos=-1;if(item.side)for(auto& side:*item.side){auto* data=allocator.av_packet_new_side_data(q,side.type,side.data.size());if(!data)throw Failure("mkv_memory_limit");std::copy(side.data.begin(),side.data.end(),data);}api().av_packet_rescale_ts(q,item.base,out.format->streams[item.stream]->time_base);if(api().av_interleaved_write_frame(out.format,q)<0||out.failure)throw Failure("cast_hw_packet_mux_failed");}
- if(api().av_interleaved_write_frame(out.format,nullptr)<0||api().av_write_frame(out.format,nullptr)<0||api().av_write_trailer(out.format)<0)throw Failure("cast_hw_mux_flush_failed");api().avio_flush(out.io);check();if(out.failure||out.bytes.size()<=header)throw Failure("cast_hw_fragment_empty");
+ AudioApi allocator;for(auto& item:mux){check();auto* q=packet.value;api().av_packet_unref(q);if(allocator.av_new_packet(q,int(item.data->size()))<0)throw Failure("mkv_memory_limit");std::copy(item.data->begin(),item.data->end(),q->data);q->pts=item.pts;q->dts=item.dts;q->duration=item.duration;q->flags=item.flags;q->stream_index=item.stream;q->pos=-1;if(item.side)for(auto& side:*item.side){auto* data=allocator.av_packet_new_side_data(q,side.type,side.data.size());if(!data)throw Failure("mkv_memory_limit");std::copy(side.data.begin(),side.data.end(),data);}api().av_packet_rescale_ts(q,item.base,out.format->streams[item.stream]->time_base);out.put(q);}
+ out.finish();check();if(!out.sink && out.bytes.size()<=header)throw Failure("cast_hw_fragment_empty");
  videoBridge->qualifyDelivery(std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now()-workStarted).count(),(starts[index+1]-starts[index])/1000);
  if(!videoConfigured){videoInputHeader=std::move(pendingHeader);videoInputCsd=std::move(pendingCsd);init.assign(out.bytes.begin(),out.bytes.begin()+header);codecs=codecDescription(out.format->streams[0]->codecpar);if(audio>=0)codecs+=","+codecDescription(out.format->streams[1]->codecpar);videoConfigured=true;}
+ if(out.sink)return {};
  return std::vector<uint8_t>(out.bytes.begin()+header,out.bytes.end());
 }
 std::string safeName(const std::string& value){if(value.empty() || value.size()>32 || value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")!=std::string::npos)return "unknown";return value;}
@@ -489,6 +553,15 @@ struct JniVideo:CastVideoBridge {
  void abort()override{auto* e=env();e->CallVoidMethod(object,abortId);checked(e);}
  void qualifyDelivery(int64_t elapsed,int64_t span)override{auto* e=env();e->CallVoidMethod(object,qualifyId,jlong(elapsed),jlong(span));checked(e);}
 };
+struct JniChunks:ChunkSink {
+ JNIEnv* e;jobject target;jbyteArray buffer;jmethodID append;
+ JniChunks(JNIEnv* e,jobject target):e(e),target(target),buffer(nullptr),append(nullptr){
+  jclass type=nullptr;try{if(!target)throw Failure("mkv_chunk_callback_contract");type=e->GetObjectClass(target);if(!type||e->ExceptionCheck())throw Failure("mkv_chunk_callback_contract");append=e->GetMethodID(type,"append","([BI)V");if(!append||e->ExceptionCheck())throw Failure("mkv_chunk_callback_contract");buffer=e->NewByteArray(65536);if(!buffer||e->ExceptionCheck())throw Failure("mkv_chunk_memory_limit");e->DeleteLocalRef(type);}
+  catch(...){if(e->ExceptionCheck())e->ExceptionClear();if(type)e->DeleteLocalRef(type);if(buffer)e->DeleteLocalRef(buffer);throw;}
+ }
+ ~JniChunks(){e->DeleteLocalRef(buffer);}
+ void write(const uint8_t* data,size_t n)override{if(n>65536)throw Failure("mkv_chunk_callback_limit");e->SetByteArrayRegion(buffer,0,jsize(n),reinterpret_cast<const jbyte*>(data));if(!e->ExceptionCheck())e->CallVoidMethod(target,append,buffer,jint(n));if(e->ExceptionCheck()){auto thrown=e->ExceptionOccurred();e->ExceptionClear();std::string reason="mkv_chunk_storage_failed";auto type=e->GetObjectClass(thrown);if(type){auto method=e->GetMethodID(type,"getMessage","()Ljava/lang/String;");if(method){auto message=static_cast<jstring>(e->CallObjectMethod(thrown,method));if(message&&!e->ExceptionCheck()){const char* text=e->GetStringUTFChars(message,nullptr);if(text){std::string value(text);if(value.size()<=64&&value.rfind("mkv_",0)==0&&value.find_first_not_of("abcdefghijklmnopqrstuvwxyz0123456789_")==std::string::npos)reason=value;e->ReleaseStringUTFChars(message,text);}e->DeleteLocalRef(message);}}e->DeleteLocalRef(type);}if(e->ExceptionCheck())e->ExceptionClear();e->DeleteLocalRef(thrown);throw Failure(reason);}}
+};
 std::mutex handlesMutex;std::unordered_map<jlong,std::shared_ptr<State>> handles;jlong nextHandle=0;
 std::shared_ptr<State> get(jlong handle){std::lock_guard<std::mutex> lock(handlesMutex);auto i=handles.find(handle);if(i==handles.end())throw Failure("mkv_stale_handle");return i->second;}
 void error(JNIEnv* e,const char* reason){if(e->ExceptionCheck())e->ExceptionClear();e->ThrowNew(e->FindClass("java/io/IOException"),reason);}
@@ -499,8 +572,9 @@ extern "C" JNIEXPORT jstring JNICALL Java_com_projectinfinity_kodi_InfinityCastR
 extern "C" JNIEXPORT jstring JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_configureVideo(JNIEnv* e,jclass,jlong h,jobject video){try{auto s=get(h);s->configureVideo(std::unique_ptr<CastVideoBridge>(new JniVideo(e,video)));return e->NewStringUTF(s->describe().c_str());}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT jbyteArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_init(JNIEnv* e,jclass,jlong h){try{return bytes(e,get(h)->init);}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT jlong JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_readBudget(JNIEnv* e,jclass,jlong h,jint n){try{auto s=get(h);if(s->cancelled.load())throw Failure("mkv_cancelled");s->input->reset(n);return jlong(s->readBudget(n));}catch(const std::exception& x){error(e,x.what());return 0;}}
-extern "C" JNIEXPORT jlongArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_sourceStats(JNIEnv* e,jclass,jlong h){try{auto s=get(h);auto& i=*s->input;jlong values[]={i.fragment,jlong(i.consumed[0]),jlong(i.consumed[1]),jlong(i.consumed[2]),jlong(i.consumed[3]),jlong(i.seeks),jlong(i.errors)};auto result=e->NewLongArray(7);if(result)e->SetLongArrayRegion(result,0,7,values);return result;}catch(const std::exception& x){error(e,x.what());return nullptr;}}
+extern "C" JNIEXPORT jlongArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_sourceStats(JNIEnv* e,jclass,jlong h){try{auto s=get(h);auto& i=*s->input;jlong values[]={i.fragment,jlong(i.consumed[0]),jlong(i.consumed[1]),jlong(i.consumed[2]),jlong(i.consumed[3]),jlong(i.seeks),jlong(i.errors)};auto result=e->NewLongArray(17);if(result){e->SetLongArrayRegion(result,0,7,values);jlong extra[10];for(int n=0;n<10;n++)extra[n]=jlong(i.metrics[n]);e->SetLongArrayRegion(result,7,10,extra);}return result;}catch(const std::exception& x){error(e,x.what());return nullptr;}}
 extern "C" JNIEXPORT jbyteArray JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segment(JNIEnv* e,jclass,jlong h,jint n){try{return bytes(e,get(h)->segment(n));}catch(const std::exception& x){error(e,x.what());return nullptr;}}
+extern "C" JNIEXPORT void JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_segmentStream(JNIEnv* e,jclass,jlong h,jint n,jobject target){try{auto s=get(h);JniChunks sink(e,target);if(s->outputSink)throw Failure("mkv_chunk_owner_busy");s->outputSink=&sink;try{auto legacy=s->segment(n);for(size_t at=0;at<legacy.size();at+=65536){s->check();sink.write(legacy.data()+at,std::min(size_t(65536),legacy.size()-at));}s->outputSink=nullptr;}catch(...){s->outputSink=nullptr;throw;}}catch(const std::exception& x){error(e,x.what());}}
 extern "C" JNIEXPORT void JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_cancel(JNIEnv*,jclass,jlong h){try{get(h)->cancelled=true;}catch(...) {}}
 extern "C" JNIEXPORT void JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_close(JNIEnv*,jclass,jlong h){std::shared_ptr<State> last;{std::lock_guard<std::mutex> lock(handlesMutex);auto i=handles.find(h);if(i==handles.end())return;last=i->second;last->cancelled=true;handles.erase(i);}}
 extern "C" JNIEXPORT jint JNICALL Java_com_projectinfinity_kodi_InfinityCastRemuxNative_active(JNIEnv*,jclass){std::lock_guard<std::mutex> lock(handlesMutex);return jint(handles.size());}
