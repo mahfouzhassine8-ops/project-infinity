@@ -1,0 +1,40 @@
+{
+  "reviewer": "Astra",
+  "agent": "/root/astra_502_review",
+  "status": "PASS_SIGNED_PAIR_REVIEW",
+  "candidate": {
+    "run": 44234028066,
+    "id": 14396442272,
+    "name": "Infinity512-Cast-Reliability-OriginalSigned-44234028066-QA",
+    "size_in_bytes": 331043944,
+    "digest": "sha256:5e4f82e44cf1b210701cbb42ba0ad006de42653afdd04da0e34ff3f41f28b381",
+    "source": "a70aaaec062eac447556d22325affef9d8d496ec",
+    "workflow_id": 397702717,
+    "APK_sha256": "4bfe67cf9d3edefdc1d3e04accc826089b314e043a8dd98dba206cd1924a1d8c"
+  },
+  "recovery": {
+    "run": 44234725861,
+    "id": 14396797811,
+    "name": "Infinity512-Cast-Reliability-OriginalSigned-44234725861-QA",
+    "size_in_bytes": 331023182,
+    "digest": "sha256:6517e6fbf0640460e1c38d97ca256e9ddc0093de8970a75a1e9f0b9c91b7abdb",
+    "source": "fa3e7900e091591006a1fcada279c9fc77c3697f",
+    "workflow_id": 397702717,
+    "APK_sha256": "c54175ca62b160649f21c50b6787e621ee784bec7dd47021aa2178e5ac5515e0"
+  },
+  "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+  "v1_v2_v3": true,
+  "candidate_changed_unchanged": [
+    4,
+    7773
+  ],
+  "recovery_changed_unchanged": [
+    2,
+    7775
+  ],
+  "recovery_restores": 2103512,
+  "candidate_registry_sha256": "f236800682c398884c5c069b8564b6e95a95ecb988f84e1724ea3badc42158ba",
+  "recovery_registry_sha256": "7385ca151a7930d0f49c94e4224c85a7c71c993fbd568bb1217b0403f79892db",
+  "accepted_pointer_updated": false,
+  "physical_acceptance": false
+}
