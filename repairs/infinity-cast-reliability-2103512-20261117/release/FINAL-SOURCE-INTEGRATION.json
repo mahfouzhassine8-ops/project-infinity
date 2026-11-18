@@ -1,0 +1,52 @@
+{
+  "status": "PASS_EXACT_PRODUCTION_SOURCE_INTEGRATION",
+  "foundation": 2103512,
+  "foundation_signing_source": "c169b2fb7c91fccf7efdde4e4660f8462dec6d2e",
+  "repair_source": "7910d51e74739f83453766c2cc89ff384cfae508",
+  "registered_signing_source": "a70aaaec062eac447556d22325affef9d8d496ec",
+  "changed_Cast_production_files": [
+    {
+      "path": "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp",
+      "before": "c6e9644be7ba3b48c08abbff6ee6b7c4eaa7c797b74c8dc5d1246488bc9707c0",
+      "after": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649"
+    },
+    {
+      "path": "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h",
+      "before": "0404e0814d49ff434653e949b78dc94810f0d4721a43cbc27af3027f69449ca8",
+      "after": "3b83a9bbd5c2b8dbe39de0170c1143ef5a8e3716956e62773234018d51fe339b"
+    },
+    {
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java",
+      "before": "e3f13d6e5e1347bc9c7879b4fa8a85e352f382c346f42e5e3a6db7d79261ea4f",
+      "after": "0169800e3f473329832e2b7d26c0b77bc02412d08c954213776dec69e184e2a0"
+    },
+    {
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java",
+      "before": "69913356f870ab4f9e1e2561979b8ef5ca4f4e672327b27b87995955d0768dca",
+      "after": "f1764f44f28a268477db6272b3429450cd761a0292071ad338215c599d5b3ffa"
+    },
+    {
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java",
+      "before": "5db76e3a9365750d3f9e5cd3a9987edcdce13167f68df88e2176b060729ccea0",
+      "after": "6a561095ed7dcacdab88fbb84ea61a9c32a9197be220a842d2007bbb042f3236"
+    },
+    {
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java",
+      "before": "cf41f1f690f97eff14533d0117cfc5306989dc8f9559d6e9f79961b98bb1cb39",
+      "after": "31d42c5d552696091bc362c36224422479a828e0902c21b058b0f138ef5a8470"
+    },
+    {
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java",
+      "before": "f290b56c78559285052e7e90ede3c60d976667a1db5c1230cc0342f4416dc329",
+      "after": "636dc66201440008eebaad747b7d4454abc9a08202f4b02e678b592c77a866a3"
+    },
+    {
+      "path": "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastResource.java",
+      "before": null,
+      "after": "690bc66c91b06bd072a5ef9592292fbe59d4846ee826f1135b365de2976a02b4"
+    }
+  ],
+  "production_sources_equal_across_repair_and_signer": true,
+  "engine_rebuild": false,
+  "physical_acceptance": "PENDING_OWNER"
+}
