@@ -13,4 +13,10 @@ s=s.replace('String address(){throw new AssertionError();}', 'void warm(long p,R
 s=s.replace("names=['InfinityCastRemux'", "names=['InfinityCastResource','InfinityCastRemux'")
 s=s.replace("z.write(fixtures/'direct-hevc.mkv','assets/direct-hevc.mkv')", "z.write(fixtures/'direct-hevc.mkv','assets/direct-hevc.mkv');z.write(fixtures/'high-sparse.mkv','assets/high-sparse.mkv')")
 s=s.replace("\n sdk=", "\n import gzip\n from sparse_cues import sparse\n (fixtures/'high-sparse.mkv').write_bytes(sparse(gzip.decompress((HERE/'fixtures/high-24s-h264-eac3.mkv.gz').read_bytes())))\n sdk=",1)
-exec(compile(s,str(__file__),'exec'),{'__file__':str(__file__),'__name__':'__main__'})
+scope={'__file__':str(__file__),'__name__':'_retained_pipeline_recipe'}
+exec(compile(s,str(__file__),'exec'),scope)
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parent))
+from reuse_native import reuse
+scope['reuse_native']=reuse
+scope['main']()

@@ -1,0 +1,46 @@
+{
+  "base": {
+    "DEX_sha256": "685d744bfcb9ecc28f0e948a9c8882cb835dff2e9d0a494c7b6768bff30b01ee",
+    "references": [
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {p1, v1, v2, v5}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(Ljava/lang/Object;JI)V"
+      },
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {p1, v8, v9, v1}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(Ljava/lang/Object;JI)V"
+      },
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {p1, p2, p3, v1}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(Ljava/lang/Object;JI)V"
+      },
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {p2, v0, v1, p1}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(Ljava/lang/Object;JI)V"
+      }
+    ]
+  },
+  "candidate": {
+    "DEX_sha256": "9189cbd00611f6e2085f6ee78658b9ab81c028583b42ec7834439e9f75dced18",
+    "references": [
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {v1, v2, v5, p1}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(JILjava/lang/Object;)V"
+      },
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {v8, v9, v1, p1}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(JILjava/lang/Object;)V"
+      },
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {p2, p3, v1, p1}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(JILjava/lang/Object;)V"
+      },
+      {
+        "class": "com/projectinfinity/kodi/castdeps/Af.smali",
+        "instruction": "invoke-static {v0, v1, p1, p2}, Lcom/projectinfinity/kodi/castdeps/Wf;->k(JILjava/lang/Object;)V"
+      }
+    ]
+  },
+  "status": "PASS_ALL_METHOD_REFERENCE_DESCRIPTORS_AND_REGISTER_PERMUTATIONS",
+  "all_four_operand_permutations_verified": true
+}

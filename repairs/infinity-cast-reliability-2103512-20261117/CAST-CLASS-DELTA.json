@@ -66,6 +66,65 @@
   ],
   "removed": [],
   "unchanged": 1014,
-  "SDK_private_dependency_classes_changed": [],
-  "status": "PASS_ALL_OTHER_CLASSES_IDENTICAL"
+  "SDK_private_dependency_classes_changed": [
+    "com/projectinfinity/kodi/castdeps/Af.smali",
+    "com/projectinfinity/kodi/castdeps/Wf.smali",
+    "com/projectinfinity/kodi/castdeps/X.smali",
+    "com/projectinfinity/kodi/castdeps/X6.smali",
+    "com/projectinfinity/kodi/castdeps/Xc.smali",
+    "com/projectinfinity/kodi/castdeps/j9.smali",
+    "com/projectinfinity/kodi/castdeps/q.smali",
+    "com/projectinfinity/kodi/castdeps/u.smali"
+  ],
+  "status": "PASS_EXACT_COMPONENT_DELTA_WITH_EIGHT_EXPLICIT_COMPILER_INTEGRATION_CHANGES",
+  "first_party_Cast_classes_changed": [
+    "com/projectinfinity/kodi/InfinityCastHardwareVideo.smali",
+    "com/projectinfinity/kodi/InfinityCastRelay$RemuxInput.smali",
+    "com/projectinfinity/kodi/InfinityCastRelay.smali",
+    "com/projectinfinity/kodi/InfinityCastRemux.smali",
+    "com/projectinfinity/kodi/InfinityCastRemuxNative.smali",
+    "com/projectinfinity/kodi/InfinityCastRpc.smali",
+    "com/projectinfinity/kodi/InfinityCastSession.smali",
+    "com/projectinfinity/kodi/c.smali",
+    "com/projectinfinity/kodi/f.smali",
+    "com/projectinfinity/kodi/g.smali",
+    "com/projectinfinity/kodi/h.smali",
+    "com/projectinfinity/kodi/i.smali",
+    "com/projectinfinity/kodi/j.smali",
+    "com/projectinfinity/kodi/k.smali",
+    "com/projectinfinity/kodi/l.smali",
+    "com/projectinfinity/kodi/m.smali",
+    "com/projectinfinity/kodi/n.smali",
+    "com/projectinfinity/kodi/o.smali",
+    "com/projectinfinity/kodi/p.smali",
+    "com/projectinfinity/kodi/q.smali",
+    "com/projectinfinity/kodi/r.smali",
+    "com/projectinfinity/kodi/s.smali",
+    "com/projectinfinity/kodi/t.smali",
+    "com/projectinfinity/kodi/u.smali",
+    "com/projectinfinity/kodi/v.smali",
+    "com/projectinfinity/kodi/w.smali",
+    "com/projectinfinity/kodi/x.smali",
+    "com/projectinfinity/kodi/y.smali",
+    "com/projectinfinity/kodi/z.smali"
+  ],
+  "SDK_delta_classification": {
+    "debug_line_only": [
+      "X",
+      "X6",
+      "Xc",
+      "j9",
+      "q"
+    ],
+    "coordinated_R8_private_parameter_permutation": [
+      "Af",
+      "Wf"
+    ],
+    "required_new_Cast_BooleanSupplier_outline_bridge": [
+      "u"
+    ],
+    "dependency_source_or_version_changes": false,
+    "all_other_classes_must_remain_exact": true,
+    "review": "SDK-REFERENCE-REVIEW.json; exactclassbefore/afterdiffs independentlyreviewed; no blanketSDKnormalization"
+  }
 }
