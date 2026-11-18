@@ -1,0 +1,95 @@
+{
+  "baseline_APK_sha256": "746f622bf2bb850ee1c12ec083a0f2b98a7ec090b9664b6712dd10a579d59170",
+  "versions": {
+    "candidate": 2103514,
+    "recovery": 2103515
+  },
+  "generations": {
+    "candidate": 99,
+    "recovery": 100
+  },
+  "parent_generation": 98,
+  "parent_authority_sha256": "c6a583a1420bdc99b22e6b9e8f55d94d5f1529a2a198c80b74314d1365af3932",
+  "workflow_sha256": "43ad342f9d9f6edca38bb6d7ad43e622377fd670aab948c626980c564372a2ea",
+  "source_bindings": {
+    "repairs/infinity-cast-reliability-2103512-20261117/release/register_dual.py": "9dfbed1a511c94617038ca368ad8dc7171dbd9bbbb4ade4b1ae12d13a78a7470",
+    "repairs/infinity-cast-reliability-2103512-20261117/release/owner_bundle.py": "95474786275ff0fe9412811957eb13fea1d671b145633109914f7e7052198ccf",
+    "repairs/infinity-cast-reliability-2103512-20261117/release/ORCHESTRATION-REVIEW.json": "87c13c519c884024737565d33b6b3a12ab982996e64bd14bb3123b397a888703",
+    "repairs/infinity-cast-reliability-2103512-20261117/release/WORKFLOW-REVIEW.json": "95f200f6dad58c65d9ad3268599e94f3cdc275850e62e5ced9d9f40e6f48e670",
+    "repairs/infinity-cast-reliability-2103512-20261117/release/ROOTS-REVIEW.json": "15d40a876e5beab5b0845d1a5550559bbf295f136c9aa604afba5e54b4a01b56",
+    "repairs/infinity-cast-reliability-2103512-20261117/release/NEW-ROOTS-SOURCE.json": "8fdcce1f573c3c854a8f379a99dd9ec6a2e88b513f00b9eaae5bdf6d186a0828",
+    "repairs/infinity-cast-reliability-2103512-20261117/CAST-CLASS-DELTA.json": "ffc31e03a78e415c4fa9acaa8785f0708db447ae729b9a7d451ee52d041e5e3a",
+    "repairs/infinity-cast-reliability-2103512-20261117/component_contract.py": "b6e93e3680b526f1ca997e6f8fdb6e68ddedeeda3e06c0649337700eba0fb1f9",
+    ".github/workflows/infinity-506-cast-component.yml": "9683b21bc6535b954f4dbf5371432e779c2123bf58ae92968291a7786d1a96e2",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "2be913e652a1e0f3b991540837067a2bbf098f3f6176fa9aefcc6052f909f69e",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml": "29b138fb233fdd2d46b82ec0078c0cf19259c1a905ffff48fd9c7a3740b5c128"
+  },
+  "base": {
+    "run": 44113996950,
+    "id": 14341728668,
+    "name": "Infinity510-Cast-Dual-Failure-OriginalSigned-44113996950-QA",
+    "size_in_bytes": 331023434,
+    "digest": "sha256:8068df0917779f281b37260bafd58eeed35d94d3be42a7a85ce2b9421d724159",
+    "source": "c169b2fb7c91fccf7efdde4e4660f8462dec6d2e",
+    "workflow_id": 397702717,
+    "APK_sha256": "746f622bf2bb850ee1c12ec083a0f2b98a7ec090b9664b6712dd10a579d59170"
+  },
+  "stage": {
+    "run": 44231874837,
+    "id": 14394873723,
+    "name": "Infinity512-Cast-Reliability-44231874837-UNSIGNED-NOT-INSTALLABLE",
+    "size_in_bytes": 646794625,
+    "digest": "sha256:901da5106de2b54b89db506b46457501a3f5fa2866b904803a70eef45d9fbaa7",
+    "source": "534e8a441ed6d0b83d337f6666d05776306b7bef",
+    "workflow_id": 421117469
+  },
+  "owners": {
+    "run": 44111882828,
+    "id": 14341707377,
+    "name": "Infinity510-Cast-Dual-Failure-Prepared-44111882828",
+    "size_in_bytes": 1284427018,
+    "digest": "sha256:9a458417ea7ff01252920e98d077167fcc7a78ec563a7e67281087c09d69afe2",
+    "source": "ccfad9b8ad8470eb7e717dfcb96014e577e00139",
+    "workflow_id": 397702717
+  },
+  "expected_changes": {
+    "candidate": {
+      "assets/experience-component-updates.properties": {
+        "before": "fdcc9eb7500c3386f8534da9097638bd2b154f10e7e22368439bc1ebf084aae3",
+        "after": "a3a8eb7c3e70238baa6ac6890d11d00e02abf02328dcd778a513f40a26fec711"
+      },
+      "lib/arm64-v8a/libinfinitycastremux.so": {
+        "before": "fcd75bd6b331b0dde303c1abb8b52960157bebe1375824eaa85e39103d683a84",
+        "after": "5073b1539f6258e3d928b96a33adade9b45fc10bdeb1e0bee2d184755c9dcdb9"
+      },
+      "classes6.dex": {
+        "before": "685d744bfcb9ecc28f0e948a9c8882cb835dff2e9d0a494c7b6768bff30b01ee",
+        "after": "9189cbd00611f6e2085f6ee78658b9ab81c028583b42ec7834439e9f75dced18"
+      },
+      "AndroidManifest.xml": {
+        "before": "fb61752b0603ec3609f57dcee9fd09704cea5b811fc21d6b1c53d5558ffaf547",
+        "after": "cc08368f52d1fbf3990aab6b573a50c12f977c98e9619bc074666d289852fade"
+      }
+    },
+    "recovery": {
+      "assets/experience-component-updates.properties": {
+        "before": "fdcc9eb7500c3386f8534da9097638bd2b154f10e7e22368439bc1ebf084aae3",
+        "after": "dacad6a51078e7571e64675480b22433fafacd69606781038372e3700ce45398"
+      },
+      "AndroidManifest.xml": {
+        "before": "fb61752b0603ec3609f57dcee9fd09704cea5b811fc21d6b1c53d5558ffaf547",
+        "after": "bad1b7c23b1310b9ddf08070dfec446729586493d5fefe44a7dc8187785e5816"
+      }
+    }
+  },
+  "accepted_pointer_updated": false,
+  "known_limitations": {
+    "Main10_Android_decode": "UNVERIFIED_HARDWARE; CIcodec_inventoryunsupported_is_notPASS",
+    "Fold_hardware_thermal_sustained_throughput": "PENDING_PHYSICAL_ACCEPTANCE; previous332msvideo-onlysamplenotfullqualification",
+    "TV_playback": "PENDING_OWNER",
+    "owner310": "Exactreceivervendorfaultnotestablished; source/read/muxdefectsreproducedandcorrected",
+    "shutdown": "NOT_SELECTED; CODE_AND_ENGINE_UNCHANGED",
+    "accepted_baseline": "NOT_PROMOTED"
+  },
+  "draft_review_digest": "5053a942e54c8d67584ffdc25a3d0d142ad2830c11aa857e5d44d9c7679d37ca"
+}

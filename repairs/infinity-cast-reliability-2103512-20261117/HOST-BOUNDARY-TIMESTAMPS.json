@@ -1,0 +1,80 @@
+{
+  "status": "PASS_EXACT_BOTH_DURATION_DIRECTIONS_SOURCE_PTS_PACKET_PAYLOAD_AND_DTS",
+  "cases": [
+    {
+      "case": "normal",
+      "index": 0,
+      "output_bytes": 14023442,
+      "payload_peak": 4185314,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "normal",
+      "index": 1,
+      "output_bytes": 14197284,
+      "payload_peak": 4139792,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "normal",
+      "index": 2,
+      "output_bytes": 14196675,
+      "payload_peak": 4139797,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "duration_40ms",
+      "index": 0,
+      "output_bytes": 14023442,
+      "payload_peak": 4185314,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "duration_40ms",
+      "index": 1,
+      "output_bytes": 14197284,
+      "payload_peak": 4139792,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "duration_40ms",
+      "index": 2,
+      "output_bytes": 14196675,
+      "payload_peak": 4139797,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "duration_42ms",
+      "index": 0,
+      "output_bytes": 14023442,
+      "payload_peak": 4185314,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "duration_42ms",
+      "index": 1,
+      "output_bytes": 14197284,
+      "payload_peak": 4139792,
+      "origin_us": -5000,
+      "exact_PTS": true
+    },
+    {
+      "case": "duration_42ms",
+      "index": 2,
+      "output_bytes": 14196675,
+      "payload_peak": 4139797,
+      "origin_us": -5000,
+      "exact_PTS": true
+    }
+  ],
+  "source_bytes_and_PTS_untouched": "Only declared Matroska default duration hint40/42ms varies; real compressed NALs/timestamps unchanged",
+  "AAC": "continuous canonical packets, monotonic sample clock",
+  "old_ARM64_failure": "six packet PTSshifts before correction; retained as failed gate44223360240"
+}

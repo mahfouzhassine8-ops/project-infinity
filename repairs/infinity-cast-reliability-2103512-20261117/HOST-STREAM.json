@@ -1,0 +1,82 @@
+{
+  "fixture_sha256": "13e8361df214dc70cf9ff91abf46f8b075ad8c545c5465c5e90699676d4c890b",
+  "source_raster": "320x180 H264, real coded high byte rate; not a4K hardware qualification",
+  "results": [
+    {
+      "index": 0,
+      "origin_us": -5000,
+      "source_bytes": 36545628,
+      "budget": 85992175,
+      "planner_saturated": 0,
+      "output_bytes": 14023442,
+      "largest_chunk": 32768,
+      "payload_peak": 4185314,
+      "moofs": 4,
+      "sha256": "66401922a14511982e047e153b6474951ff95dee351c02845fc738d66b15b166",
+      "strict_decode": true,
+      "video_packets": 192,
+      "audio_packets": 376
+    },
+    {
+      "index": 1,
+      "origin_us": -5000,
+      "source_bytes": 88437144,
+      "budget": 134217728,
+      "planner_saturated": 1,
+      "output_bytes": 14197284,
+      "largest_chunk": 32768,
+      "payload_peak": 4139792,
+      "moofs": 4,
+      "sha256": "605004e403fa7e57a7ff33b3c300d6e57c397b2b32045fabf1d5f2bc77b95384",
+      "strict_decode": true,
+      "video_packets": 192,
+      "audio_packets": 375
+    },
+    {
+      "index": 2,
+      "origin_us": -5000,
+      "source_bytes": 103038829,
+      "budget": 129658605,
+      "planner_saturated": 0,
+      "output_bytes": 14196675,
+      "largest_chunk": 32768,
+      "payload_peak": 4139797,
+      "moofs": 4,
+      "sha256": "98b9f5fb0fa596540a4b601c2f3bb1e9e4d9279274e0e88efb25f311982e1b66",
+      "strict_decode": true,
+      "video_packets": 192,
+      "audio_packets": 374
+    },
+    {
+      "index": 0,
+      "origin_us": -5000,
+      "source_bytes": 65924425,
+      "budget": 129046933,
+      "planner_saturated": 0,
+      "output_bytes": 21121928,
+      "largest_chunk": 32768,
+      "payload_peak": 4185314,
+      "moofs": 6,
+      "sha256": "de3e82230248b6fe43c1b34b5b793f2602f7120f03f8b255d3872ad62998ae59",
+      "strict_decode": true,
+      "video_packets": 288,
+      "audio_packets": 563
+    },
+    {
+      "index": 1,
+      "origin_us": -5000,
+      "source_bytes": 88437144,
+      "budget": 134217728,
+      "planner_saturated": 1,
+      "output_bytes": 14197284,
+      "largest_chunk": 32768,
+      "payload_peak": 4139792,
+      "moofs": 4,
+      "sha256": "605004e403fa7e57a7ff33b3c300d6e57c397b2b32045fabf1d5f2bc77b95384",
+      "strict_decode": true,
+      "video_packets": 192,
+      "audio_packets": 375
+    }
+  ],
+  "status": "PASS_STREAMING_MULTI_MOOF_REAL_PACKETS"
+}

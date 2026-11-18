@@ -1,0 +1,55 @@
+{
+  "status": "SEPARATE_PACKAGE_PIPELINE_READY",
+  "foundation": {
+    "run": 44113996950,
+    "id": 14341728668,
+    "name": "Infinity510-Cast-Dual-Failure-OriginalSigned-44113996950-QA",
+    "size_in_bytes": 331023434,
+    "digest": "sha256:8068df0917779f281b37260bafd58eeed35d94d3be42a7a85ce2b9421d724159",
+    "source": "c169b2fb7c91fccf7efdde4e4660f8462dec6d2e",
+    "workflow_id": 397702717,
+    "APK_sha256": "746f622bf2bb850ee1c12ec083a0f2b98a7ec090b9664b6712dd10a579d59170"
+  },
+  "native": {
+    "libkodi.so": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+    "libc++_shared.so": "f1ce8bc0759504421da60393b8654cce473973615416254e68255306ec913222",
+    "libshairplay.so": "ab402c0b2577c8f128695db53808c0e1b07b7f70d63125655eba37a0be18da9b"
+  },
+  "source": "1961f2bc067dfcda48334cc5dfed65d8b3ea5b89",
+  "engine_rebuilt": false,
+  "SDK_rebuilt": false,
+  "production_DEX_rebuilt": false,
+  "production_Cast_DEX_sha256": "9189cbd00611f6e2085f6ee78658b9ab81c028583b42ec7834439e9f75dced18",
+  "external_API_contract": {
+    "status": "PASS_RETAINED_APK_CALLER_ACCESS_STATICNESS_AND_CAST_ENTRYPOINTS",
+    "external_types_checked": [],
+    "external_members_checked": [],
+    "added": [
+      "Lcom/projectinfinity/kodi/A;",
+      "Lcom/projectinfinity/kodi/B;",
+      "Lcom/projectinfinity/kodi/C;",
+      "Lcom/projectinfinity/kodi/D;",
+      "Lcom/projectinfinity/kodi/E;",
+      "Lcom/projectinfinity/kodi/F;",
+      "Lcom/projectinfinity/kodi/G;",
+      "Lcom/projectinfinity/kodi/H;",
+      "Lcom/projectinfinity/kodi/I;",
+      "Lcom/projectinfinity/kodi/InfinityCastHardwareVideo$Delivery;",
+      "Lcom/projectinfinity/kodi/InfinityCastRelay$RemuxInput$Page;",
+      "Lcom/projectinfinity/kodi/InfinityCastRelay$WarmRequest;",
+      "Lcom/projectinfinity/kodi/InfinityCastRemux$1;",
+      "Lcom/projectinfinity/kodi/InfinityCastRemux$Ticket;",
+      "Lcom/projectinfinity/kodi/InfinityCastResource$Lease;",
+      "Lcom/projectinfinity/kodi/InfinityCastResource$Store;",
+      "Lcom/projectinfinity/kodi/InfinityCastResource;",
+      "Lcom/projectinfinity/kodi/J;",
+      "Lcom/projectinfinity/kodi/K;",
+      "Lcom/projectinfinity/kodi/L;",
+      "Lcom/projectinfinity/kodi/M;",
+      "Lcom/projectinfinity/kodi/N;"
+    ],
+    "removed": []
+  },
+  "owner_installer": false,
+  "new_Cast_library_sha256": "5073b1539f6258e3d928b96a33adade9b45fc10bdeb1e0bee2d184755c9dcdb9"
+}

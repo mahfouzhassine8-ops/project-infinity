@@ -17,6 +17,7 @@ final class InfinityCastRemuxNative {
     static native long readBudget(long handle,int index) throws IOException;
     static native long[] sourceStats(long handle) throws IOException;
     static native byte[] segment(long handle,int index) throws IOException;
+    static native void segmentStream(long handle,int index,Object sink) throws IOException;
     static native void cancel(long handle);
     static native void close(long handle);
     static native int active();

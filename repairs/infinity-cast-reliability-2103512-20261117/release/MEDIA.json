@@ -1,0 +1,146 @@
+{
+  "status": "PASS_ACTUAL_ANDROID_INTEGRATED_CAST_MEDIA",
+  "video_packets": 288,
+  "video_PTS": "exact original values plus one fixed10s HLS epoch; DTS monotonic/noB",
+  "audio": "AAC-LC48k stereo, full decode; existing continuous AAC adapter unchanged",
+  "color": "actual SPS/VUI SDR709 limited",
+  "adjacent_independent_fragments": [
+    {
+      "name": "0.m4s",
+      "video_packets": 48,
+      "first_pts_us": 10005000,
+      "last_pts_us": 11963000
+    },
+    {
+      "name": "1.m4s",
+      "video_packets": 48,
+      "first_pts_us": 12005000,
+      "last_pts_us": 13963000
+    },
+    {
+      "name": "2.m4s",
+      "video_packets": 48,
+      "first_pts_us": 14005000,
+      "last_pts_us": 15963000
+    },
+    {
+      "name": "3.m4s",
+      "video_packets": 48,
+      "first_pts_us": 16005000,
+      "last_pts_us": 17963000
+    },
+    {
+      "name": "4.m4s",
+      "video_packets": 48,
+      "first_pts_us": 18005000,
+      "last_pts_us": 19963000
+    },
+    {
+      "name": "5.m4s",
+      "video_packets": 48,
+      "first_pts_us": 20005000,
+      "last_pts_us": 21963000
+    }
+  ],
+  "GPU_frame_alignment_SSIM": 0.939309,
+  "HDR_hardware_performance": "NOT_TESTED",
+  "physical_TV": "NOT_TESTED",
+  "large_AAC_raw_sample_clock": {
+    "samples": 1125,
+    "rate": 48000,
+    "tfdt_tfhd_trun": "exact source-derived canonical reference",
+    "encoder_source": "UNCHANGED"
+  },
+  "large_resources": [
+    {
+      "index": 0,
+      "bytes": 14023420,
+      "moofs": 4,
+      "sha256": "4b3768b4838b4d591c038fae4e3cc2d8be804dc53b9d51a23571ad25ab988946"
+    },
+    {
+      "index": 1,
+      "bytes": 14197272,
+      "moofs": 4,
+      "sha256": "c42356025afa5f3b5d6816e994d8ab62439b730b15fc3babffa730388b040b6e"
+    },
+    {
+      "index": 2,
+      "bytes": 14196694,
+      "moofs": 4,
+      "sha256": "3b9ef68b3f34b99d3744e727fdc2c5623c8d2c4cd6789f0d68acb02cb09d1c6e"
+    }
+  ],
+  "direct_HEVC": "Main10L153; exactsourcecompressedpacketbytes_and_PTS; monotonicDTS; fullAVdecode",
+  "sequences": {
+    "hardware": [
+      {
+        "index": 0,
+        "sequence": 1,
+        "sha256": "46d9761ec78bd7b7ac880dddb55d77eb1de06d26c10367ff7ca7b398c51f70a5"
+      },
+      {
+        "index": 1,
+        "sequence": 33,
+        "sha256": "27442e29b914636c6d8ecba443475872d863ed94f8e3c755103599b93dc1d3a1"
+      },
+      {
+        "index": 2,
+        "sequence": 65,
+        "sha256": "01d88c6dd74333a7e1775b62fb76a21abc9ca86e7fd6c509b060e8784a50d016"
+      },
+      {
+        "index": 3,
+        "sequence": 97,
+        "sha256": "e358a64c219bc1e989b26e02e15d0d68ba21b1f8d8d7ffdeceb9ff194f43e466"
+      },
+      {
+        "index": 4,
+        "sequence": 129,
+        "sha256": "ee75a062d655c054df1b7ba043051dc626eb993abb1a95a13510319626f7ca01"
+      },
+      {
+        "index": 5,
+        "sequence": 161,
+        "sha256": "2efe7c99cd1ec5760f570332a07ecef60e9f4d4a64c0f23012b075a0ef5a7825"
+      }
+    ],
+    "direct": [
+      {
+        "index": 0,
+        "sequence": 1,
+        "sha256": "6fbaf56d16dbb8545283af120dbe3d728b605db3423f276387b8b596f2001ab2"
+      },
+      {
+        "index": 1,
+        "sequence": 33,
+        "sha256": "b7aa5df0a593af1e8ae8ce9ae2541e04db25d36fa2d071951f65a7d342bf6db2"
+      },
+      {
+        "index": 2,
+        "sequence": 65,
+        "sha256": "058fec0e01670437e4aa2be6823fdabdda890c75d0d1d3a0e4597ee04bd889eb"
+      },
+      {
+        "index": 3,
+        "sequence": 97,
+        "sha256": "13ed2780928734b97431ed9573a3e9c9bbdc3424294c9aaf7155f33986b928c6"
+      },
+      {
+        "index": 4,
+        "sequence": 129,
+        "sha256": "df6942cdff1c47642ec7e895bb8e3ded621f2051e0f21752e1c6211508373424"
+      },
+      {
+        "index": 5,
+        "sequence": 161,
+        "sha256": "ecb1eb0312585db4ac1f0c52d83b4e8b867084c4d1503674d8e09add85adc4cc"
+      }
+    ]
+  },
+  "Main10_Android_playback": "SeeRESULT.direct_HEVC.codec_inventory; unsupportedisNOTPASS",
+  "hardware_fixture": "GenuineMain8L3_RADL",
+  "cache": "Successful actualMediaCodec bootstrap followed bynonzero key requests whose inbandPSwere removed; sourceCSDcache reused",
+  "source_quota": "UNCHANGED",
+  "Fold_hardware_performance": "NOT_TESTED"
+}

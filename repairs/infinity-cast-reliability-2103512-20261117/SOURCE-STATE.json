@@ -1,0 +1,43 @@
+{
+  "status": "PASS_AVAILABLE_INTEGRATED_ENGINEERING_GATES_PHYSICAL_ACCEPTANCE_PENDING",
+  "baseline": 2103512,
+  "scope_preimages_authenticated": true,
+  "changed_production": {
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "6a561095ed7dcacdab88fbb84ea61a9c32a9197be220a842d2007bbb042f3236",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastResource.java": "690bc66c91b06bd072a5ef9592292fbe59d4846ee826f1135b365de2976a02b4",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "0169800e3f473329832e2b7d26c0b77bc02412d08c954213776dec69e184e2a0",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "31d42c5d552696091bc362c36224422479a828e0902c21b058b0f138ef5a8470",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "636dc66201440008eebaad747b7d4454abc9a08202f4b02e678b592c77a866a3",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "f1764f44f28a268477db6272b3429450cd761a0292071ad338215c599d5b3ffa",
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "3b83a9bbd5c2b8dbe39de0170c1143ef5a8e3716956e62773234018d51fe339b"
+  },
+  "host_stream": "HOST-STREAM.json",
+  "host_long": "HOST-LONG.json",
+  "resource_checks": 112,
+  "source_cache_checks": 5181,
+  "delivery_and_abandoned_result_checks": 9,
+  "physical_receiver_success": false,
+  "engine_rebuilt": false,
+  "signing_started": false,
+  "timestamp_correction": {
+    "CPP_sha256": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649",
+    "cause": "FFmpeg6movenc customflush reanchored nextfirstDTS toestimatedpriorend",
+    "repair": "Fresh boundedMP4writerperinternalchunk; codecs/demux/AAC stayalive; exactrawDTSguard",
+    "Astra_source_review": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649 approved",
+    "host_exact_video": "HOST-BOUNDARY-TIMESTAMPS.json",
+    "host_exact_AAC": "HOST-AAC-REFERENCE.json; AAC-SAMPLE-GRID.json",
+    "old_Android_app": "PASS in44223360240; overallworkflowFAIL strictPTSgate; retainednotaccepted",
+    "new_ARM64_Android": {
+      "status": "PASS",
+      "run": 44230184774,
+      "artifact": 14395490442,
+      "actual_library_sha256": "5073b1539f6258e3d928b96a33adade9b45fc10bdeb1e0bee2d184755c9dcdb9",
+      "strict_media": "PASS_VIDEO_PTS_AND_RAW_AAC_SAMPLE_GRID",
+      "cancel_ms": 110,
+      "remaining_contexts": 0
+    },
+    "Kodi_engine_rebuild": false,
+    "DEX_rebuild": false
+  }
+}

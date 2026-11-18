@@ -35,12 +35,12 @@ struct CastVideoBridge {
 struct CastVideoSource {
  // CSD is copied only from real parameter NALs. No guessed decoder metadata.
  // Empty hev1 arrays may carry their complete sets before the first VCL AU.
- static std::pair<std::vector<uint8_t>,std::vector<uint8_t>> configuration(const AVCodecParameters* p,const AVPacket* initial=nullptr,const std::vector<uint8_t>* verified=nullptr){
+ static std::pair<std::vector<uint8_t>,std::vector<uint8_t>> configuration(const AVCodecParameters* p,const AVPacket* initial=nullptr,const std::vector<uint8_t>* verified=nullptr,bool hardwareAdmission=true){
   const uint8_t* b=p->extradata;size_t size=size_t(p->extradata_size),at;std::vector<uint8_t> first,second;
   if(!b||p->extradata_size<7||size>65536||b[0]!=1)throw Failure("cast_hw_source_configuration_header");
   if(p->codec_id==AV_CODEC_ID_HEVC){
    if(size<23)throw Failure("cast_hw_source_configuration_header");
-   if(b[1]&32)throw Failure("cast_hw_source_high_tier_unsupported");
+   if(hardwareAdmission&&(b[1]&32))throw Failure("cast_hw_source_high_tier_unsupported");
    unsigned count=0,sets=0;at=23;
    auto validate=[&](const uint8_t* n,size_t length,unsigned type){
     if(length<2||(n[0]&128)||((n[0]>>1)&63)!=type||!(n[1]&7))throw Failure("cast_hw_source_configuration_nal_header");
@@ -68,7 +68,7 @@ struct CastVideoSource {
    // Never merge partial out-of-band sets with potentially conflicting updates.
    if(sets&&sets!=7)throw Failure("cast_hw_source_configuration_partial_sets");
    if(!sets){
-    if(!initial||!initial->data||initial->size<=0||initial->size>4*1024*1024)throw Failure("cast_hw_source_configuration_inband_missing");
+    if(!initial||!initial->data||initial->size<=0||initial->size>(hardwareAdmission?4:8)*1024*1024)throw Failure("cast_hw_source_configuration_inband_missing");
     const size_t total=size_t(initial->size);const unsigned width=(b[21]&3)+1;size_t offset=0;bool vcl=false;
     while(offset<total){
      if(++count>1024)throw Failure("cast_hw_source_configuration_count_limit");

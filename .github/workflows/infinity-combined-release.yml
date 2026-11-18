@@ -10,7 +10,7 @@ on:
         type: choice
         required: true
         default: final-combined
-        options: [prepare-fastqa500, sign-fastqa500, final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa, sign-core-outcomes-qa, prepare-core-forward-recovery, sign-core-forward-recovery, prepare-essential-repair, sign-essential-repair, prepare-essential-recovery, sign-essential-recovery, prepare-movies-cast-modules, prepare-movies-cast-release, review-movies-cast-release, sign-movies-cast, prepare-cast-final, review-cast-final, sign-cast-final, prepare-cast-repair90, review-cast-repair90, sign-cast-repair90, prepare-cast-repair92, review-cast-repair92, sign-cast-repair92, prepare-cast-mkv94, review-cast-mkv94, sign-cast-mkv94, prepare-cast96-dolby, review-cast96-dolby, sign-cast96-dolby, prepare-cast98-hls, review-cast98-hls, sign-cast98-hls, prepare-six502-qa, sign-six502-qa, prepare-cast504-audio, sign-cast504-audio, prepare-cast506-hardware, sign-cast506-hardware, prepare-cast508-reader, sign-cast508-reader, prepare-cast510-dual, sign-cast510-dual]
+        options: [prepare-fastqa500, sign-fastqa500, final-combined, prepare-preview451, prepare-kodi452, prepare-kodi453, prepare-ui454-455, prepare-controlled456-457, review-controlled456-457, prepare-browser458-459, review-browser458-459, prepare-six460-461, review-six460-461, package-nine-quick-updates, verify-nine-update-recovery, prepare-nine-native462-463, package-umbrella-pov-462, verify-three-native, prepare-three, sign-three, watchlist-verify-native, prepare-watchlist, sign-watchlist, publish-watchlist, prepare-tracking-modules, prepare-tracking-release, sign-tracking, verify-network-native, prepare-network-modules, prepare-network-release, sign-network, sign-performance, sign-startup-internal-qa, sign-core-outcomes-qa, prepare-core-forward-recovery, sign-core-forward-recovery, prepare-essential-repair, sign-essential-repair, prepare-essential-recovery, sign-essential-recovery, prepare-movies-cast-modules, prepare-movies-cast-release, review-movies-cast-release, sign-movies-cast, prepare-cast-final, review-cast-final, sign-cast-final, prepare-cast-repair90, review-cast-repair90, sign-cast-repair90, prepare-cast-repair92, review-cast-repair92, sign-cast-repair92, prepare-cast-mkv94, review-cast-mkv94, sign-cast-mkv94, prepare-cast96-dolby, review-cast96-dolby, sign-cast96-dolby, prepare-cast98-hls, review-cast98-hls, sign-cast98-hls, prepare-six502-qa, sign-six502-qa, prepare-cast504-audio, sign-cast504-audio, prepare-cast506-hardware, sign-cast506-hardware, prepare-cast508-reader, sign-cast508-reader, prepare-cast510-dual, sign-cast510-dual, prepare-cast512-reliability, sign-cast512-reliability]
       prepared_run:
         description: Completed official controlled preparation run for read-only authority review
         type: string
@@ -4821,5 +4821,71 @@ jobs:
             cast510-dual-original-signed/SIGNATURE.txt
             cast510-dual-original-signed/SHA256SUMS
             cast510-dual-original-signed/release-authority.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  cast512reliability:
+    name: Exact512 Cast integrated reliability QA through unchanged original owner gate
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103460-nine-corrections-20261106' && (inputs.operation == 'prepare-cast512-reliability' || inputs.operation == 'sign-cast512-reliability')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 45
+    env: {GH_TOKEN: '${{ github.token }}', PYTHONDONTWRITEBYTECODE: '1'}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.12'}
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3
+        with: {distribution: temurin, java-version: '21'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Unchanged sole-original-signer policy with reviewed unsigned workflows
+        run: python repairs/dual-experience-isolation-2103420/signer_policy.py check --out SIGNER-ROUTES.json
+      - name: Exact signed512 four-member delta and actual Cast-class owner compatibility
+        if: inputs.operation == 'prepare-cast512-reliability'
+        run: python repairs/infinity-cast-reliability-2103512-20261117/release/register_dual.py prepare
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: inputs.operation == 'prepare-cast512-reliability'
+        with: {name: 'Infinity512-Cast-Reliability-Prepared-${{ github.run_id }}', path: cast512-reliability-prepared/, if-no-files-found: error, retention-days: 90, compression-level: 6}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: inputs.operation == 'prepare-cast512-reliability'
+        with:
+          name: Infinity512-Cast-Reliability-Preparation-${{ github.run_id }}-RECEIPTS-ONLY
+          path: |
+            cast512-reliability-prepared/PREPARATION.json
+            cast512-reliability-prepared/candidate/AUTHORITY-PROPOSAL.json
+            cast512-reliability-prepared/candidate/PRESERVATION.json
+            cast512-reliability-prepared/recovery/AUTHORITY-PROPOSAL.json
+            cast512-reliability-prepared/recovery/PRESERVATION.json
+          if-no-files-found: error
+          retention-days: 90
+      - name: Exact registered authority and verified prepared APK before key access
+        if: inputs.operation == 'sign-cast512-reliability'
+        id: selected
+        run: python repairs/infinity-cast-reliability-2103512-20261117/release/register_dual.py selected
+      - name: Unchanged original APK signer and complete source owner payload gates
+        if: inputs.operation == 'sign-cast512-reliability'
+        env:
+          INFINITY_KEYSTORE_B64: ${{ secrets.INFINITY_KEYSTORE_B64 }}
+          INFINITY_STORE_PASSWORD: ${{ secrets.INFINITY_STORE_PASSWORD }}
+          INFINITY_KEY_PASSWORD: ${{ secrets.INFINITY_KEY_PASSWORD }}
+          INFINITY_KEY_ALIAS: ${{ secrets.INFINITY_KEY_ALIAS }}
+        run: python repairs/dual-experience-isolation-2103420/assemble.py sign --apk '${{ steps.selected.outputs.apk }}' --jars movies-cast-original-dex-tools --work signer-dex --repository . --expected-head "$GITHUB_SHA" --expected-generation '${{ steps.selected.outputs.generation }}' --sdk "$ANDROID_HOME/build-tools/35.0.0" --out cast512-reliability-original-signed
+      - name: Original certificate and exact signed512 preservation after signing
+        if: inputs.operation == 'sign-cast512-reliability'
+        run: python repairs/infinity-cast-reliability-2103512-20261117/release/register_dual.py post
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: inputs.operation == 'sign-cast512-reliability'
+        with: {name: 'Infinity512-Cast-Reliability-OriginalSigned-${{ github.run_id }}-QA', path: cast512-reliability-original-signed/, if-no-files-found: error, retention-days: 90, compression-level: 6}
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && inputs.operation == 'sign-cast512-reliability'
+        with:
+          name: Infinity512-Cast-Reliability-Signing-${{ github.run_id }}-RECEIPTS-ONLY
+          path: |
+            cast512-reliability-original-signed/PRESERVATION.json
+            cast512-reliability-original-signed/BUILD-RECEIPT.json
+            cast512-reliability-original-signed/SIGNATURE.txt
+            cast512-reliability-original-signed/SHA256SUMS
+            cast512-reliability-original-signed/release-authority.json
           if-no-files-found: warn
           retention-days: 90

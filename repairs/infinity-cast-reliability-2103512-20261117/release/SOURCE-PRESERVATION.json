@@ -1,0 +1,22 @@
+{
+  "status": "PASS_FROZEN_SIGNED512_SOURCE_SCOPE",
+  "foundation_source": "c169b2fb7c91fccf7efdde4e4660f8462dec6d2e",
+  "changed_source": {
+    "repairs/infinity-cast-hardware-pipeline-2103506-20261117/native/CastVideoAdapter.h": "3b83a9bbd5c2b8dbe39de0170c1143ef5a8e3716956e62773234018d51fe339b",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastHardwareVideo.java": "31d42c5d552696091bc362c36224422479a828e0902c21b058b0f138ef5a8470",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRelay.java": "f1764f44f28a268477db6272b3429450cd761a0292071ad338215c599d5b3ffa",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemux.java": "6a561095ed7dcacdab88fbb84ea61a9c32a9197be220a842d2007bbb042f3236",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastRemuxNative.java": "636dc66201440008eebaad747b7d4454abc9a08202f4b02e678b592c77a866a3",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastResource.java": "690bc66c91b06bd072a5ef9592292fbe59d4846ee826f1135b365de2976a02b4",
+    "repairs/infinity-movies-continue-cast-2103486-20261112/cast/java/com/projectinfinity/kodi/InfinityCastSession.java": "0169800e3f473329832e2b7d26c0b77bc02412d08c954213776dec69e184e2a0",
+    "repairs/infinity-six-repairs-2103502-20261116/cast/native/InfinityCastRemux.cpp": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649"
+  },
+  "orchestration": {
+    ".github/workflows/infinity-506-cast-component.yml": "9683b21bc6535b954f4dbf5371432e779c2123bf58ae92968291a7786d1a96e2",
+    ".github/workflows/infinity-506-cast-hardware-pipeline.yml": "2be913e652a1e0f3b991540837067a2bbf098f3f6176fa9aefcc6052f909f69e",
+    ".github/workflows/infinity-506-cast-hardware-stage.yml": "29b138fb233fdd2d46b82ec0078c0cf19259c1a905ffff48fd9c7a3740b5c128"
+  },
+  "all_other_existing_source": "UNCHANGED againstauthenticatedbranchpreimage",
+  "Cobra_KodiEngine_shutdown_data": "UNTOUCHED",
+  "release_status": "DRAFTONLY_NORESERVATION_OR_SIGNING"
+}

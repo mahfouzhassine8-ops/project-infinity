@@ -278,7 +278,12 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                     if(failure!=null || type==null || owner.closed()){lastFailure=mediaFailure(failure);message=lastFailure;abortTransfer();return;}
                     relay=owner;mime=type;
                     InfinityCastDiagnostics.event("media_format",type.equals("application/vnd.apple.mpegurl")?"hls":type.equals("application/dash+xml")?"dash":type.equals("video/mp4")?"mp4":type.equals("video/webm")?"webm":"other_supported",0);
-                    loadReceiver(expected,value,owner);
+                    stage("media_prepare",20000,"Cast media could not be buffered in time. Phone playback continues.");
+                    owner.warm(source.optLong("position_ms"),(ready,readyMime,problem)->ui.post(()->{
+                        if(!handoffActive(expected)||session!=value||relay!=ready)return;
+                        if(problem!=null){lastFailure=mediaFailure(problem);message=lastFailure;abortTransfer();return;}
+                        loadReceiver(expected,value,ready);
+                    }));
                 }));
                 if(!ticking){ticking=true;tick();}
             } catch(Exception | LinkageError unavailable){message="The Cast media transport could not start. Phone playback is unchanged.";abortTransfer();}
@@ -364,12 +369,20 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
             final String expectedMedia=mediaToken;
             final RemoteMediaClient receiver=remote;
             if(receiver==null || !ownsMedia()){aborting=true;restorePhone(false);return;}
+            final InfinityCastRelay owner=relay;
+            if(owner==null){aborting=true;restorePhone(false);return;}
+            stage("target_prepare",20000,"The Cast playback position could not be buffered. Returning to phone playback.");
+            final long preparation=stageSerial;
+            owner.warm(value.optLong("position_ms"),(ready,readyMime,problem)->ui.post(()->{
+                if(!handoffActive(expected)||relay!=ready||preparation!=stageSerial||receiver!=remote||!expectedMedia.equals(mediaToken))return;
+                if(problem!=null){lastFailure=mediaFailure(problem);message=lastFailure;abortTransfer();return;}if(!ownsMedia()){aborting=true;restorePhone(false);return;}
             stage("receiver_seek",8000,"The TV did not confirm its playback position. Returning to phone playback.");
             final long seekSerial=stageSerial;
             receiver.seek(new MediaSeekOptions.Builder().setPosition(value.optLong("position_ms")).build()).setResultCallback(result->{
                 if(!handoffActive(expected) || !expectedMedia.equals(mediaToken) || receiver!=remote || seekSerial!=stageSerial || !"receiver_seek".equals(stageName))return;
                 if(!result.getStatus().isSuccess()){fail("receiver_seek","rejected",result.getStatus().getStatusCode(),"The TV rejected the playback position. Returning to phone playback.");return;}
                 InfinityCastDiagnostics.event("receiver_seek","accepted",0);
+                if(!ownsMedia()){aborting=true;restorePhone(false);return;}
                 handedOff=true;stage("receiver_start",8000,"Receiver playback did not start. Returning to phone playback.");receiver.play().setResultCallback(play->{
                     if(!handoffActive(expected) || !expectedMedia.equals(mediaToken) || receiver!=remote)return;
                     if(!play.getStatus().isSuccess())fail("receiver_start","rejected",play.getStatus().getStatusCode(),"The TV rejected playback (code "+play.getStatus().getStatusCode()+"). Returning to phone playback.");
@@ -377,6 +390,7 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
                 });
                 message="Starting movie on the TV…";publish();changed();
             });
+            }));
         });
     }
     private boolean ownsMedia() {
@@ -444,9 +458,16 @@ final class InfinityCastSession implements SessionManagerListener<CastSession> {
         if(!casting() || !ownsMedia())return;
         if(playing())remote.pause();else if(!finished)remote.play();
     }
+    private long seekRequest;
     void seek(long value) {
         if(!casting() || !seekable() || value<0 || value>lastDuration)return;
-        remote.seek(new MediaSeekOptions.Builder().setPosition(value).build());
+        final long request=++seekRequest;final String expected=token,expectedMedia=mediaToken;final RemoteMediaClient receiver=remote;final InfinityCastRelay owner=relay;
+        if(owner==null)return;
+        owner.warm(value,(ready,type,problem)->ui.post(()->{
+            if(request!=seekRequest||!handoffActive(expected)||relay!=ready||receiver!=remote||!expectedMedia.equals(mediaToken)||!ownsMedia()||!seekable())return;
+            if(problem!=null){lastFailure=mediaFailure(problem);message=lastFailure;abortTransfer();return;}
+            receiver.seek(new MediaSeekOptions.Builder().setPosition(value).build());
+        }));
     }
     void returnToPhone(){
         InfinityCastDiagnostics.event("owner_action","return_requested",0);
