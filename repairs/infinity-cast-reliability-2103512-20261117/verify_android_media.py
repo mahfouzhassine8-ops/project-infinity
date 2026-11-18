@@ -49,6 +49,16 @@ for index in range(3):
 origin=micros(json.loads(subprocess.check_output(['ffprobe','-v','error','-show_format','-of','json',str(work/'fixtures/high-sparse.mkv')]))['format']['start_time'])
 assert [(micros(q['pts_time'])-10000000,q['data_hash']) for q in large_packets]==[(micros(q['pts_time'])-origin,q['data_hash'])for q in original_packets]
 assert all(b>a for a,b in zip(audio_timestamps,audio_timestamps[1:]))
+# Authoritative AAC integer sample clock: infer nothing from ffprobe's optional
+# duration annotation on separately initialized nonzero audio fragments.
+sys.path.insert(0,str(Path(__file__).resolve().parent/'tests'))
+from mp4_clock import track_samples
+reference=json.loads((Path(__file__).resolve().parent/'AAC-SAMPLE-GRID.json').read_text())
+assert hashlib.sha256((work/'fixtures/high-sparse.mkv').read_bytes()).hexdigest()==reference['source_sha256']
+clock=[]
+for n in range(3):clock+=track_samples((media/('large-'+str(n)+'.m4s')).read_bytes())
+assert clock==reference['packets'],'EXACT_CANONICAL_AAC_SAMPLE_CLOCK_CHANGED'
+r['large_AAC_raw_sample_clock']={'samples':len(clock),'rate':reference['sample_rate'],'tfdt_tfhd_trun':'exact source-derived canonical reference','encoder_source':'UNCHANGED'}
 r['large_resources']=large
 r.update(status='PASS_ACTUAL_ANDROID_INTEGRATED_CAST_MEDIA',direct_HEVC='Main10L153; exactsourcecompressedpacketbytes_and_PTS; monotonicDTS; fullAVdecode',sequences=sequences,Main10_Android_playback='SeeRESULT.direct_HEVC.codec_inventory; unsupportedisNOTPASS',hardware_fixture='GenuineMain8L3_RADL',cache='Successful actualMediaCodec bootstrap followed bynonzero key requests whose inbandPSwere removed; sourceCSDcache reused',source_quota='UNCHANGED',physical_TV='NOT_TESTED',Fold_hardware_performance='NOT_TESTED')
 out.write_text(json.dumps(r,indent=2)+'\n');print(out.read_text())

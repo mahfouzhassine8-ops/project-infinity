@@ -1,5 +1,6 @@
 """Actual Cast native output, real high-byte-rate media, no persistent movie files."""
 import os,gzip,subprocess,json,hashlib,struct,time
+from decimal import Decimal
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3];H=Path(__file__).resolve().parents[1]
 ENV=dict(os.environ);fp='/dev/shm/infinity-cast-mkv-local/host-ffmpeg/';ENV['LD_LIBRARY_PATH']=':'.join(fp+x for x in ['libavformat','libavcodec','libavutil','libswresample'])
@@ -39,7 +40,7 @@ for stride,index in [(2,0),(2,1),(2,2),(3,0),(2,1)]:
  begin=index*stride*4;end=min(begin+stride*4,24)
  expected=[p for p in original if begin<=float(p['pts_time'])<end]
  assert [p['data_hash'] for p in video]==[p['data_hash'] for p in expected]
- assert all(abs(float(a['pts_time'])-float(b['pts_time'])-10+r['origin_us']/1000000)<.0011 for a,b in zip(video,expected))
+ assert all(int(Decimal(a['pts_time'])*1000000)-10000000+r['origin_us']==int(Decimal(b['pts_time'])*1000000) for a,b in zip(video,expected))
  if stride==2 and len(report['results'])<3:allvideo+=video;allaudio+=audio
  r.update(moofs=len(sequences),sha256=hashlib.sha256(media).hexdigest(),strict_decode=True,video_packets=len(video),audio_packets=len(audio));report['results'].append(r)
  for fd in [out,init,full]:os.close(fd)

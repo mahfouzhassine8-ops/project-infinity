@@ -1,5 +1,5 @@
 {
-  "status": "IMPLEMENTED_HOST_GATES_PASSED_ANDROID_PENDING",
+  "status": "HOST_EXACT_TIMESTAMP_AND_AAC_CORRECTION_PASSED_ACTUAL_ARM64_PENDING",
   "baseline": 2103512,
   "scope_preimages_authenticated": true,
   "changed_production": {
@@ -19,5 +19,17 @@
   "delivery_and_abandoned_result_checks": 9,
   "physical_receiver_success": false,
   "engine_rebuilt": false,
-  "signing_started": false
+  "signing_started": false,
+  "timestamp_correction": {
+    "CPP_sha256": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649",
+    "cause": "FFmpeg6movenc customflush reanchored nextfirstDTS toestimatedpriorend",
+    "repair": "Fresh boundedMP4writerperinternalchunk; codecs/demux/AAC stayalive; exactrawDTSguard",
+    "Astra_source_review": "6ba6fa79e87dd0ea114ec2250d779d094dcf08a335abd4dad9c924310becb649 approved",
+    "host_exact_video": "HOST-BOUNDARY-TIMESTAMPS.json",
+    "host_exact_AAC": "HOST-AAC-REFERENCE.json; AAC-SAMPLE-GRID.json",
+    "old_Android_app": "PASS in44223360240; overallworkflowFAIL strictPTSgate; retainednotaccepted",
+    "new_ARM64_Android": "PENDING",
+    "Kodi_engine_rebuild": false,
+    "DEX_rebuild": false
+  }
 }

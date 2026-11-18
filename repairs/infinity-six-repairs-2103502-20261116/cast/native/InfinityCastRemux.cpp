@@ -101,7 +101,8 @@ struct State {
 };
 struct Output {
  AVFormatContext* format=nullptr;AVIOContext* io=nullptr;std::vector<uint8_t> bytes;const char* failure=nullptr;bool packetHeader=false;
- ~Output(){if(format)api().avformat_free_context(format);if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
+ void release(){if(format){api().avformat_free_context(format);format=nullptr;}if(io){api().av_freep(&io->buffer);api().avio_context_free(&io);}}
+ ~Output(){release();}
  ChunkSink* sink=nullptr;State* state=nullptr;uint64_t emitted=0,payload=0;unsigned flushes=0;char sinkFailure[65]{};
  static int write(void* p,uint8_t* data,int n){auto& o=*static_cast<Output*>(p);
   try{
@@ -122,14 +123,24 @@ struct Output {
    catch(...){o.failure="mkv_memory_limit";return AVERROR(ENOMEM);}
  }
  void result(int code,unsigned phase){if(code<0||failure){if(state){state->input->metrics[8]=phase;state->input->metrics[9]=uint64_t(int64_t(code));}throw Failure(failure?failure:"mkv_fragment_flush_failed");}}
- void flushChunk(){result(api().av_interleaved_write_frame(format,nullptr),1);result(api().av_write_frame(format,nullptr),2);api().avio_flush(io);result(io->error,3);payload=0;if(++flushes>=ResourceSequences)throw Failure("mkv_resource_moof_limit");}
+ int requestIndex=0;std::array<bool,2> seenTrack{};
+ void flushChunk(){
+  // A fresh bounded MP4 writer uses the next source DTS directly. Reusing
+  // movenc after a forced flush instead reanchors to an estimated sample end,
+  // and its packet check can rewrite timestamps in either rounding direction.
+  endMux();release();if(++flushes>=ResourceSequences)throw Failure("mkv_resource_moof_limit");state->check();bytes.clear();payload=0;begin(*state,requestIndex);
+ }
  void put(AVPacket* packet){
   Measure time{state->input->metrics[3]};
   if(sink){if(packet->size<0||size_t(packet->size)>FragmentLimit)throw Failure("mkv_mux_packet_limit");if(payload&&size_t(packet->size)>MuxPayloadLimit-std::min(payload,uint64_t(MuxPayloadLimit)))flushChunk();payload+=uint64_t(packet->size);state->input->metrics[6]=std::max(state->input->metrics[6],payload);}
-  result(api().av_interleaved_write_frame(format,packet),4);
+  if(packet->stream_index<0||packet->stream_index>=2)throw Failure("mkv_mux_stream_index");
+  if(sink&&flushes&&!seenTrack[packet->stream_index]&&packet->dts==AV_NOPTS_VALUE)throw Failure("mkv_boundary_dts_unavailable");
+  seenTrack[packet->stream_index]=true;result(api().av_interleaved_write_frame(format,packet),4);
  }
- void finish(){Measure time{state->input->metrics[3]};result(api().av_interleaved_write_frame(format,nullptr),5);result(api().av_write_frame(format,nullptr),6);result(api().av_write_trailer(format),7);api().avio_flush(io);result(io->error,8);if(sink){state->input->metrics[5]=emitted;if(emitted==0)throw Failure("mkv_empty_fragment");}}
+ void endMux(){result(api().av_interleaved_write_frame(format,nullptr),5);result(api().av_write_frame(format,nullptr),6);result(api().av_write_trailer(format),7);api().avio_flush(io);result(io->error,8);if(sink){state->input->metrics[5]=emitted;if(emitted==0)throw Failure("mkv_empty_fragment");}}
+ void finish(){Measure time{state->input->metrics[3]};endMux();}
  void begin(State& s,int index=0){
+  requestIndex=index;seenTrack.fill(false);
   state=&s;sink=s.outputSink;
   if(api().avformat_alloc_output_context2(&format,nullptr,"mp4",nullptr)<0 || !format)throw Failure("mkv_mp4_muxer_unavailable");
   for(int in:{s.video,s.audio})if(in>=0){
@@ -165,8 +176,8 @@ struct Output {
   api().av_dict_set(&options,"movflags",flags.c_str(),0);
   api().av_dict_set(&options,"use_editlist","0",0);
   // Stable movie-fragment numbering, independent of request/cache order.
-  api().av_dict_set(&options,"fragment_index",std::to_string(sink?uint64_t(index)*ResourceSequences+1:uint64_t(index)+1).c_str(),0);
-  if(sink)api().av_dict_set(&options,"frag_size",std::to_string(MuxPayloadLimit).c_str(),0);
+  api().av_dict_set(&options,"fragment_index",std::to_string(sink?uint64_t(index)*ResourceSequences+flushes+1:uint64_t(index)+1).c_str(),0);
+  // Size admission/flush is owned above; no second automatic flush policy.
   int code=api().avformat_write_header(format,&options);api().av_dict_free(&options);api().avio_flush(io);
   if(code<0 || failure)throw Failure(failure?failure:"mkv_mux_header_failed");if(!packetHeader && (bytes.empty() || bytes.size()>InitLimit))throw Failure("mkv_init_limit");
  }

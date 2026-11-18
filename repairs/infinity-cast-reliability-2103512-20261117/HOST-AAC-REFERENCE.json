@@ -1,0 +1,13 @@
+{
+  "status": "PASS_EXACT_SAME_SOURCE_CANONICAL_AAC_PAYLOAD_PTS_DTS_DURATION",
+  "packets": 1125,
+  "reference": "c169b2fb originalnative+HOST-ONLY64MiBreferenceoutputbound; sameactualsparse8scues, singlemuxer perresource. NoAudioAdapter/timestampchange.",
+  "source_sha256": "89cba11dd5e608dcc83ca79ce5e7bdebd2c73383d2e3caa99172af5ed13adf50",
+  "fields": [
+    "pts_time",
+    "dts_time",
+    "duration_time",
+    "data_hash"
+  ],
+  "duration_note": "Inspectcompletejoinedrendition; independentffprobeinitializationatnonzeroAACpacketdoesnotalwaysreportduration. Rawsamplegrid remainsmandatory."
+}

@@ -1,112 +1,222 @@
 {
   "baseline_member_sha256": "685d744bfcb9ecc28f0e948a9c8882cb835dff2e9d0a494c7b6768bff30b01ee",
   "candidate_member_sha256": "9189cbd00611f6e2085f6ee78658b9ab81c028583b42ec7834439e9f75dced18",
-  "changed": [
-    "com/projectinfinity/kodi/InfinityCastHardwareVideo.smali",
-    "com/projectinfinity/kodi/InfinityCastRelay$RemuxInput.smali",
-    "com/projectinfinity/kodi/InfinityCastRelay.smali",
-    "com/projectinfinity/kodi/InfinityCastRemux.smali",
-    "com/projectinfinity/kodi/InfinityCastRemuxNative.smali",
-    "com/projectinfinity/kodi/InfinityCastRpc.smali",
-    "com/projectinfinity/kodi/InfinityCastSession.smali",
-    "com/projectinfinity/kodi/c.smali",
-    "com/projectinfinity/kodi/castdeps/Af.smali",
-    "com/projectinfinity/kodi/castdeps/Wf.smali",
-    "com/projectinfinity/kodi/castdeps/X.smali",
-    "com/projectinfinity/kodi/castdeps/X6.smali",
-    "com/projectinfinity/kodi/castdeps/Xc.smali",
-    "com/projectinfinity/kodi/castdeps/j9.smali",
-    "com/projectinfinity/kodi/castdeps/q.smali",
-    "com/projectinfinity/kodi/castdeps/u.smali",
-    "com/projectinfinity/kodi/f.smali",
-    "com/projectinfinity/kodi/g.smali",
-    "com/projectinfinity/kodi/h.smali",
-    "com/projectinfinity/kodi/i.smali",
-    "com/projectinfinity/kodi/j.smali",
-    "com/projectinfinity/kodi/k.smali",
-    "com/projectinfinity/kodi/l.smali",
-    "com/projectinfinity/kodi/m.smali",
-    "com/projectinfinity/kodi/n.smali",
-    "com/projectinfinity/kodi/o.smali",
-    "com/projectinfinity/kodi/p.smali",
-    "com/projectinfinity/kodi/q.smali",
-    "com/projectinfinity/kodi/r.smali",
-    "com/projectinfinity/kodi/s.smali",
-    "com/projectinfinity/kodi/t.smali",
-    "com/projectinfinity/kodi/u.smali",
-    "com/projectinfinity/kodi/v.smali",
-    "com/projectinfinity/kodi/w.smali",
-    "com/projectinfinity/kodi/x.smali",
-    "com/projectinfinity/kodi/y.smali",
-    "com/projectinfinity/kodi/z.smali"
-  ],
-  "added": [
-    "com/projectinfinity/kodi/A.smali",
-    "com/projectinfinity/kodi/B.smali",
-    "com/projectinfinity/kodi/C.smali",
-    "com/projectinfinity/kodi/D.smali",
-    "com/projectinfinity/kodi/E.smali",
-    "com/projectinfinity/kodi/F.smali",
-    "com/projectinfinity/kodi/G.smali",
-    "com/projectinfinity/kodi/H.smali",
-    "com/projectinfinity/kodi/I.smali",
-    "com/projectinfinity/kodi/InfinityCastHardwareVideo$Delivery.smali",
-    "com/projectinfinity/kodi/InfinityCastRelay$RemuxInput$Page.smali",
-    "com/projectinfinity/kodi/InfinityCastRelay$WarmRequest.smali",
-    "com/projectinfinity/kodi/InfinityCastRemux$1.smali",
-    "com/projectinfinity/kodi/InfinityCastRemux$Ticket.smali",
-    "com/projectinfinity/kodi/InfinityCastResource$Lease.smali",
-    "com/projectinfinity/kodi/InfinityCastResource$Store.smali",
-    "com/projectinfinity/kodi/InfinityCastResource.smali",
-    "com/projectinfinity/kodi/J.smali",
-    "com/projectinfinity/kodi/K.smali",
-    "com/projectinfinity/kodi/L.smali",
-    "com/projectinfinity/kodi/M.smali",
-    "com/projectinfinity/kodi/N.smali"
-  ],
-  "removed": [],
-  "unchanged": 1014,
+  "changed": {
+    "Lcom/projectinfinity/kodi/InfinityCastHardwareVideo;": {
+      "before": "679625aaa32250805c2982e96cdebd87a1e113feb7eaeece39e3e5a2ced783af",
+      "after": "94ef7d2eba9c2a2c57b713f3e0e15c8c114da9839bef3ecb5ae495f528b62e22"
+    },
+    "Lcom/projectinfinity/kodi/InfinityCastRelay$RemuxInput;": {
+      "before": "c3c41260acd8681ed08ab269a0d9f52b663e9f82628f6180839c0c65ff104c5e",
+      "after": "64aad5a0080a247591938471c3a1daeda6525226457a8619114d55593df925bd"
+    },
+    "Lcom/projectinfinity/kodi/InfinityCastRelay;": {
+      "before": "3aa661e73da6092f3b8f305af3900403e13a8fe4b2ad93c617b4ff7951840d4f",
+      "after": "705f866400013e4df0a24a4ccfc895d3603b85f068c7977e9c6a702dc235982e"
+    },
+    "Lcom/projectinfinity/kodi/InfinityCastRemux;": {
+      "before": "b8208aea57bab5b105fd8b39e057220f201ce814ad48bad3b62405e5f8b1f79c",
+      "after": "9756872f7ffb60f2e83491c64443b7cce4ab7f4ba31bb75a9d41531b45e1e4ca"
+    },
+    "Lcom/projectinfinity/kodi/InfinityCastRemuxNative;": {
+      "before": "aa3a26202fc6ec7e5a5ddcaa4e4b486d1bce8af3f435b0829d2af5c1b44740c5",
+      "after": "17a5d8904cc7099fcec5866c7c4ae4f276a38aa329995b533c076a38cc28a862"
+    },
+    "Lcom/projectinfinity/kodi/InfinityCastRpc;": {
+      "before": "d5d7be812b028f7e5a7e25226e98ddad6addd4c8b6b2f33358e9988c67e8d3e9",
+      "after": "eb349a10c58f4157ff0da8cfc57702fb284a95da5a6ef39f5fdaafd67376e5b8"
+    },
+    "Lcom/projectinfinity/kodi/InfinityCastSession;": {
+      "before": "a25ba810f4b1c5a5f5e5ca1154571fb6b0cd224b4aa4a09742ebd47fec8c89fd",
+      "after": "d24fb403bae0aa1f4fd4c8dacba2b30eb6bcccd401611b6a77f66a4124657432"
+    },
+    "Lcom/projectinfinity/kodi/c;": {
+      "before": "6b7860a1c9bf740872394dfb8b226bc42148135702d74568ae4e475da4026d58",
+      "after": "b8bb152fb9cc9842dd8409c833a49925af17ba4590b3e06080dec2f32cb42b8f"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/Af;": {
+      "before": "c1b1c23de2f905ebbe162866af2a75cdbf31058a736ea08b901d3a1dee6d4d19",
+      "after": "be5944409396e0e44001b695802a29f529ef17deb24da5056f23f427a09bde1c"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/Wf;": {
+      "before": "e199d3884bc3cbb2095a0bd35ba2c4b3106646536edfbc69809ea609b25eea05",
+      "after": "8ef17360eea425d7d1ec858ba17dc6d692d6614d5e9cdc3d12bcb723470794ca"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/X6;": {
+      "before": "41f3fd3541b239af433d0d24501a279b3f5e44cbdd9c103b7c70a20889e8a0c1",
+      "after": "a2906ed7530306e344acebe57092fd3844cbbd123677f48644a047bbc3485d1f"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/X;": {
+      "before": "6799b36b0b2c63471f7dd72b46ad32b2fe35f3cb710cfca415062127af8ecb8c",
+      "after": "c59b49ea3ecfb56e64cb9df4ad0af9018eaa44135f9fc61425c536296b925305"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/Xc;": {
+      "before": "250168a018d85c88b41fa73e2f65e441bf68e59d5df0c82028d2846900ead658",
+      "after": "571057fac5ff9c4e02a33e0c11531e822a70f2a274123d21c766abd59ef0afcb"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/j9;": {
+      "before": "8f5368b7b16483e071bcebb56617982677472a009200d64f24f282301c086d82",
+      "after": "9daa66020ae3ec5eb3f6003a275d66708ba7c5ea4bd9657f03944b46f8ac9467"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/q;": {
+      "before": "83d4e0c70165bf8ce0aabb7ddd86ccd8f72be9d83976a01b987acf627ae110a1",
+      "after": "65db2db1e4b5ccf70c2cf1a8db22ba7b7ab0256ac9b844d8095e71feb187c6b2"
+    },
+    "Lcom/projectinfinity/kodi/castdeps/u;": {
+      "before": "55e03296d4798226d424233806856d54d4c2b48bdf0bd8b14930f652a2ebadce",
+      "after": "214ffd8fc55ee13c4116ae45980a67165aa17b06a592780ec860d1659a41ba4a"
+    },
+    "Lcom/projectinfinity/kodi/f;": {
+      "before": "85b87d408ae7d62f42ecc112f7878c8a8acd9a43f73e52912c6ffd9e0d55d30d",
+      "after": "419c6418de62a3c12b32eb3d6367ff64c6f914d94604fe760822163c948c0bf3"
+    },
+    "Lcom/projectinfinity/kodi/g;": {
+      "before": "a04ebb9f1c3aa98d915391242de09bf9d1bb1323f0cd8a146a11b159e54fcd65",
+      "after": "c3012055c834622f244c5d9600edfcb82814d4501ab815627e4626fca234a727"
+    },
+    "Lcom/projectinfinity/kodi/h;": {
+      "before": "d27c2ac5be577dbfa7c63e86a50747cd442c1c46ead8babb1f9acafea872fcab",
+      "after": "4fa8448c09d4bd3804be19425da93aca86d546e0c3ae6bde8e43820aba0557ce"
+    },
+    "Lcom/projectinfinity/kodi/i;": {
+      "before": "3bb818e0d4c450ca948ecd665db0c9ff5b6c9714f128a51fa24ea1704d57a40f",
+      "after": "70b0a94700420f9bb7b8f2bf3058c278321b6e96354d3dcdf0a7ff279969a0ab"
+    },
+    "Lcom/projectinfinity/kodi/j;": {
+      "before": "5cf0aca9a12f6742b81b3897978ce2bf5b23b491c1a6722da2d0e26970e5dade",
+      "after": "fe6b9df4f12df30079d11d4202ab8a7c3900b330074e0490aeaa09a30ec4f3bb"
+    },
+    "Lcom/projectinfinity/kodi/k;": {
+      "before": "96b44a9f5ba8655b3a5ae7ab68c9d4afdf7cfb604bf923ad3d7cfd871d354cf9",
+      "after": "d592d9067be8785aed83ff39e21093925bd67a40b61907f01591a1e46cb479d4"
+    },
+    "Lcom/projectinfinity/kodi/l;": {
+      "before": "0d7f32708613407cfe6bf09c9c9f5d4a181047798e359e3ce250f1b52fcc2cd6",
+      "after": "85dfc47e61a3747750c0be75c98c9d514e504156266d7d5dc8cf11e1c4cb3a7a"
+    },
+    "Lcom/projectinfinity/kodi/m;": {
+      "before": "4f0fa3c83022f83af2b853bf450ad4f33ae13538eb1e38fc9498be7db71aaed3",
+      "after": "d32d53871e8bec5128b07a35c9c890bcc5b6379dd04a8b7e634dcb74b0341ed7"
+    },
+    "Lcom/projectinfinity/kodi/n;": {
+      "before": "b014cf0eeda56a9bf07e95201ec3ff9762dada51b2c5e1a87e4f34a8d5d18a44",
+      "after": "4029300ed6ca0ab66457fddb05af70a82c4e8567108730fa4ef8758881dbfb6b"
+    },
+    "Lcom/projectinfinity/kodi/o;": {
+      "before": "5b6ceecc0a537ffb56ce49b4bfa75f7bc4e3b3e52f99d69284757b086bb5c245",
+      "after": "87dd62b16e70727178bddde03ec648e6e9fe4a4a0da41c62f7209a97d0d45af8"
+    },
+    "Lcom/projectinfinity/kodi/p;": {
+      "before": "cc478cc63c1c6409c2b013802debc9ab088160f0f0542c36a71e70e83311c1bb",
+      "after": "c448ae58c5f734d8d413ee792961851b1577f6aed47ff4cffe8795e3c25b1f16"
+    },
+    "Lcom/projectinfinity/kodi/q;": {
+      "before": "fd1c0ff40afcabb64ee8f86d16868e7360b83a7deb149998f048a0e32d600c49",
+      "after": "ee410301ba0eb30b61c3d5347745228fa1172b1d4d0192bf0063900e08733f00"
+    },
+    "Lcom/projectinfinity/kodi/r;": {
+      "before": "46f4cbea589088a12296c77549f4e08c0864afe1befd2397da56ff80e5f9383b",
+      "after": "b537262eae7000a699cf3600d82684851c7b2f2f11d7d71e395b99efc88b5427"
+    },
+    "Lcom/projectinfinity/kodi/s;": {
+      "before": "23fda6634c175d219deda4303a360c0b2f3b67c8c392c977781e0c67aecd775f",
+      "after": "d508f78c006ea337764c33644f3078aa802cb4e7d9bcb53db8dd2e4493d8ecbe"
+    },
+    "Lcom/projectinfinity/kodi/t;": {
+      "before": "ef67005918515b75466ad6e895ea273c3434d58f54e5c8d9fb5131fbb6bfd7cd",
+      "after": "65755023fdc94310f252676206d160c1070a0ced7501da53553b94b1349067ab"
+    },
+    "Lcom/projectinfinity/kodi/u;": {
+      "before": "3233a0266202eb696afa550b8980864ae9a3fecdd42252775e9dc0a243429080",
+      "after": "4e5286424c2b8ce33daa31c1c6af19ee8fbab8dd15ba6e923cc10f6b2a41a25a"
+    },
+    "Lcom/projectinfinity/kodi/v;": {
+      "before": "d952b4d77aebd9d03531b52ba0461ce026a3e7f31443a3d2a797ef944de9703b",
+      "after": "94e550bf493c7e0306f8ac26ddbdf09e1476a8c3d06f68e0176740ab18aa0f91"
+    },
+    "Lcom/projectinfinity/kodi/w;": {
+      "before": "ad3545fe684858486dd0e597f25a57d0079eb3821ecebb5d4a94f956dc81586b",
+      "after": "08a13ed935261b514b20ae2eb6f3f821891d65c62af1084b6f4af74e63f841d0"
+    },
+    "Lcom/projectinfinity/kodi/x;": {
+      "before": "652ec9c2b130650a7335c5d9c6316bb87a40102b68449a17f46a2dfea9d5d26e",
+      "after": "fb49629d0e00d8743ce23d4814755542f71221f178c0cd0ead6c219499e11dda"
+    },
+    "Lcom/projectinfinity/kodi/y;": {
+      "before": "5698778c0288a4da84b412f5f170abb6c29e18e96bd7f4cb14b5ae77f4298611",
+      "after": "ece9ed1a934c14d73f970ef8d22e03cbc27546ccebebbad875bedbe8ae15e277"
+    },
+    "Lcom/projectinfinity/kodi/z;": {
+      "before": "2147be3e0b09a5177eefdb9fe5a0908141e997d424626b61010b0f7bcd7aaf05",
+      "after": "39bc094cc3516a181c6c9052426dbbcf98f4c141aa7852c214fdf9239290bbb8"
+    }
+  },
+  "added": {
+    "Lcom/projectinfinity/kodi/A;": "b99e82a24e9937c38436c8d36c5d40bb10e8905ef0a6baf2977064725ee71b67",
+    "Lcom/projectinfinity/kodi/B;": "7648a935ddfebbc55b2a8c60c83a029361752a13a0167731476ecdf0154c1cbd",
+    "Lcom/projectinfinity/kodi/C;": "c758859dedf05e88053222f6e53e5b265462f2c51b9817dea276def62592d172",
+    "Lcom/projectinfinity/kodi/D;": "4c1f17bca18f2459e4fb827b99cbdb7061ce15580b6c4a6a7b4b9f233eb7cd19",
+    "Lcom/projectinfinity/kodi/E;": "a7915b180d82b60cca94e129f771be29e5ba1f7c2ebab7bd5ab4c5a07d4759cb",
+    "Lcom/projectinfinity/kodi/F;": "c7f7d28adb2f535b1e1c4bc03a0f84f6ded2ea0a615cb5411ecdff3f21555209",
+    "Lcom/projectinfinity/kodi/G;": "07986b0b09e886d50ff76412d89b58cca8aa34eca4856f513cf0abf67db181fd",
+    "Lcom/projectinfinity/kodi/H;": "53151302d523e24dce04139c0f0809769ad2d5eaa9635802c4de6a31847fad54",
+    "Lcom/projectinfinity/kodi/I;": "6d9a5a85aa19151555e8acce105f79a9982b6a107f12735a9466efecb5c95892",
+    "Lcom/projectinfinity/kodi/InfinityCastHardwareVideo$Delivery;": "9dd7796881defa7b994dce2d9798cfe3ec9fa00195c487646909f14354e265fb",
+    "Lcom/projectinfinity/kodi/InfinityCastRelay$RemuxInput$Page;": "7df2c4c920819030c013a9e84e766ad7ab53849109e8b3115c90ee16d97bbfaa",
+    "Lcom/projectinfinity/kodi/InfinityCastRelay$WarmRequest;": "9a674e8d458d81ac5c161b5f5ad920b8a352db566c171887fa6a533a3503ba16",
+    "Lcom/projectinfinity/kodi/InfinityCastRemux$1;": "652b9726b549a82ec5ed75d61c19532b4346912be56ec5829e1367d777e185b7",
+    "Lcom/projectinfinity/kodi/InfinityCastRemux$Ticket;": "a5934ee88bbb3dd271c9436add44a1c37271d45a4bfbf8fb4e191c62850568c0",
+    "Lcom/projectinfinity/kodi/InfinityCastResource$Lease;": "6d0c918672ce17383e53f9af15512a82b7c8aa4a04b3ef84f34cd78f2507090e",
+    "Lcom/projectinfinity/kodi/InfinityCastResource$Store;": "1714aee3013d1dc178d36c2b6b1fbab89869f8afdf141cee21307ad72aad5e1e",
+    "Lcom/projectinfinity/kodi/InfinityCastResource;": "3ad0870c34664584495fa6b132b47ff009a4e54fc978fc792b27e4540e1aff68",
+    "Lcom/projectinfinity/kodi/J;": "71970f02482ad83b20b8e613eb884ae4ae6d97d211f81ed65060ad8ca568f026",
+    "Lcom/projectinfinity/kodi/K;": "c2798a74e3f92fc4f680cc920fa2c3f4c487225a1c11af8bf2a7e53eab7f39d6",
+    "Lcom/projectinfinity/kodi/L;": "f478902c53db60fefecd12b4699b46ccac0c0c36403b78082e331f4845b0c02b",
+    "Lcom/projectinfinity/kodi/M;": "19900dafddda178da910d6d60e8c1202233923a7815d0bdc06d985378fc2463e",
+    "Lcom/projectinfinity/kodi/N;": "c9c54e3402639d6c8a842bf07769f36cb2dbd22eeacc0fb24a7ff28ede6c6b6a"
+  },
+  "removed": {},
   "SDK_private_dependency_classes_changed": [
-    "com/projectinfinity/kodi/castdeps/Af.smali",
-    "com/projectinfinity/kodi/castdeps/Wf.smali",
-    "com/projectinfinity/kodi/castdeps/X.smali",
-    "com/projectinfinity/kodi/castdeps/X6.smali",
-    "com/projectinfinity/kodi/castdeps/Xc.smali",
-    "com/projectinfinity/kodi/castdeps/j9.smali",
-    "com/projectinfinity/kodi/castdeps/q.smali",
-    "com/projectinfinity/kodi/castdeps/u.smali"
+    "Lcom/projectinfinity/kodi/castdeps/Af;",
+    "Lcom/projectinfinity/kodi/castdeps/Wf;",
+    "Lcom/projectinfinity/kodi/castdeps/X;",
+    "Lcom/projectinfinity/kodi/castdeps/X6;",
+    "Lcom/projectinfinity/kodi/castdeps/Xc;",
+    "Lcom/projectinfinity/kodi/castdeps/j9;",
+    "Lcom/projectinfinity/kodi/castdeps/q;",
+    "Lcom/projectinfinity/kodi/castdeps/u;"
   ],
   "status": "PASS_EXACT_COMPONENT_DELTA_WITH_EIGHT_EXPLICIT_COMPILER_INTEGRATION_CHANGES",
   "first_party_Cast_classes_changed": [
-    "com/projectinfinity/kodi/InfinityCastHardwareVideo.smali",
-    "com/projectinfinity/kodi/InfinityCastRelay$RemuxInput.smali",
-    "com/projectinfinity/kodi/InfinityCastRelay.smali",
-    "com/projectinfinity/kodi/InfinityCastRemux.smali",
-    "com/projectinfinity/kodi/InfinityCastRemuxNative.smali",
-    "com/projectinfinity/kodi/InfinityCastRpc.smali",
-    "com/projectinfinity/kodi/InfinityCastSession.smali",
-    "com/projectinfinity/kodi/c.smali",
-    "com/projectinfinity/kodi/f.smali",
-    "com/projectinfinity/kodi/g.smali",
-    "com/projectinfinity/kodi/h.smali",
-    "com/projectinfinity/kodi/i.smali",
-    "com/projectinfinity/kodi/j.smali",
-    "com/projectinfinity/kodi/k.smali",
-    "com/projectinfinity/kodi/l.smali",
-    "com/projectinfinity/kodi/m.smali",
-    "com/projectinfinity/kodi/n.smali",
-    "com/projectinfinity/kodi/o.smali",
-    "com/projectinfinity/kodi/p.smali",
-    "com/projectinfinity/kodi/q.smali",
-    "com/projectinfinity/kodi/r.smali",
-    "com/projectinfinity/kodi/s.smali",
-    "com/projectinfinity/kodi/t.smali",
-    "com/projectinfinity/kodi/u.smali",
-    "com/projectinfinity/kodi/v.smali",
-    "com/projectinfinity/kodi/w.smali",
-    "com/projectinfinity/kodi/x.smali",
-    "com/projectinfinity/kodi/y.smali",
-    "com/projectinfinity/kodi/z.smali"
+    "Lcom/projectinfinity/kodi/InfinityCastHardwareVideo;",
+    "Lcom/projectinfinity/kodi/InfinityCastRelay$RemuxInput;",
+    "Lcom/projectinfinity/kodi/InfinityCastRelay;",
+    "Lcom/projectinfinity/kodi/InfinityCastRemux;",
+    "Lcom/projectinfinity/kodi/InfinityCastRemuxNative;",
+    "Lcom/projectinfinity/kodi/InfinityCastRpc;",
+    "Lcom/projectinfinity/kodi/InfinityCastSession;",
+    "Lcom/projectinfinity/kodi/c;",
+    "Lcom/projectinfinity/kodi/f;",
+    "Lcom/projectinfinity/kodi/g;",
+    "Lcom/projectinfinity/kodi/h;",
+    "Lcom/projectinfinity/kodi/i;",
+    "Lcom/projectinfinity/kodi/j;",
+    "Lcom/projectinfinity/kodi/k;",
+    "Lcom/projectinfinity/kodi/l;",
+    "Lcom/projectinfinity/kodi/m;",
+    "Lcom/projectinfinity/kodi/n;",
+    "Lcom/projectinfinity/kodi/o;",
+    "Lcom/projectinfinity/kodi/p;",
+    "Lcom/projectinfinity/kodi/q;",
+    "Lcom/projectinfinity/kodi/r;",
+    "Lcom/projectinfinity/kodi/s;",
+    "Lcom/projectinfinity/kodi/t;",
+    "Lcom/projectinfinity/kodi/u;",
+    "Lcom/projectinfinity/kodi/v;",
+    "Lcom/projectinfinity/kodi/w;",
+    "Lcom/projectinfinity/kodi/x;",
+    "Lcom/projectinfinity/kodi/y;",
+    "Lcom/projectinfinity/kodi/z;"
   ],
   "SDK_delta_classification": {
     "debug_line_only": [
@@ -126,5 +236,7 @@
     "dependency_source_or_version_changes": false,
     "all_other_classes_must_remain_exact": true,
     "review": "SDK-REFERENCE-REVIEW.json; exactclassbefore/afterdiffs independentlyreviewed; no blanketSDKnormalization"
-  }
+  },
+  "unchanged_classes": 1014,
+  "canonical_hash_format": "baksmali2.5.2 --sequential-labels; exact established owner archive/inventory convention"
 }

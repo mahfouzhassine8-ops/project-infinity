@@ -1,0 +1,81 @@
+{
+  "source_sha256": "89cba11dd5e608dcc83ca79ce5e7bdebd2c73383d2e3caa99172af5ed13adf50",
+  "source_video_packets": 576,
+  "all_three_payloads_equal": true,
+  "source_ffprobe_vs_android_PTS_mismatches": [
+    {
+      "n": 59,
+      "source": "2.417000",
+      "android": "12.421000",
+      "host": "12.422000",
+      "flags": "___"
+    },
+    {
+      "n": 171,
+      "source": "7.083000",
+      "android": "17.087000",
+      "host": "17.088000",
+      "flags": "___"
+    },
+    {
+      "n": 248,
+      "source": "10.292000",
+      "android": "20.296000",
+      "host": "20.297000",
+      "flags": "___"
+    },
+    {
+      "n": 360,
+      "source": "14.958000",
+      "android": "24.962000",
+      "host": "24.963000",
+      "flags": "___"
+    },
+    {
+      "n": 440,
+      "source": "18.292000",
+      "android": "28.296000",
+      "host": "28.297000",
+      "flags": "___"
+    },
+    {
+      "n": 552,
+      "source": "22.958000",
+      "android": "32.962000",
+      "host": "32.963000",
+      "flags": "___"
+    }
+  ],
+  "FFmpeg6_host_vs_actual_ARM64_PTS_mismatches": [
+    {
+      "n": 59,
+      "android": "12.421000",
+      "host": "12.422000"
+    },
+    {
+      "n": 171,
+      "android": "17.087000",
+      "host": "17.088000"
+    },
+    {
+      "n": 248,
+      "android": "20.296000",
+      "host": "20.297000"
+    },
+    {
+      "n": 360,
+      "android": "24.962000",
+      "host": "24.963000"
+    },
+    {
+      "n": 440,
+      "android": "28.296000",
+      "host": "28.297000"
+    },
+    {
+      "n": 552,
+      "android": "32.962000",
+      "host": "32.963000"
+    }
+  ]
+}
