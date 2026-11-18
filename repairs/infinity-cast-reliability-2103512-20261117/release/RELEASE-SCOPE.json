@@ -1,0 +1,29 @@
+{
+  "status": "DRAFT_BEFORE_STAGE_REVIEW_OR_RESERVATION",
+  "content_baseline": 2103512,
+  "content_APK_sha256": "746f622bf2bb850ee1c12ec083a0f2b98a7ec090b9664b6712dd10a579d59170",
+  "canonical_parent": "8621561f364d32d69cfda415e470985db4770c4e",
+  "parent_authority_sha256": "c6a583a1420bdc99b22e6b9e8f55d94d5f1529a2a198c80b74314d1365af3932",
+  "proposed_versions": {
+    "candidate": 2103514,
+    "recovery": 2103515
+  },
+  "proposed_generations": {
+    "candidate": 99,
+    "recovery": 100
+  },
+  "reserved": false,
+  "accepted_pointer_updated": false,
+  "signing": false,
+  "owner_data": "NOT_ACCESSED",
+  "engine_build": false,
+  "native_change": "Cast-owned.so only; Kodi b3d8d96a preserved",
+  "source_scope": "ExistingfrozenCast-onlyallowlist+taskreceipts; releaseadminonlyafterAstraandactualAndroidgates",
+  "release_admin_scope": [
+    "nexttwoauthoritytransitions withoutacceptedpointerchange",
+    "twoexactnewchoices+onegatedjob appendedtoexistingsoleoriginalsigner397702717; originaljobsandpolicyunchanged",
+    "existingunsignedstage421117469Cast-onlycaller",
+    "newtaskownerrequest/evidence; exact15newcompiledCast-onlyINFINITYroots afterAstrareview; allpriorrootsandclassifierunchanged"
+  ],
+  "new_Cast_roots_proposal": "NEW-ROOTS-SOURCE.json"
+}

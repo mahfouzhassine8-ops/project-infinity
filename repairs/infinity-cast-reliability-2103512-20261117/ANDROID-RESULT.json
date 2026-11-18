@@ -1,0 +1,122 @@
+{
+  "SDK_error_fields": {
+    "null_vs_zero": true,
+    "safe_reason": true,
+    "real_SDK_object": true,
+    "receiver_session": "NOT_CREATED"
+  },
+  "direct_HEVC": {
+    "Main10_level": 153,
+    "AAC": true,
+    "fragment5_complete": true,
+    "stable_sequences": true,
+    "HLS": {
+      "actual_Android_HLS_playback": false,
+      "status": "NOT_SUPPORTED_BY_ACTUAL_CI_CODEC_INVENTORY"
+    },
+    "codec_inventory": {
+      "requested": "genuine_Main10_L5.1_320x180_24fps",
+      "supported_decoders": 0,
+      "decoders": [
+        {
+          "codec": "c2.goldfish.hevc.decoder",
+          "software": false,
+          "hardware": true,
+          "format_supported": false,
+          "profiles": [
+            {
+              "profile": 1,
+              "level": 524288
+            },
+            {
+              "profile": 4,
+              "level": 524288
+            }
+          ]
+        },
+        {
+          "codec": "c2.android.hevc.decoder",
+          "software": true,
+          "hardware": false,
+          "format_supported": false,
+          "profiles": [
+            {
+              "profile": 1,
+              "level": 524288
+            },
+            {
+              "profile": 4,
+              "level": 524288
+            }
+          ]
+        }
+      ]
+    },
+    "hardware_video": "NOT_EXERCISED",
+    "physical_TV": "NOT_TESTED"
+  },
+  "large_resources": {
+    "resources": 3,
+    "lengths": [
+      14197272,
+      14023420,
+      14196694
+    ],
+    "complete_HTTP_ranges": true,
+    "target_pins": true,
+    "coalesced_seeks": 81,
+    "native_after": 0
+  },
+  "failure_cleanup": true,
+  "verified_inband_bootstrap_and_nonzero_cache_reuse": true,
+  "hardware_fragment_sequence": true,
+  "decoded": {
+    "video": {
+      "packets_decoded": 288,
+      "first_pts_us": 0,
+      "last_pts_us": 11958000,
+      "seek_us": -1,
+      "seek_start_us": -1
+    },
+    "audio": {
+      "packets_decoded": 564,
+      "first_pts_us": 0,
+      "last_pts_us": 12010666,
+      "seek_us": -1,
+      "seek_start_us": -1
+    }
+  },
+  "segments": 6,
+  "master": "#EXTM3U\n#EXT-X-VERSION:7\n#EXT-X-INDEPENDENT-SEGMENTS\n#EXT-X-STREAM-INF:BANDWIDTH=2203105,CODECS=\"avc1.42C01F,mp4a.40.2\"\nhttp://127.0.0.1:34745/9c63b5cb2b214fc69187be09b8c19d8c/mkv/media.m3u8\n",
+  "HLS": {
+    "video_rendered_frames_before_seek": 2,
+    "video_rendered_frames": 8,
+    "rendered_first_frame_events": 2,
+    "audio_rendered_buffers_before_seek": 8,
+    "audio_rendered_buffers": 36,
+    "duration_ms": 12032,
+    "seek_mapped_ms": 2500,
+    "seek_elapsed_ms": 978,
+    "seek_position_ms": 2698,
+    "isPlaying": true,
+    "actual_Android_HLS_playback": true,
+    "player": "immutable baseline Media3 APIs; CI package only, no Cobra entry point or production dependency"
+  },
+  "production_R8_Relay": true,
+  "provider_auth": true,
+  "whole_fragment_HTTP": true,
+  "cancellation_ms": 110,
+  "hardware_input_fixture": "genuine_HEVC_Main8_L3_RADL_inband; not_Main10_hardware_qualification",
+  "pass": true,
+  "status": "PASS_ACTUAL_ARM64_INTEGRATED_CAST_RELIABILITY",
+  "owned_native_after_close": 0,
+  "backend": "CI private exact-package bounded small software; not hardware qualification",
+  "Fold_hardware_performance": "NOT_TESTED",
+  "TV_playback": "NOT_TESTED",
+  "phone_handoff": "existing protocol preserved, physical acceptance pending",
+  "shutdown": "NOT_SELECTED",
+  "events": "stage=receiver_policy outcome=receiver_hevc_not_documented result=1\nstage=hw_decoder outcome=c2_android_hevc_decoder result=1\nstage=hw_encoder outcome=c2_android_avc_encoder result=31\nstage=hw_source outcome=width result=320\nstage=hw_source outcome=height result=180\nstage=hw_source outcome=fps_milli result=24000\nstage=hw_source outcome=transfer result=1\nstage=hw_capability outcome=decoder_instances_declared result=32\nstage=hw_capability outcome=encoder_instances_declared result=32\nstage=hardware_video outcome=ci_small_software_backend result=0\nstage=hw_profile outcome=setup_ms result=188\nstage=hw_profile outcome=release_ms result=94\nstage=mkv_source outcome=fragment_index result=0\nstage=mkv_source outcome=read_budget_bytes result=33554432\nstage=mkv_source outcome=bytes_consumed result=262144\nstage=mkv_source outcome=seek_count result=1\nstage=mkv_source outcome=range_requests result=0\nstage=mkv_source outcome=aac_bytes result=229376\nstage=mkv_source outcome=preroll_bytes result=32768\nstage=mkv_source outcome=selected_bytes result=0\nstage=mkv_source outcome=lookahead_bytes result=0\nstage=mkv_profile outcome=aac_ms result=1155\nstage=mkv_profile outcome=seek_ms result=0\nstage=mkv_profile outcome=video_ms result=218\nstage=mkv_profile outcome=mux_ms result=0\nstage=mkv_profile outcome=total_ms result=1474\nstage=mkv_profile outcome=output_bytes result=0\nstage=mkv_profile outcome=mux_payload_peak result=0\nstage=mkv_profile outcome=planner_saturated result=0\nstage=mkv_profile outcome=failed_mux_phase result=0\nstage=mkv_profile outcome=failed_mux_result result=0\nstage=hw_profile outcome=release_ms result=0",
+  "API": 36,
+  "emulator_ABIs": "x86_64,arm64-v8a",
+  "scope": "actual original510 ARM64 FFmpeg/JNI, directMain10HTTP/rangesandcodec_inventory; genuineMain8RADL realMediaCodec720p/AAC inbandCSD/cache; privateCIsoftwarebackend, notFoldhardwareorTVqualification"
+}
