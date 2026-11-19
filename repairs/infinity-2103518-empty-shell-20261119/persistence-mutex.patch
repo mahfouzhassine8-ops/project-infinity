@@ -19,10 +19,10 @@ index 0976bc1edefd804803c66cf7cc090c58a59a1071..d7414d289f4d8041543ecee690e9b4ab
 +      InfinityPersistenceWaitTrace::StartObserver();
 diff --git a/xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h b/xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h
 new file mode 100644
-index 0000000000000000000000000000000000000000..e08b9b757a61ba6ef5bf1eb4f689cdca85189747
+index 0000000000000000000000000000000000000000..3f302477c0b029e6fecfcfd8e560297123b7c810
 --- /dev/null
 +++ b/xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h
-@@ -0,0 +1,314 @@
+@@ -0,0 +1,317 @@
 +/* SPDX-License-Identifier: GPL-2.0-or-later */
 +#pragma once
 +
@@ -158,7 +158,10 @@ index 0000000000000000000000000000000000000000..e08b9b757a61ba6ef5bf1eb4f689cdca
 +    return false;
 +  const Ticket holder{owner.id.load(), owner.acquired.load(), owner.tid.load(),
 +                      owner.site.load(), owner.line.load()};
-+  if (holder.tid == waiter.tid || owner.version.load() != version || slot.id.load() != id)
++  // Match the attempt, since a reentrant wait can have the same native TID
++  // as the holder. A holder that arrived after the sample time is deferred.
++  if (holder.id == waiter.id || holder.started > now ||
++      owner.version.load() != version || slot.id.load() != id)
 +    return false;
 +  sample = {waiter, holder, now};
 +  return true;

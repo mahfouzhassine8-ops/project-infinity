@@ -69,6 +69,25 @@ int main()
   // during that boundary, so no ordering is asserted across the two samples.
   assert(Probe::lostWait.load() == 0 && Probe::lostCompletion.load() == 0);
 
+  // Collector-only control for a same-thread reentrant attempt. Never
+  // attempt an actual second acquisition of the non-recursive mutex.
+  {
+    Probe::Guard holder(mutex, Probe::Site::Ledger, __LINE__);
+    const auto started = Probe::owner.acquired.load();
+    const auto contender = Probe::nextId.load() + Probe::WAIT_SLOTS;
+    assert(Probe::PublishWait({contender, started, Probe::Tid(), 1, 1}));
+    auto& slot = Probe::waits[contender % Probe::WAIT_SLOTS];
+    Probe::PendingWait reentrant{};
+    assert(Probe::ReadWait(slot, reentrant, started + Probe::SLOW_US));
+    assert(reentrant.waiter.tid == reentrant.holder.tid);
+    assert(reentrant.waiter.id != reentrant.holder.id);
+    slot.id.store(0);
+    // Reject a sample whose timestamp precedes the published acquisition.
+    assert(Probe::PublishWait({contender, 1, Probe::Tid(), 1, 1}));
+    assert(!Probe::ReadWait(slot, reentrant, started - 1));
+    slot.id.store(0);
+  }
+
   const auto ticket = Probe::nextId.load();
   const Probe::Ticket collision{ticket, Probe::Now(), Probe::Tid(), 1, 1};
   assert(Probe::PublishWait(collision));
