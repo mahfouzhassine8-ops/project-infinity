@@ -40,6 +40,8 @@
         if: always()
         with:
           name: 'Infinity514-Typed-Movie-Playback-${{ github.run_id }}-EVIDENCE'
-          path: infinity514-movie-playback/TYPED-MOVIE-PLAYBACK.json
+          path: |
+            infinity514-movie-playback/TYPED-MOVIE-PLAYBACK.json
+            infinity514-movie-playback/typed-movie-observation.png
           if-no-files-found: warn
           retention-days: 90

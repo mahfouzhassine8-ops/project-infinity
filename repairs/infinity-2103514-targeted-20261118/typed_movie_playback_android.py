@@ -27,6 +27,7 @@ from prepare_authority import BASE_COMMIT, DIAGNOSTIC_COMMIT, AUTHORITY, ref_blo
 from release_driver import PUBLIC_KEY
 
 HELPER = "plugin.video.themoviedb.helper"
+QA = "script.infinityqatypedmovie"
 FIXTURE = "plugin.video.infinityqaclip"
 PROVIDERS = {choice: FIXTURE + choice.lower() for choice in ("A", "B")}
 ADDONS = PROFILE + "/addons"
@@ -123,6 +124,63 @@ def make_fixture(root, clip, row, candidate):
             "item.getVideoInfoTag().setTitle('Fixture ' + tmdb)\n"
             "(directory / ('selected-' + tmdb)).write_text(choice)\n"
             "xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, item)\n")
+    observer = addon_dir / QA
+    observer.mkdir()
+    (observer / "addon.xml").write_text(
+        f'<addon id="{QA}" name="Selected legacy movie QA" version="1.0.0" provider-name="QA">'
+        '<requires><import addon="xbmc.python" version="3.0.1"/></requires>'
+        '<extension point="xbmc.python.script" library="probe.py"/>'
+        '<extension point="xbmc.addon.metadata"><summary lang="en_GB">Playback fixture observer</summary></extension></addon>')
+    (observer / "probe.py").write_text("""import json, os, re
+from pathlib import Path
+import xbmc, xbmcgui, xbmcvfs
+
+root = Path(xbmcvfs.translatePath('special://profile/addon_data/script.infinityqatypedmovie'))
+root.mkdir(parents=True, exist_ok=True)
+monitor = xbmc.Monitor()
+(root / 'ready').write_text(str(os.getpid()))
+last = -1
+while not monitor.waitForAbort(.10):
+    try:
+        request = json.loads((root / 'request.json').read_bytes())
+    except (OSError, ValueError):
+        continue
+    if request['sequence'] <= last:
+        continue
+    last = request['sequence']
+    try:
+        operation = request['operation']
+        if operation == 'open':
+            key = request['key']
+            assert re.fullmatch('[a-f0-9]{64}', key)
+            xbmc.executebuiltin('RunScript(script.infinity.uirepair,home-choice,' + key + ',movie)')
+            result = {'opened': True}
+        elif operation == 'menu':
+            result = {'heading': xbmc.getInfoLabel('Control.GetLabel(1)'),
+                      'popup': xbmc.getInfoLabel('Window.Property(Infinity.UI.Title)'),
+                      'dialog': xbmcgui.getCurrentWindowDialogId(),
+                      'menus': {}}
+            for control in (50, 6, 3):
+                count = int(xbmc.getInfoLabel('Container(%d).NumItems' % control) or 0)
+                if 0 < count <= 8:
+                    result['menus'][control] = [
+                        xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).Label' % (control, i))
+                        for i in range(count)]
+        elif operation == 'focus':
+            control, index, label = request['control'], request['index'], request['label']
+            assert control in (50, 6, 3) and 0 <= index < 8
+            xbmc.executebuiltin('SetFocus(%d,%d,absolute)' % (control, index), True)
+            assert xbmc.getInfoLabel('Container(%d).ListItem.Label' % control) == label
+            result = {'focused': label}
+        else:
+            raise ValueError(operation)
+        reply = dict(sequence=last, result=result)
+    except Exception as error:
+        reply = dict(sequence=last, error=str(error))
+    path = root / 'reply.pending'
+    path.write_text(json.dumps(reply))
+    path.replace(root / 'reply.json')
+""")
     userdata = fixture / "userdata"
     userdata.mkdir()
     (userdata / "guisettings.xml").write_text(
@@ -201,19 +259,39 @@ def until(action, label, seconds=45):
     raise RuntimeError(f"Timed out waiting for {label}: {detail}")
 
 
-def labels(*names):
-    return rpc("XBMC.GetInfoLabels", {"labels": names})
+class Observer:
+    def __init__(self, out, pid):
+        self.path = out / "observer-request.json"
+        self.sequence = 0
+        self.root = f"{DATA}/{QA}"
+        require(rpc("Addons.ExecuteAddon", {"addonid": QA, "wait": False}) == "OK", "Observer launch denied")
+        until(lambda: observe("shell", "cat", self.root + "/ready") == pid, "observer starts", 60)
 
+    def command(self, operation, **values):
+        self.sequence += 1
+        self.path.write_text(json.dumps(dict(sequence=self.sequence, operation=operation, **values)))
+        adb("push", self.path, self.root + "/request.json")
 
-def select(label, if_needed=None, heading=None, control=50):
-    focus = f"Container({control}).ListItem.Label"
-    heading_label = "Control.GetLabel(1)"
-    current = until(lambda: (v if (v := labels(focus, heading_label))[focus] in (label, if_needed) and
-                     (heading is None or v[heading_label] == heading) else None), label, 60)
-    if current[focus] != label:
-        rpc("Input.Down")
-        until(lambda: labels(focus)[focus] == label, "selected " + label)
-    rpc("Input.Select")
+        def result():
+            entry = json.loads(observe("shell", "cat", self.root + "/reply.json"))
+            return entry if entry.get("sequence") == self.sequence else None
+
+        answer = until(result, operation + " observer receipt", 10)
+        require("error" not in answer, f"Observer request failed: {answer}")
+        return answer["result"]
+
+    def select(self, label, heading=None):
+        def find():
+            result = self.command("menu")
+            for control, rows in result["menus"].items():
+                if label in rows and (heading is None or result["heading"] == heading):
+                    return int(control), rows.index(label)
+            raise RuntimeError(f"Actual menu: {result}")
+
+        control, index = until(find, "native menu action " + label, 60)
+        focused = self.command("focus", control=control, index=index, label=label)
+        require(focused["focused"] == label, "Native dialog focus differs")
+        rpc("Input.Select")
 
 
 def seconds(value):
@@ -324,18 +402,18 @@ def run(out, preparation_run):
     require(boot["complete"], f"Normal launch did not activate the staged signed module: {boot}")
     adb("forward", "tcp:19090", "tcp:9090")
     until(lambda: rpc("JSONRPC.Ping") == "pong", "local playback observation interface", 150)
-    for addon in (HELPER, *PROVIDERS.values(), "script.infinity.uirepair"):
+    for addon in (HELPER, *PROVIDERS.values(), "script.infinity.uirepair", QA):
         detail = until(lambda: rpc("Addons.GetAddonDetails", {"addonid": addon,
                        "properties": ["enabled", "version"]})["addon"], "installed " + addon)
         if not detail["enabled"]:
             require(rpc("Addons.SetAddonEnabled", {"addonid": addon, "enabled": True}) == "OK",
                     "Fixture add-on could not be enabled")
+    observer = Observer(out, str(boot["engine_pid"]))
     results = []
     for i, (label, choice, offset) in enumerate((("Resume from 0:24", "A", 24.0), ("Play from beginning", "B", 0.0))):
-        require(rpc("Addons.ExecuteAddon", {"addonid": "script.infinity.uirepair",
-                    "params": ["home-choice", keys[i], "movie"], "wait": False}) == "OK", "Home action denied")
-        select(label, if_needed="Resume from 0:24" if not offset else None)
-        select("QA Playback " + choice, if_needed="QA Playback A", heading="Choose Action", control=6)
+        require(observer.command("open", key=keys[i])["opened"], "Home action denied")
+        observer.select(label)
+        observer.select("QA Playback " + choice, heading="Choose Action")
         results.append(playback(MOVIES[i], choice, offset))
         print(json.dumps(results[-1]), flush=True)
     require(observe("shell", "pidof", PACKAGE + ":kodi") == str(boot["engine_pid"]), "Engine process changed")
@@ -352,10 +430,14 @@ if __name__ == "__main__":
     try:
         run(args.out, args.preparation_run)
     except Exception:
-        if observe("shell", "pidof", PACKAGE + ":kodi"):
-            log = observe("shell", "cat", PROFILE + "/temp/kodi.log")
+        pid = observe("shell", "pidof", PACKAGE + ":kodi")
+        if pid.isdigit():
+            log = observe("logcat", "-d", "-v", "raw", "--pid=" + pid, "-s", "Kodi:I")
             for line in log.splitlines():
-                if any(term in line for term in ("InfinityContinueTrace", "Error Type:", "Error Contents:",
+                if any(term in line for term in ("continue_navigation", "Error Type:", "Error Contents:",
                                                  "fixture_entry.py", "QA Playback", "PythonToCppException")):
                     print(line, flush=True)
+            picture = subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True, timeout=15)
+            if picture.returncode == 0:
+                (args.out / "typed-movie-observation.png").write_bytes(picture.stdout)
         raise
