@@ -1,6 +1,9 @@
 # One Fold capture for startup and the older movie
 
-Keep the existing profile. The combined stream retains startup milestones,
+Use original-signed diagnostic QA 2103520 over the existing installation.
+Keep the existing profile. [Signed APK artifact](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/44563736999/artifacts/14550142697)
+
+ The combined stream retains startup milestones,
 ledger ownership and the old-save decision codes. It drops raw Kodi log lines,
 route URLs, media IDs, titles, saved positions and credentials. The original
 Continue Playing filter validates the route codes.
@@ -20,8 +23,8 @@ while it is visible. Otherwise select a previously failing older movie and
 pick the same Resume or Play from Beginning action used when it failed. Allow
 the route decision and chooser to appear. Stop the terminal capture and share
 only the filtered file. A naturally successful startup still leaves the
-intermittent incident unresolved. The diagnostic samples slow lock attempts
-during early process startup. It needs neither root nor an app-data export.
+intermittent incident unresolved. The diagnostic samples lock attempts pending for at least 100 ms during the
+first 20 minutes of the process trace. It needs neither root nor an app-data export.
 
 A `phase=waiting` row associates a pending lock attempt with the last stable
 owner publication for that mutex. Owner zero means the sample had no stable
