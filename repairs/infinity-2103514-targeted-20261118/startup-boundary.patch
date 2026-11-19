@@ -1,0 +1,106 @@
+--- a/xbmc/interfaces/generic/InfinityStartupTrace.h
++++ b/xbmc/interfaces/generic/InfinityStartupTrace.h
+@@ -16,12 +16,13 @@
+   ThreadStateFailed, GilWait, GilAcquired, InterpreterCreate, InterpreterCreated,
+   InterpreterFailed, RestoreGilWait, RestoreGilAcquired, KodiInitialize,
+   KodiInitialized, ObserverBegin, ObserverReturned, BytecodeEnter, BytecodeReturned,
+-  BytecodeException, StoppingBeforeBytecode, ExecutionFinished, CheckpointGateClosed, Overflow
++  BytecodeException, StoppingBeforeBytecode, ExecutionFinished, CheckpointGateClosed, Overflow, InterpreterReturned
+ };
+ struct Event {
+   uint64_t request{0}, monotonicUs{0};
+   long tid{0}; int invoker{-1}, value{0}; unsigned flags{0}, tracked{0};
+   Stage stage{Stage::RequestBegin};
++  char addonId[128]{};
+ };
+ inline const char* Name(Stage s) noexcept {
+   static constexpr const char* names[]={
+@@ -35,7 +36,8 @@
+     "interpreter.thread_state_failed","gil.wait","gil.acquired","interpreter.create","interpreter.created",
+     "interpreter.failed","gil.restore_wait","gil.restore_acquired","kodi.initialize","kodi.initialized",
+     "observer.begin","observer.returned","bytecode.enter","bytecode.returned","bytecode.exception",
+-    "bytecode.cancelled_before_entry","execution.finished","gate.checkpoint_closed","trace.overflow"};
++    "bytecode.cancelled_before_entry","execution.finished","gate.checkpoint_closed","trace.overflow",
++    "interpreter.returned"};
+   const unsigned index=static_cast<unsigned>(s);
+   return index<sizeof(names)/sizeof(names[0])?names[index]:"invalid";
+ }
+@@ -92,13 +94,34 @@
+   static const uint64_t started=Now();
+   return Now()-started<1200000000ULL; // finite twenty-minute QA capture
+ }
+-inline void Record(Stage stage,int invoker=-1,int value=0,unsigned flags=0,unsigned tracked=0) noexcept {
++// Accept only a canonical add-on ID from IAddon, never a path or argument.
++inline void CopyAddonId(Event& event, const char* addonId) noexcept
++{
++  if (!addonId)
++    return;
++
++  std::size_t length = 0;
++  while (length < sizeof(event.addonId) && addonId[length] != '\0')
++  {
++    const char c = addonId[length];
++    if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
++          (c >= '0' && c <= '9') || c == '.' || c == '_' || c == '-'))
++      return;
++    ++length;
++  }
++  if (length != 0 && length < sizeof(event.addonId))
++    std::memcpy(event.addonId, addonId, length);
++}
++
++inline void Record(Stage stage,int invoker=-1,int value=0,unsigned flags=0,unsigned tracked=0,
++                   const char* addonId=nullptr) noexcept {
+   if(!Enabled())return;
+   const unsigned index=next.fetch_add(1,std::memory_order_relaxed);
+   if(index>=CAPACITY){dropped.fetch_add(1,std::memory_order_relaxed);return;}
+   const int saved=errno;
+   auto& slot=slots[index];
+   slot.event={request,Now(),static_cast<long>(::syscall(SYS_gettid)),invoker,value,flags,tracked,stage};
++  CopyAddonId(slot.event, addonId);
+   slot.ready.store(true,std::memory_order_release);
+   errno=saved;
+ }
+@@ -133,7 +156,7 @@
+ namespace InfinityStartupTrace
+ {
+ inline bool Enabled() noexcept{return false;}
+-inline void Record(Stage,int=-1,int=0,unsigned=0,unsigned=0) noexcept{}
++inline void Record(Stage,int=-1,int=0,unsigned=0,unsigned=0,const char* = nullptr) noexcept{}
+ class Request {public: Request() noexcept{} ~Request() noexcept{}};
+ template<class Sink> inline void Drain(Sink) noexcept{}
+ }
+--- a/xbmc/interfaces/generic/ScriptInvocationManager.cpp
++++ b/xbmc/interfaces/generic/ScriptInvocationManager.cpp
+@@ -369,6 +369,14 @@
+ void CScriptInvocationManager::Process()
+ {
+   InfinityStartupTrace::Drain([](const InfinityStartupTrace::Event& event) {
++    if (event.stage == InfinityStartupTrace::Stage::InterpreterCreate)
++    {
++      CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={} addon={}",
++        InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
++        event.monotonicUs, event.value, event.flags, event.tracked,
++        event.addonId[0] ? event.addonId : "-");
++      return;
++    }
+     CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}",
+       InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
+       event.monotonicUs, event.value, event.flags, event.tracked);
+--- a/xbmc/interfaces/python/PythonInvoker.cpp
++++ b/xbmc/interfaces/python/PythonInvoker.cpp
+@@ -295,9 +295,13 @@
+       m_invokerOwnsGil = true;
+ #if defined(TARGET_ANDROID)
+       InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.create", 0);
+-      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterCreate, GetId());
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterCreate, GetId(), 0, 0, 0,
++                                   m_addon ? m_addon->ID().c_str() : nullptr);
+ #endif
+       l_threadState = Py_NewInterpreter();
++      // Capture the return before the success path takes the persistence ledger mutex.
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterReturned, GetId(),
++                                   l_threadState != nullptr ? 1 : 0);
+       if (l_threadState != nullptr)
+       {
+ #if defined(TARGET_ANDROID)
