@@ -34,3 +34,8 @@ overlay and regenerate the unsigned manifests. Forward recovery restores
 versions on both sides so the unchanged installer activates them. Before APK
 assembly both manifests require the original module signature and the updated
 module set must pass real installer verification.
+
+For APK assembly, select a ZIP member-copy fixture to check that stored and
+deflated members preserve exact payload bytes and compression type, including
+an explicit replacement. The actual candidate/recovery comparison is
+separate and needs the full ARM64 receipt and original module signatures.
