@@ -8,6 +8,7 @@ import subprocess
 import sys
 import time
 from zipfile import ZipFile
+from xml.etree import ElementTree
 
 from stage_qa import HERE, ROOT, file_sha, load, require
 
@@ -64,20 +65,55 @@ def startup_markers(log):
     return None
 
 
+def choose_infinity():
+    # UI actions apply only to an exact label in this package's fresh chooser.
+    path = "/sdcard/infinity514-emulator-chooser.xml"
+    if not observe("shell", "uiautomator", "dump", path):
+        return False
+    try:
+        tree = ElementTree.fromstring(observe("shell", "cat", path))
+    except ElementTree.ParseError:
+        return False
+    for node in tree.iter("node"):
+        if node.get("package") != PACKAGE or not any(
+                (node.get(name) or "").strip().casefold() == "infinity" for name in ("text", "content-desc")):
+            continue
+        bounds = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.get("bounds", ""))
+        if bounds:
+            left, top, right, bottom = map(int, bounds.groups())
+            if left < right and top < bottom:
+                adb("shell", "input", "tap", (left + right) // 2, (top + bottom) // 2)
+                return True
+    return False
+
+
 def launch_and_verify(manifest_sha, with_trace=False):
-    launch = adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.Main")
-    require("Status: ok" in launch and "Error" not in launch, "Infinity Activity did not launch")
-    deadline = time.monotonic() + 180
+    launch = adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.Splash")
+    report = dict(launch_ok="Status: ok" in launch and "Error" not in launch,
+                  process_observed=False, manifest_readable=False, manifest_matched=False,
+                  startup_trace=None, complete=False)
+    if not report["launch_ok"]:
+        return report
+    deadline = time.monotonic() + 145
+    last_choose = 0
     while time.monotonic() < deadline:
         pid = observe("shell", "pidof", PROCESS)
         manifest = observe("shell", "cat", PROFILE + "/" + MANIFEST)
         installed = hashlib.sha256((manifest + "\n").encode()).hexdigest() if manifest else ""
+        report["process_observed"] |= pid.isdigit()
+        report["manifest_readable"] |= bool(manifest)
+        report["manifest_matched"] |= installed == manifest_sha
+        if not pid.isdigit() and time.monotonic() - last_choose > 15:
+            choose_infinity()
+            last_choose = time.monotonic()
         if pid.isdigit() and installed == manifest_sha:
             marker = startup_markers(adb("logcat", "-d", "-v", "raw", "--pid=" + pid, "-s", "Kodi:I")) if with_trace else None
             if not with_trace or marker is not None:
-                return dict(engine_pid=int(pid), installed_module_sha256=installed, startup_trace=marker)
+                report.update(complete=True, engine_pid=int(pid), installed_module_sha256=installed,
+                              startup_trace=marker)
+                break
         time.sleep(3)
-    raise RuntimeError("Expected installed signed manifest and Python startup markers were not observed")
+    return report
 
 
 def run(args):
@@ -124,17 +160,31 @@ def run(args):
         require("Success" in adb(*install, file), "Android PackageManager install failed: " + kind)
         identity = package_record()
         require(int(identity["versionCode"]) == versions[kind], "Wrong installed version")
-        records[kind] = dict(package=identity, **launch_and_verify(source_signatures[kind], kind == "candidate"))
         if kind == "baseline":
+            adb("shell", "input", "keyevent", "82")
+            # Equivalent to allowing Android's onboarding permission on this
+            # disposable device. The signed APK and its app UID are untouched.
+            adb("shell", "appops", "set", PACKAGE, "MANAGE_EXTERNAL_STORAGE", "allow")
+            observe("shell", "pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
             adb("shell", "mkdir", "-p", str(Path(SENTINEL).parent))
             adb("push", sentinel, SENTINEL)
         else:
             require(all(identity[field] == records["baseline"]["package"][field]
                         for field in ("uid", "dataDir", "firstInstallTime")), "Installation changed profile owner")
         require(observe("shell", "cat", SENTINEL) == sentinel.read_text().strip(), "Profile sentinel changed")
-        inventory.save(args.out / "ANDROID-VERIFICATION.json", dict(steps=records, completes_pair=kind == "recovery", platform=platform,
-                                                                   Fold="NOT_RUN", shutdown="NOT_SELECTED",
-                                                                   data_reset=False, uninstall=False))
+        records[kind] = dict(package=identity, installs=True, profile_sentinel=True)
+        print(f"{kind}: Android PackageManager installed {versions[kind]} over the selected profile", flush=True)
+        records[kind].update(launch_and_verify(source_signatures[kind], kind == "candidate"))
+        require(observe("shell", "cat", SENTINEL) == sentinel.read_text().strip(), "Launch changed profile sentinel")
+        shown = {field: records[kind][field] for field in (
+            "launch_ok", "process_observed", "manifest_readable", "manifest_matched", "complete")}
+        print(f"{kind}: selected startup {json.dumps(shown, sort_keys=True)}", flush=True)
+        inventory.save(args.out / "ANDROID-VERIFICATION.json", dict(
+            steps=records, completes_pair=kind == "recovery", platform=platform,
+            all_startup_verified=kind == "recovery" and all(record["complete"] for record in records.values()),
+            Fold="NOT_RUN", shutdown="NOT_SELECTED", data_reset=False, uninstall=False))
+    require(all(record["complete"] for record in records.values()), "Normal startup observation incomplete")
+
 
 
 if __name__ == "__main__":

@@ -44,6 +44,7 @@
           r=json.load(open('infinity514-android-evidence/ANDROID-VERIFICATION.json'))
           assert list(sorted(r['steps']))==['baseline','candidate','recovery']
           assert r['completes_pair'] is True and r['steps']['candidate']['startup_trace']['addon']=='script.infinity.commandcenter'
+          assert r['all_startup_verified'] is True and all(x['installs'] and x['profile_sentinel'] for x in r['steps'].values())
           assert r['shutdown']=='NOT_SELECTED' and r['data_reset'] is False and r['uninstall'] is False
           PY
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
