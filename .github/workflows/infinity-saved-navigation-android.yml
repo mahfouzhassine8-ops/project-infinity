@@ -19,7 +19,7 @@ on:
         required: true
         type: choice
         default: select-a-feature
-        options: [select-a-feature, cast98-hls-install, cast98-hls-contract, cast96-dolby-engineering, cast96-dolby-android, cast96-dolby-install, movies-cast-mkv-engineering, movies-cast-mkv-android, movies-cast-sdk, movies-cast-install, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android]
+        options: [select-a-feature, cast98-hls-install, cast98-hls-contract, cast96-dolby-engineering, cast96-dolby-android, cast96-dolby-install, movies-cast-mkv-engineering, movies-cast-mkv-android, movies-cast-sdk, movies-cast-install, saved-navigation, provider-pov, provider-umbrella, provider-seren, provider-future, multiimage, tracking-recovery, tracking-actions, tracking-continue, final-participant, final-continue, final-actions, final-pov, final-search-pov-enter, final-search-pov-button, final-search-all-enter, infinity-performance-host, infinity-performance-android, cobra-owner-host, cobra-android-launch, cobra-cards-baseline, cobra-cards-host, cobra-fold-more433, cobra-rejected434-controls, infinity-seamless-loading434, cobra-drawer436-prepare, cobra-drawer436-android, cobra-quality444-final, external-player447-android, preview-resume448-android, preview-chrome449-android, preview-layout450-android, preview-fullscreen451-android, watchlist-playback-android, infinity514-install-and-startup]
       candidate_build:
         description: Existing signed build run (no rebuild)
         required: true
@@ -2594,5 +2594,59 @@ jobs:
         with:
           name: Infinity498-HLS-Install-Recovery-${{ github.run_id }}-NO-APK
           path: cast-final-install-results/
+          if-no-files-found: warn
+          retention-days: 90
+
+  infinity514-install-and-startup:
+    name: Infinity 2103514 QA install-over, startup trace, and forward recovery
+    if: github.event_name == 'workflow_dispatch' && github.repository == 'mahfouzhassine8-ops/project-infinity' && github.ref == 'refs/heads/work/infinity-2103514-targeted-20261118' && inputs.feature == 'infinity514-install-and-startup'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      GH_TOKEN: '${{ github.token }}'
+      SELECTED_AUTHORIZATION: '${{ inputs.authorization }}'
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with: {fetch-depth: 0, persist-credentials: false, show-progress: false}
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with: {python-version: '3.12'}
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407
+        with: {packages: 'platform-tools build-tools;35.0.0', log-accepted-android-sdk-licenses: false}
+      - name: Authenticate actual original-signed baseline and both new APK inputs
+        run: python repairs/infinity-2103514-targeted-20261118/prepare_android_inputs.py
+      - name: Existing accelerated emulator configuration
+        run: sudo chmod 666 /dev/kvm
+      - uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d
+        with:
+          api-level: '36'
+          arch: x86_64
+          target: google_apis
+          profile: pixel_2
+          disk-size: 8G
+          avd-name: infinity514-startup-only
+          emulator-options: -no-window -memory 4096 -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+          script: >-
+            python repairs/infinity-2103514-targeted-20261118/verify_android.py
+            --baseline infinity514-verified-android-input/baseline.apk
+            --candidate infinity514-verified-android-input/candidate.apk
+            --recovery infinity514-verified-android-input/recovery.apk
+            --candidate-receipt infinity514-verified-android-input/candidate.json
+            --recovery-receipt infinity514-verified-android-input/recovery.json
+            --out infinity514-android-evidence
+      - name: Verify the positive recorded stages independently of runner exit
+        run: |
+          python - <<'PY'
+          import json
+          r=json.load(open('infinity514-android-evidence/ANDROID-VERIFICATION.json'))
+          assert list(sorted(r['steps']))==['baseline','candidate','recovery']
+          assert r['completes_pair'] is True and r['steps']['candidate']['startup_trace']['addon']=='script.infinity.commandcenter'
+          assert r['shutdown']=='NOT_SELECTED' and r['data_reset'] is False and r['uninstall'] is False
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: 'Infinity514-Verified-Install-Startup-${{ github.run_id }}-EVIDENCE'
+          path: infinity514-android-evidence/ANDROID-VERIFICATION.json
           if-no-files-found: warn
           retention-days: 90

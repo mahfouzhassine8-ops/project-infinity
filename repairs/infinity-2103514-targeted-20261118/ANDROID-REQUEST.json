@@ -1,0 +1,42 @@
+{
+  "Fold_acceptance": false,
+  "data_reset": false,
+  "driver_sha256": "f00f0f470e4e941d3af0786b2d3766a21afc62c447d0b04f286c4b5cfecbcc52",
+  "inputs": {
+    "baseline": {
+      "APK_sha256": "4bfe67cf9d3edefdc1d3e04accc826089b314e043a8dd98dba206cd1924a1d8c",
+      "digest": "sha256:5e4f82e44cf1b210701cbb42ba0ad006de42653afdd04da0e34ff3f41f28b381",
+      "id": 14396442272,
+      "name": "Infinity512-Cast-Reliability-OriginalSigned-44234028066-QA",
+      "run": 44234028066,
+      "size_in_bytes": 331043944,
+      "source": "a70aaaec062eac447556d22325affef9d8d496ec",
+      "versionCode": 2103514,
+      "workflow_id": 397702717
+    },
+    "candidate": {
+      "APK_sha256": "c1d206e5b74d8328834c0e582e48c7deaafc0e45439c412ed6890a43086fff64",
+      "digest": "sha256:1b35a48bf856d79ecd648d182e27b9668d121725b78f1f7a153a716ed6a1d5ea",
+      "id": 14506591970,
+      "name": "Infinity514-OriginalSigned-44476411137-QA",
+      "run": 44476411137,
+      "size_in_bytes": 331112244,
+      "source": "45289ee8235b19d6d49d9144241b1988fbc3754f",
+      "versionCode": 2103516,
+      "workflow_id": 397702717
+    },
+    "recovery": {
+      "APK_sha256": "3b4ca2171ac58303bff0379a74a6f8790ac685237f998c7b0049c03a032db515",
+      "digest": "sha256:669a320b56d0b17f3bf61ef1d9608bfb4696de8e0e82f28bdfa224b9192fbbe9",
+      "id": 14506971649,
+      "name": "Infinity514-OriginalSigned-44476964647-QA",
+      "run": 44476964647,
+      "size_in_bytes": 331043016,
+      "source": "cf10f1f1f702f8be2e5ce8fd44765ce303765b43",
+      "versionCode": 2103517,
+      "workflow_id": 397702717
+    }
+  },
+  "operation": "signed_514_pair_install_over_and_startup",
+  "shutdown": false
+}
