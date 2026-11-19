@@ -1,0 +1,42 @@
+{
+  "Android_execution": false,
+  "full_ARM64": false,
+  "original_diagnostic_commit": "301a6cd04ce02e0874bebf32fda1fb90b55fc317",
+  "overlay_sha256": "5faa3cc84c89e061496087d73b835c7c4063cf259af34fb2fb8ed5863339bff6",
+  "preserved_startup_exports": [
+    "Record(Stage,int,int,unsigned,unsigned)",
+    "Event layout",
+    "slots[8192]",
+    "name table"
+  ],
+  "prior_abi_artifact": 14502853925,
+  "prior_abi_artifact_sha256": "db4200192ba7afa1d736d537ad3cc84ff6d195cfb0c5233c45b586cca39c4298",
+  "prior_arm64_gate": "FAIL_FOUR_NEW_FORMATTING_TEMPLATE_EXPORTS",
+  "prior_arm64_run": 44463352518,
+  "source_allowlist": {
+    "xbmc/interfaces/generic/InfinityStartupTrace.h": {
+      "after_sha256": "5f3694463d70bb262b8f16ccd486ecf26f42e1e0e7595bd9bcdefdbc997363a9",
+      "before_sha256": "b249a101e5e308dd2960f37c4fedfd50d70f6922aa2a82f1e852bf805a54a6ac"
+    },
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": {
+      "after_sha256": "314d4bbc4b5bdb6edd0172087bcd20e1eb855cebde0ad7f03fd58907547953d0",
+      "before_sha256": "09a86d7b984255b817920084cc376754bbbcffb57865f72e0abf9c777e63808f"
+    },
+    "xbmc/interfaces/python/PythonInvoker.cpp": {
+      "after_sha256": "72d302f697b87d4229eb39beeef6a6857a83499d94331150090697ed10d32c51",
+      "before_sha256": "8765370da585cef37918ebd31a4322035901793e0b0f4275868ca11e2e1ff724"
+    }
+  },
+  "status": "PASS_HOST_STARTUP_AND_ABI_FIXTURE",
+  "tests": [
+    "authenticated three-file preimage and overlay",
+    "create and ledger waits",
+    "NULL return",
+    "canonical ID and private values",
+    "disabled tracing",
+    "cancellation; old drain sink",
+    "overflow; new drain sink",
+    "dynamic symbols and startup data sizes",
+    "production logger sink: exact original template arguments, bounded canonical addon field"
+  ]
+}

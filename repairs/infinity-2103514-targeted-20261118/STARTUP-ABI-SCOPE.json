@@ -1,0 +1,33 @@
+{
+  "baseline": {
+    "version_code": 2103514,
+    "commit": "a70aaaec062eac447556d22325affef9d8d496ec",
+    "apk_sha256": "4bfe67cf9d3edefdc1d3e04accc826089b314e043a8dd98dba206cd1924a1d8c",
+    "engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+    "engine_source_map_run": 43861331996,
+    "engine_source_map_artifact": 14225288536,
+    "engine_source_map_artifact_sha256": "843b16eec70bfe5c2f176a0c1643a5601836dfc40e9c18f46283106824611574",
+    "engine_source_map_sha256": "cc044d4cccdce5e8c05147efc2109dcb4b67e80a52fa490b2a31166db23b067a"
+  },
+  "diagnostic_patch_only": true,
+  "source_allowlist": {
+    "xbmc/interfaces/generic/InfinityStartupTrace.h": {
+      "before_sha256": "b249a101e5e308dd2960f37c4fedfd50d70f6922aa2a82f1e852bf805a54a6ac",
+      "after_sha256": "5f3694463d70bb262b8f16ccd486ecf26f42e1e0e7595bd9bcdefdbc997363a9"
+    },
+    "xbmc/interfaces/generic/ScriptInvocationManager.cpp": {
+      "before_sha256": "09a86d7b984255b817920084cc376754bbbcffb57865f72e0abf9c777e63808f",
+      "after_sha256": "314d4bbc4b5bdb6edd0172087bcd20e1eb855cebde0ad7f03fd58907547953d0"
+    },
+    "xbmc/interfaces/python/PythonInvoker.cpp": {
+      "before_sha256": "8765370da585cef37918ebd31a4322035901793e0b0f4275868ca11e2e1ff724",
+      "after_sha256": "72d302f697b87d4229eb39beeef6a6857a83499d94331150090697ed10d32c51"
+    }
+  },
+  "selected_host_test": "Apply the patch to exact native preimages and compile the return boundary and trace ring. Confirm a CPython wait and a ledger wait yield distinct markers. Cover NULL return, private ID filtering, disabled tracing, and the existing ring limit.",
+  "engine_build": false,
+  "application_execution": false,
+  "apk_packaging": false,
+  "signing": false,
+  "preservation": "Original exported Record signature, Event, slots and stage-name table retained"
+}
