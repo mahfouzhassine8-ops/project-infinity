@@ -4,6 +4,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import subprocess
 import sys
 
@@ -121,9 +122,10 @@ def prepare(native, old):
     require(old.hasher().hashes(old.NATIVE) == revised, "Unexpected native source delta")
     # State::mutex remains a std::mutex. The only external access to its
     # ledger is in the Python observer. Detect drift before a build.
-    access = subprocess.check_output(
-        ["rg", "-l", r"InfinityScriptPersistence\s*::\s*Get\s*\(", "xbmc"],
-        text=True, cwd=old.NATIVE).splitlines()
+    ledger_access = re.compile(rb"InfinityScriptPersistence\s*::\s*Get\s*\(")
+    access = [name for name in revised if name.startswith("xbmc/") and
+              Path(name).suffix in (".h", ".cpp", ".c", ".hpp", ".inl") and
+              ledger_access.search((old.NATIVE / name).read_bytes())]
     require(access == ["xbmc/interfaces/python/InfinityPythonPersistence.h"],
             "An uninstrumented direct persistence mutex caller exists")
     old.save("NATIVE-SOURCE-MAP.json", revised)
