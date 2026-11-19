@@ -1,12 +1,34 @@
 # One Fold capture for startup and the older movie
 
-Use original-signed diagnostic QA 2103520 over the existing installation.
-Keep the existing profile. [Signed APK artifact](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/44563736999/artifacts/14550142697)
+Diagnostic QA 2103520 failed both features in the owner's Fold test.
+Use that existing installation and profile to retrieve the evidence.
 
 The combined stream retains startup milestones, ledger ownership and the
 old-save decision codes. It drops raw Kodi log lines,
 route URLs, media IDs, titles, saved positions and credentials. The original
 Continue Playing filter validates the route codes.
+
+## Retrieve the completed test first
+
+With the authorized Fold USB connection, check the retained Android log before
+opening Infinity again. This reads the log buffer without clearing it or
+repeating the test.
+
+```sh
+umask 077
+adb logcat -d -v threadtime Kodi:I InfinityPersistenceMutex:I '*:S' |
+  python3 repairs/infinity-2103518-empty-shell-20261119/filter_fold_trace.py \
+  > infinity-fold-qa-retained.txt
+```
+
+If Android has rotated the retained log, an existing private `kodi.log` or
+`kodi.old.log` from the same session may still contain the old-save decision.
+Run it through
+[the Continue Playing filter](../infinity-2103514-targeted-20261118/filter_continue_trace.py)
+and share the filtered output. The mutex probe writes its records to Android
+logcat.
+
+## Capture a recurrence if the retained log has rotated
 
 Before opening the app, start this on the Mac with the authorized Fold USB
 connection. Run it from the repository checkout, or keep the two filters in

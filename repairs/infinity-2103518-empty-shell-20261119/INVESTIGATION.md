@@ -134,3 +134,35 @@ now accepts only the 60 boundary/outcome pairs emitted by the authenticated
 handoff events in order and dropped 14 malformed or private rows. It can
 read an existing private Kodi log directly. The device and its saved
 records are not involved in the filter check.
+
+## 2103520 physical acceptance failed
+
+The owner reports that Empty Shell recurred and older saved movies still
+failed to navigate or resume on the Fold. 2103520 is rejected for both
+features. The Android 17 result remains evidence for the diagnostic's
+install-over and logging. There was no naturally slow mutex sample in that
+test, and the prior deliberate host hold establishes only a possible wait
+path.
+
+The Fold acceptance report contains no trace. The Mac was offline and no
+matching capture was available in the workspace or repository records.
+Whether a capture was collected is unknown. If the failed session is still
+in Android's retained log, [read it without rerunning either test](FOLD-MUTEX-CAPTURE.md#retrieve-the-completed-test-first).
+
+For startup, the required evidence is `interpreter.create`,
+`interpreter.returned` and the subsequent bookkeeping marker where present,
+alongside `InfinityPersistenceMutex` owner/waiter tickets, native thread IDs
+and monotonic times for the same PID and stall window. Preserve trace loss
+and observer lifecycle markers to bound conclusions from missing events.
+The actual wait site and owner remain unresolved.
+
+For the old save, the required evidence is the `continue_navigation`
+sequence from that selection. `recovery_required` names a remembered
+fingerprint mismatch, prior failure, or provider/route rejection when one
+occurs. `remembered_provider` can give a specific validation reason.
+`native_failure_ticket_verified` or `dispatch_failed` identifies a failure
+after selection begins. `dispatch_returned` alone confirms that the call
+returned. The owner's exact branch remains unresolved.
+
+No production source or release authority changed. The accepted 2103514
+lock remains at `3f79964746c37310e4baeb4f7ea6bae87f0a4380`.
