@@ -32,7 +32,7 @@ FIXTURE = "plugin.video.infinityqaclip"
 PROVIDERS = {choice: FIXTURE + choice.lower() for choice in ("A", "B")}
 ADDONS = PROFILE + "/addons"
 DATA = PROFILE + "/userdata/addon_data"
-MOVIES = ("701001", "701002")
+MOVIES = ("701000", "701001", "701002")
 NATIVE = "lib/arm64-v8a/libkodi.so"
 SIGNER = 397702717
 SEED = HERE / "TYPED-MOVIE-ANDROID.json"
@@ -71,18 +71,25 @@ def make_fixture(root, clip, row, candidate):
                 target = helper.joinpath(*path.parts[1:])
                 target.parent.mkdir(parents=True, exist_ok=True)
                 target.write_bytes(archive.extractfile(item).read())
-    xml = (helper / "addon.xml").read_text()
-    require(ElementTree.fromstring(xml).attrib["version"] == "6.22.4", "Wrong Helper publisher version")
-    # Isolate only the metadata network boundary. Run the actual Router,
-    # PlayerFiles, Choose Action, and PlayerResolver with the real Kodi handle.
-    (helper / "addon.xml").write_text(xml.replace('library="resources/plugin.py"', 'library="resources/fixture_entry.py"', 1))
+    manifest = ElementTree.parse(helper / "addon.xml")
+    root_addon = manifest.getroot()
+    require(root_addon.attrib["version"] == "6.22.4", "Wrong Helper publisher version")
+    # Only the disposable Helper fixture skips its unrelated periodic service.
+    # The actual Router, PlayerFiles, chooser and resolver use the real handle.
+    for extension in root_addon.findall("extension"):
+        if extension.get("point") == "xbmc.python.pluginsource":
+            require(extension.get("library") == "resources/plugin.py", "Unexpected Helper entry point")
+            extension.set("library", "resources/fixture_entry.py")
+        elif extension.get("point") == "xbmc.service":
+            root_addon.remove(extension)
+    manifest.write(helper / "addon.xml", encoding="utf-8", xml_declaration=True)
     (helper / "resources/fixture_entry.py").write_text(
         "import runpy\n"
         "from pathlib import Path\n"
         "from tmdbhelper.lib.player.dialog.details import PlayerDetails\n"
         "from tmdbhelper.lib.items.listitem import ListItem\n"
         "def fixture_details(self):\n"
-        "    assert self.tmdb_type == 'movie' and str(self.tmdb_id) in ('701001', '701002')\n"
+        "    assert self.tmdb_type == 'movie' and str(self.tmdb_id) in ('701000', '701001', '701002')\n"
         "    return ListItem(infolabels=dict(mediatype='movie', title='Fixture ' + str(self.tmdb_id), duration=90),\n"
         "                    unique_ids={'tmdb': str(self.tmdb_id)}, infoproperties={})\n"
         "PlayerDetails.get_enriched_details = fixture_details\n"
@@ -113,7 +120,7 @@ def make_fixture(root, clip, row, candidate):
             "from pathlib import Path\n"
             "from urllib.parse import parse_qs\n"
             "params = parse_qs(sys.argv[2][1:])\n"
-            "assert params['tmdb'] in (['701001'], ['701002']) and params['choice'] in (['A'], ['B'])\n"
+            "assert params['tmdb'] in (['701000'], ['701001'], ['701002']) and params['choice'] in (['A'], ['B'])\n"
             "directory = Path(xbmcvfs.translatePath('special://profile/addon_data/" + FIXTURE + "'))\n"
             "directory.mkdir(parents=True, exist_ok=True)\n"
             "tmdb, choice = params['tmdb'][0], params['choice'][0]\n"
@@ -207,8 +214,8 @@ while not monitor.waitForAbort(.10):
     control = userdata / "addon_data" / CC
     control.mkdir()
     entries = {}
-    # Use independent legacy rows so the first playback session cannot update
-    # the checkpoint tested by Play from Beginning.
+    # Use independent rows so a playback cannot update the next tested offset.
+    # The initial scalar record exercises the existing Helper route as a control.
     for tmdb in MOVIES:
         shutil.copyfile(clip, provider_data / f"fixture-{tmdb}.mp4")
         identity = ns["media_identity"]("movie", {"tmdb": tmdb})
@@ -216,6 +223,8 @@ while not monitor.waitForAbort(.10):
         entries[key] = dict(key=key, media="movie", title=f"Fixture {tmdb}",
                             identity=identity, position=24.0, duration=90.0,
                             updated=int(time.time()) - 7 * 86400)
+        if tmdb == MOVIES[0]:
+            entries[key]["tmdb"] = tmdb
     state = dict(schema=2, revision=1, items=entries, sources={})
     (control / "continue-watching.json").write_text(json.dumps(state))
     return fixture, list(entries)
@@ -340,6 +349,7 @@ def run(out, preparation_run):
             file_sha(Path(__file__)) == row["driver_sha256"] and
             preparation_run == str(row["prepared_evidence"]["run"]), "Unrecognized selected playback request")
     require(adb("shell", "getprop", "ro.kernel.qemu").strip() == "1" and
+            adb("shell", "getprop", "ro.build.version.sdk").strip() == "37" and
             "arm64-v8a" in adb("shell", "getprop", "ro.product.cpu.abilist") and
             "versionCode=" not in observe("shell", "dumpsys", "package", PACKAGE),
             "Fresh disposable emulator with ARM64 execution required")
@@ -404,7 +414,11 @@ def run(out, preparation_run):
     boot = launch_and_verify(file_sha(manifest))
     require(boot["complete"], f"Normal launch did not activate the staged signed module: {boot}")
     adb("forward", "tcp:19090", "tcp:9090")
-    until(lambda: rpc("JSONRPC.Ping") == "pong", "local playback observation interface", 150)
+    def request_ready():
+        require(observe("shell", "pidof", PACKAGE + ":kodi") == str(boot["engine_pid"]),
+                "Kodi exited before playback test admission")
+        return rpc("JSONRPC.Ping") == "pong"
+    until(request_ready, "local playback observation interface", 80)
     for addon in (HELPER, *PROVIDERS.values(), "script.infinity.uirepair", QA):
         detail = until(lambda: rpc("Addons.GetAddonDetails", {"addonid": addon,
                        "properties": ["enabled", "version"]})["addon"], "installed " + addon)
@@ -413,7 +427,9 @@ def run(out, preparation_run):
                     "Fixture add-on could not be enabled")
     observer = Observer(out, str(boot["engine_pid"]))
     results = []
-    for i, (label, choice, offset) in enumerate((("Resume from 0:24", "A", 24.0), ("Play from beginning", "B", 0.0))):
+    cases = (("Play from beginning", "A", 0.0), ("Resume from 0:24", "A", 24.0),
+             ("Play from beginning", "B", 0.0))
+    for i, (label, choice, offset) in enumerate(cases):
         require(observer.command("open", key=keys[i])["opened"], "Home action denied")
         observer.select(label)
         observer.select("QA Playback " + choice, heading="Choose Action")
