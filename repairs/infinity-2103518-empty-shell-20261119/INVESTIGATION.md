@@ -1,0 +1,100 @@
+# Infinity 2103518 Empty Shell investigation
+
+## Fold incident
+
+The supplied capture summary identifies living Kodi PID 3093 and
+`interpreter.create` for TMDb Helper TID 4389 and UI Repair TID 4475.
+It reports no corresponding `interpreter.returned` and no confirmed crash
+or Android kill. Full same-process event sequences and native stacks for
+those workers were unavailable.
+
+The call site is `xbmc/interfaces/python/PythonInvoker.cpp` lines 270–322
+in the authenticated 2103518 engine source. The worker obtains a fresh
+state for the main interpreter and acquires the shared CPython 3.11.7 GIL.
+It emits `interpreter.create`, calls `Py_NewInterpreter()`, records the
+result, and then updates the persistence ledger. Add-on module paths
+and bytecode come later. Commit `679807f7`'s NULL-return cleanup remains in
+this engine. Its old double-GIL-acquire mechanism happens after a NULL
+return, which would be observable before cleanup in a complete capture.
+
+A missing return narrows the interval only when the capture continued
+after the symptom, the ring kept draining, and its finite time and
+capacity limits left room for the event. The brief alone does not show
+what either thread was waiting for or name the owning thread.
+
+## Reproduced native lock path
+
+The return marker rules out the subsequent ledger update as a point
+inside CPython's call. Earlier native write hooks can still reach the
+same ledger from within the call. CPython initializes standard streams
+in `Python/pylifecycle.c` at `init_sys_streams()` and `create_stdio()`.
+The shared FileIO initializer previously installed by an earlier observer
+can proceed through `InfinityPythonWriteHooks::RawInitialize()` at
+`xbmc/interfaces/python/InfinityPythonWriteHooks.h:729` and acquire the
+persistence mutex in `BeginProtectedOperation()` at
+`xbmc/platform/android/activity/InfinityProtectedWrites.h:196`.
+
+The host fixture executed the exact signed-QA call boundary with CPython
+3.11.7 and the pinned stdio hooks. All 256 stock creations and all 256
+hooked creations completed while fresh starts and earlier retirements
+overlapped. The hooked run observed 512 completed operation tokens. A
+separate, deliberate 350 ms hold by a host-only native thread reproduced
+a create-before-return wait. The symbolized waiter ran through
+`Py_NewInterpreter → init_sys_streams → create_stdio → RawInitialize →
+BeginProtectedOperation`. All eight invocations completed after the
+fixture released the mutex. This identifies a real wait path without
+establishing that it was the path or holder in PID 3093.
+[Source hashes and results](RECEIPT.json)
+
+The host driver accepts the authenticated source directory, the local
+pinned CPython 3.11.7 source/core build, the pinned SQLite header directory,
+and a fresh output directory. It checks each source hash and saves the
+symbolized stack from the selected contention control.
+[Reproducer](reproduce_host_startup.py)
+
+## Signed Android 17 baseline probe
+
+Run 44546288895 authenticated the original-signed 2103518 APK and used its
+exact ARM64 engine and signed module payload. All 48 independent scripts
+reached interpreter return, bookkeeping completion, bytecode entry, and
+bytecode return. The five adjacent bursts overlapped. The ring reported
+zero overflows. The longest create-to-return time was 6.651 seconds on
+the ARM64-translated emulator. The physical Fold failure did not reproduce
+in this test. [Android 17 evidence](https://github.com/mahfouzhassine8-ops/project-infinity/actions/runs/44546288895/artifacts/14539869383)
+
+## Resume Hub warning
+
+`repairs/resume-hub-2103292/InfinityResumeHubInstaller.java.in:34` pins a
+legacy overlay from Command Center 0.3.5.17 to 0.3.5.19. The branch at
+line 75 warns and returns for 0.3.5.87 before opening the overlay archive.
+The signed 2103514 and 2103518 authorities agree on the installer class,
+its archive, and the current signed `resume_hub.py` member. The Android 17
+probe reproduced the exact 0.3.5.87 warning while the signed .87 payload
+activated and all 48 workers completed. The guard is functioning and
+does not account for the observed missing interpreter returns.
+
+## Older saves on 2103518
+
+The owner confirmed that the older saved playback still enters the same
+failure flow on the Fold. The fixture proved the missing-flat-TMDb-ID
+movie pattern. An earlier positive result for a fixture cannot establish
+the field record's branch.
+
+In Command Center `plugin.py:272`, an existing verified remembered
+destination is checked before the typed-ID fallback even runs. In
+`saved_navigation.py:517` a prior failure, fingerprint mismatch, or
+rejected provider contract can still select recovery. A previously
+failed original fingerprint or unavailable original also selects
+recovery at lines 530–538. These are separate from the Empty Shell lock
+question. A privacy-safe `continue_navigation` outcome from the
+owner's existing log, or the exact selected record with its route and
+failure metadata redacted, would differentiate these routes.
+
+## Release status
+
+The Fold root cause is unconfirmed. Identifying the next production
+change requires a native stack for an incomplete worker and its lock
+owner, or a matched reproduction that yields those stacks. A complete
+same-PID trace would also verify that the return marker was not lost.
+There are zero production source changes and no new signed APK.
+Accepted 2103514 remains protected.
