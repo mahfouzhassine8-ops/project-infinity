@@ -98,3 +98,39 @@ owner, or a matched reproduction that yields those stacks. A complete
 same-PID trace would also verify that the return marker was not lost.
 There are zero production source changes and no new signed APK.
 Accepted 2103514 remains protected.
+
+## Follow-up evidence review
+
+The available logs and release artifacts contain the 514 incident and the
+controlled Android 17 examples. They contain no `continue_navigation`
+sequence from the owner's failed 518 selection or native snapshot from
+PID 3093. The connected Mac was offline during this review.
+
+The 514 and 518 signing authorities bind the same binary manifest after
+normalizing the typed versionCode. The digest is
+`4c07e8ee95e02945bdd4057f0305f9417b366b7545e127b7aeeb07204cf21517`.
+Parsing that manifest confirms the app declares neither
+`android:debuggable` nor a `profileable` element. The existing root-free
+startup log can identify both worker boundaries, but it has no waiter or
+owner event for the persistence mutex. A native diagnostic would need a
+same-process sample of the actual waiting thread, the lock it is waiting
+on, and the owner of that instance. A timeout snapshot needs to be
+independent of that mutex and the Python GIL so it can run while progress
+is stalled. No sampling change was packaged.
+
+For Continue Playing, use the recovery decision from
+`saved_navigation.py:517–537`, followed by the chooser branch at
+`saved_navigation.py:690–727`. A remembered-provider rejection may have
+an accompanying URI parse or pin outcome at lines 456–505. An original
+route may have a provider source rejection from
+`experience.py:90–137`. If there is a verified native failure ticket,
+the route was attempted before recovery. A handoff return alone cannot
+establish playback. A provider name in the chooser cannot establish any
+of these distinctions.
+
+The off-device [Continue Playing log filter](../infinity-2103514-targeted-20261118/filter_continue_trace.py)
+now accepts only the 60 boundary/outcome pairs emitted by the authenticated
+518 Python source. The offline check retained the distinct decision and
+handoff events in order and dropped 14 malformed or private rows. It can
+read an existing private Kodi log directly. The device and its saved
+records are not involved in the filter check.

@@ -1,0 +1,42 @@
+{
+  "baseline_engine_sha256": "c0c5e871380a5c4d7bf2842ffcfa84614068a8a68c4b15d31e2b87ab0ad5dc20",
+  "inputs": {
+    ".github/workflows/infinity-518-mutex-diagnostic.yml": "7b7b603a1ba113e3ebcd07bd7157d998e5ece84b4d973f571d408e5fdc3d55ed",
+    "repairs/infinity-2103518-empty-shell-20261119/MUTEX-HOST.json": "9e60e98f60601aec8abd91b6e80dc422c68ed514097c92fee5e184f8874f7543",
+    "repairs/infinity-2103518-empty-shell-20261119/SELECTED-CHECKS.md": "6b1d933758a4e805ae6db8955c10d5b15645ca646b288b5cd2287bef0df69b8f",
+    "repairs/infinity-2103518-empty-shell-20261119/build_mutex_diagnostic.py": "74c7fc6e523c86b2e41ca4fae15a57e23e32f796aff6f191eabeea3ae12c87e3",
+    "repairs/infinity-2103518-empty-shell-20261119/persistence-mutex.patch": "f22919a7712e533e44a7ccdbd52d472a6a17a50736a50400f0a361d409f4fe33",
+    "repairs/infinity-2103518-empty-shell-20261119/verify_mutex_probe.cpp": "c7024113176095af26730714b3e570233a301812c8f55060b1e7fbf989dd8d83"
+  },
+  "operation": "2103518_persistence_mutex_diagnostic_native_only",
+  "retained_engine": {
+    "digest": "sha256:d58227a20c178c733f0818861a32da387944f89261b8c8c4577136747e55021d",
+    "id": 14505683625,
+    "name": "Infinity514-Startup-Native-ARM64-44468436486-NO-INSTALLER",
+    "run": 44468436486,
+    "size_in_bytes": 210510753,
+    "source": "827dc2abdb042ed59ba3c1ab8bddd17f277c0737"
+  },
+  "source_allowlist": {
+    "xbmc/interfaces/python/InfinityPythonPersistence.h": {
+      "after": "85709d0cecd2aae10c6c15742d8d48d30668baf4d5939c5d10a105eaee9d77c0",
+      "before": "c7e7e758a3496c32b82b8948c0b8de00409a492e2f0c98996a6f9b74d6fdda06"
+    },
+    "xbmc/interfaces/python/PythonInvoker.cpp": {
+      "after": "72a31ba6e98054d68fbb2c8ddde3d1e98fc78ccb3758ced72c53382c908dc8e4",
+      "before": "72d302f697b87d4229eb39beeef6a6857a83499d94331150090697ed10d32c51"
+    },
+    "xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h": {
+      "after": "953e39a5a216ebd890c10a4a703c42b75ebf96fd1eee9828aab74ed0a5b18e7f",
+      "before": null
+    },
+    "xbmc/platform/android/activity/InfinityProtectedWrites.h": {
+      "after": "6c1621ff110b1a457e427d0ed17035cf372d09237aad494b5e1c08c5987a77f6",
+      "before": "bcd235ab97e38cd09c768a47488a14106208ff9ba1ac5da550864f2aaaa757ac"
+    },
+    "xbmc/platform/android/activity/InfinityScriptPersistence.h": {
+      "after": "0b165cacc3f8dba0ca7148ef701639be323ebfbf402278173cd5ad0466f4f3da",
+      "before": "12e26e9ee008ec65b3def04e7dc0919ff66a0d1a2d1f22cc220d83c393f7c67e"
+    }
+  }
+}

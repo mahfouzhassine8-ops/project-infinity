@@ -20,3 +20,25 @@ reproduced create wait, collect the native stack on the disposable emulator
 only. Capture the legacy Resume Hub guard separately if the normal app
 launch reports it. No app shutdown, production user data, provider change,
 engine build, APK modification, or signing is selected.
+# Follow-up evidence checks
+
+Inspect the authenticated 2103518 manifest for the Android application
+debuggable and profileable flags. Compare only the typed versionCode
+normalization used by release authority.
+
+Exercise the owner-side Continue Playing log filter offline. Accept the
+signed diagnostic boundary and outcome pairs, keep the distinct recovery
+decisions in order, and drop unknown or mismatched codes, unrelated log
+events, extra fields, and malformed timestamps. Use fixtures only. No app
+execution or profile changes are selected for this follow-up.
+
+## 2103518 install-over mutex diagnostic
+
+Use one deliberately held original ledger mutex to check that the device-side
+sampler can associate a pending attempt with the correct live native owner.
+Check release, waiter acquire and release times, success and disabled paths,
+bounded storage and explicit overflow. Treat this only as a diagnostic control.
+Compile the exact 2103518-derived ARM64 engine and compare the unchanged source
+map and exported ABI. On Android 17, select install-over preservation and
+ordinary Python startup with the new diagnostic active. No shutdown, provider,
+playback or profile migration check is selected as part of this diagnostic build.
