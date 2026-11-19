@@ -45,3 +45,8 @@ different fixed code from duplicate route arguments or a provider pin
 failure. This route-level fixture supplies a test-only verified contract and
 does not authorize a provider version. Check that a valid episode route gets
 the same typed identity in the baseline and candidate.
+
+Release-tool checks select the QA member copier, owner bundle replacement,
+and parsing of the expected Command Center startup marker order. This may
+use synthetic data. The actual full owner and original-key requirements are
+gates on the release artifacts, not part of these host fixtures.
