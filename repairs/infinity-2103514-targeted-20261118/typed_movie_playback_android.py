@@ -263,11 +263,13 @@ class Observer:
     def __init__(self, out, pid):
         self.path = out / "observer-request.json"
         self.sequence = 0
+        self.pid = pid
         self.root = f"{DATA}/{QA}"
         require(rpc("Addons.ExecuteAddon", {"addonid": QA, "wait": False}) == "OK", "Observer launch denied")
         until(lambda: observe("shell", "cat", self.root + "/ready") == pid, "observer starts", 60)
 
     def command(self, operation, **values):
+        require(observe("shell", "pidof", PACKAGE + ":kodi") == self.pid, "Selected Kodi process exited")
         self.sequence += 1
         self.path.write_text(json.dumps(dict(sequence=self.sequence, operation=operation, **values)))
         adb("push", self.path, self.root + "/request.json")
@@ -292,6 +294,7 @@ class Observer:
         focused = self.command("focus", control=control, index=index, label=label)
         require(focused["focused"] == label, "Native dialog focus differs")
         rpc("Input.Select")
+        print("Selected real Kodi dialog control:", label, flush=True)
 
 
 def seconds(value):
@@ -430,14 +433,15 @@ if __name__ == "__main__":
     try:
         run(args.out, args.preparation_run)
     except Exception:
-        pid = observe("shell", "pidof", PACKAGE + ":kodi")
-        if pid.isdigit():
-            log = observe("logcat", "-d", "-v", "raw", "--pid=" + pid, "-s", "Kodi:I")
-            for line in log.splitlines():
-                if any(term in line for term in ("continue_navigation", "Error Type:", "Error Contents:",
-                                                 "fixture_entry.py", "QA Playback", "PythonToCppException")):
-                    print(line, flush=True)
-            picture = subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True, timeout=15)
-            if picture.returncode == 0:
-                (args.out / "typed-movie-observation.png").write_bytes(picture.stdout)
+        print("Kodi pid at the observation failure:", observe("shell", "pidof", PACKAGE + ":kodi"), flush=True)
+        state = observe("logcat", "-d", "-v", "threadtime", "-s", "Kodi:I", "DEBUG:E", "libc:F", "AndroidRuntime:E")
+        evidence = [line for line in state.splitlines()
+                    if any(term in line for term in ("continue_navigation", "Fatal signal", "backtrace:",
+                        "tid:", "Abort message:", "libkodi.so", "libndk_translation", "libpython",
+                        "Error Type:", "fixture_entry.py", "QA Playback", "PythonToCppException"))]
+        print("\n".join(evidence[-100:]), flush=True)
+        print(observe("logcat", "-d", "-b", "crash", "-t", "60"), flush=True)
+        picture = subprocess.run(["adb", "exec-out", "screencap", "-p"], capture_output=True, timeout=15)
+        if picture.returncode == 0 and picture.stdout.startswith(b"\x89PNG"):
+            (args.out / "typed-movie-observation.png").write_bytes(picture.stdout)
         raise
