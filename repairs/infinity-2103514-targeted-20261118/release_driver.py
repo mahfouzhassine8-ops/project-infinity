@@ -43,7 +43,8 @@ def request():
             row["baseline"] == BASELINE and row["owner_accepted"] is False,
             "Scope or protected baseline differs")
     required = {"SCOPE.json", "CONTINUE-SCOPE.json", "CONTINUE-HOST.json", "MODULE-PRESERVATION.json",
-                "continue-navigation.patch", "STARTUP-ABI-HOST.json", "STARTUP-ABI-SCOPE.json",
+                "continue-navigation.patch", "typed-movie-fallback.patch", "TYPED-MOVIE-HOST.json",
+                "STARTUP-ABI-HOST.json", "STARTUP-ABI-SCOPE.json",
                 "prepare_modules.py", "stage_qa.py", "prepare_authority.py", "release_driver.py"}
     require(set(row["source_inputs"]) == required, "Incomplete scope approval")
     for member, expected in row["source_inputs"].items():

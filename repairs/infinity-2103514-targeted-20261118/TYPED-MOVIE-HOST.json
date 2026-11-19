@@ -1,0 +1,252 @@
+{
+  "passed": 17,
+  "retained_516_authority": "45289ee8235b19d6d49d9144241b1988fbc3754f",
+  "cases": [
+    {
+      "case": "current scalar record still uses the same eight-action menu",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "Umbrella",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "legacy typed ID opens the same eight actions with saved resume offset",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "Umbrella",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "legacy typed ID opens the same eight actions at zero",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "Umbrella",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "incompatible original route stays rejected while Helper can choose",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "Umbrella",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "disabled original route stays rejected while Helper can choose",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "verified original remains first even without stable_source",
+      "outcome": "original verified route",
+      "passed": true
+    },
+    {
+      "case": "valid local source stays first",
+      "outcome": "original verified route",
+      "passed": true
+    },
+    {
+      "case": "source mismatch does not become an authorized original",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "Umbrella",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "failed other preferred route is never retried",
+      "outcome": [
+        [
+          "Choose Action",
+          [
+            "IMDb Trailers",
+            "Umbrella",
+            "POV",
+            "Seren",
+            "THE CREW",
+            "TMDb Movies",
+            "Red Light",
+            "WatchNixtoons2"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "failed Helper preference is not rebuilt",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "failed Helper fingerprint still activates exact recovery",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "stale verified remembered route keeps the fail-safe",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "disabled Helper keeps recovery",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "valid movie identity without a valid TMDb identifier keeps recovery",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "valid movie identity without a valid TMDb identifier keeps recovery",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "unverified movie cannot use Helper",
+      "outcome": [
+        [
+          "Infinity Resume Hub",
+          [
+            "This source is unavailable or has expired. Open the title in your provider to resolve a fresh source. Resume Hub kept your local state."
+          ]
+        ]
+      ],
+      "passed": true
+    },
+    {
+      "case": "invalid present scalar does not expand fallback",
+      "outcome": [
+        [
+          "Saved destination unavailable \u2014 open with",
+          [
+            "Seren"
+          ]
+        ]
+      ],
+      "passed": true
+    }
+  ],
+  "filters": [
+    "unchanged later and Watchlist routing",
+    "synthetic rows excluded",
+    "invalid present scalar excluded"
+  ],
+  "tests_use_saved_data": false,
+  "real_android_playback": false,
+  "shutdown_selected": false
+}

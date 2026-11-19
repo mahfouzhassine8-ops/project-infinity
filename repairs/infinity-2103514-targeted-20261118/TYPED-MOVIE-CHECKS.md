@@ -1,0 +1,3 @@
+# Selected Continue Playing typed movie checks
+
+Use the prior synthetic signed-source replay and exact 2103516 production Python with the single reviewed plugin.py change. Compare baseline and corrected legacy movie rows. Verify two launch offsets, original direct playback precedence, disabled or incompatible provider rejection, malformed and missing TMDb identity, missing Helper, exact failed Helper fingerprint, prior failed Helper preference, stale verified route, no other buckets affected, diagnostics and byte-for-byte retained fixture state. The host test deliberately cancels the real Helper selection. Android verification separately selects a real Helper action and checks playback and offsets.
