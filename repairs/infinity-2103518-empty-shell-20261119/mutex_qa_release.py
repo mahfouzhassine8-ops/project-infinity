@@ -9,8 +9,8 @@ from zipfile import ZipFile
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
-sys.path.insert(0, str(ROOT / "repairs/infinity-2103514-targeted-20261118"))
 sys.path.insert(0, str(ROOT / "repairs/infinity-movies-continue-cast-2103486-20261112/release"))
+sys.path.insert(0, str(ROOT / "repairs/infinity-2103514-targeted-20261118"))
 
 import common_release as release
 from prepare_authority import owner_bundle, ref_blob
