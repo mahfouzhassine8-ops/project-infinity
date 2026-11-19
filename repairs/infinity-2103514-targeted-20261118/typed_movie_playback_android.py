@@ -349,4 +349,13 @@ if __name__ == "__main__":
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--preparation-run", required=True)
     args = parser.parse_args()
-    run(args.out, args.preparation_run)
+    try:
+        run(args.out, args.preparation_run)
+    except Exception:
+        if observe("shell", "pidof", PACKAGE + ":kodi"):
+            log = observe("shell", "cat", PROFILE + "/temp/kodi.log")
+            for line in log.splitlines():
+                if any(term in line for term in ("InfinityContinueTrace", "Error Type:", "Error Contents:",
+                                                 "fixture_entry.py", "QA Playback", "PythonToCppException")):
+                    print(line, flush=True)
+        raise
