@@ -79,6 +79,16 @@ with tempfile.TemporaryDirectory() as temp:
         check("original_route_unavailable")
     cases.append("unsupported_provider_versions_remain_rejected")
 
+    episode = "plugin://plugin.video.umbrella/?action=play&tmdb=234&season=1&episode=2"
+    identity = hub.media_identity("tv", {}, 1, 2, {"tmdb": "234"})
+    verify = lambda provider: {"scope": "show_episode"}
+    assert experience.source_identity(episode, "tv", {"tmdb": "234"}, 1, 2, verify, **trace) == identity
+    assert experience.source_identity(episode, "tv", {"tmdb": "234"}, 1, 3, verify, **trace) is None
+    check("episode_coordinates_mismatch")
+    assert experience.source_identity(episode+"&episode=4", "tv", {"tmdb": "234"}, 1, 2, verify, **trace) is None
+    check("duplicate_route_arguments")
+    cases.append("tv_episode_identities_and_specific_uri_failures")
+
     # The fake provider advertises no compatibility with real providers. It
     # exercises the remembered, byte-pinned route path independently.
     provider = "plugin.video.fixture"

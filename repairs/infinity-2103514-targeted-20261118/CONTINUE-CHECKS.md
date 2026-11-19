@@ -39,3 +39,9 @@ For APK assembly, select a ZIP member-copy fixture to check that stored and
 deflated members preserve exact payload bytes and compression type, including
 an explicit replacement. The actual candidate/recovery comparison is
 separate and needs the full ARM64 receipt and original module signatures.
+
+Check that an episode route rejected by its exact coordinates logs a
+different fixed code from duplicate route arguments or a provider pin
+failure. This route-level fixture supplies a test-only verified contract and
+does not authorize a provider version. Check that a valid episode route gets
+the same typed identity in the baseline and candidate.

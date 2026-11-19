@@ -41,7 +41,7 @@
          stamp = _render_source_stamp(root, bridge, contract['files']) if render_cache is not None else None
          cached = render_cache.get(provider) if stamp is not None else None
          if cached is not None and cached[0] == stamp and cached[1] == contract:
-@@ -119,19 +125,19 @@
+@@ -119,64 +125,73 @@
          for name, digest in contract['files'].items():
              path = (root / name).resolve()
              if not path.is_relative_to(root) or path.stat().st_size > 1024 * 1024 or hashlib.sha256(path.read_bytes()).hexdigest() not in (digest if isinstance(digest, (list, tuple)) else (digest,)):
@@ -66,13 +66,22 @@
 +def source_identity(route, media, ids, season=-1, episode=-1, verify=None, *, trace=None):
      """Bind an actual resolver invocation to typed IDs and exact episode numbers."""
      import resume_hub as hub
++
++    def reject(reason):
++        if trace is not None:
++            trace('original_route', reason)
++        return None
++
      if not isinstance(route, str) or len(route.encode('utf-8')) > 65536 or any(ord(c) < 32 for c in route):
-@@ -140,11 +146,14 @@
+-        return None
++        return reject('invalid_uri')
+     try:
          parsed = urlsplit(route)
          if parsed.scheme != 'plugin' or parsed.path not in ('', '/') or parsed.netloc not in ('plugin.video.umbrella', 'plugin.video.pov'):
-             return None
+-            return None
 -        contract = (verify or _source_contract)(parsed.netloc)
-+        if verify is not None:
++            return reject('provider_or_uri_path_mismatch')
++        if verify:
 +            contract = verify(parsed.netloc)
 +        else:
 +            contract = _source_contract(parsed.netloc, trace=trace)
@@ -84,16 +93,57 @@
          if not contract:
              return None
          query = parse_qs(parsed.query, keep_blank_values=True)
-@@ -176,7 +185,7 @@
-         return None
- 
- 
+         if any(len(v) != 1 for v in query.values()):
+-            return None
++            return reject('duplicate_route_arguments')
+         if parsed.netloc == 'plugin.video.pov':
+             if query.get('mode') != ['play_media'] or query.get('mediatype') != [('movie' if media == 'movie' else 'episode')]:
+-                return None
++                return reject('provider_action_or_media_type_mismatch')
+             route_ids = hub.verified_ids({k: query[k + '_id'][0] for k in ('imdb', 'tmdb', 'tvdb') if k + '_id' in query})
+         else:
+             if query.get('action') not in (['play'], ['play_Item']):
+-                return None
++                return reject('provider_action_mismatch')
+             route_ids = hub.verified_ids({k: query[k][0] for k in ('imdb', 'tmdb', 'tvdb') if k in query})
+         actual = hub.verified_ids(ids)
+         common = set(route_ids) & set(actual)
+         if not common or any(route_ids[k] != actual[k] for k in common):
+-            return None
++            return reject('typed_identity_mismatch')
+         if media == 'movie':
+             if 'season' in query or 'episode' in query:
+-                return None
++                return reject('episode_arguments_on_movie')
+             return hub.media_identity('movie', actual)
+         if media != 'tv' or contract.get('scope') != 'show_episode':
+-            return None
++            return reject('episode_scope_unsupported')
+         coordinates = tuple(hub.episode_number(query.get(k, [''])[0]) for k in ('season', 'episode'))
+         if min(coordinates) < 0 or coordinates != (hub.episode_number(season), hub.episode_number(episode)):
+-            return None
++            return reject('episode_coordinates_mismatch')
+         return hub.media_identity('tv', {}, season, episode, actual)
+     except (ValueError, TypeError, KeyError):
+-        return None
+-
+-
 -def verified_source(entry, route, verify=None):
++        return reject('route_parse_failed')
++
++
 +def verified_source(entry, route, verify=None, *, trace=None):
      import resume_hub as hub
      if not isinstance(route, str):
          return ''
-@@ -196,7 +205,19 @@
+@@ -191,12 +206,28 @@
+         return ''
+     identity = hub.entry_identity(entry)
+     if not identity:
++        if trace is not None:
++            trace('original_route', 'missing_saved_identity')
+         return ''
+     if identity.get('kind') in ('tvshow', 'season'):
          # Existing Watchlist/Collection directory navigation is not expired
          # movie/episode playback recovery. Preserve its original saved route.
          return stable_route(route)
@@ -110,7 +160,9 @@
 +            if failures:
 +                trace(*failures[-1])
 +            else:
-+                trace('original_provider', 'route_contract_or_identity_mismatch')
++                trace('original_provider', 'no_verified_contract')
++        elif not hub.same_identity(identity, proof):
++            trace('original_route', 'typed_identity_mismatch')
      return route if hub.same_identity(identity, proof) else ''
  
  
@@ -427,8 +479,21 @@
          record = remembered(data, identity) or {}
          pending = _property(home, 'Pending')
          choices = {original, record.get('route', '')}
-@@ -661,15 +706,19 @@
+@@ -652,6 +697,8 @@
+             choices.add(pending.get('original', ''))
+         matches = [v for v in choices if _hash(v) == failure.get('original_sha256')]
+         if len(matches) != 1:
++            if trace is not None:
++                trace('recovery', 'native_ticket_original_fingerprint_mismatch')
+             raise Cancelled('The failed navigation no longer matches this saved item.')
+         initial = matches[0]
+         failure = failure_ticket(home, entry['key'], token, initial, identity, bucket)
+@@ -659,17 +706,25 @@
+         if pending.get('token') == token and _hash(pending.get('route', '')) == failure.get('failed_sha256'):
+             failed_path = pending['route']
          if _hash(failed_path) != failure.get('failed_sha256', _hash(initial)):
++            if trace is not None:
++                trace('recovery', 'native_ticket_destination_fingerprint_mismatch')
              raise Cancelled('The failed destination no longer matches the selected route.')
          _mark_failed(profile, entry, bucket, failed_path)
 +        if trace is not None:
@@ -441,6 +506,8 @@
 -        target = navigation_target(entry, data, original, bucket)
 +        target = navigation_target(entry, data, original, bucket, trace=trace)
          if not target.startswith('plugin://' + CC + '/?action=saved-recovery&'):
++            if trace is not None:
++                trace('recovery', 'revalidation_selected_direct_route')
              raise Cancelled('The saved destination remains available; its original action was retained.')
          token = uuid.uuid4().hex
 +        if trace is not None:
@@ -448,7 +515,7 @@
      snapshot = _source_snapshot(entry, data.get('sources', {}))
      ready, _ = available('movie' if identity['kind'] == 'movie' else 'tv')
      ready = [p for p in ready if p['id'] not in attempted]
-@@ -683,6 +732,8 @@
+@@ -683,6 +738,8 @@
              return resolve(saved, provider, home, progress)
          finally:
              progress.close()
@@ -457,7 +524,7 @@
      provider, target = resolve_with_choices(entry, ready, '',
          lambda reason, options: xbmcgui.Dialog().select(
              'The saved destination failed — open with' if failure is not None else 'Saved destination unavailable — open with',
-@@ -696,6 +747,8 @@
+@@ -696,6 +753,8 @@
      if failure is not None:
          failure_ticket(home, entry['key'], token, initial, identity, bucket)
      search.route(provider)
@@ -466,7 +533,7 @@
      pending = dict(schema=1, token=token, key=entry['key'], bucket=bucket, identity=identity,
          route=target, original=initial, provider=provider, source_snapshot=snapshot,
          epoch_ms=int(time.time()*1000))
-@@ -725,7 +778,14 @@
+@@ -725,7 +784,14 @@
              offset = 0
          item.setProperty('ResumeTime', str(offset))
          item.setProperty('StartOffset', str(offset))
@@ -482,7 +549,7 @@
  
  
  def recover_saved(profile, key, token, original_target, bucket='later', item_builder=None, resume_offset=0):
-@@ -740,8 +800,12 @@
+@@ -740,8 +806,12 @@
          failure = _property(home, 'Failure', 8192) if token else None
          _choose_recovery(profile, entry, bucket, data, home, original_target, token, failure, item_builder, resume_offset)
      except Cancelled:

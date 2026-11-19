@@ -1,10 +1,11 @@
 {
-  "patch_sha256": "1d08883c97df10c9a2c0965032eee61d8df959d7bd6db8927ee488b287288d1b",
+  "patch_sha256": "d60d07062fd50b99e01b6388d4877cf08d9288b19fd6be9de3c448d1f9710f07",
   "checks": [
     {
       "mode": "baseline",
       "passed": [
         "unsupported_provider_versions_remain_rejected",
+        "tv_episode_identities_and_specific_uri_failures",
         "source_cache_false_rejection_reproduced_in_signed_baseline",
         "exact_failure_history_and_changed_provider_pins_remain_enforced",
         "chooser_cancel_has_no_profile_write",
@@ -16,6 +17,7 @@
       "mode": "candidate",
       "passed": [
         "unsupported_provider_versions_remain_rejected",
+        "tv_episode_identities_and_specific_uri_failures",
         "source_cache_false_rejection_removed_only_for_continue",
         "exact_failure_history_and_changed_provider_pins_remain_enforced",
         "chooser_cancel_has_no_profile_write",
