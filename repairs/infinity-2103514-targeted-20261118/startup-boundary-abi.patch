@@ -134,23 +134,33 @@
  }
 --- a/xbmc/interfaces/generic/ScriptInvocationManager.cpp
 +++ b/xbmc/interfaces/generic/ScriptInvocationManager.cpp
-@@ -368,7 +368,15 @@
+@@ -368,8 +368,24 @@
  
  void CScriptInvocationManager::Process()
  {
 -  InfinityStartupTrace::Drain([](const InfinityStartupTrace::Event& event) {
+-    CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}",
 +  InfinityStartupTrace::Drain([](const InfinityStartupTrace::Event& event, const char* addonId) {
++    constexpr char baseFormat[] =
++      "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}";
++    constexpr char addonField[] = " addon=";
++    char createFormat[sizeof(baseFormat) + sizeof(addonField) + 128];
++    const char* format = baseFormat;
 +    if (event.stage == InfinityStartupTrace::Stage::InterpreterCreate)
 +    {
-+      CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={} addon={}",
-+        InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
-+        event.monotonicUs, event.value, event.flags, event.tracked,
-+        addonId[0] ? addonId : "-");
-+      return;
++      const char* id = addonId[0] ? addonId : "-";
++      // The private trace slot contains a canonical ID with no format braces.
++      // Keep the baseline logger argument types to avoid new exported templates.
++      std::memcpy(createFormat, baseFormat, sizeof(baseFormat) - 1);
++      std::memcpy(createFormat + sizeof(baseFormat) - 1, addonField, sizeof(addonField) - 1);
++      const auto prefix = sizeof(baseFormat) + sizeof(addonField) - 2;
++      std::memcpy(createFormat + prefix, id, std::strlen(id) + 1);
++      format = createFormat;
 +    }
-     CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}",
++    CLog::Log(LOGINFO, format,
        InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
        event.monotonicUs, event.value, event.flags, event.tracked);
+   });
 --- a/xbmc/interfaces/python/PythonInvoker.cpp
 +++ b/xbmc/interfaces/python/PythonInvoker.cpp
 @@ -295,9 +295,12 @@

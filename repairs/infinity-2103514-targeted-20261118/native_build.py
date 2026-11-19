@@ -175,7 +175,7 @@ def compile_engine(old):
     require(proof["complete_native_engine_compiled"] and proof["reviewed_file_count"] == len(expected) and
             sha(engine) == proof["native_sha256"], "Full ARM64 compile/link receipt failed")
     with engine.open("rb") as stream, mmap.mmap(stream.fileno(), 0, access=mmap.ACCESS_READ) as binary:
-        for marker in (b"interpreter.returned", b"tracked={} addon={}", b"trace.overflow",
+        for marker in (b"interpreter.returned", b" addon=", b"trace.overflow",
                        b"bytecode.cancelled_before_entry"):
             require(binary.find(marker) >= 0, "Diagnostic marker absent from linked engine")
 

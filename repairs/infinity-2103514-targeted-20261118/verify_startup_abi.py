@@ -89,5 +89,69 @@ extern "C" const char* startup_probe(Trace::Stage stage)
                                    {n for n in original.keys() & candidate.keys()
                                     if original[n] != candidate[n]})
 
+def check_logger(work):
+    manager = work / "xbmc/interfaces/generic/ScriptInvocationManager.cpp"
+    cpp = manager.read_text()
+    begin = cpp.index("  InfinityStartupTrace::Drain(", cpp.index("void CScriptInvocationManager::Process()"))
+    end = cpp.index("  std::unique_lock<CCriticalSection>", begin)
+    source = work / "logger.cpp"
+    source.write_text(r"""
+#include "xbmc/interfaces/generic/InfinityStartupTrace.h"
+#include <cassert>
+#include <string>
+#include <string_view>
+#include <tuple>
+#include <vector>
+
+using Trace = InfinityStartupTrace::Event;
+namespace Startup = InfinityStartupTrace;
+constexpr int LOGINFO = 1;
+std::vector<std::string> messages;
+struct CLog
+{
+  template<class... Args>
+  static void Log(int, const std::string_view& format, Args&&...)
+  {
+    // Exactly the existing argument list, including the same reference types.
+    static_assert(std::is_same_v<std::tuple<Args...>,
+                  std::tuple<const char*, const uint64_t&, const int&, const long&,
+                             const uint64_t&, const int&, const unsigned&, const unsigned&>>);
+    messages.emplace_back(format);
+  }
+};
+void DrainFromManager()
+{
+DRAIN_BODY
+}
+int main()
+{
+  Startup::hostInfinity = true;
+  Startup::RecordInterpreterCreate(4, "script.infinity.test");
+  Startup::Record(Startup::Stage::InterpreterReturned, 4, 1);
+  Startup::RecordInterpreterCreate(5, "script.{untrusted}");
+  DrainFromManager();
+  const std::string original =
+    "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}";
+  assert(messages.size() == 3);
+  assert(messages[0] == original + " addon=script.infinity.test");
+  assert(messages[1] == original);
+  assert(messages[2] == original + " addon=-");
+}
+""".replace("DRAIN_BODY", cpp[begin:end]))
+    binary = work / "logger"
+    subprocess.run(
+        ["g++", "-std=c++17", "-Werror", "-D", "INFINITY_STARTUP_TRACE_HOST",
+         "-D", "TARGET_ANDROID", "-I", work, source, "-o", binary],
+        check=True,
+    )
+    subprocess.run([binary], timeout=10, check=True)
+
+
+def check_full_fixture(baseline, work):
+    check_exports(baseline, work)
+    check_logger(work)
+
+
+
 if __name__ == "__main__":
-    check(Path(sys.argv[1]), "STARTUP-ABI-SCOPE.json", "startup-boundary-abi.patch", test_fixture(), check_exports)
+    check(Path(sys.argv[1]), "STARTUP-ABI-SCOPE.json", "startup-boundary-abi.patch", test_fixture(), check_full_fixture)
