@@ -14,6 +14,7 @@ from stage_qa import ROOT, copy_member, file_sha, load, require
 REPOSITORY = "mahfouzhassine8-ops/project-infinity"
 CANONICAL = "work/infinity-2103460-nine-corrections-20261106"
 BASE_COMMIT = "a70aaaec062eac447556d22325affef9d8d496ec"
+DIAGNOSTIC_COMMIT = "45289ee8235b19d6d49d9144241b1988fbc3754f"
 AUTHORITY = Path("repairs/dual-experience-isolation-2103420/release-authority.json")
 WORKFLOW = Path(".github/workflows/infinity-combined-release.yml")
 TARGETS = ("INFINITY", "CHOOSER_SHELL")
@@ -61,6 +62,8 @@ def prepare(args):
 
     inventory, bundles, authority, guard, _ = tools()
     baseline = json.loads(ref_blob(BASE_COMMIT, AUTHORITY))
+    diagnostics = json.loads(ref_blob(DIAGNOSTIC_COMMIT, AUTHORITY))
+    require(diagnostics["candidate_versionCode"] == 2103516, "Wrong diagnostic source authority")
     previous = load(ROOT / AUTHORITY)
     staged = load(args.staged / "STAGING.json")
     require(staged["release_registry_sha256"] == file_sha(ROOT / AUTHORITY) and
@@ -93,6 +96,15 @@ def prepare(args):
         changed = {n for n in actual if actual[n] != baseline["payload"][n]["sha256"]}
         require(changed == expected_delta, "Original class or APK member changed outside the scope")
         payload = {n: dict(baseline["payload"][n], sha256=digest) for n, digest in actual.items()}
+        if kind == "candidate":
+            expected_qa_delta = {"member:assets/experience-component-updates.properties"} | {
+                "member:assets/addons/script.infinity.commandcenter/" + name
+                for name in ("plugin.py", "INFINITY-MODULES.v1", "INFINITY-MODULES.v1.sig", "addon.xml")
+            }
+            retained = diagnostics["payload"]
+            require(set(payload) == set(retained) and
+                    {n for n in payload if payload[n] != retained[n]} == expected_qa_delta,
+                    "The candidate must preserve the 2103516 diagnostics and all other reviewed members")
 
         catalog = deepcopy(verified_catalog)
         catalog.update(source=source, release_approved=False)

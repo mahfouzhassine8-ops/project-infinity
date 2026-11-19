@@ -1,0 +1,52 @@
+--- a/assets/addons/script.infinity.commandcenter/plugin.py
++++ b/assets/addons/script.infinity.commandcenter/plugin.py
+@@ -245,6 +245,30 @@
+     return ''
+ 
+ 
++def _continue_original_target(entry, sources, render=None, *, trace=None):
++    original = _target(entry, sources, render, trace=trace)
++    if (original or entry.get('media') != 'movie' or entry.get('synthetic_next') or
++            str(entry.get('tmdb') or '').strip()):
++        return original
++
++    # Legacy movies can have a validated movie ID only in the saved identity.
++    identity = hub.entry_identity(entry)
++    tmdb = identity['ids'].get('tmdb') if identity and identity['scope'] == 'movie' else ''
++    if not tmdb or not _has_tmdb_helper(render):
++        return ''
++
++    route = 'plugin://plugin.video.themoviedb.helper/?info=play&tmdb_type=movie&tmdb_id=' + tmdb
++    preference = sources.get(entry.get('key')) if isinstance(sources, dict) else None
++    if (isinstance(preference, dict) and preference.get('route') == route and
++            number(preference.get('failures')) >= 2):
++        if trace is not None:
++            trace('source_memory', 'preferred_route_failure_threshold')
++        return ''
++    if trace is not None:
++        trace('source_memory', 'typed_helper_resolver_available')
++    return route
++
++
+ def navigation_target(entry, data, bucket='continue', render=None, *, trace=None):
+     if bucket in ('later', 'watchlist', 'continue') and data.get('navigation_recovery'):
+         from saved_navigation import remembered, navigation_target as select_target
+@@ -253,7 +277,8 @@
+             # A verified preference supersedes the failed old route. Do not
+             # inspect the old provider or construct another resolver first.
+             return select_target(entry, data, '', bucket, render, trace=trace)
+-    original = _target(entry, data.get('sources', {}), render, trace=trace)
++    resolve_original = _continue_original_target if bucket == 'continue' else _target
++    original = resolve_original(entry, data.get('sources', {}), render, trace=trace)
+     if bucket not in ('later', 'watchlist', 'continue'):
+         return original
+     # Keep untouched working records on the exact old path, with no discovery.
+@@ -272,7 +297,7 @@
+         from saved_navigation import _continue_trace
+ 
+         def original_target(entry, sources):
+-            return _target(entry, sources, trace=_continue_trace)
++            return _continue_original_target(entry, sources, trace=_continue_trace)
+     return recover_saved(PROFILE, key, token, original_target, bucket,
+                          item_builder=_list_item, resume_offset=resume_offset)
+ 

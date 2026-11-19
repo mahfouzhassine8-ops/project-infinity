@@ -4939,6 +4939,7 @@ jobs:
             infinity514-unsigned-preparation/PREPARATION.json
             infinity514-unsigned-preparation/*/AUTHORITY-PROPOSAL.json
             infinity514-unsigned-preparation/*/PRESERVATION.json
+            infinity514-module-signatures/candidate/script.infinity.commandcenter/INFINITY-MODULES.v1.sig
           if-no-files-found: error
           retention-days: 90
       - name: Exact registered owner candidate or recovery

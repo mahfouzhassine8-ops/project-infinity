@@ -38,29 +38,21 @@
     "source": "a084d52a58d3ce47e50e9bfb4dcec9a04b32561b",
     "workflow_id": 397702717
   },
-  "preparation_registry_sha256": "7385ca151a7930d0f49c94e4224c85a7c71c993fbd568bb1217b0403f79892db",
-  "prepared_artifact": {
-    "digest": "sha256:6aafdacd6d7a2d871fb2df4817fd2f54bd47383d5a8c48d340d5ae0ecd0e1ce8",
-    "id": 14506467484,
-    "name": "Infinity514-Prepared-44475378678",
-    "run": 44475378678,
-    "size_in_bytes": 1284632141,
-    "source": "668566c646f27b9f72a9613cb52632abdaeafd8d",
-    "workflow_id": 397702717
-  },
-  "reviewed_source_commit": "827dc2abdb042ed59ba3c1ab8bddd17f277c0737",
-  "selected_kind": "forward-recovery",
+  "preparation_registry_sha256": "0092d1f8de24da6ff01a49b12dd93cf42c89f7bf9e38e820e871f0f6d9074b61",
+  "reviewed_source_commit": "c6286ce595fae7ec7f427d180ef53dda876b0ef3",
   "source_inputs": {
     "CONTINUE-HOST.json": "ab0e813797f8c6d786e28343fa9add3a12e6a2f86b1e8d0f7cb57539744da977",
-    "CONTINUE-SCOPE.json": "b5953f5a8b5e279a54e7c89f5055a13d6114e7e4e202f7aeb8ba98382e854351",
-    "MODULE-PRESERVATION.json": "37313fb53ce86f53652bac17aeb6572f9ad45f9cb65028c4814fe56dc99a9985",
+    "CONTINUE-SCOPE.json": "8240f5efa248686b8480f6b0934a4346e0be2e60462b4cfe4ccb690c8e57f316",
+    "MODULE-PRESERVATION.json": "f89bef8aeb937d7fdaf97858bf612788e95b99eaf9120b34eea0805124b38c31",
     "SCOPE.json": "302dd0e8895fe787f1546a0302ff6246d91ead01681084e6cf498ff31421e345",
     "STARTUP-ABI-HOST.json": "69d72c9c3b04aba09f53574cc063369f84815c7828990f0b687491d3c7136a6a",
     "STARTUP-ABI-SCOPE.json": "6031defcbf1db94c5fa4b6dc6ce9bd46cfec2f2a1906d7254f08939f946b1cc0",
+    "TYPED-MOVIE-HOST.json": "f5ce11ea980c061ef8201ead8de943e22d6522b5c3ccdfc7c3222050e974888b",
     "continue-navigation.patch": "d60d07062fd50b99e01b6388d4877cf08d9288b19fd6be9de3c448d1f9710f07",
-    "prepare_authority.py": "68ac7127eb586d88e6827506c844d20888aa3748f9e49cbb15e57f5448b0a686",
-    "prepare_modules.py": "a54965f58950ee5ee962f590ca36d397e65d3aa3197f1229268e1717d0c8f1df",
-    "release_driver.py": "99347f1ec21d240dad709571949088eb277468d744bf383c6e6c3de87aef184c",
-    "stage_qa.py": "1fbe2382eb4eeea51992da9c478666490049d817204779efeb9febb67bf5dd14"
+    "prepare_authority.py": "8a56d2acf8cc20608aa290dc106a0236c28fb1039f96c7d155a1dbb17d83058d",
+    "prepare_modules.py": "3cfed362df35382b2624fc9cdeb4ccc717fb45343cc5125f3e1fa3384f660f81",
+    "release_driver.py": "e688447f7153d5cca47d077a7611df4abb77e54927137c64211b4a186a3a42ee",
+    "stage_qa.py": "1fbe2382eb4eeea51992da9c478666490049d817204779efeb9febb67bf5dd14",
+    "typed-movie-fallback.patch": "b67284bc5e8ed35d400acced081eda0b0119349a297d7234f91c667f47e753f2"
   }
 }

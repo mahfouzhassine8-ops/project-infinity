@@ -14,6 +14,7 @@ KEY_SHA256 = "bc883be4515d328935b1f3e28294bfc0fe0f2614083274db63b1d24d4da172e8"
 EXPECTED = {PREFIX + CC + "/" + name for name in (
     "experience.py", "plugin.py", "saved_navigation.py", "infinity_modules/uirepair/runtime.py"
 )}
+TYPED_MOVIE = PREFIX + CC + "/plugin.py"
 
 
 def require(condition, message):
@@ -54,7 +55,7 @@ def stage(baseline, out, public_key):
                 for path, pins in scope["changed"].items()), "Reviewed source preimage differs")
     out.mkdir()
     report = {}
-    for name, version in (("candidate", "0.3.5.85"), ("forward-recovery", "0.3.5.86")):
+    for name, version in (("candidate", "0.3.5.87"), ("forward-recovery", "0.3.5.88")):
         root = out / name
         shutil.copytree(addons, root / PREFIX)
         if name == "candidate":
@@ -64,6 +65,23 @@ def stage(baseline, out, public_key):
                 payload = (root / path).read_bytes()
                 require(sha(payload) == pins["after_sha256"], "Wrong reviewed result: " + path)
                 compile(payload, path, "exec")
+            movie_patch = HERE / "typed-movie-fallback.patch"
+            movie_scope = scope["typed_movie"]
+            movie_file = root / TYPED_MOVIE
+            require(movie_scope["path"] == TYPED_MOVIE and movie_scope["baseline"] == 2103516 and
+                    sha(movie_patch.read_bytes()) == movie_scope["patch_sha256"] and
+                    sha(movie_file.read_bytes()) == movie_scope["before_sha256"],
+                    "Wrong 2103516 movie resolver preimage")
+            # Keep this independently reviewed delta separate from the 2103516 diagnostic patch.
+            subprocess.run(["patch", "--batch", "--forward", "--fuzz=0", "--no-backup-if-mismatch",
+                            "-p1", "-i", str(movie_patch)], cwd=root, check=True)
+            payload = movie_file.read_bytes()
+            require(sha(payload) == movie_scope["after_sha256"], "Wrong typed movie resolver")
+            compile(payload, TYPED_MOVIE, "exec")
+            for path, pins in scope["changed"].items():
+                if path != TYPED_MOVIE:
+                    require(sha((root / path).read_bytes()) == pins["after_sha256"],
+                            "Changed an existing 2103516 diagnostic: " + path)
         target_addons = root / PREFIX
         addon = target_addons / CC / "addon.xml"
         raw = addon.read_bytes()
