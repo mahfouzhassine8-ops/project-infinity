@@ -39,7 +39,17 @@
     "workflow_id": 397702717
   },
   "preparation_registry_sha256": "0092d1f8de24da6ff01a49b12dd93cf42c89f7bf9e38e820e871f0f6d9074b61",
+  "prepared_artifact": {
+    "digest": "sha256:cb83b07d075004da28869cbaf54108fa4281f188f8532a241df7baef6a513464",
+    "id": 14514535986,
+    "name": "Infinity514-Prepared-44493489263",
+    "run": 44493489263,
+    "size_in_bytes": 1284632272,
+    "source": "aa29dbc886fc33c9e163522db23acdb7b5acf899",
+    "workflow_id": 397702717
+  },
   "reviewed_source_commit": "c6286ce595fae7ec7f427d180ef53dda876b0ef3",
+  "selected_kind": "candidate",
   "source_inputs": {
     "CONTINUE-HOST.json": "ab0e813797f8c6d786e28343fa9add3a12e6a2f86b1e8d0f7cb57539744da977",
     "CONTINUE-SCOPE.json": "8240f5efa248686b8480f6b0934a4346e0be2e60462b4cfe4ccb690c8e57f316",
@@ -54,5 +64,39 @@
     "release_driver.py": "e688447f7153d5cca47d077a7611df4abb77e54927137c64211b4a186a3a42ee",
     "stage_qa.py": "1fbe2382eb4eeea51992da9c478666490049d817204779efeb9febb67bf5dd14",
     "typed-movie-fallback.patch": "b67284bc5e8ed35d400acced081eda0b0119349a297d7234f91c667f47e753f2"
+  },
+  "typed_movie_playback_verification": {
+    "artifact": 14518370537,
+    "digest": "sha256:85a8fdb5cef7f662cb3799c4a3998502a56dd0756c53baf54535757b71b1a62a",
+    "results": [
+      {
+        "action": "A",
+        "advanced": 1.144,
+        "kodi_tag_tmdb": "701000",
+        "observed": 0.002,
+        "playing_fixture": "fixture-701000.mp4",
+        "requested": 0.0,
+        "tmdb": "701000"
+      },
+      {
+        "action": "A",
+        "advanced": 24.97,
+        "kodi_tag_tmdb": "701001",
+        "observed": 24.0,
+        "playing_fixture": "fixture-701001.mp4",
+        "requested": 24.0,
+        "tmdb": "701001"
+      },
+      {
+        "action": "B",
+        "advanced": 0.917,
+        "kodi_tag_tmdb": "701002",
+        "observed": 0.0,
+        "playing_fixture": "fixture-701002.mp4",
+        "requested": 0.0,
+        "tmdb": "701002"
+      }
+    ],
+    "run": 44501589948
   }
 }
