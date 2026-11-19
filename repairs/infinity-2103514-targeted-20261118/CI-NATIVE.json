@@ -1,0 +1,22 @@
+{
+  "apk_packaging": false,
+  "baseline": {
+    "apk_sha256": "4bfe67cf9d3edefdc1d3e04accc826089b314e043a8dd98dba206cd1924a1d8c",
+    "commit": "a70aaaec062eac447556d22325affef9d8d496ec",
+    "engine_sha256": "b3d8d96aa55bf0e48f6cf7c995b2c2ebf9c53720b94f2a9e791dd039d64bf1e7",
+    "engine_source_map_artifact": 14225288536,
+    "engine_source_map_artifact_sha256": "843b16eec70bfe5c2f176a0c1643a5601836dfc40e9c18f46283106824611574",
+    "engine_source_map_run": 43861331996,
+    "engine_source_map_sha256": "cc044d4cccdce5e8c05147efc2109dcb4b67e80a52fa490b2a31166db23b067a",
+    "version_code": 2103514
+  },
+  "inputs": {
+    ".github/workflows/infinity-514-startup-boundary.yml": "38dd91df4ed8cd37f092cc2630958ea699b6732cbea69f629dca153c8a15390c",
+    "repairs/infinity-2103514-targeted-20261118/SCOPE.json": "302dd0e8895fe787f1546a0302ff6246d91ead01681084e6cf498ff31421e345",
+    "repairs/infinity-2103514-targeted-20261118/native_build.py": "4ab71954f3d69e489317aed66f73486fb999897e32949da5a178a1124f06040d",
+    "repairs/infinity-2103514-targeted-20261118/startup-boundary.patch": "affd7debf76fea095e1a291cb7eaf7b1ff91b71a8bcd66567baba77a1e9cc27c"
+  },
+  "operation": "compile_exact_2103514_startup_diagnostic_arm64",
+  "selected": "Full ARM64 compile/link, startup markers, exact 2103514 exported ABI and dependencies",
+  "signing": false
+}
