@@ -178,6 +178,11 @@ while not monitor.waitForAbort(.10):
                     result['menus'][control] = [
                         xbmc.getInfoLabel('Container(%d).ListItemAbsolute(%d).Label' % (control, i))
                         for i in range(count)]
+        elif operation == 'playing':
+            player = xbmc.Player()
+            tag = player.getVideoInfoTag()
+            result = {'playing': player.isPlayingVideo(), 'file': player.getPlayingFile(),
+                      'tmdb': tag.getUniqueID('tmdb'), 'title': tag.getTitle()}
         elif operation == 'focus':
             control, index, label = request['control'], request['index'], request['label']
             assert control in (50, 6, 3) and 0 <= index < 8
@@ -319,22 +324,24 @@ def active_video():
     return next((v["playerid"] for v in rpc("Player.GetActivePlayers") if v["type"] == "video"), None)
 
 
-def playback(tmdb, choice, offset):
+def playback(observer, tmdb, choice, offset):
     def get_state():
         player = active_video()
         if player is None:
             return None
         values = rpc("Player.GetProperties", {"playerid": player,
                      "properties": ["time", "totaltime", "speed", "currentvideostream", "currentaudiostream"]})
-        item = rpc("Player.GetItem", {"playerid": player, "properties": ["uniqueid", "file"]})["item"]
         if seconds(values["totaltime"]) < 89 or values["speed"] != 1 or not values.get("currentvideostream"):
             return None
-        return player, values, item
-    player, first, item = until(get_state, "Kodi opens and decodes the selected clip", 65)
+        return player, values
+    player, first = until(get_state, "Kodi opens and decodes the selected clip", 65)
     start = seconds(first["time"])
     require(offset - 0.5 <= start <= offset + 3.0, f"Expected start near {offset}, actual {start}")
-    require(item.get("type") == "movie" and str(item.get("uniqueid", {}).get("tmdb")) == tmdb,
-            "Opened playback identity differs from saved movie")
+    actual = observer.command("playing")
+    require(actual["playing"] and Path(actual["file"]).name == f"fixture-{tmdb}.mp4",
+            f"Kodi did not play the selected identity's fixture: {actual}")
+    require(actual["tmdb"] in ("", tmdb) and actual["title"] == "Fixture " + tmdb,
+            f"Conflicting playback identity: {actual}")
     require(bool(first.get("currentaudiostream")), "Expected a real audio stream")
     require(observe("shell", "cat", f"{DATA}/{FIXTURE}/selected-{tmdb}") == choice,
             "The actual selected Helper action did not invoke its declared provider clip")
@@ -342,7 +349,8 @@ def playback(tmdb, choice, offset):
                   else None), "actual playback clock advances", 12)
     rpc("Player.Stop", {"playerid": player})
     until(lambda: active_video() is None, "clip stopped")
-    return dict(tmdb=tmdb, action=choice, requested=offset, observed=start, advanced=seconds(later[1]["time"]))
+    return dict(tmdb=tmdb, action=choice, requested=offset, observed=start, advanced=seconds(later[1]["time"]),
+                playing_fixture=Path(actual["file"]).name, kodi_tag_tmdb=actual["tmdb"])
 
 
 def run(out, preparation_run):
@@ -443,7 +451,7 @@ def run(out, preparation_run):
         # The Helper groups by plugin, then its own standard picker exposes
         # that group's concrete media action. Select that action as well.
         observer.select("Play with QA Playback " + choice, heading="Choose Action")
-        results.append(playback(MOVIES[i], choice, offset))
+        results.append(playback(observer, MOVIES[i], choice, offset))
         print(json.dumps(results[-1]), flush=True)
     require(observe("shell", "pidof", PACKAGE + ":kodi") == str(boot["engine_pid"]), "Engine process changed")
     (out / REPORT).write_text(json.dumps(dict(status="PASS_ACTUAL_TYPED_MOVIE_PLAYBACK", results=results,
