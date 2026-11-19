@@ -13,7 +13,7 @@ ROOT = HERE.parents[1]
 PRIOR = "dea5df6063b49d65099c7958722f2b9f33895600"
 REVIEW = ROOT / "native-retained/repairs/infinity-six-repairs-2103502-20261116/lock"
 EXACT = ROOT / "baseline514-native"
-SCOPE = json.loads((HERE / "SCOPE.json").read_bytes())
+SCOPE = json.loads((HERE / "STARTUP-ABI-SCOPE.json").read_bytes())
 BASE = SCOPE["baseline"]
 BRANCH = "work/infinity-2103514-targeted-20261118"
 TASK = "repairs/infinity-2103514-targeted-20261118"
@@ -59,6 +59,9 @@ def gate(old):
             "Wrong Infinity diagnostic build request")
     paths = [f"{TASK}/CI-NATIVE.json", f"{TASK}/native_build.py",
              f"{TASK}/SCOPE.json", f"{TASK}/startup-boundary.patch",
+             f"{TASK}/STARTUP-ABI-SCOPE.json", f"{TASK}/startup-boundary-abi.patch",
+             f"{TASK}/STARTUP-ABI-CHECKS.md", f"{TASK}/STARTUP-ABI-HOST.json",
+             f"{TASK}/verify_startup_abi.py", f"{TASK}/verify_startup_boundary.py",
              ".github/workflows/infinity-514-startup-boundary.yml"]
     require(not git("diff", "--name-only", "HEAD", "--", *paths), "Diagnostic inputs changed")
     request = json.loads((HERE / "CI-NATIVE.json").read_bytes())
@@ -72,6 +75,15 @@ def gate(old):
     for name in ("SCOPE.json", "startup-boundary.patch"):
         require((HERE / name).read_bytes() == git("show", "301a6cd0:" + TASK + "/" + name),
                 "Host-tested startup patch or source pins differ")
+    previous = json.loads((HERE / "SCOPE.json").read_bytes())
+    receipt = json.loads((HERE / "STARTUP-ABI-HOST.json").read_bytes())
+    require(SCOPE["baseline"] == previous["baseline"] and
+            {name: row["before_sha256"] for name, row in SCOPE["source_allowlist"].items()} ==
+            {name: row["before_sha256"] for name, row in previous["source_allowlist"].items()} and
+            receipt["source_allowlist"] == SCOPE["source_allowlist"] and
+            receipt["overlay_sha256"] == sha(HERE / "startup-boundary-abi.patch") and
+            receipt["status"] == "PASS_HOST_STARTUP_AND_ABI_FIXTURE",
+            "Wrong ABI-compatible diagnostic scope or host receipt")
     legacy, scope = (json.loads(path.read_bytes()) for path in (old.REQUEST, old.SCOPE))
     require(old.sha(old.REQUEST) == "ef12b91795833060319a25d8dc5feed77a5083bf8b2ac7cadd0a0d48f50448d2" and
             legacy["reviewed_files"] == old.source_hashes(), "Retained historical request or reviewed files changed")
@@ -130,7 +142,7 @@ def prepare(old):
     old.prepare()
     require(old.hasher().hashes(old.NATIVE) == before,
             "Historical source reconstruction does not match all 2103514 source bytes")
-    patch = HERE / "startup-boundary.patch"
+    patch = HERE / "startup-boundary-abi.patch"
     command = ["patch", "--batch", "--forward", "--fuzz=0", "-p1", "-i", str(patch)]
     subprocess.run(command + ["--dry-run"], cwd=old.NATIVE, check=True)
     subprocess.run(command, cwd=old.NATIVE, check=True)
@@ -173,16 +185,22 @@ def compile_engine(old):
             return subprocess.check_output([tools / "llvm-readelf", option, "--wide", path], text=True)
         header = read("-h")
         require(all(value in header for value in ("ELF64", "AArch64", "DYN")), "Invalid ARM64 shared object")
-        symbols = {tuple(row[i] for i in (7, 3, 4, 5)) for line in read("--dyn-syms").splitlines()
-                   if len(row := line.split()) >= 8 and row[4] in ("GLOBAL", "WEAK")
-                   and row[5] in ("DEFAULT", "PROTECTED") and row[6] != "UND"}
+        exported = [row for line in read("--dyn-syms").splitlines()
+                    if len(row := line.split()) >= 8 and row[4] in ("GLOBAL", "WEAK")
+                    and row[5] in ("DEFAULT", "PROTECTED") and row[6] != "UND"]
+        symbols = {tuple(row[i] for i in (7, 3, 4, 5)) for row in exported}
+        storage = {row[7]: int(row[2], 0) for row in exported
+                   if row[3] == "OBJECT" and "InfinityStartupTrace" in row[7]}
+        require(storage.get("_ZN20InfinityStartupTrace5slotsE") == 458752 and
+                storage.get("_ZZN20InfinityStartupTrace4NameENS_5StageEE5names") == 400,
+                "Exported startup trace storage layout changed")
         return symbols, set(re.findall(r"Shared library: \[([^\]]+)\]", read("-d"))), tuple(
-            re.findall(r"Rev:\s*\d+[^\n]*?Name:\s*(\S+)", read("--version-info")))
+            re.findall(r"Rev:\s*\d+[^\n]*?Name:\s*(\S+)", read("--version-info"))), storage
 
     previous, current = abi(EXACT / "libkodi.so"), abi(engine)
     old.save("ABI-514.json", dict(removed=sorted(previous[0] - current[0]),
         added=sorted(current[0] - previous[0]), needed_before=sorted(previous[1]),
-        needed_after=sorted(current[1]), versions_before=previous[2], versions_after=current[2]))
+        needed_after=sorted(current[1]), versions_before=previous[2], versions_after=current[2], startup_storage_before=previous[3], startup_storage_after=current[3]))
     require(previous == current, "Exact 2103514 exported ABI or runtime dependencies differ")
     old.save("ARM64-514.json", dict(status="PASS_FULL_ARM64_LINK_AND_EXACT_2103514_ABI", **proof,
                                   android_execution="NOT_RUN",

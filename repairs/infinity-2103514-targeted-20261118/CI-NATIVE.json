@@ -13,8 +13,14 @@
   "inputs": {
     ".github/workflows/infinity-514-startup-boundary.yml": "38dd91df4ed8cd37f092cc2630958ea699b6732cbea69f629dca153c8a15390c",
     "repairs/infinity-2103514-targeted-20261118/SCOPE.json": "302dd0e8895fe787f1546a0302ff6246d91ead01681084e6cf498ff31421e345",
-    "repairs/infinity-2103514-targeted-20261118/native_build.py": "21957e3159e6a2aba1f4a1464aab146707bf56cb7bcf01116e39fe25297ccba5",
-    "repairs/infinity-2103514-targeted-20261118/startup-boundary.patch": "affd7debf76fea095e1a291cb7eaf7b1ff91b71a8bcd66567baba77a1e9cc27c"
+    "repairs/infinity-2103514-targeted-20261118/STARTUP-ABI-CHECKS.md": "09160279be35a3b422f32237fa3ded0ebbd9d88b58dd3d86e3154b9b553fe331",
+    "repairs/infinity-2103514-targeted-20261118/STARTUP-ABI-HOST.json": "59e1dae9ca6c1e953f7ef8ca07750b9b5e8a3a29257c6fd8652befb825cd60cf",
+    "repairs/infinity-2103514-targeted-20261118/STARTUP-ABI-SCOPE.json": "e765d5bc7931e9ac047c8e1111dccb888eee3e7d22eff1db6508b9dc38a32240",
+    "repairs/infinity-2103514-targeted-20261118/native_build.py": "1a4613c654fba408e593e442c57d93521d006c3327ffcf8b1df2b7d054bb8ea9",
+    "repairs/infinity-2103514-targeted-20261118/startup-boundary-abi.patch": "726cdcbbe46a65ca5f5d476d23ecc53eae5601c46b3dd877c4b21ffedfdfdc04",
+    "repairs/infinity-2103514-targeted-20261118/startup-boundary.patch": "affd7debf76fea095e1a291cb7eaf7b1ff91b71a8bcd66567baba77a1e9cc27c",
+    "repairs/infinity-2103514-targeted-20261118/verify_startup_abi.py": "fa33bad1c5c6825dcd0d6f562eb989be415ac3849610669c74953a9f0119ed72",
+    "repairs/infinity-2103514-targeted-20261118/verify_startup_boundary.py": "995a95eb23bb816a098d5343deb69190cba0ba527f7fc1093730f77d9ce19364"
   },
   "operation": "compile_exact_2103514_startup_diagnostic_arm64",
   "selected": "Full ARM64 compile/link, startup markers, exact 2103514 exported ABI and dependencies",

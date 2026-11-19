@@ -1,0 +1,169 @@
+--- a/xbmc/interfaces/generic/InfinityStartupTrace.h
++++ b/xbmc/interfaces/generic/InfinityStartupTrace.h
+@@ -16,7 +16,7 @@
+   ThreadStateFailed, GilWait, GilAcquired, InterpreterCreate, InterpreterCreated,
+   InterpreterFailed, RestoreGilWait, RestoreGilAcquired, KodiInitialize,
+   KodiInitialized, ObserverBegin, ObserverReturned, BytecodeEnter, BytecodeReturned,
+-  BytecodeException, StoppingBeforeBytecode, ExecutionFinished, CheckpointGateClosed, Overflow
++  BytecodeException, StoppingBeforeBytecode, ExecutionFinished, CheckpointGateClosed, Overflow, InterpreterReturned
+ };
+ struct Event {
+   uint64_t request{0}, monotonicUs{0};
+@@ -24,6 +24,8 @@
+   Stage stage{Stage::RequestBegin};
+ };
+ inline const char* Name(Stage s) noexcept {
++  if (s == Stage::InterpreterReturned)
++    return "interpreter.returned";
+   static constexpr const char* names[]={
+     "request.begin","request.end","builtin.resolve","builtin.resolved","builtin.result",
+     "lookup.wait","lookup.locked","dispatch.wait","dispatch.locked",
+@@ -47,6 +49,7 @@
+ #include <cerrno>
+ #include <chrono>
+ #include <cstring>
++#include <type_traits>
+ #include <fcntl.h>
+ #include <sys/syscall.h>
+ #include <unistd.h>
+@@ -56,6 +59,9 @@
+ constexpr unsigned DRAIN_BATCH=32;
+ struct Slot { Event event; std::atomic<bool> ready{false}; };
+ inline std::array<Slot,CAPACITY> slots;
++// Published by the same Slot::ready release as the corresponding event.
++// Keep this private so the existing Event and exported slots keep their ABI.
++[[gnu::visibility("hidden")]] inline char addonIds[CAPACITY][128]{};
+ inline std::atomic<unsigned> next{0}, dropped{0};
+ inline std::atomic<uint64_t> serial{0};
+ inline std::atomic_flag draining=ATOMIC_FLAG_INIT;
+@@ -92,15 +98,51 @@
+   static const uint64_t started=Now();
+   return Now()-started<1200000000ULL; // finite twenty-minute QA capture
+ }
+-inline void Record(Stage stage,int invoker=-1,int value=0,unsigned flags=0,unsigned tracked=0) noexcept {
+-  if(!Enabled())return;
+-  const unsigned index=next.fetch_add(1,std::memory_order_relaxed);
+-  if(index>=CAPACITY){dropped.fetch_add(1,std::memory_order_relaxed);return;}
+-  const int saved=errno;
+-  auto& slot=slots[index];
+-  slot.event={request,Now(),static_cast<long>(::syscall(SYS_gettid)),invoker,value,flags,tracked,stage};
+-  slot.ready.store(true,std::memory_order_release);
+-  errno=saved;
++[[gnu::visibility("hidden")]] inline void RecordEvent(
++    Stage stage, int invoker, int value, unsigned flags, unsigned tracked,
++    const char* addonId) noexcept
++{
++  if (!Enabled())
++    return;
++  const unsigned index = next.fetch_add(1, std::memory_order_relaxed);
++  if (index >= CAPACITY)
++  {
++    dropped.fetch_add(1, std::memory_order_relaxed);
++    return;
++  }
++  const int saved = errno;
++  auto& slot = slots[index];
++  slot.event = {request, Now(), static_cast<long>(::syscall(SYS_gettid)),
++                invoker, value, flags, tracked, stage};
++  if (addonId)
++  {
++    // Only canonical add-on IDs are copied. Never record paths or arguments.
++    auto& id = addonIds[index];
++    std::size_t length = 0;
++    while (length < sizeof(id) && addonId[length] != '\0')
++    {
++      const char c = addonId[length];
++      if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
++            (c >= '0' && c <= '9') || c == '.' || c == '_' || c == '-'))
++        break;
++      ++length;
++    }
++    if (length != 0 && length < sizeof(id) && addonId[length] == '\0')
++      std::memcpy(id, addonId, length);
++  }
++  slot.ready.store(true, std::memory_order_release);
++  errno = saved;
++}
++// Retain the signed engine's five-argument exported entry point even when
++// its new, small body would otherwise be fully inlined.
++[[gnu::used, gnu::noinline]] inline void Record(Stage stage, int invoker = -1, int value = 0,
++                                              unsigned flags = 0, unsigned tracked = 0) noexcept
++{
++  RecordEvent(stage, invoker, value, flags, tracked, nullptr);
++}
++[[gnu::visibility("hidden")]] inline void RecordInterpreterCreate(int invoker, const char* addonId) noexcept
++{
++  RecordEvent(Stage::InterpreterCreate, invoker, 0, 0, 0, addonId);
+ }
+ class Request {
+   uint64_t previous{0}; bool owns{false};
+@@ -121,10 +163,24 @@
+     const auto end=drained+DRAIN_BATCH;
+     for(unsigned i=drained;i<CAPACITY && i<end && i<next.load(std::memory_order_relaxed);++i) {
+       if(!slots[i].ready.load(std::memory_order_acquire))break;
+-      sink(slots[i].event);drained=i+1;
++      if constexpr (std::is_invocable_v<Sink, const Event&, const char*>)
++        sink(slots[i].event, addonIds[i]);
++      else
++        sink(slots[i].event);
++      drained=i+1;
+     }
+     const auto overflow=dropped.load(std::memory_order_relaxed);
+-    if(overflow!=reportedDropped){Event e;e.stage=Stage::Overflow;e.value=static_cast<int>(overflow);sink(e);reportedDropped=overflow;}
++    if (overflow != reportedDropped)
++    {
++      Event event;
++      event.stage = Stage::Overflow;
++      event.value = static_cast<int>(overflow);
++      if constexpr (std::is_invocable_v<Sink, const Event&, const char*>)
++        sink(event, "");
++      else
++        sink(event);
++      reportedDropped = overflow;
++    }
+   }catch(...){/* A diagnostic sink never alters execution. */}
+   errno=saved;draining.clear(std::memory_order_release);
+ }
+@@ -134,6 +190,7 @@
+ {
+ inline bool Enabled() noexcept{return false;}
+ inline void Record(Stage,int=-1,int=0,unsigned=0,unsigned=0) noexcept{}
++inline void RecordInterpreterCreate(int, const char*) noexcept{}
+ class Request {public: Request() noexcept{} ~Request() noexcept{}};
+ template<class Sink> inline void Drain(Sink) noexcept{}
+ }
+--- a/xbmc/interfaces/generic/ScriptInvocationManager.cpp
++++ b/xbmc/interfaces/generic/ScriptInvocationManager.cpp
+@@ -368,7 +368,15 @@
+ 
+ void CScriptInvocationManager::Process()
+ {
+-  InfinityStartupTrace::Drain([](const InfinityStartupTrace::Event& event) {
++  InfinityStartupTrace::Drain([](const InfinityStartupTrace::Event& event, const char* addonId) {
++    if (event.stage == InfinityStartupTrace::Stage::InterpreterCreate)
++    {
++      CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={} addon={}",
++        InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
++        event.monotonicUs, event.value, event.flags, event.tracked,
++        addonId[0] ? addonId : "-");
++      return;
++    }
+     CLog::Log(LOGINFO, "InfinityStartupTrace stage={} request={} invoker={} tid={} us={} value={} flags={} tracked={}",
+       InfinityStartupTrace::Name(event.stage), event.request, event.invoker, event.tid,
+       event.monotonicUs, event.value, event.flags, event.tracked);
+--- a/xbmc/interfaces/python/PythonInvoker.cpp
++++ b/xbmc/interfaces/python/PythonInvoker.cpp
+@@ -295,9 +295,12 @@
+       m_invokerOwnsGil = true;
+ #if defined(TARGET_ANDROID)
+       InfinityScriptPersistence::InitializationProgress(GetId(), "native.interpreter.create", 0);
+-      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterCreate, GetId());
++      InfinityStartupTrace::RecordInterpreterCreate(GetId(), m_addon ? m_addon->ID().c_str() : nullptr);
+ #endif
+       l_threadState = Py_NewInterpreter();
++      // Capture the return before the success path takes the persistence ledger mutex.
++      InfinityStartupTrace::Record(InfinityStartupTrace::Stage::InterpreterReturned, GetId(),
++                                   l_threadState != nullptr ? 1 : 0);
+       if (l_threadState != nullptr)
+       {
+ #if defined(TARGET_ANDROID)

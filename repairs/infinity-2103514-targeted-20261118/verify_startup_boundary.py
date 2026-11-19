@@ -153,8 +153,8 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def main(native_root):
-    scope = json.loads((HERE / "SCOPE.json").read_bytes())
+def check(native_root, scope_file, patch_file, fixture, after=None):
+    scope = json.loads((HERE / scope_file).read_bytes())
     allowlist = scope["source_allowlist"]
     with tempfile.TemporaryDirectory(prefix="infinity514-boundary-") as tmp:
         work = Path(tmp)
@@ -165,7 +165,7 @@ def main(native_root):
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(original, target)
 
-        patch = HERE / "startup-boundary.patch"
+        patch = HERE / patch_file
         stats = subprocess.check_output(["git", "apply", "--numstat", patch], cwd=work, text=True)
         assert {line.split("\t")[-1] for line in stats.splitlines()} == set(allowlist)
         subprocess.run(["git", "apply", "--check", patch], cwd=work, check=True)
@@ -178,7 +178,7 @@ def main(native_root):
         start = invoker.index(anchor)
         end = invoker.index("      if (l_threadState == nullptr)", start)
         source = work / "host.cpp"
-        source.write_text(HOST.replace("BODY", invoker[start:end]))
+        source.write_text(fixture.replace("BODY", invoker[start:end]))
         executable = work / "startup-boundary"
         subprocess.run(
             ["g++", "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pthread",
@@ -187,10 +187,12 @@ def main(native_root):
             check=True,
         )
         subprocess.run([executable], timeout=10, check=True)
+        if after is not None:
+            after(native_root, work)
         print("PASS Exact native preimages, call-site ordering and bounded trace behavior")
 
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         raise SystemExit("Usage: verify_startup_boundary.py <authenticated native source root>")
-    main(Path(sys.argv[1]))
+    check(Path(sys.argv[1]), "SCOPE.json", "startup-boundary.patch", HOST)

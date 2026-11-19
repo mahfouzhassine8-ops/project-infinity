@@ -19,7 +19,9 @@ A dispatch return is separate from verified recovery playback.
 
 ## Empty Shell
 
-Apply the three-file native patch from 301a6cd0 unchanged. The add-on ID at
+Carry the same three-file diagnostic behavior from 301a6cd0 in the
+ABI-compatible overlay. It retains the original exported function and trace
+storage layout. The add-on ID at
 interpreter creation, return before the persistence ledger, completion
 marker and existing terminal events distinguish where a future occurrence
 stopped making progress. The cause of the field failure remains unproven.
