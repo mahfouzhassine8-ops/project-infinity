@@ -50,3 +50,12 @@ Release-tool checks select the QA member copier, owner bundle replacement,
 and parsing of the expected Command Center startup marker order. This may
 use synthetic data. The actual full owner and original-key requirements are
 gates on the release artifacts, not part of these host fixtures.
+
+Run 44478878810 verified PackageManager upgrades and retained the test
+profile across 2103514, 2103516 and 2103517. It observed the Kodi process
+but did not find the installed module manifest on the fresh emulator.
+The targeted follow-up reproduces a pre-existing authenticated 2103514
+module profile with the exact baseline APK bytes on a disposable
+emulator. The ordinary app UID and enforcing SELinux are retained.
+Only the baseline is seeded. Candidate and recovery manifests must
+be activated by the shipped app. Trace observation is recorded separately.

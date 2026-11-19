@@ -33,6 +33,37 @@ def observe(*args):
     return value.stdout.strip() if value.returncode == 0 else ""
 
 
+def seed_existing_modules(baseline, out, app_uid):
+    # Reproduce an existing 2103514 profile on the disposable Android runner.
+    # Authenticate every staged member from the exact original-signed APK.
+    fixture = out / "baseline-modules"
+    with ZipFile(baseline) as archive:
+        lines = archive.read("assets/" + MANIFEST).decode("ascii").splitlines()
+        require(lines[:3] == ["INFINITY-MODULES/1", "package\t0.3.5.84", "protocol\t1"],
+                "Incorrect signed module generation for the Android fixture")
+        for _, digest, name in (line.split("\t") for line in lines if line.startswith("file\t")):
+            path = Path(name)
+            require(not path.is_absolute() and ".." not in path.parts, "Invalid fixture member path")
+            data = archive.read("assets/addons/" + name)
+            require(hashlib.sha256(data).hexdigest() == digest, "Baseline fixture member does not match signed manifest")
+            target = fixture / path
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(data)
+        for name in (MANIFEST, MANIFEST + ".sig"):
+            (fixture / name.removeprefix("addons/")).write_bytes(archive.read("assets/" + name))
+    require(adb("shell", "getprop", "ro.kernel.qemu").strip() == "1" and
+            app_uid.isdigit() and int(app_uid) >= 10000, "Disposable emulator app UID required")
+    adb("root")
+    adb("wait-for-device")
+    require(adb("shell", "id", "-u").strip() == "0" and adb("shell", "getenforce").strip() == "Enforcing",
+            "Expected debug-emulator transport with SELinux enforcing")
+    adb("shell", "mkdir", "-p", PROFILE + "/addons")
+    adb("push", str(fixture) + "/.", PROFILE + "/addons/")
+    backing = f"/data/media/0/Android/data/{PACKAGE}/files/.kodi"
+    adb("shell", "chown", "-R", f"{app_uid}:{app_uid}", backing)
+    adb("shell", "restorecon", "-RF", backing)
+
+
 def package_record():
     text = adb("shell", "dumpsys", "package", PACKAGE)
     patterns = dict(versionCode=r"\bversionCode=(\d+)", uid=r"\b(?:userId|appId)=(\d+)",
@@ -91,7 +122,7 @@ def launch_and_verify(manifest_sha, with_trace=False):
     launch = adb("shell", "am", "start", "-W", "-n", PACKAGE + "/.Splash")
     report = dict(launch_ok="Status: ok" in launch and "Error" not in launch,
                   process_observed=False, manifest_readable=False, manifest_matched=False,
-                  startup_trace=None, complete=False)
+                  startup_trace=None, trace_seen=False, observed_module_sha256=None, complete=False)
     if not report["launch_ok"]:
         return report
     deadline = time.monotonic() + 145
@@ -103,11 +134,19 @@ def launch_and_verify(manifest_sha, with_trace=False):
         report["process_observed"] |= pid.isdigit()
         report["manifest_readable"] |= bool(manifest)
         report["manifest_matched"] |= installed == manifest_sha
+        if installed:
+            report["observed_module_sha256"] = installed
+        marker = None
+        if pid.isdigit() and with_trace:
+            log = adb("logcat", "-d", "-v", "raw", "--pid=" + pid, "-s", "Kodi:I")
+            report["trace_seen"] |= "InfinityStartupTrace stage=" in log
+            marker = startup_markers(log)
+            if marker is not None:
+                report["startup_trace"] = marker
         if not pid.isdigit() and time.monotonic() - last_choose > 15:
             choose_infinity()
             last_choose = time.monotonic()
         if pid.isdigit() and installed == manifest_sha:
-            marker = startup_markers(adb("logcat", "-d", "-v", "raw", "--pid=" + pid, "-s", "Kodi:I")) if with_trace else None
             if not with_trace or marker is not None:
                 report.update(complete=True, engine_pid=int(pid), installed_module_sha256=installed,
                               startup_trace=marker)
@@ -168,6 +207,7 @@ def run(args):
             observe("shell", "pm", "grant", PACKAGE, "android.permission.POST_NOTIFICATIONS")
             adb("shell", "mkdir", "-p", str(Path(SENTINEL).parent))
             adb("push", sentinel, SENTINEL)
+            seed_existing_modules(file, args.out, identity["uid"])
         else:
             require(all(identity[field] == records["baseline"]["package"][field]
                         for field in ("uid", "dataDir", "firstInstallTime")), "Installation changed profile owner")
@@ -177,11 +217,12 @@ def run(args):
         records[kind].update(launch_and_verify(source_signatures[kind], kind == "candidate"))
         require(observe("shell", "cat", SENTINEL) == sentinel.read_text().strip(), "Launch changed profile sentinel")
         shown = {field: records[kind][field] for field in (
-            "launch_ok", "process_observed", "manifest_readable", "manifest_matched", "complete")}
+            "launch_ok", "process_observed", "manifest_readable", "manifest_matched", "observed_module_sha256", "trace_seen", "complete")}
         print(f"{kind}: selected startup {json.dumps(shown, sort_keys=True)}", flush=True)
         inventory.save(args.out / "ANDROID-VERIFICATION.json", dict(
             steps=records, completes_pair=kind == "recovery", platform=platform,
             all_startup_verified=kind == "recovery" and all(record["complete"] for record in records.values()),
+            fixture="Authenticated 2103514 installed-module bytes on the disposable emulator",
             Fold="NOT_RUN", shutdown="NOT_SELECTED", data_reset=False, uninstall=False))
     require(all(record["complete"] for record in records.values()), "Normal startup observation incomplete")
 
