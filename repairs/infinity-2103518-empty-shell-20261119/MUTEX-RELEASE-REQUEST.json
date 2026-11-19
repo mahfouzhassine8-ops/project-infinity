@@ -1,0 +1,39 @@
+{
+  "inputs": {
+    ".github/workflows/infinity-combined-release.yml": "671ef3cd84554c2dbdd6a8fd73e61190b91b31a555cb5e25c2f369f78f93a99a",
+    "repairs/infinity-2103518-empty-shell-20261119/MUTEX-NATIVE-REQUEST.json": "ea05ee193267268d32e1e6b061e86027631983f22f708145040b8c63629e7d64",
+    "repairs/infinity-2103518-empty-shell-20261119/mutex_qa_release.py": "7abbecf78141aa30a7b7775e431b6ec682c753ce1034f1417859824bc6ea41c4"
+  },
+  "native_artifact": {
+    "digest": "sha256:0352a51d9735e8e705df742eaca52804952ac9fc9a4c83364b72b3c288d9612e",
+    "id": 14548728023,
+    "name": "Infinity518-Mutex-Native-ARM64-44553739418-NO-INSTALLER",
+    "run": 44553739418,
+    "size_in_bytes": 203148342,
+    "source": "2f78bcfa9fe5bec39abb34c422ac18246207cdc2",
+    "workflow_id": 423993338
+  },
+  "operation": "original_sign_one_2103518_based_persistence_mutex_diagnostic",
+  "owner518_artifact": {
+    "digest": "sha256:cb83b07d075004da28869cbaf54108fa4281f188f8532a241df7baef6a513464",
+    "id": 14514535986,
+    "name": "Infinity514-Prepared-44493489263",
+    "run": 44493489263,
+    "size_in_bytes": 1284632272,
+    "source": "aa29dbc886fc33c9e163522db23acdb7b5acf899",
+    "workflow_id": 397702717
+  },
+  "owner_acceptance": false,
+  "registry_before_sha256": "be379598aba29a5c4ddec17bd072f269fc39cbe613aa288bc3a88072f6678803",
+  "signed518_artifact": {
+    "APK_sha256": "9bfb4c87bc2536a2b806fa995866fd719345fcd575c180aeba93eb02c4303f54",
+    "digest": "sha256:ab6236dfec358110d404acf11773dc330ce23bfe25e43ad469a7b6e90bbce2ca",
+    "id": 14518117319,
+    "name": "Infinity514-OriginalSigned-44502506009-QA",
+    "run": 44502506009,
+    "size_in_bytes": 331112150,
+    "source": "41dcaca27396fca320097b6a53d1ba5f3d7dfee6",
+    "versionCode": 2103518,
+    "workflow_id": 397702717
+  }
+}
