@@ -11,6 +11,7 @@ import re
 import shutil
 import socket
 import subprocess
+import sys
 import tarfile
 import time
 import urllib.request
@@ -25,6 +26,10 @@ import common_release as release
 from prepare_modules import CC, inventory, stage
 from prepare_authority import BASE_COMMIT, DIAGNOSTIC_COMMIT, AUTHORITY, ref_blob
 from release_driver import PUBLIC_KEY
+
+# Reuse only the retained Android 17 device transport and OS tutorial observer.
+sys.path.insert(0, str(ROOT / "repairs/infinity-final-release-462-20261107"))
+from verify_android_release import Device
 
 HELPER = "plugin.video.themoviedb.helper"
 QA = "script.infinityqatypedmovie"
@@ -426,6 +431,8 @@ def run(out, preparation_run):
             require(rpc("Addons.SetAddonEnabled", {"addonid": addon, "enabled": True}) == "OK",
                     "Fixture add-on could not be enabled")
     observer = Observer(out, str(boot["engine_pid"]))
+    transport = Device(out)
+    transport.dismiss_immersive_education()
     results = []
     cases = (("Play from beginning", "A", 0.0), ("Resume from 0:24", "A", 24.0),
              ("Play from beginning", "B", 0.0))
@@ -433,6 +440,9 @@ def run(out, preparation_run):
         require(observer.command("open", key=keys[i])["opened"], "Home action denied")
         observer.select(label)
         observer.select("QA Playback " + choice, heading="Choose Action")
+        # The Helper groups by plugin, then its own standard picker exposes
+        # that group's concrete media action. Select that action as well.
+        observer.select("Play with QA Playback " + choice, heading="Choose Action")
         results.append(playback(MOVIES[i], choice, offset))
         print(json.dumps(results[-1]), flush=True)
     require(observe("shell", "pidof", PACKAGE + ":kodi") == str(boot["engine_pid"]), "Engine process changed")
