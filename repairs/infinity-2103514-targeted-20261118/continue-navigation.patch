@@ -1,0 +1,497 @@
+--- a/assets/addons/script.infinity.commandcenter/experience.py
++++ b/assets/addons/script.infinity.commandcenter/experience.py
+@@ -87,29 +87,35 @@
+     return tuple(result)
+ 
+ 
+-def _source_contract(provider, render_cache=None, media=None):
++def _source_contract(provider, render_cache=None, media=None, *, trace=None):
+     """Reuse the existing Watched Bridge producer contract; never trust a name."""
+     import xbmcaddon
+     import xbmcvfs
+     import xml.etree.ElementTree as ET
++
++    def reject(reason):
++        if trace is not None:
++            trace('original_provider', reason)
++        return None
++
+     try:
+         bridge = Path(xbmcvfs.translatePath(xbmcaddon.Addon('script.infinity.watchedbridge').getAddonInfo('path')))
+         raw = (bridge / 'PROVIDER-CONTRACTS.json').read_bytes()
+         if hashlib.sha256(raw).hexdigest() != 'c03846eaa853307da91634641bb4266a5420242d6b33770f1328cc18e9fd974e':
+-            return None
++            return reject('contract_catalog_digest_mismatch')
+         contract = json.loads(raw).get(provider)
+         if not contract:
+-            return None
++            return reject('provider_absent_from_contract_catalog')
+         root = Path(xbmcvfs.translatePath(xbmcaddon.Addon(provider).getAddonInfo('path'))).resolve()
+         manifest = ET.parse(root / 'addon.xml').getroot()
+         if manifest.get('id') != provider:
+-            return None
++            return reject('provider_manifest_id_mismatch')
+         if manifest.get('version') != contract['version']:
+             contract = CURRENT_SOURCE_CONTRACTS.get(provider, {}).get(manifest.get('version'))
+             if not contract and media == 'movie':
+                 contract = CURRENT_MOVIE_SOURCE_CONTRACTS.get(provider, {}).get(manifest.get('version'))
+             if not contract:
+-                return None
++                return reject('provider_version_not_approved')
+         stamp = _render_source_stamp(root, bridge, contract['files']) if render_cache is not None else None
+         cached = render_cache.get(provider) if stamp is not None else None
+         if cached is not None and cached[0] == stamp and cached[1] == contract:
+@@ -119,19 +125,19 @@
+         for name, digest in contract['files'].items():
+             path = (root / name).resolve()
+             if not path.is_relative_to(root) or path.stat().st_size > 1024 * 1024 or hashlib.sha256(path.read_bytes()).hexdigest() not in (digest if isinstance(digest, (list, tuple)) else (digest,)):
+-                return None
++                return reject('provider_source_pin_mismatch')
+         if stamp is not None:
+             if _render_source_stamp(root, bridge, contract['files']) != stamp:
+-                return None
++                return reject('provider_source_changed_during_check')
+             # Only two reviewed source-memory providers can reach here.
+             if len(render_cache) < 2:
+                 render_cache[provider] = (stamp, contract)
+         return contract
+     except (OSError, ValueError, RuntimeError, ET.ParseError):
+-        return None
+-
+-
+-def source_identity(route, media, ids, season=-1, episode=-1, verify=None):
++        return reject('provider_or_contract_unreadable')
++
++
++def source_identity(route, media, ids, season=-1, episode=-1, verify=None, *, trace=None):
+     """Bind an actual resolver invocation to typed IDs and exact episode numbers."""
+     import resume_hub as hub
+     if not isinstance(route, str) or len(route.encode('utf-8')) > 65536 or any(ord(c) < 32 for c in route):
+@@ -140,11 +146,14 @@
+         parsed = urlsplit(route)
+         if parsed.scheme != 'plugin' or parsed.path not in ('', '/') or parsed.netloc not in ('plugin.video.umbrella', 'plugin.video.pov'):
+             return None
+-        contract = (verify or _source_contract)(parsed.netloc)
++        if verify is not None:
++            contract = verify(parsed.netloc)
++        else:
++            contract = _source_contract(parsed.netloc, trace=trace)
+         if not contract and media == 'movie':
+             # Movie-only current interfaces, checked against the installed
+             # original producer source. TV/episode contracts stay unchanged.
+-            contract = _source_contract(parsed.netloc, _movie_source_cache, media='movie')
++            contract = _source_contract(parsed.netloc, _movie_source_cache, media='movie', trace=trace)
+         if not contract:
+             return None
+         query = parse_qs(parsed.query, keep_blank_values=True)
+@@ -176,7 +185,7 @@
+         return None
+ 
+ 
+-def verified_source(entry, route, verify=None):
++def verified_source(entry, route, verify=None, *, trace=None):
+     import resume_hub as hub
+     if not isinstance(route, str):
+         return ''
+@@ -196,7 +205,19 @@
+         # Existing Watchlist/Collection directory navigation is not expired
+         # movie/episode playback recovery. Preserve its original saved route.
+         return stable_route(route)
+-    proof = source_identity(route, entry.get('media'), identity['ids'], entry.get('season'), entry.get('episode'), verify)
++    if trace is None:
++        proof = source_identity(route, entry.get('media'), identity['ids'], entry.get('season'), entry.get('episode'), verify)
++    else:
++        failures = []
++        proof = source_identity(route, entry.get('media'), identity['ids'], entry.get('season'), entry.get('episode'),
++                                verify, trace=lambda stage, reason: failures.append((stage, reason)))
++        # A reviewed movie-only contract can succeed after the initial policy
++        # declines the version. Emit only the final reason for rejecting it.
++        if proof is None:
++            if failures:
++                trace(*failures[-1])
++            else:
++                trace('original_provider', 'route_contract_or_identity_mismatch')
+     return route if hub.same_identity(identity, proof) else ''
+ 
+ 
+--- a/assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/runtime.py
++++ b/assets/addons/script.infinity.commandcenter/infinity_modules/uirepair/runtime.py
+@@ -199,17 +199,23 @@
+     controller = load()
+     if not controller.hub.KEY_RE.fullmatch(str(key)):
+         return
+-    def current():
++    from saved_navigation import _continue_trace
++
++    def current(trace=None):
+         data = controller.hub.load_view(controller.PROFILE)
+         entry = data.get('items', {}).get(key)
+         if not isinstance(entry, dict) or entry.get('media') != media or entry.get('synthetic_next'):
++            if trace is not None:
++                trace('selection', 'saved_item_missing_or_ineligible')
+             return None, None, '', None
+         identity = controller.hub.entry_identity(entry)
+         if not identity:
++            if trace is not None:
++                trace('selection', 'unverified_identity')
+             return None, None, '', None
+-        target = controller.navigation_target(entry, data, 'continue')
++        target = controller.navigation_target(entry, data, 'continue', trace=trace)
+         return data, entry, target, identity
+-    data, entry, target, identity = current()
++    data, entry, target, identity = current(_continue_trace)
+     if entry is None or not target:
+         xbmcgui.Dialog().ok('Infinity Resume Hub',
+             'This source is unavailable or has expired. Open the title in your provider to resolve a fresh source. Resume Hub kept your local state.')
+@@ -223,7 +229,9 @@
+     options.append(('Play from beginning', 'begin'))
+     selected = choose('Continue Watching — ' + label, options)
+     if selected not in ('resume', 'begin'):
+-        return
++        _continue_trace('checkpoint_choice', 'cancelled')
++        return
++    _continue_trace('checkpoint_choice', selected)
+     # A modal can outlive asynchronous playback progress/source updates.
+     # The original identity & path must still match before launching.
+     live_data, live, live_target, live_identity = current()
+@@ -231,6 +239,7 @@
+             live.get('updated') != entry.get('updated') or
+             live.get('position') != entry.get('position') or
+             live.get('duration') != entry.get('duration')):
++        _continue_trace('selection', 'saved_item_changed')
+         xbmcgui.Dialog().notification('Infinity Resume Hub', 'Item changed. Open it again.', time=2500)
+         return
+     if selected == 'resume' and not resume_allowed:
+@@ -245,7 +254,12 @@
+     # Preserve Kodi's original URL/listitem playback path and selected
+     # saved offset; no provider search, data reset, synthetic source or
+     # global PlayMedia/DialogSelect rewrite.
+-    xbmc.Player().play(target, item)
++    try:
++        xbmc.Player().play(target, item)
++    except Exception:
++        _continue_trace('original_handoff', 'dispatch_failed')
++        raise
++    _continue_trace('original_handoff', 'dispatch_returned')
+ 
+ def main(args):
+     home = xbmcgui.Window(10000)
+--- a/assets/addons/script.infinity.commandcenter/plugin.py
++++ b/assets/addons/script.infinity.commandcenter/plugin.py
+@@ -81,9 +81,9 @@
+         return False
+ 
+ 
+-def _render_verified_source(entry, route, render=None):
++def _render_verified_source(entry, route, render=None, *, trace=None):
+     if render is None:
+-        return verified_source(entry, route)
++        return verified_source(entry, route, trace=trace)
+     from experience import _source_contract
+     cache = render.setdefault('source_contracts', {})
+     return verified_source(entry, route, lambda provider: _source_contract(provider, cache))
+@@ -164,7 +164,7 @@
+         return False
+ 
+ 
+-def _target(entry, sources=None, render=None):
++def _target(entry, sources=None, render=None, *, trace=None):
+     source_memory = render['source_memory'] if render is not None else setting_bool('source_memory_enabled', True)
+     if source_memory and not entry.get('synthetic_next'):
+         preference = sources.get(entry.get('key'), {}) if isinstance(sources, dict) else {}
+@@ -175,6 +175,8 @@
+         # failed preferred route after two recorded failures.
+         preferred = preference.get('route')
+         failed = number(preference.get('failures')) >= 2
++        if failed and preferred and trace is not None:
++            trace('source_memory', 'preferred_route_failure_threshold')
+         choices = ([] if failed else [preferred])
+         captured = entry.get('stable_source')
+         if captured != preferred or not failed:
+@@ -189,12 +191,14 @@
+                 (original_source != preferred or not failed)):
+             choices.append(original_source)
+         for saved in choices:
+-            route = _render_verified_source(entry, saved, render)
++            route = _render_verified_source(entry, saved, render, trace=trace)
+             if not route:
+                 continue
+             host = route.split('/')[2] if route.startswith('plugin://') else ''
+             if not host or _has_addon(host, render):
+                 return route
++            if trace is not None:
++                trace('original_provider', 'provider_disabled')
+     if entry.get('synthetic_next') and (entry.get('next_verified') is not True or
+             entry.get('show_ids_verified') is not True or
+             str(entry.get('show_tmdb') or '').strip() != str(entry.get('tmdb') or '').strip()):
+@@ -216,6 +220,8 @@
+         if identity and identity.get('scope') == 'show_episode':
+             tmdb = str(identity.get('ids', {}).get('tmdb') or '')
+     if tmdb.isdigit() and _has_tmdb_helper(render):
++        if trace is not None:
++            trace('source_memory', 'typed_helper_resolver_available')
+         if media == 'tv':
+             season = hub.episode_number(entry.get('season'))
+             episode = hub.episode_number(entry.get('episode'))
+@@ -229,35 +235,45 @@
+         return ''  # No verified resolver: display the existing unavailable action.
+     source = str(entry.get('source') or '').strip()
+     if source.startswith('plugin://') and not _has_addon(source.split('/')[2], render):
++        if trace is not None:
++            trace('original_provider', 'provider_disabled')
+         return ''
+     if source.startswith('plugin://'):
+-        return _render_verified_source(entry, source, render)
++        return _render_verified_source(entry, source, render, trace=trace)
+     if stable_route(source) or time.time() - number(entry.get('updated')) < 21600:
+         return source
+     return ''
+ 
+ 
+-def navigation_target(entry, data, bucket='continue', render=None):
++def navigation_target(entry, data, bucket='continue', render=None, *, trace=None):
+     if bucket in ('later', 'watchlist', 'continue') and data.get('navigation_recovery'):
+         from saved_navigation import remembered, navigation_target as select_target
+         record = remembered(data, hub.entry_identity(entry))
+         if record and record.get('success_verified') is True and record.get('route'):
+             # A verified preference supersedes the failed old route. Do not
+             # inspect the old provider or construct another resolver first.
+-            return select_target(entry, data, '', bucket, render)
+-    original = _target(entry, data.get('sources', {}), render)
++            return select_target(entry, data, '', bucket, render, trace=trace)
++    original = _target(entry, data.get('sources', {}), render, trace=trace)
+     if bucket not in ('later', 'watchlist', 'continue'):
+         return original
+     # Keep untouched working records on the exact old path, with no discovery.
+     if original and not data.get('navigation_recovery'):
++        if trace is not None:
++            trace('target', 'original_route_accepted')
+         return original
+     from saved_navigation import navigation_target as select_target
+-    return select_target(entry, data, original, bucket, render)
++    return select_target(entry, data, original, bucket, render, trace=trace)
+ 
+ 
+ def recover_entry(key, bucket='later', token='', resume_offset=0):
+     from saved_navigation import recover_saved
+-    return recover_saved(PROFILE, key, token, _target, bucket,
++    original_target = _target
++    if bucket == 'continue':
++        from saved_navigation import _continue_trace
++
++        def original_target(entry, sources):
++            return _target(entry, sources, trace=_continue_trace)
++    return recover_saved(PROFILE, key, token, original_target, bucket,
+                          item_builder=_list_item, resume_offset=resume_offset)
+ 
+ 
+--- a/assets/addons/script.infinity.commandcenter/saved_navigation.py
++++ b/assets/addons/script.infinity.commandcenter/saved_navigation.py
+@@ -446,57 +446,95 @@
+     return matches[0] if len(matches) == 1 else None
+ 
+ 
+-def _provider_current(record, render=None):
++def _continue_trace(stage, outcome):
++    # These callers emit fixed stage and outcome codes only. The event never
++    # contains a route, fingerprint, media identity, token or playback position.
++    _trace('continue_navigation', boundary=stage, outcome=outcome)
++
++
++def _provider_current(record, render=None, *, continue_only=False, trace=None):
++    def reject(reason):
++        if trace is not None:
++            trace('remembered_provider', reason)
++        return None
++
+     proof = record.get('provider')
+     if not isinstance(proof, dict) or not isinstance(proof.get('contract'), dict):
+-        return None
++        return reject('contract_missing')
+     pins = proof['contract'].get('pins', {})
+     if not isinstance(pins, dict) or not 1 <= len(pins) <= 64 or 'addon.xml' not in pins:
+-        return None
++        return reject('contract_pins_invalid')
+     identity = proof.get('id', '')
+     if not re.fullmatch(r'plugin\.[A-Za-z0-9._-]{1,170}', identity):
+-        return None
+-    cache = render.setdefault('navigation_providers', {}) if render is not None else {}
++        return reject('provider_id_invalid')
++    if continue_only:
++        # The result of parsing an individual URI is never a provider-wide
++        # fact. Check it before consulting or populating the shared render cache.
++        try:
++            _params(proof, record.get('route'))
++        except (Unavailable, ValueError, TypeError):
++            return reject('route_invalid')
++    cache_name = 'continue_navigation_providers' if continue_only else 'navigation_providers'
++    cache = render.setdefault(cache_name, {}) if render is not None else {}
+     cache_key = (identity, json.dumps(proof['contract'], sort_keys=True))
+     if cache_key in cache:
+         provider = cache[cache_key]
+-        if provider:
++        if provider and not continue_only:
+             try:_params(provider, record.get('route'))
+             except (Unavailable, ValueError, TypeError):return None
+         return provider
++    reason = 'provider_unavailable'
+     try:
+         provider = deepcopy(proof)
+         provider['root'] = xbmcvfs.translatePath(xbmcaddon.Addon(identity).getAddonInfo('path'))
+         for name, pin in pins.items():
++            reason = 'contract_pins_invalid'
+             if not re.fullmatch(r'[a-f0-9]{64}', str(pin)):
+                 raise ValueError('Invalid provider source proof')
++            reason = 'source_pin_mismatch_or_unreadable'
+             if hashlib.sha256(_source(Path(provider['root']).resolve(), name)).hexdigest() != pin:
+                 raise ValueError('Provider source changed')
+-        # The exact bytes were checked above; do not read/hash them a second time.
++        reason = 'provider_disabled'
+         if not xbmc.getCondVisibility('System.AddonIsEnabled(' + identity + ')'):
+             raise ValueError('Provider unavailable')
+-        _params(provider, record.get('route'))
++        if not continue_only:
++            _params(provider, record.get('route'))
+         cache[cache_key] = provider
+     except (OSError, ValueError, RuntimeError, TypeError, KeyError, AttributeError):
+         cache[cache_key] = None
++        reject(reason)
+     return cache[cache_key]
+ 
+ 
+-def navigation_target(entry, data, original, bucket, render=None):
++def navigation_target(entry, data, original, bucket, render=None, *, trace=None):
+     """No provider discovery, lookup or chooser for an unchanged working route."""
+     identity = hub.entry_identity(entry)
+     if bucket not in BUCKETS or not identity:
++        if trace is not None:
++            trace('target', 'unverified_identity')
+         return original
+     record = remembered(data, identity)
+     if record and record.get('success_verified') is True and record.get('route'):
+-        if (record.get('failed') is not True and record.get('route_sha256') == _hash(record['route'])
+-                and _provider_current(record, render)):
++        if record.get('failed') is True:
++            reason = 'remembered_route_previously_failed'
++        elif record.get('route_sha256') != _hash(record['route']):
++            reason = 'remembered_route_fingerprint_mismatch'
++        elif not _provider_current(record, render, continue_only=bucket == 'continue', trace=trace):
++            reason = 'remembered_provider_or_route_rejected'
++        else:
++            if trace is not None:
++                trace('target', 'remembered_route_accepted')
+             return record['route']
+         # Keep the last verified choice intact, even when it becomes incompatible.
+-        return 'plugin://' + CC + '/?' + urlencode(dict(action='saved-recovery', key=entry['key'], bucket=bucket))
+-    failed = record.get('failed_routes', []) if record else []
+-    if original and not any(isinstance(v, dict) and v.get('sha256') == _hash(original) for v in failed):
+-        return original
++    else:
++        failed = record.get('failed_routes', []) if record else []
++        if original and not any(isinstance(v, dict) and v.get('sha256') == _hash(original) for v in failed):
++            if trace is not None:
++                trace('target', 'original_route_accepted')
++            return original
++        reason = 'original_route_previously_failed' if original else 'original_route_unavailable'
++    if trace is not None:
++        trace('recovery_required', reason)
+     return 'plugin://' + CC + '/?' + urlencode(dict(action='saved-recovery', key=entry['key'], bucket=bucket))
+ 
+ 
+@@ -620,6 +658,8 @@
+     if _property(home, 'Pending').get('token') == token:
+         home.clearProperty('Infinity.SavedNavigation.Pending')
+         home.clearProperty('Infinity.SavedNavigation.Success')
++    if pending['bucket'] == 'continue' and not folder:
++        _continue_trace('recovery_handoff', 'playback_verified')
+     _trace('saved_navigation_remembered', saved_key=key, media_identity=identity,
+            provider=pending['provider']['id'], destination_sha256=_hash(pending['route']))
+     return True
+@@ -637,14 +677,19 @@
+ 
+ 
+ def _choose_recovery(profile, entry, bucket, data, home, original_target, token='', failure=None, item_builder=None, resume_offset=0):
++    trace = _continue_trace if bucket == 'continue' else None
+     identity = hub.entry_identity(entry)
+     if not identity:
++        if trace is not None:
++            trace('recovery', 'unverified_identity')
+         raise Unavailable('The saved media identity is not verified. Nothing was changed.')
+     _protocol(home)
+     original = original_target(entry, data.get('sources', {}))
+     initial = original
+     attempted = []
+     if failure is not None:
++        if trace is not None:
++            trace('recovery', 'native_failure_ticket_received')
+         record = remembered(data, identity) or {}
+         pending = _property(home, 'Pending')
+         choices = {original, record.get('route', '')}
+@@ -661,15 +706,19 @@
+         if _hash(failed_path) != failure.get('failed_sha256', _hash(initial)):
+             raise Cancelled('The failed destination no longer matches the selected route.')
+         _mark_failed(profile, entry, bucket, failed_path)
++        if trace is not None:
++            trace('recovery', 'native_failure_ticket_verified')
+         attempted = failure['attempted']
+         resume_offset = failure.get('resume', 0)
+     else:
+         # Missing, incompatible or previously failed only. A valid original
+         # destination cannot be turned into a provider prompt by this action.
+-        target = navigation_target(entry, data, original, bucket)
++        target = navigation_target(entry, data, original, bucket, trace=trace)
+         if not target.startswith('plugin://' + CC + '/?action=saved-recovery&'):
+             raise Cancelled('The saved destination remains available; its original action was retained.')
+         token = uuid.uuid4().hex
++        if trace is not None:
++            trace('recovery', 'unavailable_without_native_attempt')
+     snapshot = _source_snapshot(entry, data.get('sources', {}))
+     ready, _ = available('movie' if identity['kind'] == 'movie' else 'tv')
+     ready = [p for p in ready if p['id'] not in attempted]
+@@ -683,6 +732,8 @@
+             return resolve(saved, provider, home, progress)
+         finally:
+             progress.close()
++    if trace is not None:
++        trace('recovery', 'alternatives_available' if ready else 'no_compatible_alternative')
+     provider, target = resolve_with_choices(entry, ready, '',
+         lambda reason, options: xbmcgui.Dialog().select(
+             'The saved destination failed — open with' if failure is not None else 'Saved destination unavailable — open with',
+@@ -696,6 +747,8 @@
+     if failure is not None:
+         failure_ticket(home, entry['key'], token, initial, identity, bucket)
+     search.route(provider)
++    if trace is not None:
++        trace('recovery', 'alternative_verified')
+     pending = dict(schema=1, token=token, key=entry['key'], bucket=bucket, identity=identity,
+         route=target, original=initial, provider=provider, source_snapshot=snapshot,
+         epoch_ms=int(time.time()*1000))
+@@ -725,7 +778,14 @@
+             offset = 0
+         item.setProperty('ResumeTime', str(offset))
+         item.setProperty('StartOffset', str(offset))
+-        xbmc.Player().play(target, item)
++        try:
++            xbmc.Player().play(target, item)
++        except Exception:
++            if trace is not None:
++                trace('recovery_handoff', 'dispatch_failed')
++            raise
++        if trace is not None:
++            trace('recovery_handoff', 'dispatch_returned')
+ 
+ 
+ def recover_saved(profile, key, token, original_target, bucket='later', item_builder=None, resume_offset=0):
+@@ -740,8 +800,12 @@
+         failure = _property(home, 'Failure', 8192) if token else None
+         _choose_recovery(profile, entry, bucket, data, home, original_target, token, failure, item_builder, resume_offset)
+     except Cancelled:
++        if bucket == 'continue':
++            _continue_trace('recovery', 'cancelled_or_changed')
+         _trace('saved_navigation_cancelled', saved_key=str(key)[:64])
+     except (Unavailable, OSError, ValueError, RuntimeError, TypeError, KeyError,
+             AttributeError, SyntaxError, ET.ParseError) as error:
++        if bucket == 'continue':
++            _continue_trace('recovery', 'failed')
+         _trace('saved_navigation_failed', saved_key=str(key)[:64], error_type=type(error).__name__)
+         xbmcgui.Dialog().ok('Infinity saved item', str(error))

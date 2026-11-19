@@ -1,0 +1,31 @@
+{
+  "patch_sha256": "1d08883c97df10c9a2c0965032eee61d8df959d7bd6db8927ee488b287288d1b",
+  "checks": [
+    {
+      "mode": "baseline",
+      "passed": [
+        "unsupported_provider_versions_remain_rejected",
+        "source_cache_false_rejection_reproduced_in_signed_baseline",
+        "exact_failure_history_and_changed_provider_pins_remain_enforced",
+        "chooser_cancel_has_no_profile_write",
+        "resume_and_beginning_preserve_offsets_for_direct_and_recovery",
+        "handoff_requires_exact_native_receipt_and_playback_provenance"
+      ]
+    },
+    {
+      "mode": "candidate",
+      "passed": [
+        "unsupported_provider_versions_remain_rejected",
+        "source_cache_false_rejection_removed_only_for_continue",
+        "exact_failure_history_and_changed_provider_pins_remain_enforced",
+        "chooser_cancel_has_no_profile_write",
+        "resume_and_beginning_preserve_offsets_for_direct_and_recovery",
+        "handoff_requires_exact_native_receipt_and_playback_provenance",
+        "continue_diagnostics_exclude_private_fields"
+      ]
+    }
+  ],
+  "exact_signed_python_preimage": true,
+  "app_execution": false,
+  "owner_saved_record_accessed": false
+}
