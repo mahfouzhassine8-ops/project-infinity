@@ -37,7 +37,11 @@ def retained():
     import importlib.util
 
     path = REVIEW / "native_build502.py"
-    require(path.read_bytes() == git("show", PRIOR + ":" + str(path.relative_to(ROOT))),
+    reference = ROOT / "native-retained"
+    require(subprocess.check_output(["git", "-C", str(reference), "rev-parse", "HEAD"]).decode().strip() == PRIOR,
+            "Wrong frozen producer checkout")
+    require(path.read_bytes() == subprocess.check_output([
+        "git", "-C", str(reference), "show", PRIOR + ":" + str(path.relative_to(reference))]),
             "Reviewed native producer changed")
     spec = importlib.util.spec_from_file_location("retained_native", path)
     module = importlib.util.module_from_spec(spec)
