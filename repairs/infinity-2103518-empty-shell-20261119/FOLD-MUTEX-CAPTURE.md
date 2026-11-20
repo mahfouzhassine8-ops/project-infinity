@@ -1,54 +1,34 @@
 # One Fold capture for startup and the older movie
 
 Diagnostic QA 2103520 failed both features in the owner's Fold test.
-Use that existing installation and profile for the evidence session.
+Use the existing installation and profile for one Terminal session. The
+earlier Terminal capture was from 2103518. This is the first capture with
+2103520's mutex instrumentation.
 
-The combined stream retains startup milestones, ledger ownership and the
-old-save decision codes. It drops raw Kodi log lines,
-route URLs, media IDs, titles, saved positions and credentials. The original
-Continue Playing filter validates the route codes.
+1. Unlock the Fold and connect it to the Mac by USB. Allow USB debugging
+   if Android prompts you.
+2. Download [infinity-520-fold-capture.pyz](infinity-520-fold-capture.pyz)
+   into Downloads. Open Terminal and run the following command.
 
-## Retrieve the completed test first
+   ```sh
+   python3 ~/Downloads/infinity-520-fold-capture.pyz
+   ```
 
-With the authorized Fold USB connection, check the retained Android log before
-opening Infinity again. This reads the log buffer without clearing it or
-repeating the test.
+3. When Terminal shows **Capture running**, open Infinity normally. If
+   Empty Shell appears, leave it visible for about 20 seconds. Keep the
+   same capture running if Home becomes usable.
+4. From Home, open one older saved movie that previously failed. Choose
+   the same playback action and wait for the result.
+5. Press **Control-C** in Terminal. Share only the
+   `Infinity-520-Fold-*.txt` file whose path Terminal prints. If Empty
+   Shell prevents access to Home, share the startup capture from that
+   session.
 
-```sh
-umask 077
-adb logcat -d -v threadtime Kodi:I InfinityPersistenceMutex:I '*:S' |
-  python3 repairs/infinity-2103518-empty-shell-20261119/filter_fold_trace.py \
-  > infinity-fold-qa-retained.txt
-```
-
-If Android has rotated the retained log, an existing private `kodi.log` or
-`kodi.old.log` from the same session may still contain the old-save decision.
-Run it through
-[the Continue Playing filter](../infinity-2103514-targeted-20261118/filter_continue_trace.py)
-and share the filtered output. The mutex probe writes its records to Android
-logcat.
-
-## Capture a recurrence if the retained log has rotated
-
-Before opening the app, start this on the Mac with the authorized Fold USB
-connection. Run it from the repository checkout, or keep the two filters in
-their original relative folders. Use a new destination file.
-
-```sh
-umask 077
-adb logcat -v threadtime -T 1 Kodi:I InfinityPersistenceMutex:I '*:S' |
-  python3 repairs/infinity-2103518-empty-shell-20261119/filter_fold_trace.py \
-  > infinity-fold-qa.txt
-```
-
-Open Infinity normally. If the empty shell occurs, keep the capture running
-while it is visible. Otherwise select a previously failing older movie and
-pick the same Resume or Play from Beginning action used when it failed. Allow
-the route decision and chooser to appear. Stop the terminal capture and share
-only the filtered file. A naturally successful startup still leaves the
-intermittent incident unresolved. The diagnostic samples lock attempts
-pending for at least 100 ms during the first 20 minutes of the process
-trace. It needs neither root nor an app-data export.
+The helper checks that 2103520 is installed. It only reads Android logs and
+saves a filtered file on the Mac. The file retains startup milestones, mutex
+ownership and saved-route decisions. It excludes titles, media IDs, URLs,
+credentials and saved positions. The mutex probe samples attempts pending
+for at least 100 ms during the first 20 minutes of the process trace.
 
 A `phase=waiting` row associates a pending lock attempt with the last stable
 owner publication for that mutex. Owner zero means the sample had no stable

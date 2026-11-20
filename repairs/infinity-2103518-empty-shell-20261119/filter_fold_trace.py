@@ -24,8 +24,8 @@ MUTEX = re.compile(r"phase=(?:observer_(?:start|end)|observer_start_failed resul
                    r"loss wait_slots=\d+ completion_slots=\d+ sample_limit=\d+ log_writes=\d+)")
 
 
-def main():
-    for line in sys.stdin:
+def filtered_lines(lines):
+    for line in lines:
         match = LINE.fullmatch(line.rstrip("\r\n"))
         if not match:
             continue
@@ -33,7 +33,7 @@ def main():
         if tag == "Kodi":
             row = decision(body)
             if row is not None:
-                print(json.dumps(dict(android_time=stamp, android_pid=int(pid), **row), sort_keys=True), flush=True)
+                yield json.dumps(dict(android_time=stamp, android_pid=int(pid), **row), sort_keys=True)
                 continue
             # Kodi can prepend the C++ log context before the trace marker.
             _, found, event = body.partition("InfinityStartupTrace ")
@@ -44,7 +44,12 @@ def main():
                 continue
         elif not MUTEX.fullmatch(body):
             continue
-        print(stamp, pid, tid, tag, body, flush=True)
+        yield " ".join((stamp, pid, tid, tag, body))
+
+
+def main():
+    for line in filtered_lines(sys.stdin):
+        print(line, flush=True)
 
 
 if __name__ == "__main__":
