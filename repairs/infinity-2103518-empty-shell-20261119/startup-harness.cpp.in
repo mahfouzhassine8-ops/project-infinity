@@ -1,0 +1,250 @@
+#include <Python.h>
+#define INFINITY_SCRIPT_OBSERVER_HOST
+#define INFINITY_STARTUP_TRACE_HOST
+#include "interfaces/python/InfinityPythonPersistence.h"
+#include "interfaces/generic/InfinityStartupTrace.h"
+
+#include <atomic>
+#include <barrier>
+#include <cassert>
+#include <chrono>
+#include <cstdio>
+#include <cstring>
+#include <execinfo.h>
+#include <thread>
+#include <vector>
+
+using namespace std::chrono_literals;
+namespace Ledger = InfinityScriptPersistence;
+namespace Trace = InfinityStartupTrace;
+namespace Hooks = InfinityPythonWriteHooks;
+
+// The fixture never loads an authenticated add-on. A call here is a test error.
+extern "C" int InfinityCommandCenterIdentityV1(const char*, char*, size_t, char*, size_t, unsigned int*)
+{
+  std::abort();
+}
+
+static PyThreadState* main_state = nullptr;
+static std::atomic<int> hold_phase{0};
+static thread_local bool trigger_hold{false};
+static std::atomic<unsigned> audit_creates{0};
+static pthread_mutex_t* observed_ledger = nullptr;
+static thread_local bool record_contended_ledger = false;
+
+extern "C" int __real_pthread_mutex_lock(pthread_mutex_t*);
+extern "C" int __wrap_pthread_mutex_lock(pthread_mutex_t* mutex)
+{
+  if (record_contended_ledger && mutex == observed_ledger)
+  {
+    record_contended_ledger = false;
+    void* frames[48]{};
+    const int count = backtrace(frames, 48);
+    for (int index = 0; index < count; ++index)
+      std::fprintf(stderr, "fixture-mutex-stack %p\n", frames[index]);
+  }
+  return __real_pthread_mutex_lock(mutex);
+}
+
+static int audit_control(const char* name, PyObject*, void*)
+{
+  if (std::strcmp(name, "cpython.PyInterpreterState_New") != 0)
+    return 0;
+  ++audit_creates;
+  if (trigger_hold)
+  {
+    trigger_hold = false;
+    hold_phase.store(1, std::memory_order_release);
+    hold_phase.notify_one();
+    auto phase = hold_phase.load(std::memory_order_acquire);
+    while (phase < 2)
+    {
+      hold_phase.wait(phase);
+      phase = hold_phase.load(std::memory_order_acquire);
+    }
+    record_contended_ledger = true;
+  }
+  return 0;
+}
+
+static void install_exact_fileio_hooks()
+{
+  auto* temporary = Py_NewInterpreter();
+  assert(temporary);
+  auto* io = PyImport_ImportModule("_io");
+  assert(io);
+  assert(Hooks::RememberIOTypes(io));
+  assert(Hooks::DescriptorReader(io, "FileIO", 0));
+  assert(Hooks::DescriptorReader(io, "BufferedWriter", 1));
+  assert(Hooks::DescriptorReader(io, "TextIOWrapper", 2));
+  assert(Hooks::DescriptorReader(io, "FileIO", 3, "writable"));
+  assert(Hooks::Function<Hooks::IO_OPEN>(io, "open"));
+  assert(Hooks::Initializer(io));
+  Py_DECREF(io);
+  Py_EndInterpreter(temporary);
+  PyThreadState_Swap(main_state);
+}
+
+struct Addon
+{
+  std::string ID() const { return "script.infinityqastartup.host"; }
+};
+struct Runtime
+{
+  PyThreadState* GetMainThreadState() const { return main_state; }
+};
+struct CServiceBroker
+{
+  static Runtime GetXBPython() { return {}; }
+};
+enum { LOGERROR };
+struct CLog
+{
+  template <class... Args> static void Log(Args&&...) {}
+  template <class... Args> static void LogF(Args&&...) {}
+};
+struct Invoker
+{
+  int id;
+  Addon fixture;
+  Addon* m_addon = &fixture;
+  PyThreadState* m_threadState = nullptr;
+  PyThreadState* m_mainThreadState = nullptr;
+  bool m_invokerOwnsGil = false;
+  std::string m_sourceFile;
+  int GetId() const { return id; }
+
+  bool Create(PyThreadState*& l_threadState)
+  {
+    bool newInterp = false;
+    // The retained code is inserted verbatim. The surrounding class supplies
+    // only the inputs needed to execute the boundary in a standalone process.
+#define TARGET_ANDROID
+@@CALL_SITE@@
+#undef TARGET_ANDROID
+    assert(l_threadState && newInterp);
+    assert(!m_invokerOwnsGil);
+    return true;
+  }
+
+  void Exercise()
+  {
+    PyThreadState* created = nullptr;
+    assert(Create(created));
+    m_threadState = created;
+    PyEval_RestoreThread(m_threadState);
+    m_invokerOwnsGil = true;
+    assert(PyRun_SimpleString("import time, threading, io, os\ntime.sleep(0.001)\n") == 0);
+    assert(PyThreadState_Get() == m_threadState);
+    PyGC_Collect();
+    PyDict_Clear(PyImport_GetModuleDict());
+    PyGC_Collect();
+    PyErr_Clear();
+    Py_EndInterpreter(m_threadState);
+    PyThreadState_Swap(m_mainThreadState);
+    PyThreadState_Clear(m_mainThreadState);
+    PyThreadState_DeleteCurrent();
+    m_mainThreadState = nullptr;
+    m_threadState = nullptr;
+    m_invokerOwnsGil = false;
+  }
+};
+
+int main(int argc, char* argv[])
+{
+  assert(argc == 3);
+  const std::string mode(argv[1]);
+  assert(mode == "stock" || mode == "hooked" || mode == "ledger_hold");
+  std::wstring python_path;
+  for (const unsigned char byte : std::string(argv[2]))
+    python_path += byte;
+  Py_SetPath(python_path.c_str());
+  Py_DontWriteBytecodeFlag = 1;
+  Py_OptimizeFlag = 1;
+  Py_Initialize();
+  assert(std::strncmp(Py_GetVersion(), "3.11.7", 6) == 0);
+  main_state = PyThreadState_Get();
+  if (mode != "stock")
+  {
+    assert(PySys_AddAuditHook(InfinityPythonPersistence::Audit, nullptr) == 0);
+    install_exact_fileio_hooks();
+  }
+  assert(PySys_AddAuditHook(audit_control, nullptr) == 0);
+  main_state = PyEval_SaveThread();
+  observed_ledger = Ledger::Get().mutex.native_handle();
+  Trace::hostInfinity = true;
+  constexpr int workers = 8;
+  const int rounds = mode == "ledger_hold" ? 1 : 32;
+  std::barrier gate(workers);
+  std::vector<std::thread> threads;
+  std::thread locker;
+  if (mode == "ledger_hold")
+  {
+    locker = std::thread([] {
+      auto state = hold_phase.load(std::memory_order_acquire);
+      while (!state)
+      {
+        hold_phase.wait(state);
+        state = hold_phase.load(std::memory_order_acquire);
+      }
+      {
+        std::lock_guard<std::mutex> lock(Ledger::Get().mutex);
+        hold_phase.store(2, std::memory_order_release);
+        hold_phase.notify_one();
+        std::this_thread::sleep_for(350ms);
+      }
+    });
+  }
+  for (int worker = 0; worker < workers; ++worker)
+  {
+    threads.emplace_back([&, worker] {
+      gate.arrive_and_wait();
+      for (int round = 0; round < rounds; ++round)
+      {
+        trigger_hold = mode == "ledger_hold" && worker == 0;
+        Invoker invoker{worker * rounds + round};
+        invoker.Exercise();
+      }
+    });
+  }
+  for (auto& thread : threads)
+    thread.join();
+  if (locker.joinable())
+    locker.join();
+
+  std::map<int, uint64_t> enter, leave;
+  const auto drain = [&](const Trace::Event& event, const char*) {
+    if (event.stage == Trace::Stage::InterpreterCreate)
+      enter.at(event.invoker) = event.monotonicUs;
+    if (event.stage == Trace::Stage::InterpreterReturned && event.value == 1)
+      leave.at(event.invoker) = event.monotonicUs;
+  };
+  for (int index = 0; index < workers * rounds; ++index)
+  {
+    enter.emplace(index, 0);
+    leave.emplace(index, 0);
+  }
+  while (Trace::drained < Trace::next.load())
+    Trace::Drain(drain);
+  assert(Trace::dropped.load() == 0);
+  assert(audit_creates.load() == static_cast<unsigned>(workers * rounds));
+  uint64_t maximum = 0;
+  for (const auto& [id, start] : enter)
+  {
+    assert(start && leave.at(id) >= start);
+    maximum = std::max(maximum, leave.at(id) - start);
+  }
+  assert(mode == "stock" ? Ledger::Get().protection.nextOperation == 0
+                         : Ledger::Get().protection.nextOperation >= static_cast<uint64_t>(2 * workers * rounds));
+  assert(Ledger::Get().protection.operations.empty());
+  if (mode == "ledger_hold")
+    assert(leave.at(0) - enter.at(0) >= 340000);
+  std::printf("{\"mode\":\"%s\",\"created_and_retired\":%d,\"max_create_us\":%llu,"
+              "\"first_create_us\":%llu,\"ledger_completed_tokens\":%llu,"
+              "\"trace_overflow\":false}\n", mode.c_str(), workers * rounds,
+              static_cast<unsigned long long>(maximum),
+              static_cast<unsigned long long>(leave.at(0) - enter.at(0)),
+              static_cast<unsigned long long>(Ledger::Get().protection.nextOperation));
+  PyEval_RestoreThread(main_state);
+  assert(Py_FinalizeEx() == 0);
+}

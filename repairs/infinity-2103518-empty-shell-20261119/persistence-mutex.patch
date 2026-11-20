@@ -1,0 +1,487 @@
+diff --git a/xbmc/interfaces/python/InfinityPythonPersistence.h b/xbmc/interfaces/python/InfinityPythonPersistence.h
+index 1694ba94ab897d28145d1698a86549aa2da5966e..a7c11b93c32f293253120d927712fefa02916f2f 100644
+--- a/xbmc/interfaces/python/InfinityPythonPersistence.h
++++ b/xbmc/interfaces/python/InfinityPythonPersistence.h
+@@ -631 +631 @@ inline int Audit(const char* event,PyObject* args,void*)
+-    auto& ledger=InfinityScriptPersistence::Get();std::lock_guard<std::mutex> lock(ledger.mutex);
++    auto& ledger=InfinityScriptPersistence::Get();InfinityPersistenceWaitTrace::Guard lock(ledger.mutex, InfinityPersistenceWaitTrace::Site::PythonObserver, __LINE__);
+@@ -970 +970 @@ inline PyObject* CheckedVfsWrite(PyObject* self, PyObject* args)
+-    std::lock_guard<std::mutex> lock(state.mutex);
++    InfinityPersistenceWaitTrace::Guard lock(state.mutex, InfinityPersistenceWaitTrace::Site::PythonObserver, __LINE__);
+@@ -1005 +1005 @@ inline PyObject* CheckedVfsWrite(PyObject* self, PyObject* args)
+-    std::lock_guard<std::mutex> lock(state.mutex);
++    InfinityPersistenceWaitTrace::Guard lock(state.mutex, InfinityPersistenceWaitTrace::Site::PythonObserver, __LINE__);
+diff --git a/xbmc/interfaces/python/PythonInvoker.cpp b/xbmc/interfaces/python/PythonInvoker.cpp
+index 0976bc1edefd804803c66cf7cc090c58a59a1071..d7414d289f4d8041543ecee690e9b4abf527c8bd 100644
+--- a/xbmc/interfaces/python/PythonInvoker.cpp
++++ b/xbmc/interfaces/python/PythonInvoker.cpp
+@@ -289,0 +290 @@ bool CPythonInvoker::execute(const std::string& script, std::vector<std::wstring
++      InfinityPersistenceWaitTrace::StartObserver();
+diff --git a/xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h b/xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h
+new file mode 100644
+index 0000000000000000000000000000000000000000..3f302477c0b029e6fecfcfd8e560297123b7c810
+--- /dev/null
++++ b/xbmc/platform/android/activity/InfinityPersistenceWaitTrace.h
+@@ -0,0 +1,317 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#pragma once
++
++#include <mutex>
++
++#if defined(TARGET_ANDROID) || defined(INFINITY_PERSISTENCE_WAIT_TRACE_HOST)
++#include "interfaces/generic/InfinityStartupTrace.h"
++#include <atomic>
++#include <cerrno>
++#include <cstdint>
++#include <pthread.h>
++#include <time.h>
++#ifdef TARGET_ANDROID
++#include <android/log.h>
++#endif
++#endif
++
++namespace InfinityPersistenceWaitTrace __attribute__((visibility("hidden")))
++{
++enum class Site : unsigned { Ledger = 1, ProtectedWrite, PythonObserver };
++
++#if defined(TARGET_ANDROID) || defined(INFINITY_PERSISTENCE_WAIT_TRACE_HOST)
++using Number = unsigned long long;
++constexpr unsigned WAIT_SLOTS = 128;
++constexpr unsigned COMPLETED_SLOTS = 128;
++constexpr Number SLOW_US = 100000;
++constexpr Number RESAMPLE_US = 2000000;
++constexpr unsigned SAMPLE_LIMIT = 1024;
++static_assert(std::atomic<Number>::is_always_lock_free &&
++              std::atomic<unsigned>::is_always_lock_free);
++
++struct Ticket
++{
++  Number id{0}, started{0};
++  unsigned tid{0}, site{0}, line{0};
++};
++
++struct WaitSlot
++{
++  // 0 is free, 1 is reserved, and each published value is a unique ticket.
++  std::atomic<Number> id{0}, started{0};
++  std::atomic<unsigned> tid{0}, site{0}, line{0};
++};
++
++struct Ownership
++{
++  // Only threads holding the original mutex publish ownership updates.
++  std::atomic<Number> version{0}, id{0}, acquired{0};
++  std::atomic<unsigned> tid{0}, site{0}, line{0};
++};
++
++struct Completion
++{
++  Ticket ticket;
++  Number acquired, released;
++};
++
++struct CompletionSlot
++{
++  // Writers publish complete records with release. The sampler frees a
++  // record only after copying it and never blocks a writer on a full slot.
++  std::atomic<unsigned> state{0};
++  Completion record{};
++};
++
++inline WaitSlot waits[WAIT_SLOTS];
++inline CompletionSlot completions[COMPLETED_SLOTS];
++inline Ownership owner;
++inline std::atomic<Number> nextId{2}, nextCompletion{0}, lostWait{0}, lostCompletion{0};
++inline std::atomic<bool> started{false};
++
++inline Number Now() noexcept { return InfinityStartupTrace::Now(); }
++inline unsigned Tid() noexcept { return static_cast<unsigned>(::syscall(SYS_gettid)); }
++
++inline bool PublishWait(const Ticket& ticket) noexcept
++{
++  auto& slot = waits[ticket.id % WAIT_SLOTS];
++  Number free = 0;
++  if (!slot.id.compare_exchange_strong(free, 1))
++  {
++    ++lostWait;
++    return false;
++  }
++  slot.started.store(ticket.started);
++  slot.tid.store(ticket.tid);
++  slot.site.store(ticket.site);
++  slot.line.store(ticket.line);
++  slot.id.store(ticket.id);
++  return true;
++}
++
++inline void PublishOwner(const Ticket& ticket, Number acquired) noexcept
++{
++  ++owner.version;
++  owner.id.store(ticket.id);
++  owner.tid.store(ticket.tid);
++  owner.site.store(ticket.site);
++  owner.line.store(ticket.line);
++  owner.acquired.store(acquired);
++  ++owner.version;
++}
++
++inline void PublishCompletion(const Completion& record) noexcept
++{
++  auto& slot = completions[nextCompletion.fetch_add(1, std::memory_order_relaxed) % COMPLETED_SLOTS];
++  unsigned free = 0;
++  if (!slot.state.compare_exchange_strong(free, 1))
++  {
++    ++lostCompletion;
++    return;
++  }
++  slot.record = record;
++  slot.state.store(2, std::memory_order_release);
++}
++
++struct PendingWait
++{
++  Ticket waiter;
++  Ticket holder;
++  Number observed;
++};
++
++inline bool ReadWait(const WaitSlot& slot, PendingWait& sample, Number now) noexcept
++{
++  const auto id = slot.id.load();
++  if (id < 2)
++    return false;
++  const Ticket waiter{id, slot.started.load(), slot.tid.load(), slot.site.load(), slot.line.load()};
++  if (now < waiter.started || now - waiter.started < SLOW_US)
++    return false;
++  const auto version = owner.version.load();
++  if (version & 1)
++    return false;
++  const Ticket holder{owner.id.load(), owner.acquired.load(), owner.tid.load(),
++                      owner.site.load(), owner.line.load()};
++  // Match the attempt, since a reentrant wait can have the same native TID
++  // as the holder. A holder that arrived after the sample time is deferred.
++  if (holder.id == waiter.id || holder.started > now ||
++      owner.version.load() != version || slot.id.load() != id)
++    return false;
++  sample = {waiter, holder, now};
++  return true;
++}
++
++class Guard
++{
++public:
++  Guard(std::mutex& mutex, Site site, unsigned line) : m_mutex(mutex)
++  {
++    const int entryErrno = errno;
++    if (InfinityStartupTrace::Enabled())
++    {
++      m_ticket = {nextId.fetch_add(1, std::memory_order_relaxed), Now(), Tid(),
++                  static_cast<unsigned>(site), line};
++      m_published = PublishWait(m_ticket);
++    }
++    errno = entryErrno;
++    try
++    {
++      m_mutex.lock();
++    }
++    catch (...)
++    {
++      ClearWait();
++      throw;
++    }
++    const int lockedErrno = errno;
++    if (m_ticket.id)
++    {
++      m_acquired = Now();
++      PublishOwner(m_ticket, m_acquired);
++      ClearWait();
++    }
++    errno = lockedErrno;
++  }
++
++  ~Guard()
++  {
++    const int entryErrno = errno;
++    if (m_ticket.id)
++      PublishOwner({}, 0);
++    errno = entryErrno;
++    m_mutex.unlock();
++    const int unlockedErrno = errno;
++    if (m_ticket.id)
++    {
++      const auto released = Now();
++      if (released - m_ticket.started >= SLOW_US)
++        PublishCompletion({m_ticket, m_acquired, released});
++    }
++    errno = unlockedErrno;
++  }
++
++  Guard(const Guard&) = delete;
++  Guard& operator=(const Guard&) = delete;
++
++private:
++  void ClearWait() noexcept
++  {
++    if (m_published)
++      waits[m_ticket.id % WAIT_SLOTS].id.store(0);
++  }
++
++  std::mutex& m_mutex;
++  Ticket m_ticket;
++  Number m_acquired{0};
++  bool m_published{false};
++};
++
++#ifdef TARGET_ANDROID
++inline void* Observe(void*) noexcept
++{
++  constexpr char tag[] = "InfinityPersistenceMutex";
++  Number sampleId[WAIT_SLOTS]{}, sampleOwner[WAIT_SLOTS]{}, sampleTime[WAIT_SLOTS]{};
++  Number count = 0, limitLoss = 0, logLoss = 0;
++  Number lastWaitLoss = 0, lastCompletionLoss = 0, lastLimitLoss = 0, lastLogLoss = 0;
++  const Number deadline = Now() + 1200000000ULL;
++  if (__android_log_print(ANDROID_LOG_INFO, tag, "phase=observer_start") < 0)
++    ++logLoss;
++  do
++  {
++    const auto now = Now();
++    for (unsigned i = 0; i < WAIT_SLOTS; ++i)
++    {
++      PendingWait sample{};
++      if (!ReadWait(waits[i], sample, now) ||
++          (sampleId[i] == sample.waiter.id && sampleOwner[i] == sample.holder.id &&
++           now - sampleTime[i] < RESAMPLE_US))
++        continue;
++      sampleId[i] = sample.waiter.id;
++      sampleOwner[i] = sample.holder.id;
++      sampleTime[i] = now;
++      if (count++ >= SAMPLE_LIMIT)
++      {
++        ++limitLoss;
++        continue;
++      }
++      if (__android_log_print(ANDROID_LOG_INFO, tag,
++          "phase=waiting ticket=%llu tid=%u site=%u line=%u started_us=%llu observed_us=%llu wait_us=%llu "
++          "owner_ticket=%llu owner_tid=%u owner_site=%u owner_line=%u acquired_us=%llu",
++          sample.waiter.id, sample.waiter.tid, sample.waiter.site, sample.waiter.line,
++          sample.waiter.started, sample.observed, sample.observed - sample.waiter.started,
++          sample.holder.id, sample.holder.tid, sample.holder.site, sample.holder.line,
++          sample.holder.started) < 0)
++        ++logLoss;
++    }
++    for (auto& slot : completions)
++    {
++      if (slot.state.load(std::memory_order_acquire) != 2)
++        continue;
++      const auto record = slot.record;
++      slot.state.store(0, std::memory_order_release);
++      if (count++ >= SAMPLE_LIMIT)
++      {
++        ++limitLoss;
++        continue;
++      }
++      if (__android_log_print(ANDROID_LOG_INFO, tag,
++          "phase=completed ticket=%llu tid=%u site=%u line=%u started_us=%llu acquired_us=%llu "
++          "released_us=%llu wait_us=%llu",
++          record.ticket.id, record.ticket.tid, record.ticket.site, record.ticket.line,
++          record.ticket.started, record.acquired, record.released,
++          record.acquired - record.ticket.started) < 0)
++        ++logLoss;
++    }
++    const auto waitLoss = lostWait.load(), completionLoss = lostCompletion.load();
++    if (waitLoss != lastWaitLoss || completionLoss != lastCompletionLoss ||
++        limitLoss != lastLimitLoss || logLoss != lastLogLoss)
++    {
++      lastWaitLoss = waitLoss;
++      lastCompletionLoss = completionLoss;
++      lastLimitLoss = limitLoss;
++      lastLogLoss = logLoss;
++      if (__android_log_print(ANDROID_LOG_WARN, tag,
++          "phase=loss wait_slots=%llu completion_slots=%llu sample_limit=%llu log_writes=%llu",
++          waitLoss, completionLoss, limitLoss, logLoss) < 0)
++        ++logLoss;
++    }
++    timespec pause{0, 100000000};
++    nanosleep(&pause, nullptr);
++  } while (Now() < deadline);
++  __android_log_print(ANDROID_LOG_INFO, tag, "phase=observer_end");
++  return nullptr;
++}
++
++inline void StartObserver() noexcept
++{
++  if (!InfinityStartupTrace::Enabled() || started.exchange(true))
++    return;
++  const int savedErrno = errno;
++  pthread_attr_t attr;
++  int error = pthread_attr_init(&attr);
++  if (!error)
++  {
++    error = pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
++    pthread_t thread;
++    if (!error)
++      error = pthread_create(&thread, &attr, Observe, nullptr);
++    pthread_attr_destroy(&attr);
++  }
++  if (error)
++    __android_log_print(ANDROID_LOG_WARN, "InfinityPersistenceMutex",
++                        "phase=observer_start_failed result=%d", error);
++  errno = savedErrno;
++}
++#else
++inline void StartObserver() noexcept {}
++#endif
++#else
++class Guard : private std::lock_guard<std::mutex>
++{
++public:
++  Guard(std::mutex& mutex, Site, unsigned) : std::lock_guard<std::mutex>(mutex) {}
++};
++inline void StartObserver() noexcept {}
++#endif
++} // namespace InfinityPersistenceWaitTrace
+diff --git a/xbmc/platform/android/activity/InfinityProtectedWrites.h b/xbmc/platform/android/activity/InfinityProtectedWrites.h
+index 44d0fd121d8af2256f70823f81aaf6997415766a..b942036bc8bc5f13d846e6634c8e0ffd5469ce69 100644
+--- a/xbmc/platform/android/activity/InfinityProtectedWrites.h
++++ b/xbmc/platform/android/activity/InfinityProtectedWrites.h
+@@ -60 +60 @@ inline std::string VerifiedVfsWriteFailureTarget(int writer,
+-  std::lock_guard<std::mutex> lock(state.mutex);
++  InfinityPersistenceWaitTrace::Guard lock(state.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -115 +115 @@ inline void ProtectionFailure(const std::string& reason)
+-{ auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); ProtectionFailureLocked(s.protection, reason); }
++{ auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); ProtectionFailureLocked(s.protection, reason); }
+@@ -117 +117 @@ inline void RegisterParticipant(int id)
+-{ auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); s.protection.participants.insert(id); }
++{ auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); s.protection.participants.insert(id); }
+@@ -119 +119 @@ inline bool WriteProtectionActive()
+-{ auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); return s.protection.phase != 0; }
++{ auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); return s.protection.phase != 0; }
+@@ -126 +126 @@ inline bool RejectOpaqueMutation(const std::string& operation)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -135 +135 @@ inline void InvalidateDescriptor(int descriptor, uint64_t except = 0)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -143 +143 @@ inline void InvalidateDescriptorRange(int first, int last)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -152 +152 @@ inline void RememberAlias(const std::string& from, const std::string& to)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); auto& p = s.protection;
+@@ -181 +181 @@ inline std::string NamespaceFailureEvidence(const std::string& path,int error)
+-  auto& state=Get();std::lock_guard<std::mutex> lock(state.mutex);
++  auto& state=Get();InfinityPersistenceWaitTrace::Guard lock(state.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -201 +201 @@ inline uint64_t BeginProtectedOperation(int id, const std::vector<std::string>&
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -285 +285 @@ inline void EndProtectedOperation(uint64_t token)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -328 +328 @@ inline void BindProtectedChild(uint64_t token, int pid)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -357 +357 @@ inline void RecordProtectedResult(uint64_t token, const std::string& path)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -370 +370 @@ inline void RequireProtectedIdentity(uint64_t token)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -379 +379 @@ inline bool ProtectActualTargets(uint64_t owner, const std::vector<std::string>&
+-    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++    auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -390 +390 @@ inline bool ProtectActualTargets(uint64_t owner, const std::vector<std::string>&
+-    auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++    auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -466 +466 @@ inline bool VerifiedBufferNamespaceTransition(int writer,const std::string& key,
+-  auto& state=Get();std::lock_guard<std::mutex> lock(state.mutex);
++  auto& state=Get();InfinityPersistenceWaitTrace::Guard lock(state.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -497 +497 @@ inline void SetProtectedBuffer(int writer, const std::string& key,
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); auto& p = s.protection;
+@@ -506 +506 @@ inline void SetProtectedTransaction(const std::string& key, const std::string& p
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); auto& p = s.protection;
+@@ -514 +514 @@ inline bool HasProtectedTransaction(const std::string& path)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -522 +522 @@ inline bool BeginWriteProtection(uint64_t generation, const std::vector<std::str
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); auto& p = s.protection;
+@@ -542 +542 @@ inline bool CloseParticipantWrites(uint64_t generation)
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); auto& p = s.protection;
+@@ -633 +633 @@ inline EssentialWriteProof EssentialWrites()
+-{ auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex); return EssentialWritesLocked(s); }
++{ auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); return EssentialWritesLocked(s); }
+@@ -637 +637 @@ inline size_t ActiveProtectedResources()
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -649 +649 @@ inline size_t OptionalUnfinishedWriters()
+-  auto& s = Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s = Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -753 +753 @@ inline void RecordRemovedNamespace(uint64_t token)
+-  std::lock_guard<std::mutex> lock(state.mutex);
++  InfinityPersistenceWaitTrace::Guard lock(state.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+@@ -880 +880 @@ inline bool SealEssentialWrites(uint64_t generation)
+-    std::lock_guard<std::mutex> lock(s.mutex); auto& p = s.protection;
++    InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__); auto& p = s.protection;
+@@ -896 +896 @@ inline bool SealEssentialWrites(uint64_t generation)
+-  std::lock_guard<std::mutex> lock(s.mutex);
++  InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::ProtectedWrite, __LINE__);
+diff --git a/xbmc/platform/android/activity/InfinityScriptPersistence.h b/xbmc/platform/android/activity/InfinityScriptPersistence.h
+index 90911c3678b4ba1420c9ca8a327f9a4ec0f622fc..5caa92ab8307434e4aa31acd977eb8e56c9f3fd0 100644
+--- a/xbmc/platform/android/activity/InfinityScriptPersistence.h
++++ b/xbmc/platform/android/activity/InfinityScriptPersistence.h
+@@ -1,0 +2 @@
++#include "InfinityPersistenceWaitTrace.h"
+@@ -156 +157 @@ inline void Admit(int id, const std::string& name)
+-  auto& s=Get(); std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get(); InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -175 +176 @@ inline bool InitializationProgress(int id, const char* stage, uint64_t interpret
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -192 +193 @@ inline bool Pending(int id)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.writers.count(id)!=0;
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);return s.writers.count(id)!=0;
+@@ -196 +197 @@ inline void Observed(int id)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -202 +203 @@ inline void Fail(int id, const std::string& reason, const std::string& detail={}
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -238 +239 @@ inline void Touch(int id,const std::string& path,bool present=true,bool director
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -276 +277 @@ inline void SQLiteCompanions(int id,const std::string& path)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -293 +294 @@ inline void Retired(int id)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -321 +322 @@ inline bool AdvisoryInterpreterRetirement(int id, const std::string& reason)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -329 +330 @@ inline bool TakeInterpreterRetirement(int id)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -334 +335 @@ inline bool DurableRetirement(const std::string& name)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -340 +341 @@ inline bool BlockedRetirement(const std::string& name)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -345 +346 @@ inline std::string Failure()
+-{auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);return s.failure;}
++{auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);return s.failure;}
+@@ -371 +372 @@ inline Evidence Snapshot()
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);Evidence result;
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);Evidence result;
+@@ -461 +462 @@ inline void CommitWorker(std::map<std::string,Namespace> paths)
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -472 +473 @@ inline bool PollInventory()
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);
+@@ -490 +491 @@ inline bool PollCommit()
+-  auto& s=Get();std::lock_guard<std::mutex> lock(s.mutex);
++  auto& s=Get();InfinityPersistenceWaitTrace::Guard lock(s.mutex, InfinityPersistenceWaitTrace::Site::Ledger, __LINE__);

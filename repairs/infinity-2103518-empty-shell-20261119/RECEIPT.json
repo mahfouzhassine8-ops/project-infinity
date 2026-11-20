@@ -1,0 +1,104 @@
+{
+  "signed_qa_SHA256": "9bfb4c87bc2536a2b806fa995866fd719345fcd575c180aeba93eb02c4303f54",
+  "engine_SHA256": "c0c5e871380a5c4d7bf2842ffcfa84614068a8a68c4b15d31e2b87ab0ad5dc20",
+  "native_source_sha256": {
+    "xbmc/interfaces/python/PythonInvoker.cpp": "72d302f697b87d4229eb39beeef6a6857a83499d94331150090697ed10d32c51",
+    "xbmc/interfaces/generic/InfinityStartupTrace.h": "5f3694463d70bb262b8f16ccd486ecf26f42e1e0e7595bd9bcdefdbc997363a9",
+    "xbmc/interfaces/python/InfinityPythonPersistence.h": "c7e7e758a3496c32b82b8948c0b8de00409a492e2f0c98996a6f9b74d6fdda06",
+    "xbmc/interfaces/python/InfinityPythonWriteHooks.h": "755417f20304c2bfe6300feb3813dc7538c264ea8bf7e6d1ddba60e33034b6a1",
+    "xbmc/interfaces/python/InfinityPythonPersistenceSource.h": "d627ea33fbe4ed6de8bbc5e735dd7c0ba88bd97950c64d9007df0bd5b4c6d05b",
+    "xbmc/interfaces/python/InfinityReadonlyPlatformCommand.h": "2a4db9c5a1c59e1c44647fde2b28b64e90743ce112a015bb7e83fc5874da30b2",
+    "xbmc/platform/android/activity/InfinityScriptPersistence.h": "12e26e9ee008ec65b3def04e7dc0919ff66a0d1a2d1f22cc220d83c393f7c67e",
+    "xbmc/platform/android/activity/InfinityProtectedWrites.h": "bcd235ab97e38cd09c768a47488a14106208ff9ba1ac5da550864f2aaaa757ac",
+    "xbmc/dbwrappers/InfinitySQLiteVFS.h": "a0158e25d5105c17e9578ba1eac688fb06848c1c2ec78c68ecc10e5a593d0399",
+    "xbmc/interfaces/python/InfinityPythonCryptoContract.h": "d207e194c98d27212937defc0f4403ce8073bf4c73f6aef9e9cc4369fae4e3f0",
+    "xbmc/platform/android/activity/InfinityInstalledModules.h": "8b7be4b30ca05c39c9f8c4e8d4603da5fe6a0f1610d317a9d0419f73d4800cb7"
+  },
+  "CPython": "3.11.7",
+  "host": [
+    {
+      "mode": "stock",
+      "created_and_retired": 256,
+      "max_create_us": 392976,
+      "first_create_us": 148914,
+      "ledger_completed_tokens": 0,
+      "trace_overflow": false
+    },
+    {
+      "mode": "hooked",
+      "created_and_retired": 256,
+      "max_create_us": 401318,
+      "first_create_us": 131992,
+      "ledger_completed_tokens": 512,
+      "trace_overflow": false
+    },
+    {
+      "mode": "ledger_hold",
+      "created_and_retired": 8,
+      "max_create_us": 722480,
+      "first_create_us": 629218,
+      "ledger_completed_tokens": 16,
+      "trace_overflow": false
+    }
+  ],
+  "venue": "Linux x86_64 host, exact call boundary and FileIO hook, controlled native lock hold",
+  "symbolized_ledger_hold_control": {
+    "mode": "ledger_hold",
+    "created_and_retired": 8,
+    "max_create_us": 594015,
+    "first_create_us": 594015,
+    "ledger_completed_tokens": 16,
+    "trace_overflow": false
+  },
+  "symbolized_call_sequence": [
+    "Py_NewInterpreter",
+    "new_interpreter",
+    "init_sys_streams",
+    "create_stdio",
+    "_io_open_impl",
+    "InfinityPythonWriteHooks::RawInitialize",
+    "InfinityPythonWriteHooks::Call",
+    "InfinityScriptPersistence::BeginProtectedOperation",
+    "pthread_mutex_lock"
+  ],
+  "android17": {
+    "run": 44546288895,
+    "artifact": 14539869383,
+    "passed": 48,
+    "adjacent_overlap": 5,
+    "legacy_resume_hub_warning_reproduced": true,
+    "trace_overflow": false,
+    "max_create_us": 6650729,
+    "owner_profile_used": false,
+    "physical_Fold_incident_reproduced": false
+  },
+  "fold_root_cause": "UNCONFIRMED",
+  "production_mutations": [],
+  "new_APK": false,
+  "reproducer_verified": [
+    {
+      "mode": "stock",
+      "created_and_retired": 256,
+      "max_create_us": 403683,
+      "first_create_us": 134261,
+      "ledger_completed_tokens": 0,
+      "trace_overflow": false
+    },
+    {
+      "mode": "hooked",
+      "created_and_retired": 256,
+      "max_create_us": 460077,
+      "first_create_us": 124554,
+      "ledger_completed_tokens": 512,
+      "trace_overflow": false
+    },
+    {
+      "mode": "ledger_hold",
+      "created_and_retired": 8,
+      "max_create_us": 555367,
+      "first_create_us": 555367,
+      "ledger_completed_tokens": 16,
+      "trace_overflow": false
+    }
+  ]
+}

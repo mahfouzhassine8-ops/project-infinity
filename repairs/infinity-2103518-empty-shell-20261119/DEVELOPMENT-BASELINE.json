@@ -1,0 +1,63 @@
+{
+  "development_baseline": {
+    "certificate_sha256": "d7adeb68e9341596a02bd3262b737a0f45fc6e771ed7e60285437e833b58c6d7",
+    "command_center": {
+      "diagnostic_dispatch_sha256": "addb226b114adeb884557a8ef9eeb25ee112ef3b4298b82f0d6bb4a3d6958cb0",
+      "resolver_sha256": "c741ed05cfb1692a9b3e5f33a39595127da5cab36b5691e70ecb6ff7d30b221b",
+      "saved_navigation_sha256": "075cb9d5c51d483b79da51f499e8336d4100fb984d45473a78027d5a0c1f12f5",
+      "verified_payload_members": 67
+    },
+    "complete_release_authority": {
+      "commit": "497981978f880eea79fbc4a5dcd308c7725590e8",
+      "path": "repairs/dual-experience-isolation-2103420/release-authority.json",
+      "payload_entries": 17947,
+      "sha256": "ffe6b5e069d13febf8e56ca96be6797882c444b7df7ec0d83cde18e85eba357c"
+    },
+    "fold_acceptance": "REJECTED_BOTH_FEATURES",
+    "native_source": {
+      "artifact": {
+        "digest": "sha256:cd54bcde97d4983ef655084c5459792cc39589fbd5e1509ed8a71a0bb1668142",
+        "id": 14548338308,
+        "name": "Infinity518-Mutex-Native-Evidence-44553739418-NO-INSTALLER",
+        "run": 44553739418,
+        "size_in_bytes": 16957452,
+        "source": "2f78bcfa9fe5bec39abb34c422ac18246207cdc2"
+      },
+      "engine_sha256": "7a8600bd9279d708a7530aaf82dcbb2f295cf28a061635096f6d92a4e7ffca91",
+      "manifest_member": "NATIVE-SOURCE-MAP.json",
+      "manifest_sha256": "84ab116a2c8c0b558d1b4a6ef698dfbbd74bca707c4407d3d860343d69b27072",
+      "verified_source_files": 9419
+    },
+    "signed_apk": {
+      "APK_sha256": "6fde8ec9abe3bd4cf0b6a669fb39f91378d1f3bd9ae56075b97268757df3a3b6",
+      "digest": "sha256:b91a2f239f29d5ce508abba20eb6c9ebbee21d2c7364c94a13762b4b262c26aa",
+      "id": 14550142697,
+      "name": "Infinity518-Mutex-OriginalSigned-44563736999-QA",
+      "run": 44563736999,
+      "size_in_bytes": 331181619,
+      "source": "497981978f880eea79fbc4a5dcd308c7725590e8",
+      "versionCode": 2103520,
+      "workflow_id": 397702717
+    },
+    "signed_receipt": {
+      "digest": "sha256:d57689f4c2dfdcf6d7f745594dae7d4dc701dff7be70407dfeeb7869c213e7ff",
+      "id": 14549957773,
+      "name": "Infinity518-Mutex-Signed-Evidence-44563736999",
+      "run": 44563736999,
+      "size_in_bytes": 3521,
+      "source": "497981978f880eea79fbc4a5dcd308c7725590e8"
+    },
+    "versionCode": 2103520
+  },
+  "fold_terminal_evidence": "PENDING_DEVICE_CONNECTION_OR_EXISTING_FILTERED_CAPTURE",
+  "historical_recovery_only": {
+    "commit": "3f79964746c37310e4baeb4f7ea6bae87f0a4380",
+    "protected_ref": "refs/heads/lock/infinity-2103514-user-approved-baseline-20261117",
+    "versionCode": 2103514
+  },
+  "retained_instrumentation": [
+    "Python interpreter milestones",
+    "persistence mutex ownership and timing",
+    "continue_navigation route decisions"
+  ]
+}
